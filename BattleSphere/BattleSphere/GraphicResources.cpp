@@ -2,18 +2,15 @@
 
 HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 {
-	m_rasterizerState = nullptr;
-	m_depthStencilView = nullptr;
-	m_backbufferRTV = nullptr;
-	m_samplerState = nullptr;
-
 	HWND wndHandle = initWindow(hInstance);
-	DirectX::createDirect3DContext(wndHandle);
+	DX::createDirect3DContext(wndHandle);
 
 	createDepthStencil();
 	setRasterizerState();
 	setSamplerState();
 	setViewPort();
+
+	return wndHandle;
 }
 
 HWND GraphicResources::initWindow(HINSTANCE hInstance)
@@ -63,7 +60,7 @@ void GraphicResources::createDepthStencil()
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
-	HRESULT hr = DirectX::getDevice()->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
+	HRESULT hr = DX::getDevice()->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDepthStencil", L"Error", MB_OK | MB_ICONERROR);
 
@@ -76,12 +73,12 @@ void GraphicResources::createDepthStencil()
 
 	// Create depth stencil state
 	ID3D11DepthStencilState* pDSState;
-	hr = DirectX::getDevice()->CreateDepthStencilState(&dsDesc, &pDSState);
+	hr = DX::getDevice()->CreateDepthStencilState(&dsDesc, &pDSState);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
 
 	// Bind depth stencil state
-	DirectX::getDeviceContext()->OMSetDepthStencilState(pDSState, 1);
+	DX::getDeviceContext()->OMSetDepthStencilState(pDSState, 1);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	ZeroMemory(&descDSV, sizeof(descDSV));
@@ -90,7 +87,7 @@ void GraphicResources::createDepthStencil()
 	descDSV.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view
-	hr = DirectX::getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthStencilView);
+	hr = DX::getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthStencilView);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
@@ -106,7 +103,7 @@ void GraphicResources::setViewPort()
 	m_viewPort.MaxDepth = 1.0f;
 	m_viewPort.TopLeftX = 0;
 	m_viewPort.TopLeftY = 0;
-	DirectX::getDeviceContext()->RSSetViewports(1, &m_viewPort);
+	DX::getDeviceContext()->RSSetViewports(1, &m_viewPort);
 }
 
 void GraphicResources::setRasterizerState()
@@ -123,7 +120,7 @@ void GraphicResources::setRasterizerState()
 	rasterizerDesc.MultisampleEnable = false;
 	rasterizerDesc.AntialiasedLineEnable = false;
 
-	HRESULT hr = DirectX::getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
+	HRESULT hr = DX::getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_rasterizerState", L"Error", MB_OK | MB_ICONERROR);
 }
@@ -144,7 +141,7 @@ void GraphicResources::setSamplerState()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	hr = DirectX::getDevice()->CreateSamplerState(&sampDesc, &pointClamp);
+	hr = DX::getDevice()->CreateSamplerState(&sampDesc, &pointClamp);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
 
@@ -159,15 +156,15 @@ void GraphicResources::setSamplerState()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	hr = DirectX::getDevice()->CreateSamplerState(&sampDesc, &linearWrap);
+	hr = DX::getDevice()->CreateSamplerState(&sampDesc, &linearWrap);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
 
 	// Set samplers
-	DirectX::getDeviceContext()->VSSetSamplers(0, 1, &pointClamp);
-	DirectX::getDeviceContext()->DSSetSamplers(0, 1, &pointClamp);
-	DirectX::getDeviceContext()->PSSetSamplers(0, 1, &linearWrap);
-	DirectX::getDeviceContext()->PSSetSamplers(1, 1, &pointClamp);
+	DX::getDeviceContext()->VSSetSamplers(0, 1, &pointClamp);
+	DX::getDeviceContext()->DSSetSamplers(0, 1, &pointClamp);
+	DX::getDeviceContext()->PSSetSamplers(0, 1, &linearWrap);
+	DX::getDeviceContext()->PSSetSamplers(1, 1, &pointClamp);
 	// release pointers to sampler states
 	pointClamp->Release();
 	linearWrap->Release();
@@ -175,6 +172,11 @@ void GraphicResources::setSamplerState()
 
 GraphicResources::GraphicResources()
 {
+	m_rasterizerState = nullptr;
+	m_depthStencilView = nullptr;
+	m_backbufferRTV = nullptr;
+	m_samplerState = nullptr;
+
 	m_width = 1920.0f;
 	m_height = 1080.0f;
 }

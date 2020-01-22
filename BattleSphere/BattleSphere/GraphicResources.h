@@ -1,7 +1,10 @@
 #pragma once
 //#include "assimp/scene.h"
 #include <d3d11.h>
-#include "DirectX.h"
+#include "DX.h"
+#pragma comment (lib, "d3d11.lib")
+#pragma comment (lib, "d3dcompiler.lib")
+using namespace DirectX;
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 

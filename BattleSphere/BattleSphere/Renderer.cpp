@@ -7,71 +7,76 @@
 #include <sstream>
 #include <iterator>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_win32.h"
-#include "imgui/imgui_impl_dx11.h"
-
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 
+#pragma comment (lib, "d3d11.lib")
+#pragma comment (lib, "d3dcompiler.lib")
+
 ////
 #include "GraphicResources.h"
+#include "VertexShader.h"
+#include "PixelShader.h"
+
+using namespace DirectX;
 
 GraphicResources g_graphicResources;
+
+
+//TODO Remove
+ID3D11Buffer* _vertexBuffer = nullptr;
+VertexShader gVS;
+PixelShader gPS;
+
+struct PosCol
+{
+	float x, y, z;
+	float r, g, b;
+};
+
+PosCol vertexData[3]
+{
+	0.0f, 0.5f, 0.0f,
+	1.0f, 0.0f, 0.0f,
+
+	-0.5f, -0.5f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+
+	0.5f, -0.5f, 0.0f,
+	0.0f, 1.0f, 0.0f
+};
+
+void setupTestTriangle()
+{
+	// VERTEX BUFFER
+	D3D11_BUFFER_DESC bufferDesc;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	D3D11_SUBRESOURCE_DATA data;
+
+	bufferDesc.ByteWidth = sizeof(vertexData);
+	data.pSysMem = vertexData;
+
+	HRESULT result = DX::getDevice()->CreateBuffer(&bufferDesc, &data, &_vertexBuffer);
+	if (FAILED(result))
+		MessageBox(NULL, L"ERROR _vertexBuffer in testTriangle", L"Error", MB_OK | MB_ICONERROR);
+
+	gVS = VertexShader(L"VertexShader.hlsl");
+	gPS = PixelShader(L"PixelShader.hlsl");
+}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) 
 {
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance);; // Initialize resources and return window handler
-	/*
+
 	if (wndHandle)
 	{
-		CreateDirect3DContext(wndHandle); // Skapa och koppla SwapChain, Device och Device Context
-
-		SetViewport(); // And rasterizer state
-
-		createMeshes(); // test
-		setupTextures();
-
-		createRenderTargets();
-		createShaders();
-		createShadersSP();
-		createShadersShadowMap();
-
-		createTriangleData(); //5. Definiera triangelvertiser, 6. Skapa vertex buffer, 7. Skapa input layout
-
-		samplerSetUp();
-		createConstantBuffer();
-
 		ShowWindow(wndHandle, nCmdShow);
 
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); // (void)io;
-		ImGui_ImplWin32_Init(wndHandle);
-		ImGui_ImplDX11_Init(gDevice, gDeviceContext);
-		ImGui::StyleColorsDark();
-
-		std::unique_ptr<Keyboard> keyboard;
-		std::unique_ptr<Mouse> mouse;
-		Mouse::ButtonStateTracker tracker;
-
-		keyboard = std::make_unique<Keyboard>();
-		mouse = std::make_unique<Mouse>();
-		mouse->SetWindow(wndHandle);
-		POINT cursorPos;
-		XMFLOAT3 velocity{ 0.0f, 0.0f, 0.0f };
-
-		float pitch = 0.0f;
-		float yaw = 0.0f;
-		float lastT = -1.0f;
-		LARGE_INTEGER clockFreq;
-		LARGE_INTEGER startTime;
-		LARGE_INTEGER delta;
-		LARGE_INTEGER currTime;
-		QueryPerformanceFrequency(&clockFreq);
-		QueryPerformanceCounter(&startTime);
+		setupTestTriangle();
 
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -80,145 +85,44 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			{
 				switch (msg.message)
 				{
-				case WM_KEYDOWN:
-					Keyboard::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-				case WM_KEYUP:
-					Keyboard::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-				case WM_MOUSEMOVE:
-					Mouse::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-				case WM_RBUTTONDOWN:
-					Mouse::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-				case WM_RBUTTONUP:
-					Mouse::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-				case WM_INPUT:
-					Mouse::ProcessMessage(msg.message, msg.wParam, msg.lParam);
-					break;
 				}
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
 			else
 			{
-				//Camera updates
-				//
-				//
-				QueryPerformanceCounter(&currTime);
-				delta.QuadPart = currTime.QuadPart - startTime.QuadPart;
-				float deltaSeconds = (float)delta.QuadPart / clockFreq.QuadPart;
-				startTime = currTime;
+				//TODO Ersätt med riktig render funktion eller i separata klasser
+				//RENDER
+				DX::getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+				float clearColour[3] = {0.0f, 0.0f, 0.0f};
 
-				DirectX::Mouse::State ms = mouse->GetState();
-				DirectX::Keyboard::State kb = keyboard->GetState();
+				DX::getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+				DX::getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
 
+				DX::getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
+				DX::getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+				DX::getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+				DX::getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+				DX::getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
 
-				mouse->SetMode(ms.rightButton ? Mouse::MODE_RELATIVE : Mouse::MODE_ABSOLUTE);
-				if (ms.positionMode == Mouse::MODE_RELATIVE)
-				{
+				UINT32 vertexSize = sizeof(float) * 6;
+				UINT32 offset = 0;
 
-					yaw += XMConvertToRadians(ms.x);
-					pitch += XMConvertToRadians(ms.y);
-					pitch = min(XM_PI / 2, max(-XM_PI / 2, pitch));
-					ms.x = 0;
-					ms.y = 0;
-				}
+				DX::getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+				DX::getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				DX::getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				XMMATRIX rotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
-				XMMATRIX rotationYPos = XMMatrixRotationRollPitchYaw(0.0f, yaw, 0.0f);
-
-				velocity.x = 0;
-				velocity.y = 0;
-				velocity.z = 0;
-
-				if (kb.W)
-					velocity.z += gCamera.distance * deltaSeconds;
-				if (kb.S)
-					velocity.z -= gCamera.distance * deltaSeconds;
-				if (kb.A)
-					velocity.x -= gCamera.distance * deltaSeconds;
-				if (kb.D)
-					velocity.x += gCamera.distance * deltaSeconds;
-				if (kb.Space)
-					velocity.y += gCamera.distance * deltaSeconds;
-				if (kb.LeftControl)
-					velocity.y -= gCamera.distance * deltaSeconds;
-				if (kb.Home)
-					velocity = { 0.0f, 0.0f, -2.0f };
-				if (kb.Escape)
-					msg.message = WM_QUIT;
-
-				transform(velocity, rotation, rotationYPos);
-
-				GetCursorPos(&cursorPos); // gets current cursor coordinates
-				ScreenToClient(wndHandle, &cursorPos); // sets cursor coordinates relative to the program window. upper left corner of the screen = (0,0)
-				float tempT = mousePicking(cursorPos);
-				lastT = tempT;
-
-				//
-				//
-				// RENDER //
-				gDeviceContext->RSSetState(gRasterizerState);
-				gClearColour[3] = 1.0;
-				renderShadowMap();
-
-				gDeviceContext->OMSetRenderTargets(3, gRenderTargetsDeferred, gDSV);
-				gDeviceContext->ClearDepthStencilView(gDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-				gDeviceContext->ClearRenderTargetView(gRenderTargetsDeferred[0], gClearColour);
-				gDeviceContext->ClearRenderTargetView(gRenderTargetsDeferred[1], gClearColour);
-				gDeviceContext->ClearRenderTargetView(gRenderTargetsDeferred[2], gClearColour);
-
-				renderFirstPass();
-				renderNormalMap();
-				renderBoundingVolume();
-				renderBillboard();
-
-				gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, nullptr);
-				gDeviceContext->ClearRenderTargetView(gBackbufferRTV, gClearColour);
-
-				renderSecondPass();
-
-				update(lastT, cursorPos);
-
-				gSwapChain->Present(0, 0);
-
-				ImGui::Render();
-				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+				DX::getDeviceContext()->Draw(3, 0);
 			}
 		}
 
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
+		//TODO Release
+		DX::getDevice()->Release();
+		DX::getDeviceContext()->Release();
+		DX::getSwapChain()->Release();
 
-		gVertexBufferFSQuad->Release();
-		gConstantBuffer->Release();
-		gShaderResourceDeferred[0]->Release();
-		gShaderResourceDeferred[1]->Release();
-		gShaderResourceDeferred[2]->Release();
-		gRenderTargetsDeferred[0]->Release();
-		gRenderTargetsDeferred[1]->Release();
-		gRenderTargetsDeferred[2]->Release();
-		gSamplerState->Release();
-
-		gVertexLayout->Release();
-		gVertexLayoutFSQuad->Release();
-
-		gVertexShader->Release();
-		gVertexShaderSP->Release();
-		gGeometryShader->Release();
-		gPixelShader->Release();
-		gPixelShaderSP->Release();
-		gPixelShaderBillboard->Release();
-		gGeometryShaderBillboard->Release();
-
-		gDSV->Release();
-		gBackbufferRTV->Release();
-		gSwapChain->Release();
-		gDevice->Release();
-		gDeviceContext->Release();
-		delete gPillar;
 		DestroyWindow(wndHandle);
 	}
 
 	return (int)msg.wParam;
-}*/
 }
