@@ -32,7 +32,7 @@ IDXGISwapChain* DX::getSwapChain()
 	return m_swapChain;
 }
 
-HRESULT DX::createDirect3DContext(HWND wndHandle) 
+HRESULT DX::createDirect3DContext(HWND wndHandle)
 {
 	// create a struct to hold information about the swap chain
 	DXGI_SWAP_CHAIN_DESC scd;
@@ -48,13 +48,20 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	scd.SampleDesc.Count = 1;                               // how many multisamples
 	scd.Windowed = TRUE;                                    // windowed/full-screen mode
 
-															// create a device, device context and swap chain using the information in the scd struct
+	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
+
+	UINT creationFlags = 0;
+
+#ifdef _DEBUG
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+	// create a device, device context and swap chain using the information in the scd struct
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
-		NULL,
-		NULL,
-		NULL,
+		creationFlags,
+		featureLevels,
+		ARRAYSIZE(featureLevels),
 		D3D11_SDK_VERSION,
 		&scd,
 		&m_swapChain,
@@ -62,6 +69,6 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 		NULL,
 		&m_deviceContext);
 
-	
+
 	return hr;
 }
