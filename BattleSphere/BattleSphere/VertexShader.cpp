@@ -22,7 +22,7 @@ HRESULT VertexShader::createVertexShader(LPCWSTR fileName, ID3DBlob** pVS, ID3DB
 		return result;
 	}
 
-	DX::getDevice()->CreateVertexShader((*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), nullptr, &m_vertexShader);
+	DX::getInstance()->getDevice()->CreateVertexShader((*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), nullptr, &m_vertexShader);
 	return result;
 }
 
@@ -49,13 +49,15 @@ void VertexShader::createInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
 		},
 	};
 
-	DX::getDevice()->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), (*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), &m_vertexLayout);
+	DX::getInstance()->getDevice()->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), (*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), &m_vertexLayout);
 
 	(*pVS)->Release();
 }
 
 VertexShader::VertexShader()
 {
+	m_vertexLayout = nullptr;
+	m_vertexShader = nullptr;
 }
 
 // Constructor

@@ -22,17 +22,20 @@ HRESULT PixelShader::createPixelShader(LPCWSTR fileName)
 		if (FAILED(result))
 			MessageBox(NULL, L"Error", L"Error: createPixelShader in pixelShader.cpp has failed", MB_OK | MB_ICONERROR);
 
-		return result;
+		
 	}
 
-	DX::getDevice()->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &m_pixelShader);
+	DX::getInstance()->getDevice()->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &m_pixelShader);
 
 	if (pPS) pPS->Release();
 	if (errorBlob) errorBlob->Release();
+
+	return result;
 }
 
 PixelShader::PixelShader()
 {
+	m_pixelShader = nullptr;
 }
 
 PixelShader::PixelShader(LPCWSTR fileName)

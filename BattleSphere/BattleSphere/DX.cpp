@@ -1,17 +1,29 @@
 #include "DX.h"
 
+DX* DX::m_instance = nullptr;
+
 DX::DX()
 {
+	m_device = nullptr;
+	m_deviceContext = nullptr;
+	m_swapChain = nullptr;
 }
 
-ID3D11Device* DX::getDevice() 
+DX* DX::getInstance()
+{
+	if (m_instance == nullptr)
+		m_instance = new DX();
+
+	return m_instance;
+}
+
+ID3D11Device* DX::getDevice()
 {
 	return m_device;
 }
 
 ID3D11DeviceContext* DX::getDeviceContext() 
 {
-	
 	return m_deviceContext;
 }
 
