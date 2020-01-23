@@ -95,7 +95,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//TODO Ersätt med riktig render funktion eller i separata klasser
 				//RENDER
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-				float clearColour[3] = {0.0f, 0.0f, 0.0f};
+				float clearColour[] = { 0, 0, 0, 1 };
 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
@@ -114,6 +114,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
 				DX::getInstance()->getDeviceContext()->Draw(3, 0);
+
+				DX::getInstance()->getSwapChain()->Present(0, 0);
 			}
 		}
 

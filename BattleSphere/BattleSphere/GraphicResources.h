@@ -23,6 +23,7 @@ private:
 
 	HWND initWindow(HINSTANCE hInstance);
 	void createDepthStencil();
+	void createBackBuffer();
 	void setViewPort();
 	void setRasterizerState();
 	void setSamplerState();

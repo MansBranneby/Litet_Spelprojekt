@@ -6,6 +6,7 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	DX::getInstance()->createDirect3DContext(wndHandle);
 
 	createDepthStencil();
+	createBackBuffer();
 	setRasterizerState();
 	setSamplerState();
 	setViewPort();
@@ -119,6 +120,17 @@ void GraphicResources::createDepthStencil()
 		pDSState->Release();
 }
 
+void GraphicResources::createBackBuffer()
+{
+	// get the address of the back buffer
+	ID3D11Texture2D* pBackBuffer = nullptr;
+	DX::getInstance()->getSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+
+	// use the back buffer address to create the render target
+	DX::getInstance()->getDevice()->CreateRenderTargetView(pBackBuffer, NULL, &m_backbufferRTV);
+	pBackBuffer->Release();
+}
+
 void GraphicResources::setViewPort()
 {
 	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
@@ -190,6 +202,9 @@ void GraphicResources::setSamplerState()
 
 GraphicResources::GraphicResources()
 {
+	m_width = 1920.0f;
+	m_height = 1080.0f;
+
 	m_viewPort.Width = m_width;
 	m_viewPort.Height = m_height;
 	m_viewPort.MinDepth = 0.0f;
@@ -201,9 +216,6 @@ GraphicResources::GraphicResources()
 	m_depthStencilView = nullptr;
 	m_backbufferRTV = nullptr;
 	m_samplerState = nullptr;
-
-	m_width = 1920.0f;
-	m_height = 1080.0f;
 }
 
 GraphicResources::~GraphicResources()
