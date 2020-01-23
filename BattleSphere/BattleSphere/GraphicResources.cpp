@@ -3,7 +3,7 @@
 HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 {
 	HWND wndHandle = initWindow(hInstance);
-	DX::createDirect3DContext(wndHandle);
+	DX::getInstance()->createDirect3DContext(wndHandle);
 
 	createDepthStencil();
 	setRasterizerState();
@@ -15,6 +15,9 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 
 HWND GraphicResources::initWindow(HINSTANCE hInstance)
 {
+	// TODO Not sure if it's suppose to be here
+	LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
 	WNDCLASSEX wcex = { 0 };
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -39,9 +42,27 @@ HWND GraphicResources::initWindow(HINSTANCE hInstance)
 		hInstance,
 		nullptr);
 
+	// TODO Wutface?
 	int dab = GetClientRect(handle, &rc);
 
 	return handle;
+}
+
+// TODO Not sure if it's suppose to be here
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	//// check if IMGUI can handle the message (when we click INSIDE ImGui
+	//if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+	//	return true;
+
+	switch (message)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	}
+
+	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 void GraphicResources::createDepthStencil()
@@ -49,8 +70,8 @@ void GraphicResources::createDepthStencil()
 	ID3D11Texture2D* pDepthStencil = NULL;
 	D3D11_TEXTURE2D_DESC descDepth;
 	ZeroMemory(&descDepth, sizeof(descDepth));
-	descDepth.Width = m_width;
-	descDepth.Height = m_height;
+	descDepth.Width = (UINT)m_width;
+	descDepth.Height = (UINT)m_height;
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -60,7 +81,7 @@ void GraphicResources::createDepthStencil()
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
-	HRESULT hr = DX::getDevice()->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
+	HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDepthStencil", L"Error", MB_OK | MB_ICONERROR);
 
@@ -73,12 +94,12 @@ void GraphicResources::createDepthStencil()
 
 	// Create depth stencil state
 	ID3D11DepthStencilState* pDSState;
-	hr = DX::getDevice()->CreateDepthStencilState(&dsDesc, &pDSState);
+	hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &pDSState);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
 
 	// Bind depth stencil state
-	DX::getDeviceContext()->OMSetDepthStencilState(pDSState, 1);
+	DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(pDSState, 1);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	ZeroMemory(&descDSV, sizeof(descDSV));
@@ -87,23 +108,20 @@ void GraphicResources::createDepthStencil()
 	descDSV.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view
-	hr = DX::getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthStencilView);
+	if(pDepthStencil != nullptr)
+		hr = DX::getInstance()->getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthStencilView);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
-	pDepthStencil->Release();
-	pDSState->Release();
+	if(pDepthStencil != nullptr)
+		pDepthStencil->Release();
+	if(pDSState != nullptr)
+		pDSState->Release();
 }
 
 void GraphicResources::setViewPort()
 {
-	m_viewPort.Width = m_width;
-	m_viewPort.Height = m_height;
-	m_viewPort.MinDepth = 0.0f;
-	m_viewPort.MaxDepth = 1.0f;
-	m_viewPort.TopLeftX = 0;
-	m_viewPort.TopLeftY = 0;
-	DX::getDeviceContext()->RSSetViewports(1, &m_viewPort);
+	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
 }
 
 void GraphicResources::setRasterizerState()
@@ -120,7 +138,7 @@ void GraphicResources::setRasterizerState()
 	rasterizerDesc.MultisampleEnable = false;
 	rasterizerDesc.AntialiasedLineEnable = false;
 
-	HRESULT hr = DX::getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
+	HRESULT hr = DX::getInstance()->getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_rasterizerState", L"Error", MB_OK | MB_ICONERROR);
 }
@@ -141,7 +159,7 @@ void GraphicResources::setSamplerState()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	hr = DX::getDevice()->CreateSamplerState(&sampDesc, &pointClamp);
+	hr = DX::getInstance()->getDevice()->CreateSamplerState(&sampDesc, &pointClamp);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
 
@@ -156,15 +174,15 @@ void GraphicResources::setSamplerState()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	hr = DX::getDevice()->CreateSamplerState(&sampDesc, &linearWrap);
+	hr = DX::getInstance()->getDevice()->CreateSamplerState(&sampDesc, &linearWrap);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
 
 	// Set samplers
-	DX::getDeviceContext()->VSSetSamplers(0, 1, &pointClamp);
-	DX::getDeviceContext()->DSSetSamplers(0, 1, &pointClamp);
-	DX::getDeviceContext()->PSSetSamplers(0, 1, &linearWrap);
-	DX::getDeviceContext()->PSSetSamplers(1, 1, &pointClamp);
+	DX::getInstance()->getDeviceContext()->VSSetSamplers(0, 1, &pointClamp);
+	DX::getInstance()->getDeviceContext()->DSSetSamplers(0, 1, &pointClamp);
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, &linearWrap);
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(1, 1, &pointClamp);
 	// release pointers to sampler states
 	pointClamp->Release();
 	linearWrap->Release();
@@ -172,6 +190,13 @@ void GraphicResources::setSamplerState()
 
 GraphicResources::GraphicResources()
 {
+	m_viewPort.Width = m_width;
+	m_viewPort.Height = m_height;
+	m_viewPort.MinDepth = 0.0f;
+	m_viewPort.MaxDepth = 1.0f;
+	m_viewPort.TopLeftX = 0;
+	m_viewPort.TopLeftY = 0;
+
 	m_rasterizerState = nullptr;
 	m_depthStencilView = nullptr;
 	m_backbufferRTV = nullptr;

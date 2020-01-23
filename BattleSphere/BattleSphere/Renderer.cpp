@@ -59,7 +59,7 @@ void setupTestTriangle()
 	bufferDesc.ByteWidth = sizeof(vertexData);
 	data.pSysMem = vertexData;
 
-	HRESULT result = DX::getDevice()->CreateBuffer(&bufferDesc, &data, &_vertexBuffer);
+	HRESULT result = DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, &data, &_vertexBuffer);
 	if (FAILED(result))
 		MessageBox(NULL, L"ERROR _vertexBuffer in testTriangle", L"Error", MB_OK | MB_ICONERROR);
 
@@ -67,7 +67,7 @@ void setupTestTriangle()
 	gPS = PixelShader(L"PixelShader.hlsl");
 }
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) 
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance);; // Initialize resources and return window handler
@@ -83,9 +83,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		{
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
 			{
-				switch (msg.message)
-				{
-				}
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -93,36 +90,37 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			{
 				//TODO Ersätt med riktig render funktion eller i separata klasser
 				//RENDER
-				DX::getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[3] = {0.0f, 0.0f, 0.0f};
 
-				DX::getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-				DX::getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
+				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
 
-				DX::getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
-				DX::getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-				DX::getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-				DX::getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-				DX::getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
+				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+				DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+				DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
 
 				UINT32 vertexSize = sizeof(float) * 6;
 				UINT32 offset = 0;
 
-				DX::getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
-				DX::getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				DX::getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+				DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				DX::getDeviceContext()->Draw(3, 0);
+				DX::getInstance()->getDeviceContext()->Draw(3, 0);
 			}
 		}
 
 		//TODO Release
-		DX::getDevice()->Release();
-		DX::getDeviceContext()->Release();
-		DX::getSwapChain()->Release();
+		DX::getInstance()->getDevice()->Release();
+		DX::getInstance()->getDeviceContext()->Release();
+		DX::getInstance()->getSwapChain()->Release();
 
 		DestroyWindow(wndHandle);
 	}
 
 	return (int)msg.wParam;
 }
+
