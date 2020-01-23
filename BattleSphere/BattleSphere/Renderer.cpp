@@ -87,6 +87,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		{
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
 			{
+				if (msg.wParam == VK_ESCAPE)
+					msg.message = WM_QUIT;
+
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
