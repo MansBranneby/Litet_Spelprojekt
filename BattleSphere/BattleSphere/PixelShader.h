@@ -8,9 +8,12 @@ class PixelShader
 private:
 	ID3D11PixelShader* m_pixelShader;
 	HRESULT createPixelShader(LPCWSTR fileName);
+
 public:
 	PixelShader();
 	PixelShader(LPCWSTR fileName);
-
+	
 	ID3D11PixelShader& getPixelShader() const;
+	
+	void release();
 };

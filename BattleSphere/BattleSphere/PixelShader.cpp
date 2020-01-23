@@ -43,6 +43,11 @@ PixelShader::PixelShader(LPCWSTR fileName)
 	createPixelShader(fileName);
 }
 
+void PixelShader::release()
+{
+	if (m_pixelShader) m_pixelShader->Release();
+}
+
 ID3D11PixelShader& PixelShader::getPixelShader() const
 {
 	return *m_pixelShader;

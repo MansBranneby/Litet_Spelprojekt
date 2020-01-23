@@ -19,4 +19,6 @@ public:
 
 	ID3D11VertexShader& getVertexShader() const;
 	ID3D11InputLayout& getvertexLayout() const;
+
+	void release();
 };

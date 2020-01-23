@@ -21,5 +21,6 @@ public:
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
 	HRESULT createDirect3DContext(HWND wndHandle);
+	void release();
 };
 

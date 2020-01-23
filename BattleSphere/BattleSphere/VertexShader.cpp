@@ -83,3 +83,9 @@ ID3D11InputLayout& VertexShader::getvertexLayout() const
 {
 	return *m_vertexLayout;
 }
+
+void VertexShader::release()
+{
+	if (m_vertexLayout) m_vertexLayout->Release();
+	if (m_vertexShader) m_vertexShader->Release();
+}

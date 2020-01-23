@@ -123,9 +123,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		}
 
 		//TODO Release
-		DX::getInstance()->getDevice()->Release();
-		DX::getInstance()->getDeviceContext()->Release();
-		DX::getInstance()->getSwapChain()->Release();
+		_vertexBuffer->Release();
+		gVS.release();
+		gPS.release();
+		DX::getInstance()->release();
 		delete DX::getInstance();
 
 		DestroyWindow(wndHandle);

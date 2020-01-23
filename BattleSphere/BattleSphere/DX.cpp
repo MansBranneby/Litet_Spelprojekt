@@ -72,3 +72,10 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 
 	return hr;
 }
+
+void DX::release()
+{
+	getDevice()->Release();
+	getDeviceContext()->Release();
+	getSwapChain()->Release();
+}
