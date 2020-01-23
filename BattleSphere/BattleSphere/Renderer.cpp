@@ -69,8 +69,12 @@ void setupTestTriangle()
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	#define _ITERATOR_DEBUG_LEVEL 0
+	#define _HAS_ITERATOR_DEBUGGING 0
+
 	MSG msg = { 0 };
-	HWND wndHandle = g_graphicResources.initializeResources(hInstance);; // Initialize resources and return window handler
+	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 
 	if (wndHandle)
 	{
@@ -117,6 +121,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		DX::getInstance()->getDevice()->Release();
 		DX::getInstance()->getDeviceContext()->Release();
 		DX::getInstance()->getSwapChain()->Release();
+		delete DX::getInstance();
 
 		DestroyWindow(wndHandle);
 	}
