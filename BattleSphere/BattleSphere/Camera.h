@@ -1,12 +1,6 @@
 #pragma once
 
-#include <windows.h>
-#include <d3d11.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
-
-#pragma comment (lib, "d3d11.lib")
-#pragma comment (lib, "d3dcompiler.lib")
 
 #include "ConstantBuffer.h"
 
@@ -28,13 +22,15 @@ private:
 	XMMATRIX m_projection;
 	XMMATRIX m_viewProjection;
 
-	// Constant buffer
-	ConstantBuffer *m_constantBufferVP = nullptr;
+	// Constant buffers
+	ConstantBuffer* m_constantBufferVP = nullptr;
+	ConstantBuffer* m_constantBufferPosition = nullptr;
 
 public:
 	Camera(float width, float height, float nearPlane, float farPlane);
 	~Camera();
 
 	ConstantBuffer* getConstantBufferVP();
+	ConstantBuffer* getConstantBufferPosition();
 };
 

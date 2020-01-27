@@ -44,9 +44,6 @@ float DX::getHeight()
 
 HRESULT DX::createDirect3DContext(HWND wndHandle)
 {
-	m_width = 1920.0f;
-	m_height = 1080.0f;
-
 	// create a struct to hold information about the swap chain
 	DXGI_SWAP_CHAIN_DESC scd;
 

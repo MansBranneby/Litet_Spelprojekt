@@ -19,6 +19,7 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "Camera.h"
+#include "Light.h"
 
 using namespace DirectX;
 
@@ -26,7 +27,8 @@ GraphicResources g_graphicResources;
 
 
 //TODO Remove
-//Camera* g_camera;
+Camera* g_camera = nullptr;
+Light* g_light = nullptr;
 
 ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
@@ -78,9 +80,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
-	
-	// TODO: move camera to game?
-	//g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+
+	// TODO: Move camera and light to game?
+	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+	g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(0.8f, 0.1f, 0.1f, 1.0f));
 
 	if (wndHandle)
 	{
@@ -109,7 +112,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
 
-				//DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
+				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
+				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
+				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
@@ -136,7 +141,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		gPS.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
-		//delete g_camera;
+		delete g_camera;
+		delete g_light;
 
 		DestroyWindow(wndHandle);
 	}

@@ -16,8 +16,8 @@ private:
 	IDXGISwapChain* m_swapChain;
 
 	// Data
-	float m_width;
-	float m_height;
+	float m_width = 1920.0f;
+	float m_height = 1080.0f;
 
 public:
 	static DX* getInstance();
