@@ -1,5 +1,4 @@
 ﻿  BoundingVolume.cpp
   OBB.cpp
-  QuadtreeNode.cpp
   Generating Code...
-  BattleSphere.vcxproj -> C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\x64\Debug\BattleSphere.exe
+C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\BattleSphere\OBB.cpp(23): error C4716: 'OBB::intersectsWithOBB': must return a value
