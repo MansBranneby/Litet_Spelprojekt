@@ -1,4 +1,0 @@
-﻿  BoundingVolume.cpp
-  OBB.cpp
-  Generating Code...
-C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\BattleSphere\OBB.cpp(23): error C4716: 'OBB::intersectsWithOBB': must return a value
