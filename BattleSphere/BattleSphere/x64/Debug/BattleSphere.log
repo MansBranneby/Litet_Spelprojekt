@@ -1,0 +1,11 @@
+﻿  DX.cpp
+  GraphicResources.cpp
+  PixelShader.cpp
+  Renderer.cpp
+C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\BattleSphere\Renderer.cpp(73,1): warning C4005: '_ITERATOR_DEBUG_LEVEL': macro redefinition
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\yvals.h(124): message : see previous definition of '_ITERATOR_DEBUG_LEVEL'
+C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\BattleSphere\Renderer.cpp(74,1): warning C4005: '_HAS_ITERATOR_DEBUGGING': macro redefinition
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\yvals.h(103): message : see previous definition of '_HAS_ITERATOR_DEBUGGING'
+  VertexShader.cpp
+  Generating Code...
+  BattleSphere.vcxproj -> C:\Users\Glenn\source\repos\Litet_Spelprojekt\BattleSphere\x64\Debug\BattleSphere.exe
