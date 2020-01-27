@@ -15,6 +15,18 @@ cbuffer PS_CONSTANT_BUFFER : register(b1)
 	float4 cameraPos;
 };
 
+cbuffer PS_CONSTANT_BUFFER : register(b2)
+{
+	float3 Ka;
+	float illum;
+	float3 Kd;
+	float Ni;
+	float3 Ks;
+	float Ns;
+	float3 Ke;
+	float d;
+};
+
 float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//
@@ -24,7 +36,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	////Illumination models
 	//int illumModel = 2;
-
+	
 	//switch (illumModel)
 	//{
 	//case 0: // Constant colour (diffuse)

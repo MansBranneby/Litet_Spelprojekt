@@ -29,10 +29,17 @@ GraphicResources g_graphicResources;
 //TODO Remove
 Camera* g_camera = nullptr;
 Light* g_light = nullptr;
+ConstantBuffer* g_constantBufferMaterials = nullptr;
 
 ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
 PixelShader gPS;
+
+struct MaterialTest
+{
+	XMVECTOR Ka, Kd, Ks, Ke;
+};
+MaterialTest* g_materialTest = nullptr;
 
 struct PosCol
 {
@@ -70,6 +77,14 @@ void setupTestTriangle()
 
 	gVS = VertexShader(L"VertexShader.hlsl");
 	gPS = PixelShader(L"PixelShader.hlsl");
+
+	//Setup material
+	g_materialTest = new MaterialTest;
+	g_materialTest->Ka = XMVectorSet(0.1f, 0.1f, 0.1f, 2);
+	g_materialTest->Kd = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	g_materialTest->Ks = XMVectorSet(0.5f, 0.5f, 0.5f, 100.0f);
+	g_materialTest->Ke = XMVectorSet(0.5f, 0.5f, 0.5f, 100.0f);
+	g_constantBufferMaterials = new ConstantBuffer(&g_materialTest, sizeof(MaterialTest));
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -115,6 +130,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
+				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
 
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
@@ -141,8 +157,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		gPS.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
+
+		//Remove
 		delete g_camera;
 		delete g_light;
+		delete g_materialTest;
+		delete g_constantBufferMaterials;
 
 		DestroyWindow(wndHandle);
 	}
