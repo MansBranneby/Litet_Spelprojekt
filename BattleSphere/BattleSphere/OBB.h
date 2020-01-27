@@ -20,6 +20,7 @@ public:
 	~OBB();
 
 	DirectX::XMFLOAT2 getHalfWD();
+	std::vector<DirectX::XMVECTOR> getAxes();
 
 	CollisionInfo intersects(BoundingVolume* other);
 };

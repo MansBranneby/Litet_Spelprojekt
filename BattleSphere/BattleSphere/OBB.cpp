@@ -8,28 +8,27 @@ CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 	// TODO B to A's space
 
 	// Cast bounding volume to OBB
-	other = static_cast<OBB*> (other);
+	OBB* otherOBB = static_cast<OBB*> (other);
 
 	DirectX::XMVECTOR pos = DirectX::XMLoadFloat2(&getPos());
 	DirectX::XMVECTOR otherPos = DirectX::XMLoadFloat2(&other->getPos());
 	DirectX::XMVECTOR vecToOBB = DirectX::XMVectorSubtract(otherPos, pos);
-
+	
 	// SA stands for seperating axis
 	// SA: Ax
 	float projection = abs(DirectX::XMVectorGetX(DirectX::XMVector2Dot(vecToOBB, m_xAxis)));
-	//float proj = 
-
-	//return CollisionInfo();
+	//float proj = m_halfWD.x + abs(DirectX::XMVector2Dot(otherOBB->getHalfWD().y * otherOBB->getAxes()[0], m_xAxis));
+	return collisionInfo;
 }
 
 OBB::OBB()
 {
 	// Local axes
-	DirectX::XMVECTOR m_xAxis = {1.0f, 0.0};
-	DirectX::XMVECTOR m_zAxis = {0.0, 1.0};
+	m_xAxis = {1.0f, 0.0};
+	m_zAxis = {0.0, 1.0};
 
 	// half width and height
-	DirectX::XMFLOAT2 m_halfWD = { 0.0f, 0.0f };
+	m_halfWD = { 0.0f, 0.0f };
 }
 
 OBB::OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 widthDepth, DirectX::XMMATRIX rotationMatrix)
@@ -58,6 +57,11 @@ OBB::~OBB()
 DirectX::XMFLOAT2 OBB::getHalfWD()
 {
 	return m_halfWD;
+}
+
+std::vector<DirectX::XMVECTOR> OBB::getAxes()
+{
+	return m_axes;
 }
 
 CollisionInfo OBB::intersects(BoundingVolume* other)
