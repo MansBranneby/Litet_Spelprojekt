@@ -18,12 +18,11 @@
 #include "GraphicResources.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
-<<<<<<< HEAD
+
 #include "Clock.h"
-=======
 #include "Camera.h"
 #include "Light.h"
->>>>>>> Camera_and_phong
+
 
 using namespace DirectX;
 
