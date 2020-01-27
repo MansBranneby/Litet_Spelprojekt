@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="GraphicResources.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -156,6 +158,8 @@
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="GraphicResources.h" />
     <ClInclude Include="imgui\imconfig.h" />

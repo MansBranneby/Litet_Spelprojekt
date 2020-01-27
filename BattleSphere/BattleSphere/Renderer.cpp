@@ -18,6 +18,7 @@
 #include "GraphicResources.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "Camera.h"
 
 using namespace DirectX;
 
@@ -25,6 +26,8 @@ GraphicResources g_graphicResources;
 
 
 //TODO Remove
+//Camera* g_camera;
+
 ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
 PixelShader gPS;
@@ -75,6 +78,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
+	
+	// TODO: move camera to game?
+	//g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 
 	if (wndHandle)
 	{
@@ -103,6 +109,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
 
+				//DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
+
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
@@ -128,6 +136,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		gPS.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
+		//delete g_camera;
 
 		DestroyWindow(wndHandle);
 	}
