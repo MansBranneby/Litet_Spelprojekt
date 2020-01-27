@@ -18,6 +18,7 @@
 #include "GraphicResources.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "Clock.h"
 
 using namespace DirectX;
 
@@ -28,6 +29,8 @@ GraphicResources g_graphicResources;
 ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
 PixelShader gPS;
+
+Clock* gClock;
 
 struct PosCol
 {
@@ -82,9 +85,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
+		gClock = new Clock();
+		
+		int counterFrames = 0;
+		int fps = 0;
+
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
+			gClock->calcDeltaTime();
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
 			{
 				if (msg.wParam == VK_ESCAPE)
@@ -119,6 +128,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->Draw(3, 0);
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
+
+				counterFrames++;
+				if (gClock->getTimeInSec() > 1.0)
+				{
+					fps = counterFrames;
+					counterFrames = 0;
+					gClock->resetSecTimer();
+					OutputDebugStringA(std::to_string(fps).c_str());
+					OutputDebugStringA("\n");
+				}
+
+				//std::string xd = std::to_string(gClock->getDeltaTime());
+				//OutputDebugStringA(xd.c_str());
+				gClock->resetStartTimer();
 			}
 		}
 
