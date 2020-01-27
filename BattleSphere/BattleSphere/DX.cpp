@@ -32,6 +32,16 @@ IDXGISwapChain* DX::getSwapChain()
 	return m_swapChain;
 }
 
+float DX::getWidth()
+{
+	return m_width;
+}
+
+float DX::getHeight()
+{
+	return m_height;
+}
+
 HRESULT DX::createDirect3DContext(HWND wndHandle)
 {
 	// create a struct to hold information about the swap chain

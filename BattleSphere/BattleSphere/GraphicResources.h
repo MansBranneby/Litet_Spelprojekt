@@ -18,9 +18,6 @@ private:
 	// SAMPLERS //
 	ID3D11SamplerState* m_samplerState = nullptr;
 
-	float m_width;
-	float m_height;
-
 	HWND initWindow(HINSTANCE hInstance);
 	void createDepthStencil();
 	void createBackBuffer();
