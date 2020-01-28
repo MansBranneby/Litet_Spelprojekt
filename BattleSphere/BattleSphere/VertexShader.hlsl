@@ -1,13 +1,15 @@
 struct VS_IN
 {
 	float3 pos : POSITION;
-	float3 col : COLOUR;
+	float2 tex : TEXCOORDS;
+	float3 normal : NORMAL;
 };
 
 struct VS_OUT
 {
 	float4 pos : SV_POSITION;
-	float3 col : COLOUR;
+	float2 tex : TEXCOORDS;
+	float3 normal : NORMAL;
 };
 
 cbuffer VS_CONSTANT_BUFFER : register(b0)
@@ -21,7 +23,8 @@ VS_OUT VS_main(VS_IN input)
 
 	float4 position = float4(input.pos, 1);
 	output.pos = mul(position, VP);
-	output.col = input.col;
+	output.tex = input.tex;
+	output.normal = input.normal;
 
 	return output;
 }

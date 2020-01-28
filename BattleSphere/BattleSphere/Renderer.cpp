@@ -23,6 +23,9 @@
 #include "Camera.h"
 #include "Light.h"
 
+//TODO: Remove
+#include "GameObject.h"
+
 
 using namespace DirectX;
 
@@ -42,19 +45,23 @@ Clock* gClock;
 struct PosCol
 {
 	float x, y, z;
-	float r, g, b;
+	float u, v;
+	float nx, ny, nz;
 };
 
 PosCol vertexData[3]
 {
 	0.0f, 0.5f, 0.0f,
-	1.0f, 0.0f, 0.0f,
+	1.0f, 0.0f,
+	0.0f, 0.0f,0.0f,
 
 	-0.5f, -0.5f, 0.0f,
-	0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
 
 	0.5f, -0.5f, 0.0f,
-	0.0f, 1.0f, 0.0f
+	1.0f, 0.0f,
+	0.0f, 0.0f,0.0f
 };
 
 void setupTestTriangle()
@@ -101,6 +108,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		int counterFrames = 0;
 		int fps = 0;
 
+		GameObject test;
+		test.loadFromFile("2mesh2mat");
+
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
@@ -133,7 +143,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
 
-				UINT32 vertexSize = sizeof(float) * 6;
+				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
 				DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);

@@ -1,7 +1,8 @@
 struct PS_IN
 {
 	float4 pos : SV_POSITION;
-	float3 col : COLOUR;
+	float2 tex : TEXCOORDS;
+	float3 normal : NORMAL;
 };
 
 cbuffer PS_CONSTANT_BUFFER : register(b0)
@@ -56,5 +57,5 @@ float4 PS_main(PS_IN input) : SV_Target
 	//};
 
 	//return float4(fragmentCol, 1.0f);
-	return float4(input.col, 1.0f);
+	return float4(1.0f, 1.0f, 1.0f, 1.0f);
 };
