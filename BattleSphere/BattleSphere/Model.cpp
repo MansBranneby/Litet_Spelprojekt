@@ -17,7 +17,8 @@ void Model::createVertexBuffer()
 void Model::draw()
 {
 	UINT32 vertexSize = sizeof(vertex);
-	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, 0);
+	UINT32 offset = 0;
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw();
@@ -63,6 +64,9 @@ void Model::loadModel(std::ifstream& in)
 			m_vertices[i].normX >> m_vertices[i].normY >> m_vertices[i].normZ;
 		inputStream.clear();
 	}
+	// Creates a vertex buffer
+	createVertexBuffer();
+
 
 	// Get number of materials to read
 	std::getline(in, line);

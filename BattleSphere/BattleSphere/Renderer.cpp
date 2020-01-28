@@ -178,7 +178,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				DX::getInstance()->getDeviceContext()->Draw(3, 0);
+				test.draw();
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 

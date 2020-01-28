@@ -37,6 +37,10 @@ void GameObject::update()
 
 void GameObject::draw()
 {
+	for (int i = 0; i < m_nrOfModels; i++)
+	{
+		m_models[i].draw();
+	}
 }
 
 void GameObject::setPosition(XMVECTOR pos)
