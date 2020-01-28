@@ -2,6 +2,7 @@
 
 GameObject::GameObject()
 {
+	m_pos = XMVectorSet(0,0,0,0);
 }
 
 void GameObject::update()

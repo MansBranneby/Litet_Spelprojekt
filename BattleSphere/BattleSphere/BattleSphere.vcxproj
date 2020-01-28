@@ -147,6 +147,7 @@
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GraphicResources.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GraphicResources.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

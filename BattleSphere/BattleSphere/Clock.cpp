@@ -4,6 +4,8 @@ Clock::Clock()
 {
 	m_dt = 0;
 	m_timeInSec = 0;
+	m_currTime.QuadPart = 0;
+	m_delta.QuadPart = 0;
 
 	QueryPerformanceFrequency(&m_clockFreq);
 	QueryPerformanceCounter(&m_startTime);

@@ -19,6 +19,11 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "Clock.h"
+#include "Game.h"
+
+//TODO delet dis
+//#include "Input.h"
+//#include "GameObject.h"
 
 using namespace DirectX;
 
@@ -30,7 +35,12 @@ ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
 PixelShader gPS;
 
-Clock* gClock;
+Clock* g_Clock;
+Game* g_Game;
+
+// TODO delet dis
+//Input* gInput;
+//GameObject* gGameObject;
 
 struct PosCol
 {
@@ -85,15 +95,21 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		gClock = new Clock();
-		
+		g_Clock = new Clock();
+		g_Game = new Game();
+
+		// TODO delet dis 
+		//gInput = new Input();
+		//gGameObject = new GameObject();
+		//gGameObject->setPosition(XMVectorSet(0, 0, 0, 0));
+
 		int counterFrames = 0;
 		int fps = 0;
 
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
-			gClock->calcDeltaTime();
+			g_Clock->calcDeltaTime();
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
 			{
 				if (msg.wParam == VK_ESCAPE)
@@ -130,18 +146,47 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
 				counterFrames++;
-				if (gClock->getTimeInSec() > 1.0)
+				if (g_Clock->getTimeInSec() > 1.0)
 				{
 					fps = counterFrames;
 					counterFrames = 0;
-					gClock->resetSecTimer();
-					OutputDebugStringA(std::to_string(fps).c_str());
-					OutputDebugStringA("\n");
-				}
+					g_Clock->resetSecTimer();
 
-				//std::string xd = std::to_string(gClock->getDeltaTime());
-				//OutputDebugStringA(xd.c_str());
-				gClock->resetStartTimer();
+					// TODO delet dis (visa fps)
+					//OutputDebugStringA(std::to_string(fps).c_str());
+					//OutputDebugStringA("\n");
+					
+					// TODO delet dis (testa controllern)
+					/*
+					if (!gInput->refresh(0))
+					{
+						OutputDebugStringA("error\n");
+					}
+					else
+					{
+						if (gInput->isPressed(0, XINPUT_GAMEPAD_A))
+						{
+							OutputDebugStringA("A\n");
+						}
+						if (gInput->isPressed(0, XINPUT_GAMEPAD_RIGHT_SHOULDER))
+						{
+							OutputDebugStringA("RB\n");
+						}
+						//OutputDebugStringA(std::to_string(gInput->getTriggerR(0)).c_str());
+						OutputDebugStringA("X: ");
+						OutputDebugStringA(std::to_string(XMVectorGetX(gGameObject->getPosition())).c_str());
+						OutputDebugStringA(" Y: ");
+						OutputDebugStringA(std::to_string(XMVectorGetY(gGameObject->getPosition())).c_str());
+						OutputDebugStringA("\n");
+					}
+					*/
+				}
+				
+
+				g_Game->update(g_Clock->getDeltaTime());
+				g_Game->draw();
+
+				g_Clock->resetStartTimer();
 			}
 		}
 
@@ -149,6 +194,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		_vertexBuffer->Release();
 		gVS.release();
 		gPS.release();
+		delete g_Clock;
+		delete g_Game;
 		DX::getInstance()->release();
 		delete DX::getInstance();
 

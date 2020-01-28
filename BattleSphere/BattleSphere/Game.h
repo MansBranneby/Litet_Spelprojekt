@@ -6,6 +6,7 @@
 
 #include "DX.h"
 #include "GameObject.h"
+#include "Input.h"
 
 using namespace DirectX;
 
@@ -13,9 +14,12 @@ class Game
 {
 private:
 	std::vector<GameObject*> m_gameObjects;
+	Input input;
 public:
-	Game(float dt);
+	Game();
 
-	void update();
+	void update(float dt);
 	void draw();
+
+	void release();
 };
