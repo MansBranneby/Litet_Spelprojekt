@@ -13,11 +13,11 @@ private:
 	// Bounding volume
 	BoundingVolume* m_boundingVolume;
 
-	std::vector<DirectX::XMFLOAT2> calculateNewNodePositions(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 halfWD);
+	std::vector<DirectX::XMFLOAT3> calculateNewNodePositions(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD);
 
 public:
 	QuadtreeNode();
 	//	Dimensions of box
-	QuadtreeNode(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 halfWD, std::vector<BoundingVolume*> models, unsigned int levels, unsigned int currentLevel);
+	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, std::vector<BoundingVolume*> models, unsigned int levels, unsigned int currentLevel);
 	~QuadtreeNode();
 };

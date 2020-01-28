@@ -21,6 +21,12 @@
 
 using namespace DirectX;
 
+// TODO TEST
+#include "QuadtreeNode.h"
+QuadtreeNode* g_root;
+BoundingVolume* g_BV;
+
+
 GraphicResources g_graphicResources;
 
 
@@ -75,6 +81,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
+
+	// TODO Quadtree
+	DirectX::XMFLOAT3 levelPos = { 0.0f, 0.0f, 0.0f};
+	DirectX::XMFLOAT2 halfWD = { 10.0f, 10.0f };
+	DirectX::XMMATRIX rotMax = DirectX::XMMatrixRotationY(DirectX::XM_PI * 0.25f);
+	//DirectX::XMMATRIX rotMax = DirectX::XMMatrixIdentity();
+	std::vector<BoundingVolume*> BVs = { new OBB({-5.0f, 0.0f, -5.0f}, {1.0f, 1.0f}, DirectX::XMMatrixIdentity()), new OBB({-1.01f, 0.0f, -1.01f}, {1.0f, 1.0f}, DirectX::XMMatrixIdentity()) };
+	g_root = new QuadtreeNode(levelPos, halfWD, BVs, 2, 0);
+
 
 	if (wndHandle)
 	{

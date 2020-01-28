@@ -6,28 +6,28 @@
 struct CollisionInfo
 {
 	bool m_colliding;
-	DirectX::XMFLOAT2 m_normal;
+	DirectX::XMFLOAT3 m_normal;
 
 	CollisionInfo()
 	{
 		m_colliding = false;
-		m_normal = DirectX::XMFLOAT2(0.0f, 0.0f);
+		m_normal = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	}
 };
 
 class BoundingVolume
 {
 private:
-	DirectX::XMFLOAT2 m_pos;
+	DirectX::XMFLOAT3 m_pos;
 
 	virtual CollisionInfo intersectsWithOBB(BoundingVolume* other) = 0;
-
+	virtual CollisionInfo intersectsWithSphere(BoundingVolume* other) = 0;
 public:
 	BoundingVolume();
-	BoundingVolume(DirectX::XMFLOAT2 pos);
+	BoundingVolume(DirectX::XMFLOAT3 pos);
 	virtual ~BoundingVolume();
 	
-	DirectX::XMFLOAT2 getPos();
+	DirectX::XMFLOAT3 getPos();
 
 	virtual CollisionInfo intersects(BoundingVolume* other) = 0;
 };

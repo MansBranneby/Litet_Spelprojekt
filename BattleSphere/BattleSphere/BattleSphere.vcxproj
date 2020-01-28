@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="GraphicResources.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="GraphicResources.h" />

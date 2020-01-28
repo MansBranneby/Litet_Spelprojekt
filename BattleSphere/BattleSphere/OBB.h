@@ -9,18 +9,23 @@ private:
 	DirectX::XMVECTOR m_zAxis;
 	std::vector<DirectX::XMVECTOR> m_axes;
 
-	// half width and height
+	// half width and depth
 	DirectX::XMFLOAT2 m_halfWD;
 
+	// Rotation matrix
+	DirectX::XMMATRIX m_rotationMatrix;
+
+	// Intersect functions
 	CollisionInfo intersectsWithOBB(BoundingVolume* other);
+	CollisionInfo intersectsWithSphere(BoundingVolume* other);
 
 public:
 	OBB();
-	OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix);
+	OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix);
 	~OBB();
 
-	DirectX::XMFLOAT2 getHalfWD();
-	std::vector<DirectX::XMVECTOR> getAxes();
+	DirectX::XMFLOAT2 getHalfWD() const;
+	std::vector<DirectX::XMVECTOR> getAxes() const;
 
 	CollisionInfo intersects(BoundingVolume* other);
 };

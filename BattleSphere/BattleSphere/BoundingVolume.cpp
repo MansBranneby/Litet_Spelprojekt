@@ -2,10 +2,10 @@
 
 BoundingVolume::BoundingVolume()
 {
-	m_pos = { 0.0f, 0.0f};
+	m_pos = { 0.0f, 0.0f, 0.0f};
 }
 
-BoundingVolume::BoundingVolume(DirectX::XMFLOAT2 pos)
+BoundingVolume::BoundingVolume(DirectX::XMFLOAT3 pos)
 {
 	m_pos = pos;
 }
@@ -14,7 +14,7 @@ BoundingVolume::~BoundingVolume()
 {
 }
 
-DirectX::XMFLOAT2 BoundingVolume::getPos()
+DirectX::XMFLOAT3 BoundingVolume::getPos()
 {
 	return m_pos;
 }
