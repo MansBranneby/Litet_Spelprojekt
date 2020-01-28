@@ -28,6 +28,7 @@ void GameObject::loadFromFile(std::string filename)
 	for (int i = 0; i < m_nrOfModels; i++) // Reads all objects
 		m_models[i].loadModel(in);
 
+	m_pos = XMVectorSet(0,0,0,0);
 }
 
 void GameObject::update()
