@@ -79,12 +79,12 @@ void setupTestTriangle()
 	gPS = PixelShader(L"PixelShader.hlsl");
 
 	//Setup material
-	g_materialTest = new MaterialTest;
-	g_materialTest->Ka = XMVectorSet(0.1f, 0.1f, 0.1f, 2);
+	g_materialTest = new MaterialTest();
+	g_materialTest->Ka = XMVectorSet(1.0f, 0.0f, 0.0f, 2);
 	g_materialTest->Kd = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-	g_materialTest->Ks = XMVectorSet(0.5f, 0.5f, 0.5f, 100.0f);
+	g_materialTest->Ks = XMVectorSet(1.0f, 1.0f, 1.0f, 100.0f);
 	g_materialTest->Ke = XMVectorSet(0.5f, 0.5f, 0.5f, 100.0f);
-	g_constantBufferMaterials = new ConstantBuffer(&g_materialTest, sizeof(MaterialTest));
+	g_constantBufferMaterials = new ConstantBuffer(g_materialTest, sizeof(MaterialTest));
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -98,7 +98,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
-	g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(0.8f, 0.1f, 0.1f, 1.0f));
+	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	g_light = new Light(XMVectorSet(1.0f, 0.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 
 	if (wndHandle)
 	{
