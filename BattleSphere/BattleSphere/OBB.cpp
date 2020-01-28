@@ -47,6 +47,7 @@ CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 	if (projection > proj)
 		return collisionInfo;
 
+	// If we're here there is a collision
 	collisionInfo.m_colliding = true;
 
 	return collisionInfo;
@@ -62,12 +63,12 @@ OBB::OBB()
 	m_halfWD = { 0.0f, 0.0f };
 }
 
-OBB::OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 widthDepth, DirectX::XMMATRIX rotationMatrix)
+OBB::OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix)
 	:BoundingVolume(pos)
 {
 	// Calculate half width and depth
-	m_halfWD.x = pos.x - widthDepth.x;
-	m_halfWD.y = pos.y - widthDepth.y;
+	m_halfWD.x = halfWD.x;
+	m_halfWD.y = halfWD.y;
 
 	// Define axes
 	m_xAxis = { 1.0f, 0.0 };

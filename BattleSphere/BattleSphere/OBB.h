@@ -16,7 +16,7 @@ private:
 
 public:
 	OBB();
-	OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 minMaxXZ, DirectX::XMMATRIX rotationMatrix);
+	OBB(DirectX::XMFLOAT2 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix);
 	~OBB();
 
 	DirectX::XMFLOAT2 getHalfWD();
