@@ -4,7 +4,7 @@ void Game::handleMovement(float dt, int id)
 {
 	m_robots[id].setPosition(
 		m_robots[id].getPosition() +
-		XMVectorSet(input.getThumbLX(id), input.getThumbLY(id), 0.0f, 0.0f) *
+		XMVectorSet(input.getThumbLX(id), 0.0f, input.getThumbLY(id) * (-1.0f), 0.0f) *
 		m_robots[id].getVelocity() * dt
 	);
 }
@@ -59,11 +59,14 @@ void Game::update(float dt)
 
 void Game::updateSec()
 {
-	OutputDebugStringA("X: ");
-	OutputDebugStringA(std::to_string(XMVectorGetX(m_robots[0].getPosition())).c_str());
-	OutputDebugStringA(" Y: ");
-	OutputDebugStringA(std::to_string(XMVectorGetY(m_robots[0].getPosition())).c_str());
-	OutputDebugStringA("\n");
+	if (m_nrOfPlayers != 0)
+	{
+		OutputDebugStringA("X: ");
+		OutputDebugStringA(std::to_string(XMVectorGetX(m_robots[0].getPosition())).c_str());
+		OutputDebugStringA(" Y: ");
+		OutputDebugStringA(std::to_string(XMVectorGetY(m_robots[0].getPosition())).c_str());
+		OutputDebugStringA("\n");
+	}
 }
 
 void Game::draw()
