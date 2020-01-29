@@ -16,7 +16,7 @@ class Game
 {
 private:
 	int m_nrOfPlayers;
-	std::vector<GameObject*> m_gameObjects;
+	std::vector<GameObject> m_gameObjects;
 	Input input;
 	std::vector<Robot> m_robots;
 
