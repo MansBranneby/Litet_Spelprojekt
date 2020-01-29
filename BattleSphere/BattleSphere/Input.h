@@ -18,7 +18,9 @@ private:
 public:
 	Input();
 
+	bool reconnectController(int user);
 	bool refresh(int user);
+
 	bool isPressed(int user, WORD button);
 
 	float getThumbLX(int user);

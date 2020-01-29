@@ -160,24 +160,42 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					/*
 					if (!gInput->refresh(0))
 					{
-						OutputDebugStringA("error\n");
+						OutputDebugStringA("1 error\n");
+						gInput->reconnectController(0);
 					}
 					else
 					{
 						if (gInput->isPressed(0, XINPUT_GAMEPAD_A))
 						{
-							OutputDebugStringA("A\n");
+							OutputDebugStringA("1 A\n");
 						}
+						
 						if (gInput->isPressed(0, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 						{
 							OutputDebugStringA("RB\n");
 						}
+						
 						//OutputDebugStringA(std::to_string(gInput->getTriggerR(0)).c_str());
+						
 						OutputDebugStringA("X: ");
 						OutputDebugStringA(std::to_string(XMVectorGetX(gGameObject->getPosition())).c_str());
 						OutputDebugStringA(" Y: ");
 						OutputDebugStringA(std::to_string(XMVectorGetY(gGameObject->getPosition())).c_str());
 						OutputDebugStringA("\n");
+						
+					}
+					
+					if (!gInput->refresh(1))
+					{
+						OutputDebugStringA("2 error\n");
+						gInput->reconnectController(1);
+					}
+					else
+					{
+						if (gInput->isPressed(1, XINPUT_GAMEPAD_A))
+						{
+							OutputDebugStringA("2 A\n");
+						}
 					}
 					*/
 				}

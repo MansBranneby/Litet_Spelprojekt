@@ -10,6 +10,11 @@ bool Input::refresh(int user)
     return m_gamepads[user].refresh();
 }
 
+bool Input::reconnectController(int user)
+{
+    return getControllerState();
+}
+
 bool Input::isPressed(int user, WORD button)
 {
     return m_gamepads[user].isPressed(button);
