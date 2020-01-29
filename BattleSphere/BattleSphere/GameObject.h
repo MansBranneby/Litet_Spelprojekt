@@ -10,15 +10,14 @@
 using namespace DirectX;
 
 class GameObject
-	{
+{
 private:
-
 	int m_nrOfModels;
 	Model* m_models;
-	
 
 public:
 	GameObject();
+	GameObject(std::string filename);
 	~GameObject();
 
 	void loadFromFile(std::string filename); // Without .nyp file extension

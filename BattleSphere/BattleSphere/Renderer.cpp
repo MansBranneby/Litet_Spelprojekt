@@ -138,8 +138,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		GameObject test;
 		GameObject test1;
+		GameObject test2("Building");
 		test.loadFromFile("BattleSphere");
-		test1.loadFromFile("1mesh1mat");
+		test1.loadFromFile("2mesh2mat");
 
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -189,9 +190,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				test1.setPosition(-3.0f, 0.0f, 0.0f);
 				test.rotate(0, 0.72f, 0.72f, 0.1f);
 				test1.rotate(1.0f, 0.0f, 0.0f, 0.11f);
-
+				test2.rotate(0.0f, 1.0, 0.0f, 0.11f);
 				test.draw();
 				test1.draw();
+				test2.draw();
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 

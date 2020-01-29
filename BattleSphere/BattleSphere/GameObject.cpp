@@ -6,6 +6,13 @@ GameObject::GameObject()
 	m_models = nullptr;
 }
 
+GameObject::GameObject(std::string filename)
+{
+	m_nrOfModels = 0;
+	m_models = nullptr;
+	loadFromFile(filename);
+}
+
 GameObject::~GameObject()
 {
 	if (m_models) delete[] m_models;
