@@ -13,7 +13,7 @@ using namespace DirectX;
 class Game
 {
 private:
-	std::vector<GameObject*> m_gameObjects;
+	std::vector<GameObject> m_gameObjects;
 	Input input;
 public:
 	Game();

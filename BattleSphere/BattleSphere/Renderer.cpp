@@ -117,7 +117,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(1.0f, 0.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	g_light = new Light(XMVectorSet(1.0f, 0.0f, -3.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 
 	if (wndHandle)
 	{
@@ -137,7 +137,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		int fps = 0;
 
 		GameObject test;
-		test.loadFromFile("2mesh2mat");
+		GameObject test1;
+		test.loadFromFile("BattleSphere");
+		test1.loadFromFile("1mesh1mat");
 
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -159,7 +161,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				float clearColour[] = { 0, 0, 0, 1 };
 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
@@ -179,7 +182,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
+				test.move(0.003f, 0.0f, 0.0f);
+				test.scale(0.2, 0.2, 0.2);
+				//test1.move(-0.3, 0.0, 0.0);
+				//test.setPosition(3, 0.0, 0.0);
+				test1.setPosition(-3.0f, 0.0f, 0.0f);
+				test.rotate(0, 0.72f, 0.72f, 0.1f);
+				test1.rotate(1.0f, 0.0f, 0.0f, 0.11f);
+
 				test.draw();
+				test1.draw();
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 

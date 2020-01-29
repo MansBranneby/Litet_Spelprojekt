@@ -54,15 +54,16 @@ float4 PS_main(PS_IN input) : SV_Target
 		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
 		break;
 	case 2: // "Phong" (diffuse, ambient, specular)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol * d;
+		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol ;
+
 		break;
 	case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol * d;
+		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol ;
 		break;
 	default:
 		fragmentCol = float3(1.0f, 1.0f, 1.0f);
 		break;
 	};
-
+	
 	return float4(fragmentCol, 1.0f);
 };

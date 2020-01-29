@@ -18,15 +18,21 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	matrix VP;
 };
 
+cbuffer VS_CONSTANT_BUFFER : register(b1)
+{
+	matrix M;
+};
+
 VS_OUT VS_main(VS_IN input)
 {
 	VS_OUT output = (VS_OUT)0;
 
 	float4 position = float4(input.pos, 1);
-	output.pos = mul(position, VP);
-	output.posWC = input.pos;
+	position = mul(M, position);
+	output.posWC = position.xyz;
+	output.pos = mul(VP, position);
 	output.tex = input.tex;
-	output.normal = input.normal;
+	output.nor = normalize(mul(M, float4(input.normal, 0.0f))).xyz;
 
 	return output;
 }

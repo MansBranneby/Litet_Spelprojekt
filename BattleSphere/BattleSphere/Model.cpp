@@ -3,6 +3,12 @@
 
 void Model::createVertexBuffer()
 {
+	//TODO: Remove
+	/*for (int i = 0; i < m_nrOfVertices; i++)
+	{
+		OutputDebugStringA((std::to_string(m_vertices[i].normX) + " " + std::to_string(m_vertices[i].normY) + " " + std::to_string(m_vertices[i].normZ) + '\n').c_str());
+	}*/
+	
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -14,11 +20,45 @@ void Model::createVertexBuffer()
 	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
 }
 
+void Model::createVertexCBuffer()
+{
+	m_modelMatrixData = (XMMATRIX*)_aligned_malloc(sizeof(XMMATRIX), 16);
+	*m_modelMatrixData = XMMatrixTranslation(0, 0, 0);
+
+	D3D11_BUFFER_DESC vsCBufferDesc;
+	ZeroMemory(&vsCBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	vsCBufferDesc.ByteWidth = sizeof(XMMATRIX);
+	vsCBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	vsCBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	vsCBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	vsCBufferDesc.MiscFlags = 0;
+	vsCBufferDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA vsCBufferData;
+	ZeroMemory(&vsCBufferData, sizeof(D3D11_SUBRESOURCE_DATA));
+	vsCBufferData.pSysMem = m_modelMatrixData;
+	vsCBufferData.SysMemPitch = 0;
+	vsCBufferData.SysMemSlicePitch = 0;
+
+	DX::getInstance()->getDevice()->CreateBuffer(&vsCBufferDesc, &vsCBufferData, &m_modelMatrixCBuffer);
+}
+
+void Model::updateSubResource()
+{
+	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
+}
+
 void Model::draw()
 {
 	UINT32 vertexSize = sizeof(vertex);
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_modelMatrixCBuffer);
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw();
@@ -27,11 +67,16 @@ void Model::draw()
 
 Model::Model()
 {
+	m_pos = XMVectorSet(0, 0, 0, 0);
 	m_vertices = nullptr;
 	m_subModels = nullptr;
 	m_vertexBuffer = nullptr;
 	m_nrOfSubModels = 0;
 	m_nrOfVertices = 0;
+	m_modelMatrixCBuffer = nullptr;
+	m_modelMatrixData = nullptr;
+	m_rotationMat = XMMatrixIdentity();
+	m_scalingMat = XMMatrixIdentity();
 }
 
 Model::~Model()
@@ -39,7 +84,38 @@ Model::~Model()
 	if (m_vertices) delete[] m_vertices;
 	if (m_subModels) delete[] m_subModels;
 	if (m_vertexBuffer) m_vertexBuffer->Release();
-	
+	if (m_modelMatrixCBuffer) m_modelMatrixCBuffer->Release();
+	if (m_modelMatrixData) _aligned_free(m_modelMatrixData);
+}
+
+void Model::move(XMVECTOR dPos)
+{
+	m_pos += dPos;
+}
+
+void Model::rotate(float vx, float vy, float vz, float rotDeg)
+{
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rotation = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rotation };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_rotationMat = m_rotationMat * dRotation;
+	updateSubResource();
+}
+
+void Model::scale(float xScale, float yScale, float zScale)
+{
+	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
+	updateSubResource();
+}
+
+void Model::setPosition(XMVECTOR pos)
+{
+	m_pos = pos;
+	updateSubResource();
 }
 
 void Model::loadModel(std::ifstream& in)
@@ -154,4 +230,7 @@ void Model::loadModel(std::ifstream& in)
 		}
 		m_subModels[i].setFaces(indices, nrOfIndices);
 	}
+
+	// Create model matrix
+	createVertexCBuffer();
 }

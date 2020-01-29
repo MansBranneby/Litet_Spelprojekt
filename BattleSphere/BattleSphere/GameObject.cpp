@@ -27,8 +27,6 @@ void GameObject::loadFromFile(std::string filename)
 
 	for (int i = 0; i < m_nrOfModels; i++) // Reads all objects
 		m_models[i].loadModel(in);
-
-	m_pos = XMVectorSet(0,0,0,0);
 }
 
 void GameObject::update()
@@ -38,17 +36,43 @@ void GameObject::update()
 void GameObject::draw()
 {
 	for (int i = 0; i < m_nrOfModels; i++)
-	{
 		m_models[i].draw();
-	}
+}
+
+void GameObject::setPosition(float x, float y, float z)
+{
+	XMVECTOR newPos = { x, y, z, 0 };
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].setPosition(newPos);
 }
 
 void GameObject::setPosition(XMVECTOR pos)
 {
-	m_pos = pos;
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].setPosition(pos);
 }
 
-XMVECTOR GameObject::getPosition()
+void GameObject::move(XMVECTOR dPos)
 {
-	return m_pos;
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].move(dPos);
+}
+
+void GameObject::move(float dX, float dY, float dZ)
+{
+	XMVECTOR dPos = { dX, dY, dZ, 0 };
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].move(dPos);
+}
+
+void GameObject::rotate(float vx, float vy, float vz, float rotDeg)
+{
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].rotate(vx, vy, vz, rotDeg);
+}
+
+void GameObject::scale(float xScale, float yScale, float zScale)
+{
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].scale(xScale, yScale, zScale);
 }
