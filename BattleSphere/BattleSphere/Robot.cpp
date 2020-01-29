@@ -4,7 +4,7 @@ Robot::Robot(int playerId)
 {
 	m_playerId = 0;
 	m_health = 100;
-	m_velocity = 1.0f;
+	m_velocity = 3.0f;
 	m_colour = XMVectorSet(1,0,0,0);
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = -1;

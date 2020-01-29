@@ -4,6 +4,7 @@ GameObject::GameObject()
 {
 	m_nrOfModels = 0;
 	m_models = nullptr;
+	m_position = XMVectorSet(0,0,0,0);
 }
 
 GameObject::~GameObject()
@@ -42,18 +43,26 @@ void GameObject::draw()
 void GameObject::setPosition(float x, float y, float z)
 {
 	XMVECTOR newPos = { x, y, z, 0 };
+	m_position = newPos;
 	for (int i = 0; i < m_nrOfModels; i++)
 		m_models[i].setPosition(newPos);
 }
 
 void GameObject::setPosition(XMVECTOR pos)
 {
+	m_position = pos;
 	for (int i = 0; i < m_nrOfModels; i++)
 		m_models[i].setPosition(pos);
 }
 
+XMVECTOR GameObject::getPosition()
+{
+	return m_position;
+}
+
 void GameObject::move(XMVECTOR dPos)
 {
+	m_position += dPos;
 	for (int i = 0; i < m_nrOfModels; i++)
 		m_models[i].move(dPos);
 }
@@ -61,6 +70,7 @@ void GameObject::move(XMVECTOR dPos)
 void GameObject::move(float dX, float dY, float dZ)
 {
 	XMVECTOR dPos = { dX, dY, dZ, 0 };
+	m_position += dPos;
 	for (int i = 0; i < m_nrOfModels; i++)
 		m_models[i].move(dPos);
 }

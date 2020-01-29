@@ -71,8 +71,8 @@ void GraphicResources::createDepthStencil()
 	ID3D11Texture2D* pDepthStencil = NULL;
 	D3D11_TEXTURE2D_DESC descDepth;
 	ZeroMemory(&descDepth, sizeof(descDepth));
-	descDepth.Width = m_viewPort.Width;//(UINT)DX::getInstance()->getWidth();
-	descDepth.Height = m_viewPort.Height;//(UINT)DX::getInstance()->getHeight();
+	descDepth.Width = (UINT)m_viewPort.Width;//(UINT)DX::getInstance()->getWidth();
+	descDepth.Height = (UINT)m_viewPort.Height;//(UINT)DX::getInstance()->getHeight();
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

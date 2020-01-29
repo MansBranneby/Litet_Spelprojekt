@@ -136,10 +136,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		int counterFrames = 0;
 		int fps = 0;
 
+		/*
 		GameObject test;
 		GameObject test1;
 		test.loadFromFile("BattleSphere");
 		test1.loadFromFile("1mesh1mat");
+		*/
 
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -182,6 +184,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
+				/*
 				test.move(0.003f, 0.0f, 0.0f);
 				test.scale(0.2f, 0.2f, 0.2f);
 				//test1.move(-0.3, 0.0, 0.0);
@@ -192,6 +195,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				test.draw();
 				test1.draw();
+				*/
+
+				g_Game->update(g_Clock->getDeltaTime());
+				g_Game->draw();
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
@@ -250,9 +257,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					*/
 				}
 				
-
-				g_Game->update(g_Clock->getDeltaTime());
-				g_Game->draw();
 
 				g_Clock->resetStartTimer();
 			}

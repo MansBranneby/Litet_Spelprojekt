@@ -92,6 +92,7 @@ Model::~Model()
 void Model::move(XMVECTOR dPos)
 {
 	m_pos += dPos;
+	updateSubResource();
 }
 
 void Model::rotate(float vx, float vy, float vz, float rotDeg)

@@ -52,8 +52,8 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 
 	// fill the swap chain description struct
 	scd.BufferCount = 1;                                    // one back buffer
-	scd.BufferDesc.Height = m_height;
-	scd.BufferDesc.Width = m_width;
+	scd.BufferDesc.Height = (UINT)m_height;
+	scd.BufferDesc.Width = (UINT)m_width;
 	scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
 	scd.OutputWindow = wndHandle;                           // the window to be used

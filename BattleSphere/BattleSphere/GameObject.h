@@ -12,7 +12,7 @@ using namespace DirectX;
 class GameObject
 	{
 private:
-
+	XMVECTOR m_position;
 	int m_nrOfModels;
 	Model* m_models;
 	
@@ -27,6 +27,8 @@ public:
 
 	void setPosition(float x, float y, float z);
 	void setPosition(XMVECTOR pos);
+	XMVECTOR getPosition();
+
 	void move(XMVECTOR dPos);
 	void move(float dX, float dY, float dZ);
 	void rotate(float vx, float vy, float vz, float rotDeg);

@@ -2,11 +2,11 @@
 
 void Game::handleMovement(float dt, int id)
 {
-	m_robots[id].setPosition(
-		m_robots[id].getPosition() +
-		XMVectorSet(input.getThumbLX(id), 0.0f, input.getThumbLY(id) * (-1.0f), 0.0f) *
-		m_robots[id].getVelocity() * dt
+	m_robots[id].move(
+		XMVectorSet(input.getThumbLX(id), 0.0f, input.getThumbLY(id), 0.0f) *
+		m_robots[id].getVelocity() * dt * (input.getTriggerR(id) + 0.2) * 8
 	);
+	m_robots[id].rotate(0, 1, 0, input.getThumbRX(id) * dt * 100);
 }
 
 void Game::handleInputs(float dt)
@@ -36,6 +36,7 @@ Game::Game()
 	{
 		Robot robot(i);
 		m_robots.push_back(robot);
+		m_robots[i].loadFromFile("BattleSphere");
 	}
 }
 
@@ -64,7 +65,7 @@ void Game::updateSec()
 		OutputDebugStringA("X: ");
 		OutputDebugStringA(std::to_string(XMVectorGetX(m_robots[0].getPosition())).c_str());
 		OutputDebugStringA(" Y: ");
-		OutputDebugStringA(std::to_string(XMVectorGetY(m_robots[0].getPosition())).c_str());
+		OutputDebugStringA(std::to_string(XMVectorGetZ(m_robots[0].getPosition())).c_str());
 		OutputDebugStringA("\n");
 	}
 }
