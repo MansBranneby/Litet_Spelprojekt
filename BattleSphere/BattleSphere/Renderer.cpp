@@ -151,7 +151,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					fps = counterFrames;
 					counterFrames = 0;
 					g_Clock->resetSecTimer();
-
+					g_Game->updateSec();
 					// TODO delet dis (visa fps)
 					//OutputDebugStringA(std::to_string(fps).c_str());
 					//OutputDebugStringA("\n");

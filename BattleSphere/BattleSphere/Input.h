@@ -13,10 +13,14 @@ class Input
 private:
 	Gamepad m_gamepads[XUSER_MAX_COUNT];
 	int m_gamepadIds[XUSER_MAX_COUNT];
+	int m_nrOfGamepads;
 
 	int getControllerState();
 public:
 	Input();
+
+	int getId(int user);
+	int getNrOfGamepads();
 
 	bool reconnectController(int user);
 	bool refresh(int user);

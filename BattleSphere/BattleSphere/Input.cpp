@@ -2,12 +2,22 @@
 
 Input::Input()
 {
-    getControllerState();
+    m_nrOfGamepads = getControllerState();
 }
 
 bool Input::refresh(int user)
 {
     return m_gamepads[user].refresh();
+}
+
+int Input::getId(int user)
+{
+    return m_gamepadIds[user];
+}
+
+int Input::getNrOfGamepads()
+{
+    return m_nrOfGamepads;
 }
 
 bool Input::reconnectController(int user)
@@ -68,6 +78,7 @@ int Input::getControllerState()
             // Controller is connected
             counter++;
             m_gamepads[i].setId(i);
+            m_gamepadIds[i] = i;
         }
         else
         {
