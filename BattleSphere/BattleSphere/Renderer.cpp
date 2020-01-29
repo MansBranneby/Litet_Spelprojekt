@@ -20,6 +20,7 @@
 #include "PixelShader.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Bloom.h"
 
 using namespace DirectX;
 
@@ -132,7 +133,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
-
+				
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
