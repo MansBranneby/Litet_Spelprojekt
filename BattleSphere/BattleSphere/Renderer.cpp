@@ -21,7 +21,7 @@
 
 using namespace DirectX;
 
-// TODO TEST
+// TODO test quadtree
 #include "QuadtreeNode.h"
 QuadtreeNode* g_root;
 BoundingVolume* g_BV;
@@ -82,7 +82,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 
-	// TODO Quadtree
+	// TODO test quadtree
 	DirectX::XMFLOAT3 levelPos = { 0.0f, 0.0f, 0.0f};
 	DirectX::XMFLOAT2 halfWD = { 10.0f, 10.0f };
 	DirectX::XMMATRIX rotMax = DirectX::XMMatrixRotationY(DirectX::XM_PI * 0.25f);
@@ -146,6 +146,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		DestroyWindow(wndHandle);
 	}
+
+
+	// TODO delete dynamically allocated stuff
+	delete g_root;
+
+	for (int i = 0; i < BVs.size(); ++i)
+		delete BVs[i];
 
 	return (int)msg.wParam;
 }

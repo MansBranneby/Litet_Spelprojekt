@@ -46,6 +46,5 @@ QuadtreeNode::~QuadtreeNode()
 	for (size_t i = 0; i < m_children.size(); i++)
 		delete m_children[i];
 
-	for (size_t i = 0; i < m_models.size(); i++)
-		delete m_models[i];
+	delete m_boundingVolume;
 }

@@ -19,7 +19,7 @@ class BoundingVolume
 {
 private:
 	DirectX::XMFLOAT3 m_pos;
-
+	
 	virtual CollisionInfo intersectsWithOBB(BoundingVolume* other) = 0;
 	virtual CollisionInfo intersectsWithSphere(BoundingVolume* other) = 0;
 public:

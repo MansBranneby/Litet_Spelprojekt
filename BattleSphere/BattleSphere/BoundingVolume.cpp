@@ -1,5 +1,14 @@
 #include "BoundingVolume.h"
 
+CollisionInfo BoundingVolume::intersectsWithTriangle()
+{
+	CollisionInfo collisionInfo;
+
+
+
+	return collisionInfo;
+}
+
 BoundingVolume::BoundingVolume()
 {
 	m_pos = { 0.0f, 0.0f, 0.0f};
