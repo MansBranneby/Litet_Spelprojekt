@@ -22,7 +22,7 @@ void Model::createVertexBuffer()
 
 void Model::createVertexCBuffer()
 {
-	m_modelMatrixData = (XMMATRIX*)_aligned_malloc(sizeof(XMMATRIX), 16);
+	m_modelMatrixData = new XMMATRIX();
 	*m_modelMatrixData = XMMatrixTranslation(0, 0, 0);
 
 	D3D11_BUFFER_DESC vsCBufferDesc;
@@ -75,6 +75,7 @@ Model::Model()
 	m_nrOfVertices = 0;
 	m_modelMatrixCBuffer = nullptr;
 	m_modelMatrixData = nullptr;
+	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
 }
@@ -85,7 +86,7 @@ Model::~Model()
 	if (m_subModels) delete[] m_subModels;
 	if (m_vertexBuffer) m_vertexBuffer->Release();
 	if (m_modelMatrixCBuffer) m_modelMatrixCBuffer->Release();
-	if (m_modelMatrixData) _aligned_free(m_modelMatrixData);
+	if (m_modelMatrixData) delete (m_modelMatrixData);
 }
 
 void Model::move(XMVECTOR dPos)

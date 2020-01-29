@@ -183,7 +183,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
 				test.move(0.003f, 0.0f, 0.0f);
-				test.scale(0.2, 0.2, 0.2);
+				test.scale(0.2f, 0.2f, 0.2f);
 				//test1.move(-0.3, 0.0, 0.0);
 				//test.setPosition(3, 0.0, 0.0);
 				test1.setPosition(-3.0f, 0.0f, 0.0f);
