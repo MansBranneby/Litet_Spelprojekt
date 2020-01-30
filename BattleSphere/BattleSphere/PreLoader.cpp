@@ -1,6 +1,6 @@
 #include "PreLoader.h"
 
-void PreLoader::loadFromFile(std::string filename)
+void PreLoader::loadFromFile(objectType type, std::string filename, int variant = 0)
 {
 	std::string line;
 	std::istringstream inputStream;
@@ -9,22 +9,21 @@ void PreLoader::loadFromFile(std::string filename)
 
 	std::getline(in, line);
 	inputStream.str(line);
-	inputStream >> m_nrOfModels; // Get number of objects to read
+	inputStream >> m_nrOfmodels[type][variant]; // Get number of objects to read
 	inputStream.clear();
-	m_models = new Model[m_nrOfModels];
+	m_objects[type].push_back(new Model[m_nrOfmodels[type][variant]]);
 
 
 	for (int i = 0; i < m_nrOfModels; i++) // Reads all objects
-		m_models[i].loadModel(in);
+		m_models.loadModel(in);
 }
 
 PreLoader::PreLoader()
 {
-	m_nrOfModels = 0;
-	m_models = nullptr;
+	m_objects.reserve(OBJECT_TYPES);
+	m_nrOfmodels.reserve(OBJECT_TYPES);
 }
 
 PreLoader::~PreLoader()
-{
-	if (m_models) delete[] m_models;
+{	
 }

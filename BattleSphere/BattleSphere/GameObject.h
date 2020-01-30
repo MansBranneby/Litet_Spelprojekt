@@ -8,6 +8,15 @@
 
 using namespace DirectX;
 
+enum objectType {
+	drone = 0,
+	weapon = 1,
+	robot = 2,
+	node = 3,
+	projectile = 4,
+	resource = 5
+};
+
 struct renderData {
 	XMVECTOR pos;
 	XMVECTOR rotation;

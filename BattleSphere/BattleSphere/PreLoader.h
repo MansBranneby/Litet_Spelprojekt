@@ -7,22 +7,18 @@
 #include "Projectile.h"
 #include "Resource.h"
 
+#define OBJECT_TYPES 6
+// objectType enum: drone, weapon, robot, node, projectile, resource
+
 
 class PreLoader
 {
 private: 
 	// Preloaded models
-	int m_nrOfModels;
-	Model* m_models;
+	std::vector<std::vector<int>> m_nrOfmodels;
+	std::vector<std::vector<Model*>> m_objects;
 
-	// GameObjects
-	std::vector<Weapon> m_weapons;
-	std::vector<Robot> m_robots;
-	std::vector<Node> m_nodes;
-	std::vector<Projectile> m_Projectiles;
-	std::vector<Resource> m_Resources;
-
-	void loadFromFile(std::string filename); // Without .nyp file extension
+	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
 
 public:
 	PreLoader();

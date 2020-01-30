@@ -24,8 +24,7 @@
 #include "Camera.h"
 #include "Light.h"
 
-//TODO: Remove
-#include "GameObject.h"
+#include "PreLoader.h"
 
 
 using namespace DirectX;
@@ -45,9 +44,6 @@ PixelShader gPS;
 Clock* g_Clock;
 Game* g_Game;
 
-// TODO delet dis
-//Input* gInput;
-//GameObject* gGameObject;
 
 struct MaterialTest
 {
@@ -128,20 +124,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_Clock = new Clock();
 		g_Game = new Game();
 
-		// TODO delet dis 
-		//gInput = new Input();
-		//gGameObject = new GameObject();
-		//gGameObject->setPosition(XMVectorSet(0, 0, 0, 0));
+		PreLoader preLoader;
 
 		int counterFrames = 0;
 		int fps = 0;
 
-		/*
-		GameObject test;
-		GameObject test1;
-		test.loadFromFile("BattleSphere");
-		test1.loadFromFile("1mesh1mat");
-		*/
+		
 
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -184,18 +172,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				/*
-				test.move(0.003f, 0.0f, 0.0f);
-				test.scale(0.2f, 0.2f, 0.2f);
-				//test1.move(-0.3, 0.0, 0.0);
-				//test.setPosition(3, 0.0, 0.0);
-				test1.setPosition(-3.0f, 0.0f, 0.0f);
-				test.rotate(0, 0.72f, 0.72f, 0.1f);
-				test1.rotate(1.0f, 0.0f, 0.0f, 0.11f);
-
-				test.draw();
-				test1.draw();
-				*/
+			
 
 				g_Game->update(g_Clock->getDeltaTime());
 				g_Game->draw();
