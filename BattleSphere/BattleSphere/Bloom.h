@@ -2,7 +2,9 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
+
 #include "DX.h"
+#include "ComputeShader.h"
 
 using namespace DirectX;
 
@@ -21,7 +23,13 @@ private:
 	ID3D11ShaderResourceView* m_horizontalSRV = nullptr;
 	ID3D11ShaderResourceView* m_bloomSRV = nullptr;
 
+	ID3D11UnorderedAccessView* m_horizontalUAV = nullptr;
+
+	ComputeShader m_horizontalCS;
+	ComputeShader m_verticalCS;
+
 	void createResources();
+	void createShaders();
 
 public:
 	Bloom();
@@ -29,5 +37,9 @@ public:
 
 	ID3D11RenderTargetView* getMaterialRTV();
 	ID3D11ShaderResourceView* getBloomSRV();
+
+	void setRenderTarget();
+	void setShaderResource();
+	void run();
 };
 
