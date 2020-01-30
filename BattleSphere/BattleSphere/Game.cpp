@@ -31,13 +31,13 @@ void Game::handleInputs(float dt)
 
 Game::Game()
 {
-	m_nrOfPlayers = input.getNrOfGamepads();
-	for (int i = 0; i < m_nrOfPlayers; i++)
-	{
-		Robot robot(i);
-		m_robots.push_back(robot);
-		m_robots[i].loadFromFile("BattleSphere");
-	}
+	//m_nrOfPlayers = input.getNrOfGamepads();
+	//for (int i = 0; i < m_nrOfPlayers; i++)
+	//{
+	//	Robot robot(i);
+	//	m_robots.push_back(robot);
+	//	m_robots[i].loadFromFile("BattleSphere");
+	//}
 }
 
 void Game::update(float dt)

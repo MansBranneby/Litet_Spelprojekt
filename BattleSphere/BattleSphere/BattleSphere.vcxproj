@@ -146,6 +146,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Drone.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -160,9 +161,12 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PreLoader.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -172,6 +176,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="Drone.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -188,8 +193,11 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="PreLoader.h" />
+    <ClInclude Include="Projectile.h" />
+    <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="SubModel.h" />
     <ClInclude Include="VertexShader.h" />
