@@ -199,6 +199,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />

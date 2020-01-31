@@ -31,13 +31,14 @@ void Game::handleInputs(float dt)
 
 Game::Game()
 {
-	//m_nrOfPlayers = input.getNrOfGamepads();
-	//for (int i = 0; i < m_nrOfPlayers; i++)
-	//{
-	//	Robot robot(i);
-	//	m_robots.push_back(robot);
-	//	m_robots[i].loadFromFile("BattleSphere");
-	//}
+	m_nrOfPlayers = input.getNrOfGamepads();
+	for (int i = 0; i < m_nrOfPlayers; i++)
+	{
+		Robot robot(i);
+		m_robots.push_back(robot);
+
+
+	}
 }
 
 void Game::update(float dt)
@@ -72,15 +73,11 @@ void Game::updateSec()
 
 void Game::draw()
 {
-	for (int i = 0; i < m_gameObjects.size(); i++)
-	{
-		//m_gameObjects[i]->draw();
-	}
-
 	for (int i = 0; i < m_robots.size(); i++)
 	{
 		// TODO something
-		m_robots[i].draw();
+		//m_robots[i].draw();
+		preLoader.draw(objectType::robot, m_robots[i].getData());
 	}
 }
 

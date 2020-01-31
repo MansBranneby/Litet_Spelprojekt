@@ -4,24 +4,11 @@
 #include <DirectXMath.h>
 #include <vector>
 #include "DX.h"
-
+#include "StructsAndEnums.h"
 
 using namespace DirectX;
 
-enum objectType {
-	drone = 0,
-	weapon = 1,
-	robot = 2,
-	node = 3,
-	projectile = 4,
-	resource = 5
-};
 
-struct objectData {
-	XMVECTOR pos;
-	XMVECTOR rotation;
-	XMVECTOR scale;
-};
 
 
 class GameObject
@@ -30,8 +17,6 @@ private:
 	XMVECTOR m_position;
 	XMVECTOR m_rotation;
 	XMVECTOR m_scale;
-
-
 
 public:
 	GameObject();
@@ -44,14 +29,16 @@ public:
 	// Translation
 	void setPosition(float x, float y, float z); // Absolute
 	void setPosition(XMVECTOR pos);
-	void move(float dX, float dY, float dZ); // Relative
+	void move(float dX, float dY, float dZ); // Relative current value
 	void move(XMVECTOR dPos);
+	// Set relative object
 
 	// Rotation
 	void setRotation(XMVECTOR rotation); // Absolute
 	void setRotation(float vx, float vy, float vz, float rotDeg);
-	void rotate(XMVECTOR dRotation); // Relative
+	void rotate(XMVECTOR dRotation); // Relative current value
 	void rotate(float vx, float vy, float vz, float dRotDeg);
+	// Set relative object
 
 	// Scale
 	void setScale(XMVECTOR scale); // Absolute
@@ -60,4 +47,5 @@ public:
 	void scale(float xScale, float yScale, float zScale);
 
 	XMVECTOR getPosition();
+	objectData const getData();
 };

@@ -15,19 +15,16 @@ class PreLoader
 {
 private:
 	// Preloaded models
-	std::vector<std::vector<int>> m_nrOfmodels;
-	std::vector<std::vector<Model*>> m_objects;
+	std::vector<int> m_nrOfmodels[OBJECT_TYPES];
+	std::vector<Model*> m_objects[OBJECT_TYPES];
 
 	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
+	void setObjectData(objectType type, objectData data, int variant = 0);
 
-	void setPosition(XMVECTOR pos, objectType type, int modelNr = 0);
-	void setRotation(XMVECTOR rotation, , objectType type, int modelNr = 0);
-	void setScale(XMVECTOR scale, objectType type, int modelNr = 0);
 public:
 	PreLoader();
 	~PreLoader();
 
-    void setObjectData(objectData data, objectType type, int objectVariant = 0);
-    void draw(objectType type, int objectVariant = 0);
+    void draw(objectType type, objectData data, int variant = 0);
 };
 

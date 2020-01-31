@@ -108,7 +108,7 @@ void Model::setRotation(XMVECTOR rotation)
 	float rot = cos(rotInRad / 2);
 	XMVECTOR rotVec = { vx, vy, vz,  rot };
 	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
-	m_rotationMat = m_rotationMat * dRotation;
+	m_rotationMat = dRotation;
 }
 
 void Model::setScale(XMVECTOR scale)
@@ -119,6 +119,14 @@ void Model::setScale(XMVECTOR scale)
 	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
 }
 
+
+void Model::setObjectData(objectData data)
+{
+	setPosition(data.pos);
+	setRotation(data.rotation);
+	setScale(data.scale);
+	updateSubResource();
+}
 
 void Model::loadModel(std::ifstream& in)
 {

@@ -24,7 +24,6 @@
 #include "Camera.h"
 #include "Light.h"
 
-#include "PreLoader.h"
 
 
 using namespace DirectX;
@@ -123,8 +122,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		g_Clock = new Clock();
 		g_Game = new Game();
-
-		PreLoader preLoader;
 
 		int counterFrames = 0;
 		int fps = 0;

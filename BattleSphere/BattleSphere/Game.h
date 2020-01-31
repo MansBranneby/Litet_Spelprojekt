@@ -9,6 +9,8 @@
 #include "GameObject.h"
 #include "Input.h"
 #include "Robot.h"
+#include "PreLoader.h"
+
 
 using namespace DirectX;
 
@@ -19,6 +21,8 @@ private:
 	std::vector<GameObject> m_gameObjects;
 	Input input;
 	std::vector<Robot> m_robots;
+
+	PreLoader preLoader;
 
 	void handleMovement(float dt, int id);
 	void handleInputs(float dt);

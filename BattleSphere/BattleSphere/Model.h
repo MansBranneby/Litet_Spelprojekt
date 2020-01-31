@@ -3,12 +3,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "StructsAndEnums.h"
 
-struct vertex {
-	float posX, posY, posZ;
-	float u, v;
-	float normX, normY, normZ;
-};
 
 class Model
 {
@@ -31,15 +27,15 @@ private:
 	void createVertexCBuffer(); // For model matrix
 	void updateSubResource();
 
+    void setPosition(XMVECTOR pos);
+	void setRotation(XMVECTOR rotation);
+	void setScale(XMVECTOR scale);
 public:
 	void draw();
 	Model();
 	~Model();
 
-
-    void setPosition(XMVECTOR pos);
-	void setRotation(XMVECTOR rotation);
-	void setScale(XMVECTOR scale);
+	void setObjectData(objectData data);
 	void loadModel(std::ifstream& in);
 };
 
