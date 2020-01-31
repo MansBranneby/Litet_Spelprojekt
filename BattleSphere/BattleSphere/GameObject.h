@@ -17,7 +17,7 @@ enum objectType {
 	resource = 5
 };
 
-struct renderData {
+struct objectData {
 	XMVECTOR pos;
 	XMVECTOR rotation;
 	XMVECTOR scale;
@@ -31,7 +31,7 @@ private:
 	XMVECTOR m_rotation;
 	XMVECTOR m_scale;
 
-	
+
 
 public:
 	GameObject();

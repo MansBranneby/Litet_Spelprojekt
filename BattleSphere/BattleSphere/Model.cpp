@@ -8,7 +8,7 @@ void Model::createVertexBuffer()
 	{
 		OutputDebugStringA((std::to_string(m_vertices[i].normX) + " " + std::to_string(m_vertices[i].normY) + " " + std::to_string(m_vertices[i].normZ) + '\n').c_str());
 	}*/
-	
+
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -89,36 +89,36 @@ Model::~Model()
 	if (m_modelMatrixData) delete (m_modelMatrixData);
 }
 
-void Model::move(XMVECTOR dPos)
+void Model::setPosition(XMVECTOR pos)
 {
-	m_pos += dPos;
-	updateSubResource();
+	m_pos = pos;
 }
 
-void Model::rotate(float vx, float vy, float vz, float rotDeg)
+void Model::setRotation(XMVECTOR rotation)
 {
+	float vx = rotation.m128_f32[0];
+	float vy = rotation.m128_f32[1];
+	float vz = rotation.m128_f32[2];
+	float rotDeg = rotation.m128_f32[3];
+
 	float rotInRad = XMConvertToRadians(rotDeg);
 	vx *= sin(rotInRad / 2);
 	vy *= sin(rotInRad / 2);
 	vz *= sin(rotInRad / 2);
-	float rotation = cos(rotInRad / 2);
-	XMVECTOR rotVec = { vx, vy, vz,  rotation };
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
 	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
 	m_rotationMat = m_rotationMat * dRotation;
-	updateSubResource();
 }
 
-void Model::scale(float xScale, float yScale, float zScale)
+void Model::setScale(XMVECTOR scale)
 {
+	float xScale = scale.m128_f32[0];
+	float yScale = scale.m128_f32[1];
+	float zScale = scale.m128_f32[2];
 	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
-	updateSubResource();
 }
 
-void Model::setPosition(XMVECTOR pos)
-{
-	m_pos = pos;
-	updateSubResource();
-}
 
 void Model::loadModel(std::ifstream& in)
 {
@@ -135,7 +135,7 @@ void Model::loadModel(std::ifstream& in)
 	for (int i = 0; i < m_nrOfVertices; i++)
 	{
 		std::getline(in, line);
-		inputStream.str(line); 
+		inputStream.str(line);
 		inputStream >>
 			m_vertices[i].posX >> m_vertices[i].posY >> m_vertices[i].posZ >>
 			m_vertices[i].u >> m_vertices[i].v >>
@@ -187,7 +187,7 @@ void Model::loadModel(std::ifstream& in)
 		inputStream.clear();
 
 		// Diffuse texture
-		
+
 		std::getline(in, line);
 
 		//?

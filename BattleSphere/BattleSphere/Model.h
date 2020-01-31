@@ -36,10 +36,10 @@ public:
 	Model();
 	~Model();
 
-	void move(XMVECTOR dPos);
-	void rotate(float vx, float vy, float vz, float rotDeg);
-	void scale(float xScale, float yScale, float zScale);
-	void setPosition(XMVECTOR pos);
+
+    void setPosition(XMVECTOR pos);
+	void setRotation(XMVECTOR rotation);
+	void setScale(XMVECTOR scale);
 	void loadModel(std::ifstream& in);
 };
 
