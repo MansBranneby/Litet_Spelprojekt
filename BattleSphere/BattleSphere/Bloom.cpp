@@ -16,23 +16,27 @@ void Bloom::createResources()
 	texDesc.MiscFlags = 0;
 	texDesc.SampleDesc.Count = 1;
 
-	// Material
-	HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_materialTex);
-	if (FAILED(hr))
-		MessageBox(NULL, L"materialTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
+	//// Material
+	//HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_materialTex);
+	//if (FAILED(hr))
+	//	MessageBox(NULL, L"materialTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
-	// Horizontal
-	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_horizontalTex);
+	// Scene
+	HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_sceneTex);
 	if (FAILED(hr))
-		MessageBox(NULL, L"horizontalTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"sceneTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
 	// Bloom
 	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_bloomTex);
 	if (FAILED(hr))
 		MessageBox(NULL, L"bloomTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
+	// Horizontal
+	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDesc, NULL, &m_horizontalTex);
+	if (FAILED(hr))
+		MessageBox(NULL, L"horizontalTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
-	if (m_materialTex != 0 && m_horizontalTex != 0 && m_bloomTex != 0)
+	if (m_sceneTex != 0 && m_bloomTex != 0 && m_horizontalTex != 0)
 	{
 		//// RENDER TARGETS ////
 
@@ -42,19 +46,14 @@ void Bloom::createResources()
 		RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		RTVDesc.Texture2D.MipSlice = 0;
 
-		// Material
-		hr = DX::getInstance()->getDevice()->CreateRenderTargetView(m_materialTex, &RTVDesc, &m_materialRTV);
+		// 0: Scene, 1: Emissive materials
+		hr = DX::getInstance()->getDevice()->CreateRenderTargetView(m_sceneTex, &RTVDesc, &m_bloomRTV[0]);
 		if (FAILED(hr))
-			MessageBox(NULL, L"materialRTV in Bloom", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(NULL, L"bloomRTV[0] in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
-		// Horizontal
-		hr = DX::getInstance()->getDevice()->CreateRenderTargetView(m_horizontalTex, &RTVDesc, &m_horizontalRTV);
+		hr = DX::getInstance()->getDevice()->CreateRenderTargetView(m_bloomTex, &RTVDesc, &m_bloomRTV[1]);
 		if (FAILED(hr))
-			MessageBox(NULL, L"horizontalRTV in Bloom", L"Error", MB_OK | MB_ICONERROR);
-		// Bloom
-		hr = DX::getInstance()->getDevice()->CreateRenderTargetView(m_bloomTex, &RTVDesc, &m_bloomRTV);
-		if (FAILED(hr))
-			MessageBox(NULL, L"bloomRTV in Bloom", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(NULL, L"bloomRTV[1] in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
 		//// SHADER RESOURCES ////
 
@@ -66,7 +65,7 @@ void Bloom::createResources()
 		SRVDesc.Texture2D.MipLevels = texDesc.MipLevels;
 
 		// Material
-		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_materialTex, &SRVDesc, &m_materialSRV);
+		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_bloomTex, &SRVDesc, &m_materialSRV);
 		if (FAILED(hr))
 			MessageBox(NULL, L"materialSRV in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
@@ -74,10 +73,15 @@ void Bloom::createResources()
 		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_horizontalTex, &SRVDesc, &m_horizontalSRV);
 		if (FAILED(hr))
 			MessageBox(NULL, L"horizontalSRV in Bloom", L"Error", MB_OK | MB_ICONERROR);
-		// Bloom
-		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_bloomTex, &SRVDesc, &m_bloomSRV);
+		
+		// Bloom - 0: Scene, 1: Emissive materials
+		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_sceneTex, &SRVDesc, &m_bloomSRV[0]);
 		if (FAILED(hr))
-			MessageBox(NULL, L"bloomSRV in Bloom", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(NULL, L"bloomSRV[0] in Bloom", L"Error", MB_OK | MB_ICONERROR);
+		
+		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_bloomTex, &SRVDesc, &m_bloomSRV[1]);
+		if (FAILED(hr))
+			MessageBox(NULL, L"bloomSRV[1] in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
 		//// UNORDERED ACCESS VIEWS ////
 
@@ -91,8 +95,12 @@ void Bloom::createResources()
 		hr = DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_horizontalTex, &UAVdesc, &m_horizontalUAV);
 		if (FAILED(hr))
 			MessageBox(NULL, L"horizontalUAV in Bloom", L"Error", MB_OK | MB_ICONERROR);
-	}
 
+		// Bloom
+		hr = DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_bloomTex, &UAVdesc, &m_bloomUAV);
+		if (FAILED(hr))
+			MessageBox(NULL, L"bloomUAV in Bloom", L"Error", MB_OK | MB_ICONERROR);
+	}
 }
 
 void Bloom::createShaders()
@@ -109,54 +117,60 @@ Bloom::Bloom()
 
 Bloom::~Bloom()
 {
-	m_materialTex->Release();
 	m_horizontalTex->Release();
+	m_sceneTex->Release();
 	m_bloomTex->Release();
 
-	m_materialRTV->Release();
-	m_horizontalRTV->Release();
-	m_bloomRTV->Release();
+	m_bloomRTV[0]->Release();
+	m_bloomRTV[1]->Release();
 
 	m_materialSRV->Release();
 	m_horizontalSRV->Release();
-	m_bloomSRV->Release();
+	m_bloomSRV[0]->Release();
+	m_bloomSRV[1]->Release();
 
 	m_horizontalUAV->Release();
+	m_bloomUAV->Release();
 
 	m_horizontalCS.release();
 	m_verticalCS.release();
 }
 
-ID3D11RenderTargetView* Bloom::getMaterialRTV()
-{
-	return m_materialRTV;
-}
-
-ID3D11ShaderResourceView* Bloom::getBloomSRV()
-{
-	return m_bloomSRV;
-}
-
 void Bloom::setRenderTarget()
 {
-	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &m_materialRTV, NULL);
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(2, m_bloomRTV, NULL);
 }
 
 void Bloom::setShaderResource()
 {
-	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &m_horizontalSRV);
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 2, m_bloomSRV);
 }
 
 void Bloom::run()
 {
 	ID3D11RenderTargetView* nullRTV = { NULL };
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(0, &nullRTV, NULL);
-
+	
+	//// HORIZONTAL PASS ////
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_horizontalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_materialSRV);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_horizontalUAV, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch(2, (UINT)DX::getInstance()->getHeight() / 2, 1);
+	DX::getInstance()->getDeviceContext()->Dispatch(60, (UINT)DX::getInstance()->getHeight(), 1); 
 
 	ID3D11ShaderResourceView* nullSRV = { NULL };
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &nullSRV);
+	DX::getInstance()->getDeviceContext()->CSSetShaderResources(1, 1, &nullSRV);
+
+	ID3D11UnorderedAccessView* nullUAV = { NULL };
+	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
+
+	//// VERTICAL PASS ////
+	DX::getInstance()->getDeviceContext()->CSSetShader(&m_verticalCS.getComputeShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_horizontalSRV);
+	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_bloomUAV, 0);
+	DX::getInstance()->getDeviceContext()->Dispatch((UINT)DX::getInstance()->getWidth(), 36, 1);
+
+	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &nullSRV);
+	DX::getInstance()->getDeviceContext()->CSSetShaderResources(1, 1, &nullSRV);
+	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
 }

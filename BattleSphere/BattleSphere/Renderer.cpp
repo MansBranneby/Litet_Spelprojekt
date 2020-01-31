@@ -54,7 +54,7 @@ struct PosCol
 struct PosUV
 {
 	float x, y, z;
-	float u, v;
+	float u, v, a;
 };
 
 PosCol vertexData[3]
@@ -75,22 +75,23 @@ void createFullscreenQuad()
 	PosUV fsQuad[6] =
 	{
 		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
-		0.0f, 0.0f,			//v0 tex
-
-		1.0, -1.0f, 0.0f,	//v1 pos	R B
-		1.0f, 1.0f,			//v1 tex
+		0.0f, 0.0f,	0.0f,	//v0 tex
 
 		-1.0f, -1.0f, 0.0f, //v2 pos	L B
-		0.0f, 1.0f,			//v2 tex
+		0.0f, 1.0f,	0.0f,	//v2 tex
+
+		1.0, -1.0f, 0.0f,	//v1 pos	R B
+		1.0f, 1.0f,	0.0f,	//v1 tex
+
 
 		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
-		0.0f, 0.0f,			//v3 tex
-
-		1.0f, 1.0f, 0.0f,	//v4 pos	R T
-		1.0f, 0.0f,			//v4 tex
+		0.0f, 0.0f,	0.0f,	//v3 tex
 
 		1.0f, -1.0f, 0.0f,	//v5 pos	R B
-		1.0f, 1.0f			//v5 tex
+		1.0f, 1.0f, 0.0f,	//v5 tex
+
+		1.0f, 1.0f, 0.0f,	//v4 pos	R T
+		1.0f, 0.0f,	0.0f	//v4 tex
 	};
 
 	D3D11_BUFFER_DESC bufferDescFSQuad;
@@ -175,6 +176,10 @@ void finalRender()
 
 	ID3D11ShaderResourceView* nullRTV = { NULL };
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullRTV);
+
+	//ID3D11SamplerState* nullSS = NULL;
+	//DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, &nullSS);
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -208,6 +213,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			else
 			{
 				//// RENDER ////
+
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 0, 0, 0, 1 };
 
@@ -237,11 +243,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				DX::getInstance()->getDeviceContext()->Draw(3, 0);
 
-				DX::getInstance()->getSwapChain()->Present(0, 0);
-
 				g_bloom->run();
 
 				finalRender();
+
+				DX::getInstance()->getSwapChain()->Present(0, 0);
+
 			}
 		}
 
@@ -250,6 +257,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_vertexBufferFSQuad->Release();
 		gVS.release();
 		gPS.release();
+		g_vertexShaderFinalRender.release();
+		g_pixelShaderFinalRender.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
 

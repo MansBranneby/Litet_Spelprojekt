@@ -1,4 +1,6 @@
-Texture2D tex : register(t0);
+Texture2D scene : register(t0);
+Texture2D bloom : register(t1);
+
 SamplerState sampAni;
 
 struct VS_OUT
@@ -9,7 +11,10 @@ struct VS_OUT
 
 float4 PS_main(VS_OUT input) : SV_Target
 {
-	float3 texColour = tex.Sample(sampAni, input.tex).xyz;
+	float3 sceneColour = scene.Sample(sampAni, input.tex).xyz;
+	float3 bloomColour = bloom.Sample(sampAni, input.tex).xyz;
 
-	return float4(1.0f, 0.0f, 0.0f, 1.0f);
+	float3 fragmentColour = sceneColour + bloomColour;
+
+	return float4(fragmentColour, 1.0f);
 };

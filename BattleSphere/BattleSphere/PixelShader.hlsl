@@ -1,3 +1,5 @@
+SamplerState sampAni;
+
 struct PS_IN
 {
 	float4 pos : SV_POSITION;
@@ -25,8 +27,16 @@ cbuffer PS_CONSTANT_BUFFER : register(b2)
 	float4 KeIn; //Ke + d
 };
 
-float4 PS_main(PS_IN input) : SV_Target
+struct PS_OUT
 {
+	float4 scene : SV_Target0;
+	float4 bloom : SV_Target1;
+};
+
+PS_OUT PS_main(PS_IN input)
+{
+	PS_OUT output;
+
 	////LIGHTING//// (for one light)
 
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
@@ -64,5 +74,8 @@ float4 PS_main(PS_IN input) : SV_Target
 		break;
 	};
 
-	return float4(fragmentCol, 1.0f);
+	output.scene = float4(fragmentCol, 1.0f);
+	output.bloom = float4(fragmentCol, 1.0f);
+
+	return output;
 };
