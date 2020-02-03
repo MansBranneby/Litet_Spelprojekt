@@ -39,7 +39,6 @@ void Model::createVertexCBuffer()
 	vsCBufferData.pSysMem = m_modelMatrixData;
 	vsCBufferData.SysMemPitch = 0;
 	vsCBufferData.SysMemSlicePitch = 0;
-
 	DX::getInstance()->getDevice()->CreateBuffer(&vsCBufferDesc, &vsCBufferData, &m_modelMatrixCBuffer);
 }
 
@@ -94,6 +93,7 @@ Model::Model()
 	m_modelMatrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
+	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();

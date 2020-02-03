@@ -8,7 +8,6 @@
 #include "DX.h"
 #include "GameObject.h"
 #include "Input.h"
-#include "Robot.h"
 #include "PreLoader.h"
 
 
@@ -18,14 +17,18 @@ class Game
 {
 private:
 	int m_nrOfPlayers;
+	int m_controllerId[XUSER_MAX_COUNT];
 	std::vector<GameObject> m_gameObjects;
-	Input input;
-	std::vector<Robot> m_robots;
+	Input m_input;
+	Robot* m_robots[XUSER_MAX_COUNT];
+	std::vector<Projectile*> m_projectiles;
 
 	PreLoader m_preLoader;
 
 	void handleMovement(float dt, int id);
 	void handleInputs(float dt);
+
+	void updatePlayerStatus();
 public:
 	Game();
 

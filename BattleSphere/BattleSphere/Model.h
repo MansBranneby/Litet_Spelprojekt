@@ -21,6 +21,7 @@ private:
 	ID3D11Buffer* m_modelMatrixCBuffer;
 	XMMATRIX* m_modelMatrixData;
 	XMMATRIX m_rotationMat;
+	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
 	XMMATRIX m_relRotationMat;
 	XMMATRIX m_relScalingMat;
