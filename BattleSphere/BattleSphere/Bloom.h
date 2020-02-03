@@ -38,6 +38,7 @@ public:
 
 	void setRenderTarget();
 	void setShaderResource();
+	void clearRenderTarget();
 	void run();
 };
 

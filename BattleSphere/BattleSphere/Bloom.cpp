@@ -146,6 +146,13 @@ void Bloom::setShaderResource()
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 2, m_bloomSRV);
 }
 
+void Bloom::clearRenderTarget()
+{
+	float clearColour[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_bloomRTV[0], clearColour);
+	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_bloomRTV[1], clearColour);
+}
+
 void Bloom::run()
 {
 	ID3D11RenderTargetView* nullRTV = { NULL };

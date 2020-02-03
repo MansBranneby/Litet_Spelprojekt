@@ -177,9 +177,6 @@ void finalRender()
 	ID3D11ShaderResourceView* nullRTV = { NULL };
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullRTV);
-
-	//ID3D11SamplerState* nullSS = NULL;
-	//DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, &nullSS);
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -218,9 +215,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				float clearColour[] = { 0, 0, 0, 1 };
 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-				
+				g_bloom->clearRenderTarget();
+
 				// BLOOM
-				//DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
 				g_bloom->setRenderTarget();
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
