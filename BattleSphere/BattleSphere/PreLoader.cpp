@@ -31,6 +31,13 @@ void PreLoader::setObjectData(objectType type, objectData data, int variant)
 		m_objects[typ][variant][i].setObjectData(data);
 }
 
+void PreLoader::setObjectData(objectType type, objectData data, objectData relativeData, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+		m_objects[typ][variant][i].setObjectData(data, relativeData);
+}
+
 PreLoader::PreLoader()
 {	
 	// Load objects
@@ -38,6 +45,7 @@ PreLoader::PreLoader()
 	//loadFromFile(weapon, "?");
 	loadFromFile(objectType::robot, "BattleSphere");
 	loadFromFile(objectType::node, "Building");
+	loadFromFile(objectType::robot, "Building");
 	//loadFromFile(projectile, "?");
 	//loadFromFile(resource, "?");
 }
@@ -58,6 +66,16 @@ void PreLoader::draw(objectType type, objectData data, int variant)
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data);
+		m_objects[typ][variant][i].draw();
+	}
+}
+
+void PreLoader::draw(objectType type, objectData data, objectData relativeData, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+	{
+		m_objects[typ][variant][i].setObjectData(data, relativeData);
 		m_objects[typ][variant][i].draw();
 	}
 }

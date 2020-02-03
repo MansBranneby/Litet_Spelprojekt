@@ -12,7 +12,7 @@ using namespace DirectX;
 
 
 class GameObject
-	{
+{
 private:
 	XMVECTOR m_position;
 	XMVECTOR m_rotation;
@@ -24,7 +24,6 @@ public:
 
 
 	void update();
-	void draw();
 
 	// Translation
 	void setPosition(float x, float y, float z); // Absolute

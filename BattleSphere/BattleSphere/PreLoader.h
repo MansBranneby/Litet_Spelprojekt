@@ -20,11 +20,13 @@ private:
 
 	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
 	void setObjectData(objectType type, objectData data, int variant = 0);
+	void setObjectData(objectType type, objectData data, objectData relativeData, int variant = 0);
 
 public:
 	PreLoader();
 	~PreLoader();
 
-    void draw(objectType type, objectData data, int variant = 0);
+	void draw(objectType type, objectData data, int variant = 0);
+	void draw(objectType type, objectData data, objectData relativeData, int variant = 0);
 };
 

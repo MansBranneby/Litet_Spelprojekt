@@ -5,7 +5,8 @@
 
 using namespace DirectX;
 
-enum class objectType {
+enum class objectType 
+{
 	drone = 0,
 	weapon = 1,
 	robot = 2,
@@ -14,13 +15,15 @@ enum class objectType {
 	resource = 5
 };
 
-struct objectData {
+struct objectData 
+{
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
 	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
 };
 
-struct vertex {
+struct vertex 
+{
 	float posX, posY, posZ;
 	float u, v;
 	float normX, normY, normZ;

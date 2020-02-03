@@ -22,7 +22,7 @@ private:
 	Input input;
 	std::vector<Robot> m_robots;
 
-	PreLoader preLoader;
+	PreLoader m_preLoader;
 
 	void handleMovement(float dt, int id);
 	void handleInputs(float dt);

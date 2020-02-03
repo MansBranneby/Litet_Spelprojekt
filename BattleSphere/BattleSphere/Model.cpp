@@ -53,6 +53,22 @@ void Model::updateSubResource()
 	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
 }
 
+void Model::updateRelSubResource()
+{
+	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
+		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
+
+	//*m_modelMatrixData = XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]) *
+	//	XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+
+
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
+}
+
 void Model::draw()
 {
 	UINT32 vertexSize = sizeof(vertex);
@@ -68,6 +84,7 @@ void Model::draw()
 Model::Model()
 {
 	m_pos = XMVectorSet(0, 0, 0, 0);
+	m_relPos = XMVectorSet(0, 0, 0, 0);
 	m_vertices = nullptr;
 	m_subModels = nullptr;
 	m_vertexBuffer = nullptr;
@@ -78,6 +95,8 @@ Model::Model()
 	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
+	m_relRotationMat = XMMatrixIdentity();
+	m_relScalingMat = XMMatrixIdentity();
 }
 
 Model::~Model()
@@ -92,6 +111,12 @@ Model::~Model()
 void Model::setPosition(XMVECTOR pos)
 {
 	m_pos = pos;
+}
+
+void Model::setPosition(XMVECTOR pos, XMVECTOR relPos)
+{
+	m_pos = pos;
+	m_relPos = relPos;
 }
 
 void Model::setRotation(XMVECTOR rotation)
@@ -111,12 +136,39 @@ void Model::setRotation(XMVECTOR rotation)
 	m_rotationMat = dRotation;
 }
 
+void Model::setRotation(XMVECTOR rotation, XMVECTOR relRotation)
+{
+	setRotation(rotation);
+	float vx = relRotation.m128_f32[0];
+	float vy = relRotation.m128_f32[1];
+	float vz = relRotation.m128_f32[2];
+	float rotDeg = relRotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_relRotationMat = dRotation;
+}
+
 void Model::setScale(XMVECTOR scale)
 {
 	float xScale = scale.m128_f32[0];
 	float yScale = scale.m128_f32[1];
 	float zScale = scale.m128_f32[2];
 	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
+}
+
+void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
+{
+	setScale(scale);
+	float xScale = relScale.m128_f32[0];
+	float yScale = relScale.m128_f32[1];
+	float zScale = relScale.m128_f32[2];
+	m_relScalingMat = XMMatrixScaling(xScale, yScale, zScale);
 }
 
 
@@ -126,6 +178,14 @@ void Model::setObjectData(objectData data)
 	setRotation(data.rotation);
 	setScale(data.scale);
 	updateSubResource();
+}
+
+void Model::setObjectData(objectData data, objectData relativeData)
+{
+	setPosition(data.pos, relativeData.pos);
+	setRotation(data.rotation, relativeData.rotation);
+	setScale(data.scale, relativeData.scale);
+	updateRelSubResource();
 }
 
 void Model::loadModel(std::ifstream& in)

@@ -77,8 +77,11 @@ void Game::draw()
 	{
 		// TODO something
 		//m_robots[i].draw();
-		preLoader.draw(objectType::robot, m_robots[i].getData());
+		//m_preLoader.draw(objectType::robot, m_robots[i].getData(), m_robots[i].getData());
+		//m_preLoader.draw(objectType::robot, m_robots[i].getData(), 1);
 	}
+	m_preLoader.draw(objectType::robot, m_robots[0].getData(), m_robots[1].getData());
+	m_preLoader.draw(objectType::robot, m_robots[1].getData());
 }
 
 void Game::release()
