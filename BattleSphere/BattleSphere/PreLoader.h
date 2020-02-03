@@ -7,7 +7,7 @@
 #include "Projectile.h"
 #include "Resource.h"
 
-#define OBJECT_TYPES 6
+#define OBJECT_TYPES 7
 // objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource
 
 
@@ -26,6 +26,8 @@ public:
 	PreLoader();
 	~PreLoader();
 
+	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
+	void draw(objectType type, int variant = 0);
 	void draw(objectType type, objectData data, int variant = 0);
 	void draw(objectType type, objectData data, objectData relativeData, int variant = 0);
 };

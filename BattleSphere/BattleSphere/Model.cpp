@@ -57,11 +57,6 @@ void Model::updateRelSubResource()
 	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
 		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
 
-	//*m_modelMatrixData = XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]) *
-	//	XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
-
-
-
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));

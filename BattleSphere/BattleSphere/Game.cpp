@@ -118,10 +118,10 @@ void Game::handleInputs(float dt)
 					m_projectiles.push_back(bullet);
 				}
 				*/
-				if (m_input.isPressed(i, XINPUT_GAMEPAD_A))
-				{
-					OutputDebugStringA("A\n");
-				}
+				//if (m_input.isPressed(i, XINPUT_GAMEPAD_A))
+				//{
+				//	OutputDebugStringA("A\n");
+				//}
 			}
 		}
 	}
@@ -147,18 +147,18 @@ Game::Game()
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
+
+	objectData sceneData;
+	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+	sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
+	m_preLoader.setStaticData(objectType::e_scene, sceneData);
 }
 
 void Game::update(float dt)
 {
 	handleInputs(dt);
 	updatePlayerStatus();
-
-	for (int i = 0; i < m_gameObjects.size(); i++)
-	{
-		// TODO remove comment
-		//m_gameObjects[i]->update(dt);
-	}
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
@@ -188,7 +188,6 @@ void Game::update(float dt)
 
 void Game::updateSec()
 {
-	//add something
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_input.isPressed(i, XINPUT_GAMEPAD_A))
@@ -200,19 +199,13 @@ void Game::updateSec()
 
 void Game::draw()
 {
-	for (int i = 0; i < m_gameObjects.size(); i++)
-	{
-		//m_gameObjects[i]->draw();
-	}
-
+	m_preLoader.draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
 		{
 			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
-			// TODO something
 
-			//TODO: Remove m_robots[i]->draw();
 			m_preLoader.draw(objectType::e_robot, m_robots[i]->getData());
 			m_preLoader.draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 
@@ -225,24 +218,16 @@ void Game::draw()
 
 	for (int i = 0; i < m_projectiles.size(); i++)
 	{
-		//m_projectiles[i]->draw();
 		m_preLoader.draw(objectType::e_projectile, m_projectiles[i]->getData());
 	}
 }
 
 void Game::release()
 {
-	for (int i = 0; i < m_gameObjects.size(); i++)
-	{
-		// TODO release gameobject
-		//m_gameObjects[i].release();
-	}
-
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
 		{
-			// TODO release gameobject
 			m_robots[i]->release();
 			delete m_robots[i];
 		}

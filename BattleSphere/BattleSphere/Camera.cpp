@@ -3,9 +3,9 @@
 Camera::Camera(float width, float height, float nearPlane, float farPlane)
 {
 	// Base vectors
-	m_position = XMVectorSet(0.0f, 5.0f, -7.0f, 0.0f);
+	m_position = XMVectorSet(0.0f, 45.0f, -60.0f, 0.0f);
 	
-	m_lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_lookAt = XMVectorSet(0.0f, 0.0f, -23.0f, 0.0f);
 	
 	m_up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
