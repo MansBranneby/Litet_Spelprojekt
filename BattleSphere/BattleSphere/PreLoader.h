@@ -8,7 +8,7 @@
 #include "Resource.h"
 
 #define OBJECT_TYPES 6
-// objectType enum: drone, weapon, robot, node, projectile, resource
+// objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource
 
 
 class PreLoader

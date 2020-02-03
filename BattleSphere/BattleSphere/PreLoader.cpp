@@ -41,13 +41,12 @@ void PreLoader::setObjectData(objectType type, objectData data, objectData relat
 PreLoader::PreLoader()
 {	
 	// Load objects
-	//loadFromFile(drone, "?");
-	//loadFromFile(weapon, "?");
-	loadFromFile(objectType::robot, "BattleSphere");
-	loadFromFile(objectType::node, "Building");
-	loadFromFile(objectType::robot, "Building");
-	//loadFromFile(projectile, "?");
-	//loadFromFile(resource, "?");
+	//loadFromFile(objectType::e_drone, "?");
+	loadFromFile(objectType::e_weapon, "1mesh1mat");
+	loadFromFile(objectType::e_robot, "BattleSphere");
+	loadFromFile(objectType::e_node, "Building");
+	loadFromFile(objectType::e_projectile, "Building");
+	//loadFromFile(objectType::e_resource, "?");
 }
 
 PreLoader::~PreLoader()

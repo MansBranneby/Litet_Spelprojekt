@@ -15,20 +15,24 @@ void Game::handleMovement(float dt, int id)
 		weapons[m_robots[id]->getCurrentWeapon(RIGHT)]->getRelativePos()
 	);
 
-	weapons[m_robots[id]->getCurrentWeapon(RIGHT)]->setPositionRelative(
-		m_robots[id]->getPosition()
-	);
+	//m_robots[id]->getWeapons()[m_robots[id]->getCurrentWeapon(RIGHT)]->setPosition(
+	//	m_robots[id]->getWeapons()[m_robots[id]->getCurrentWeapon(RIGHT)]->getRelativePos()
+	//);
 
-	if (m_robots[id]->getCurrentWeapon(LEFT) != -1)
-	{
-		weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setPosition(
-			m_robots[id]->getPosition()
-		);
+	//weapons[m_robots[id]->getCurrentWeapon(RIGHT)]->setPositionRelative(
+	//	m_robots[id]->getPosition()
+	//);
 
-		weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setPositionRelative(
-			weapons[m_robots[id]->getCurrentWeapon(LEFT)]->getRelativePos()
-		);
-	}
+	//if (m_robots[id]->getCurrentWeapon(LEFT) != -1)
+	//{
+	//	weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setPosition(
+	//		m_robots[id]->getPosition()
+	//	);
+	//
+	//	weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setPositionRelative(
+	//		weapons[m_robots[id]->getCurrentWeapon(LEFT)]->getRelativePos()
+	//	);
+	//}
 
 	// Rotation
 	if (abs(m_input.getThumbRX(id)) > 0.1f || abs(m_input.getThumbRY(id)) > 0.1f)
@@ -37,11 +41,11 @@ void Game::handleMovement(float dt, int id)
 
 		m_robots[id]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
 		
-		weapons[m_robots[id]->getCurrentWeapon(RIGHT)]->setRotationAfter(0, 1, 0, m_robots[id]->getCurrentRot());
-		if (m_robots[id]->getCurrentWeapon(LEFT) != -1)
-		{
-			weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setRotationAfter(0, 1, 0, m_robots[id]->getCurrentRot());
-		}
+		//weapons[m_robots[id]->getCurrentWeapon(RIGHT)]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
+		//if (m_robots[id]->getCurrentWeapon(LEFT) != -1)
+		//{
+		//	weapons[m_robots[id]->getCurrentWeapon(LEFT)]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
+		//}
 	}
 
 	// Projectile movement
@@ -84,6 +88,8 @@ void Game::handleInputs(float dt)
 								XMVectorSet(0, sin(rotInRad/2), 0, cos(rotInRad/2))
 							) + m_robots[i]->getPosition()
 						);
+
+					bullet->setRotation(0.0, 1.0, 0.0f, m_robots[i]->getCurrentRot());
 
 					// TODO add recoil here 
 					bullet->setDirection(XMVector3Cross(bullet->getPosition() - m_robots[i]->getPosition(), XMVectorSet(0,1,0,0)));
@@ -130,14 +136,6 @@ void Game::updatePlayerStatus()
 		{
 			Robot* robot = new Robot(i);
 			m_robots[i] = robot;
-			if (i == 0)
-				//m_robots[i]->loadFromFile("BattleSphere");
-			if (i == 1)
-				//m_robots[i]->loadFromFile("Building");
-			if (i == 2)
-				//m_robots[i]->loadFromFile("1mesh1mat");
-			if (i == 3)
-				//m_robots[i]->loadFromFile("2mesh2mat");
 		}
 	}
 	m_nrOfPlayers = m_input.getNrOfGamepads();
@@ -211,16 +209,16 @@ void Game::draw()
 	{
 		if (m_robots[i] != nullptr)
 		{
+			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 			// TODO something
 
 			//TODO: Remove m_robots[i]->draw();
-			m_preLoader.draw(objectType::robot, m_robots[i].getData());
+			m_preLoader.draw(objectType::e_robot, m_robots[i]->getData());
+			m_preLoader.draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 
-			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
-			weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->draw();
 			if (m_robots[i]->getCurrentWeapon(LEFT) != -1)
 			{
-				weapons[m_robots[i]->getCurrentWeapon(LEFT)]->draw();
+				m_preLoader.draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData());
 			}
 		}
 	}
@@ -228,7 +226,7 @@ void Game::draw()
 	for (int i = 0; i < m_projectiles.size(); i++)
 	{
 		//m_projectiles[i]->draw();
-		m_preLoader.draw(objectType::projectile, m_projectiles[i].getData());
+		m_preLoader.draw(objectType::e_projectile, m_projectiles[i]->getData());
 	}
 }
 

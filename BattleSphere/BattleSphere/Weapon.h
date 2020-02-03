@@ -1,10 +1,11 @@
+#pragma once
+
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <vector>
 
 #include "DX.h"
 #include "GameObject.h"
-
 using namespace DirectX;
 
 #define PISTOL 0

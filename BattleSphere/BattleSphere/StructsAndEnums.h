@@ -7,12 +7,12 @@ using namespace DirectX;
 
 enum class objectType 
 {
-	drone = 0,
-	weapon = 1,
-	robot = 2,
-	node = 3,
-	projectile = 4,
-	resource = 5
+	e_drone = 0,
+	e_weapon = 1,
+	e_robot = 2,
+	e_node = 3,
+	e_projectile = 4,
+	e_resource = 5
 };
 
 struct objectData 
