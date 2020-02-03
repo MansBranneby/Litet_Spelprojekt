@@ -39,13 +39,13 @@ void Model::createVertexCBuffer()
 	vsCBufferData.pSysMem = m_modelMatrixData;
 	vsCBufferData.SysMemPitch = 0;
 	vsCBufferData.SysMemSlicePitch = 0;
-
 	DX::getInstance()->getDevice()->CreateBuffer(&vsCBufferDesc, &vsCBufferData, &m_modelMatrixCBuffer);
 }
 
 void Model::updateSubResource()
 {
-	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
+		* m_rotationAfterMat * XMMatrixTranslation(m_posRelative.m128_f32[0], m_posRelative.m128_f32[1], m_posRelative.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -68,6 +68,7 @@ void Model::draw()
 Model::Model()
 {
 	m_pos = XMVectorSet(0, 0, 0, 0);
+	m_posRelative = XMVectorSet(0, 0, 0, 0);
 	m_vertices = nullptr;
 	m_subModels = nullptr;
 	m_vertexBuffer = nullptr;
@@ -77,6 +78,7 @@ Model::Model()
 	m_modelMatrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
+	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
 }
 
@@ -108,6 +110,30 @@ void Model::rotate(float vx, float vy, float vz, float rotDeg)
 	updateSubResource();
 }
 
+void Model::setRotation(float vx, float vy, float vz, float rotDeg)
+{
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rotation = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rotation };
+	m_rotationMat = XMMatrixRotationQuaternion(rotVec);
+	updateSubResource();
+}
+
+void Model::setRotationAfter(float vx, float vy, float vz, float rotDeg)
+{
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rotation = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rotation };
+	m_rotationAfterMat = XMMatrixRotationQuaternion(rotVec);
+	updateSubResource();
+}
+
 void Model::scale(float xScale, float yScale, float zScale)
 {
 	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
@@ -117,6 +143,12 @@ void Model::scale(float xScale, float yScale, float zScale)
 void Model::setPosition(XMVECTOR pos)
 {
 	m_pos = pos;
+	updateSubResource();
+}
+
+void Model::setPositionRelative(XMVECTOR pos)
+{
+	m_posRelative = pos;
 	updateSubResource();
 }
 

@@ -267,6 +267,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		gVS.release();
 		gPS.release();
 		delete g_Clock;
+		g_Game->release();
 		delete g_Game;
 		DX::getInstance()->release();
 		delete DX::getInstance();

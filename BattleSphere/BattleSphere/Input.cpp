@@ -12,6 +12,7 @@ bool Input::refresh(int user)
 
 int Input::getId(int user)
 {
+    m_nrOfGamepads = getControllerState();
     return m_gamepadIds[user];
 }
 
@@ -76,13 +77,15 @@ int Input::getControllerState()
         if (dwResult == ERROR_SUCCESS)
         {
             // Controller is connected
-            counter++;
             m_gamepads[i].setId(i);
             m_gamepadIds[i] = i;
+            counter++;
         }
         else
         {
-            // Controller is not connected 
+            // Controller is not connected
+            m_gamepads[i].setId(-1);
+            m_gamepadIds[i] = -1;
         }
     }
 
