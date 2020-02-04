@@ -2,15 +2,18 @@
 
 Robot::Robot(int playerId)
 {
-	m_playerId = 0;
+	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 3.0f;
+	m_currentRotation = 0.0;
 	m_colour = XMVectorSet(1,0,0,0);
 	m_currentWeapon[LEFT] = -1;
-	m_currentWeapon[RIGHT] = -1;
+	m_currentWeapon[RIGHT] = 0;
 	m_score = 0;
+	Weapon* pistol = new Weapon(RIFLE);
+	m_weapons.push_back(pistol);
+
 	// TODO add init
-	//std::vector<Weapon> m_weapons;
 	//Resource m_resource;
 }
 
@@ -44,6 +47,16 @@ float Robot::getVelocity()
 	return m_velocity;
 }
 
+void Robot::setCurrentRot(float deg)
+{
+	m_currentRotation = deg;
+}
+
+float Robot::getCurrentRot()
+{
+	return m_currentRotation;
+}
+
 void Robot::setColour(XMVECTOR colour)
 {
 	m_colour = colour;
@@ -56,22 +69,25 @@ XMVECTOR Robot::getColour()
 
 void Robot::changeWeapon(int side)
 {
-	// TODO remove comment and try the function
-	/*
-	if (m_weapons.length() > 2) 
+
+	if (m_weapons.size() > 2) 
 	{
-		m_currentWeapon[side] = (m_currentWeapon[side] + 1) % m_weapons.length();
+		m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
 		{
-			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % m_weapons.length();
+			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		}
 	}
-	*/
 }
 
 int Robot::getCurrentWeapon(int side)
 {
 	return m_currentWeapon[side];
+}
+
+std::vector<Weapon*> Robot::getWeapons()
+{
+	return m_weapons;
 }
 
 void Robot::addScore(int score)
@@ -84,7 +100,33 @@ void Robot::resetScore()
 	m_score = 0;
 }
 
+void Robot::addWeapon(int type)
+{
+	Weapon* weapon = new Weapon();
+	m_weapons.push_back(weapon);
+	if (m_currentWeapon[LEFT] == -1)
+		m_currentWeapon[LEFT] = 1;
+}
+
+bool Robot::upgradeWeapon(int type)
+{
+	for (int i = 0; i < m_weapons.size(); i++)
+	{
+		if (m_weapons[i]->getType() == type)
+		{
+			m_weapons[i]->upgrade();
+			return true;
+		}
+	}
+	addWeapon(type);
+	return  false;
+}
+
 void Robot::release()
 {
-	// TODO realease weapons/resource?
+	// TODO realease resource?
+	for (int i = 0; i < m_weapons.size(); i++)
+	{
+		delete m_weapons[i];
+	}
 }

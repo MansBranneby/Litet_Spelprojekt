@@ -2,8 +2,8 @@
 
 Gamepad::Gamepad()
 {
-	m_deadZoneX = 0.08f;
-	m_deadZoneY = 0.08f;
+	m_deadZoneX = 0.1f;
+	m_deadZoneY = 0.1f;
 	m_state.Gamepad.wButtons = 0;
 
 	m_controllerId = -1;
@@ -93,7 +93,7 @@ float Gamepad::getThumbRX()
 
 float Gamepad::getThumbRY()
 {
-	return m_thumbRX;
+	return m_thumbRY;
 }
 
 float Gamepad::getTriggerL()

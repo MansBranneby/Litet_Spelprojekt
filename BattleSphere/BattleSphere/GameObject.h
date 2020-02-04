@@ -32,5 +32,8 @@ public:
 	void move(XMVECTOR dPos);
 	void move(float dX, float dY, float dZ);
 	void rotate(float vx, float vy, float vz, float rotDeg);
+	void setRotation(float vx, float vy, float vz, float rotDeg);
+	void setRotationAfter(float vx, float vy, float vz, float rotDeg);
+	void setPositionRelative(XMVECTOR pos);
 	void scale(float xScale, float yScale, float zScale);
 };

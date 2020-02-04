@@ -81,6 +81,24 @@ void GameObject::rotate(float vx, float vy, float vz, float rotDeg)
 		m_models[i].rotate(vx, vy, vz, rotDeg);
 }
 
+void GameObject::setRotation(float vx, float vy, float vz, float rotDeg)
+{
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].setRotation(vx, vy, vz, rotDeg);
+}
+
+void GameObject::setRotationAfter(float vx, float vy, float vz, float rotDeg)
+{
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].setRotationAfter(vx, vy, vz, rotDeg);
+}
+
+void GameObject::setPositionRelative(XMVECTOR pos)
+{
+	for (int i = 0; i < m_nrOfModels; i++)
+		m_models[i].setPositionRelative(pos);
+}
+
 void GameObject::scale(float xScale, float yScale, float zScale)
 {
 	for (int i = 0; i < m_nrOfModels; i++)

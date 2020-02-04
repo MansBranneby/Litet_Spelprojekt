@@ -163,10 +163,12 @@
     <ClCompile Include="LightCulling.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="VertexShader.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -191,9 +193,11 @@
     <ClInclude Include="LightCulling.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="SubModel.h" />
     <ClInclude Include="VertexShader.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ComputeShaderLightCulling.hlsl">
