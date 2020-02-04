@@ -36,7 +36,7 @@ public:
 	Bloom();
 	~Bloom();
 
-	void setRenderTarget();
+	void setRenderTarget(ID3D11DepthStencilView* depthStencil);
 	void setShaderResource();
 	void clearRenderTarget();
 

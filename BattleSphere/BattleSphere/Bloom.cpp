@@ -188,9 +188,9 @@ Bloom::~Bloom()
 	m_verticalCS.release();
 }
 
-void Bloom::setRenderTarget()
+void Bloom::setRenderTarget(ID3D11DepthStencilView* depthStencil)
 {
-	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(2, m_bloomRTV, NULL);
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(2, m_bloomRTV, depthStencil);
 }
 
 void Bloom::setShaderResource()

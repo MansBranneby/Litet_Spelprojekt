@@ -45,6 +45,7 @@ PS_OUT PS_main(PS_IN input)
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
+	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
@@ -61,13 +62,14 @@ PS_OUT PS_main(PS_IN input)
 		fragmentCol = Kd;
 		break;
 	case 1: // Lambertian shading (diffuse, ambient)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
+		fragmentCol = Kd * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
+		//fragmentCol = float3(0.0f, 1.0f, 0.0f);
 		break;
 	case 2: // "Phong" (diffuse, ambient, specular)
-		fragmentCol = Ka * Ia + input.col * max(dot(normal, L), 0.0f) * (float3)lightCol * d + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol * d;
+		fragmentCol = Kd * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol + Ke;
 		break;
 	case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol * d;
+		fragmentCol = Kd * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
 		break;
 	default:
 		fragmentCol = float3(1.0f, 1.0f, 1.0f);
@@ -75,7 +77,10 @@ PS_OUT PS_main(PS_IN input)
 	};
 
 	output.scene = float4(fragmentCol, 1.0f);
-	output.bloom = float4(fragmentCol, 1.0f);
+	if(Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
+		output.bloom = float4(fragmentCol, 1.0f);
+	else
+		output.bloom = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	return output;
 };

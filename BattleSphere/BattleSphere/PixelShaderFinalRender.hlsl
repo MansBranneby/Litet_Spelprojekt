@@ -14,7 +14,7 @@ float4 PS_main(VS_OUT input) : SV_Target
 	float3 sceneColour = scene.Sample(sampAni, input.tex).xyz;
 	float3 bloomColour = bloom.Sample(sampAni, input.tex).xyz;
 
-	float3 fragmentColour = sceneColour + bloomColour * 3;
+	float3 fragmentColour = sceneColour + bloomColour;
 
 	return float4(fragmentColour, 1.0f);
 };

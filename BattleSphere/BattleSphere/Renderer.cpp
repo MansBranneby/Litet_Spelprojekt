@@ -62,11 +62,11 @@ struct PosCol
 	float nx, ny, nz;
 };
 
-struct PosUV
-{
-	float x, y, z;
-	float u, v, a;
-};
+//struct PosUV
+//{
+//	float x, y, z;
+//	float u, v, a;
+//};
 
 PosCol vertexData[3]
 {
@@ -86,26 +86,31 @@ PosCol vertexData[3]
 void createFullscreenQuad()
 {
 	//Fullscreen quad
-	PosUV fsQuad[6] =
+	PosCol fsQuad[6] =
 	{
 		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
-		0.0f, 0.0f,	0.0f,	//v0 tex
-
-		-1.0f, -1.0f, 0.0f, //v2 pos	L B
-		0.0f, 1.0f,	0.0f,	//v2 tex
+		0.0f, 0.0f,			//v0 tex
+		0.0f, 0.0f, 0.0f,
 
 		1.0, -1.0f, 0.0f,	//v1 pos	R B
-		1.0f, 1.0f,	0.0f,	//v1 tex
+		1.0f, 1.0f,			//v1 tex
+		0.0f, 0.0f, 0.0f,
 
+		-1.0f, -1.0f, 0.0f, //v2 pos	L B
+		0.0f, 1.0f,			//v2 tex
+		0.0f, 0.0f, 0.0f,
 
 		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
-		0.0f, 0.0f,	0.0f,	//v3 tex
-
-		1.0f, -1.0f, 0.0f,	//v5 pos	R B
-		1.0f, 1.0f, 0.0f,	//v5 tex
+		0.0f, 0.0f,			//v3 tex
+		0.0f, 0.0f, 0.0f,
 
 		1.0f, 1.0f, 0.0f,	//v4 pos	R T
-		1.0f, 0.0f,	0.0f	//v4 tex
+		1.0f, 0.0f,			//v4 tex
+		0.0f, 0.0f, 0.0f,
+
+		1.0f, -1.0f, 0.0f,	//v5 pos	R B
+		1.0f, 1.0f,			//v5 tex
+		0.0f, 0.0f, 0.0f
 	};
 
 	D3D11_BUFFER_DESC bufferDescFSQuad;
@@ -161,7 +166,7 @@ void createRenderResources()
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(1.0f, 0.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	g_light = new Light(XMVectorSet(1.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 
 	g_bloom = new Bloom();
 }
@@ -176,7 +181,7 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderFinalRender.getPixelShader(), nullptr, 0);
 
-	UINT32 vertexSize = sizeof(PosUV);
+	UINT32 vertexSize = sizeof(PosCol);
 	UINT32 offset = 0;
 
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &g_vertexBufferFSQuad, &vertexSize, &offset);
@@ -243,7 +248,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				g_bloom->clearRenderTarget();
 
 				// BLOOM
-				g_bloom->setRenderTarget();
+				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView());
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
