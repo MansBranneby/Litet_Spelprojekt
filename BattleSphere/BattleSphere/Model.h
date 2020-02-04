@@ -15,8 +15,8 @@ private:
 	vertex* m_vertices;
 	int m_nrOfSubModels;
 	SubModel* m_subModels;
-
 	XMMATRIX m_modelMatrix;
+	XMVECTOR OBB[4];
 
 	ID3D11Buffer* m_modelMatrixCBuffer;
 	XMMATRIX* m_modelMatrixData;
@@ -26,6 +26,7 @@ private:
 	XMMATRIX m_relRotationMat;
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
+
 
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCBuffer(); // For model matrix
@@ -45,6 +46,6 @@ public:
 
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
-	void loadModel(std::ifstream& in);
+	void loadModel(std::ifstream& in); // 0 = OBB, 1 = sphere
 };
 

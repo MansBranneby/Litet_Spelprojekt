@@ -1,13 +1,13 @@
 #include "BoundingVolume.h"
 
-CollisionInfo BoundingVolume::intersectsWithTriangle()
-{
-	CollisionInfo collisionInfo;
-
-
-
-	return collisionInfo;
-}
+//CollisionInfo BoundingVolume::intersectsWithTriangle()
+//{
+//	CollisionInfo collisionInfo;
+//
+//
+//
+//	return collisionInfo;
+//}
 
 BoundingVolume::BoundingVolume()
 {

@@ -298,4 +298,7 @@ void Model::loadModel(std::ifstream& in)
 
 	// Create model matrix
 	createVertexCBuffer();
+
+	// Create bounding volume
+
 }
