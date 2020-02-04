@@ -18,7 +18,9 @@
 #include "GraphicResources.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
-
+#include "Camera.h"
+#include "Light.h"
+#include "Bloom.h"
 #include "Clock.h"
 #include "Game.h"
 #include "Camera.h"
@@ -29,16 +31,19 @@
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
-
+Bloom* g_bloom = nullptr;
 
 //TODO Remove
 Camera* g_camera = nullptr;
 Light* g_light = nullptr;
 ConstantBuffer* g_constantBufferMaterials = nullptr;
 
+ID3D11Buffer* g_vertexBufferFSQuad = nullptr;
 ID3D11Buffer* _vertexBuffer = nullptr;
 VertexShader gVS;
 PixelShader gPS;
+VertexShader g_vertexShaderFinalRender;
+PixelShader g_pixelShaderFinalRender;
 
 Clock* g_Clock;
 Game* g_Game;
@@ -57,6 +62,12 @@ struct PosCol
 	float nx, ny, nz;
 };
 
+struct PosUV
+{
+	float x, y, z;
+	float u, v, a;
+};
+
 PosCol vertexData[3]
 {
 	0.0f, 0.5f, 0.0f,
@@ -71,6 +82,49 @@ PosCol vertexData[3]
 	1.0f, 0.0f,
 	0.0f, 0.0f,0.0f
 };
+
+void createFullscreenQuad()
+{
+	//Fullscreen quad
+	PosUV fsQuad[6] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
+		0.0f, 0.0f,	0.0f,	//v0 tex
+
+		-1.0f, -1.0f, 0.0f, //v2 pos	L B
+		0.0f, 1.0f,	0.0f,	//v2 tex
+
+		1.0, -1.0f, 0.0f,	//v1 pos	R B
+		1.0f, 1.0f,	0.0f,	//v1 tex
+
+
+		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
+		0.0f, 0.0f,	0.0f,	//v3 tex
+
+		1.0f, -1.0f, 0.0f,	//v5 pos	R B
+		1.0f, 1.0f, 0.0f,	//v5 tex
+
+		1.0f, 1.0f, 0.0f,	//v4 pos	R T
+		1.0f, 0.0f,	0.0f	//v4 tex
+	};
+
+	D3D11_BUFFER_DESC bufferDescFSQuad;
+	memset(&bufferDescFSQuad, 0, sizeof(bufferDescFSQuad));
+	bufferDescFSQuad.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDescFSQuad.Usage = D3D11_USAGE_DEFAULT;
+	bufferDescFSQuad.ByteWidth = sizeof(fsQuad);
+
+	D3D11_SUBRESOURCE_DATA dataFSQuad;
+	dataFSQuad.pSysMem = fsQuad;
+
+	// create a Vertex Buffer
+	HRESULT result = DX::getInstance()->getDevice()->CreateBuffer(&bufferDescFSQuad, &dataFSQuad, &g_vertexBufferFSQuad);
+	if (FAILED(result))
+		MessageBox(NULL, L"gvertexBufferFSQuad", L"Error", MB_OK | MB_ICONERROR);
+
+	g_vertexShaderFinalRender = VertexShader(L"VertexShaderFinalRender.hlsl");
+	g_pixelShaderFinalRender = PixelShader(L"PixelShaderFinalRender.hlsl");
+}
 
 void setupTestTriangle()
 {
@@ -100,6 +154,45 @@ void setupTestTriangle()
 	g_constantBufferMaterials = new ConstantBuffer(g_materialTest, sizeof(MaterialTest));
 }
 
+void createRenderResources()
+{
+	createFullscreenQuad();
+
+	// TODO: Move camera and light to game?
+	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	g_light = new Light(XMVectorSet(1.0f, 0.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+
+	g_bloom = new Bloom();
+}
+
+void finalRender()
+{
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderFinalRender.getPixelShader(), nullptr, 0);
+
+	UINT32 vertexSize = sizeof(PosUV);
+	UINT32 offset = 0;
+
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &g_vertexBufferFSQuad, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
+
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
+	g_bloom->setShaderResource();
+	
+	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+
+	ID3D11ShaderResourceView* nullRTV = { NULL };
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullRTV);
+}
+
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -109,10 +202,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 
-	// TODO: Move camera and light to game?
-	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
-	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(1.0f, 0.0f, -3.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	createRenderResources(); // Creates instances of graphics classes etc.
 
 	if (wndHandle)
 	{
@@ -142,20 +232,24 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			}
 			else
 			{
-				//TODO Ersätt med riktig render funktion eller i separata klasser
-				//RENDER
+				//// RENDER ////
+
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 0, 0, 0, 1 };
 
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
+				
+				g_bloom->clearRenderTarget();
+
+				// BLOOM
+				g_bloom->setRenderTarget();
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
-
+				
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
@@ -173,6 +267,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				g_Game->update(g_Clock->getDeltaTime());
 				g_Game->draw();
+
+				g_bloom->run();
+
+				finalRender();
 
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
@@ -238,17 +336,21 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		//TODO Release
 		_vertexBuffer->Release();
+		g_vertexBufferFSQuad->Release();
 		gVS.release();
 		gPS.release();
 		delete g_Clock;
 		g_Game->release();
 		delete g_Game;
+		g_vertexShaderFinalRender.release();
+		g_pixelShaderFinalRender.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
 
 		//Remove
 		delete g_camera;
 		delete g_light;
+		delete g_bloom;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
 
