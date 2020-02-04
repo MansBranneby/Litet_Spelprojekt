@@ -279,8 +279,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Clock->resetSecTimer();
 
 					// TODO delet dis (visa fps)
-					//OutputDebugStringA(std::to_string(fps).c_str());
-					//OutputDebugStringA("\n");
+					OutputDebugStringA(std::to_string(fps).c_str());
+					OutputDebugStringA("\n");
 					
 					// TODO delet dis (testa controllern)
 					/*
