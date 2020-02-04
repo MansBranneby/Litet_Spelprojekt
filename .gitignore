@@ -331,3 +331,25 @@ ASALocalRun/
 
 *.VC.db
 .vs/
+BattleSphere/.vs/BattleSphere/v16/.suo
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.log
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/CL.command.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/CL.read.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/CL.write.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/fxc.read.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/fxc.write.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/link.command.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/link.read.1.tlog
+BattleSphere/BattleSphere/x64/Debug/BattleSphere.tlog/link.write.1.tlog
+BattleSphere/BattleSphere/x64/Debug/DX.obj
+BattleSphere/BattleSphere/x64/Debug/GraphicResources.obj
+BattleSphere/BattleSphere/x64/Debug/PixelShader.obj
+BattleSphere/BattleSphere/x64/Debug/Renderer.obj
+BattleSphere/BattleSphere/x64/Debug/vc142.idb
+BattleSphere/BattleSphere/x64/Debug/vc142.pdb
+BattleSphere/BattleSphere/x64/Debug/VertexShader.obj
+BattleSphere/x64/Debug/BattleSphere.exe
+BattleSphere/x64/Debug/BattleSphere.ilk
+BattleSphere/x64/Debug/BattleSphere.pdb
+BattleSphere/x64/Debug/PixelShader.cso
+BattleSphere/x64/Debug/VertexShader.cso
