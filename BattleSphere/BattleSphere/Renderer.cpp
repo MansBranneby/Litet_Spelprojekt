@@ -35,7 +35,6 @@ GraphicResources g_graphicResources;
 
 //TODO Remove
 Camera* g_camera = nullptr;
-Light* g_light = nullptr;
 ConstantBuffer* g_constantBufferMaterials = nullptr;
 
 ID3D11Buffer* _vertexBuffer = nullptr;
@@ -117,8 +116,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	g_lightCulling.initialize();
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
-	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(1.0f, 0.0f, -3.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+
 
 	if (wndHandle)
 	{
@@ -151,9 +149,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		GameObject test1;
 		test.loadFromFile("Scene");
 
-		test.setPosition(0, 0.0, 0.0f);
+		test.setPosition(0, 0.0f, 0.0f);
 		
-		test.scale(0.6, 0.6, 0.6);
+		test.scale(0.6f, 0.6f, 0.6f);
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
@@ -178,7 +176,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
-				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
 
@@ -280,7 +277,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		//Remove
 		delete g_camera;
-		delete g_light;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
 

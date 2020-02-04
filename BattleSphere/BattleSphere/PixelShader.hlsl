@@ -15,11 +15,6 @@ struct Light {
 	float Intensity;
 	float4 color;
 };
-/*cbuffer PS_CONSTANT_BUFFER : register(b0)
-{
-	float4 lightPos;
-	float4 lightCol;
-};*/
 
 cbuffer PS_CONSTANT_BUFFER : register(b1)
 {
@@ -43,7 +38,7 @@ float DoSpotCone(Light light, float4 L)
 	
 	float minCos = cos(radians(light.SpotlightAngle));
 	float maxCos = lerp(minCos, 1, 0.5f);
-	float cosAngle = dot(normalize(light.Direction), -L);
+	float cosAngle = dot(normalize(light.Direction), -L.xyz);
 	return smoothstep(minCos, maxCos, cosAngle);
 }
 
@@ -68,16 +63,16 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
 	fragmentCol = Ka * Ia;
-	for (int i = startOffset; i < startOffset + lightCount; i++)
+	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
 		
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
-		float3 L;
-		float3 R;
-		float4 lightCol;
+		float3 L = float3(0,0,0);
+		float3 R = float3(0,0,0);
+		float4 lightCol = float4(0,0,0,0);
 		switch (light.Type) {
 		case 0:
 			//Point light
@@ -101,6 +96,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
 			break;
 		}
+		
 		
 
 
