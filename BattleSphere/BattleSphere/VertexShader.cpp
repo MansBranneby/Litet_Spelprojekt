@@ -39,13 +39,22 @@ void VertexShader::createInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
 			0							 // used for INSTANCING (ignore)
 		},
 		{
-			"COLOUR",
+			"TEXCOORDS",
 			0,				// same slot as previous (same vertexBuffer)
-			DXGI_FORMAT_R32G32B32_FLOAT,
+			DXGI_FORMAT_R32G32_FLOAT,
 			0,
 			12,							// offset of FIRST element (after POSITION)
 			D3D11_INPUT_PER_VERTEX_DATA,
 			0
+		},
+		{
+			"NORMAL",		// "semantic" name in shader
+			0,				// "semantic" index (not used)
+			DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
+			0,							 // input slot
+			20,							 // offset of first element
+			D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
+			0							 // used for INSTANCING (ignore)
 		},
 	};
 

@@ -28,7 +28,7 @@ HWND GraphicResources::initWindow(HINSTANCE hInstance)
 	if (!RegisterClassEx(&wcex))
 		return false;
 
-	RECT rc = { 0, 0, (int)m_width, (int)m_height };
+	RECT rc = { 0, 0, (int)DX::getInstance()->getWidth() , (int)DX::getInstance()->getHeight() };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	HWND handle = CreateWindow(
 		L"BattleSphere",
@@ -71,8 +71,8 @@ void GraphicResources::createDepthStencil()
 	ID3D11Texture2D* pDepthStencil = NULL;
 	D3D11_TEXTURE2D_DESC descDepth;
 	ZeroMemory(&descDepth, sizeof(descDepth));
-	descDepth.Width = (UINT)m_width;
-	descDepth.Height = (UINT)m_height;
+	descDepth.Width = (UINT)m_viewPort.Width;//(UINT)DX::getInstance()->getWidth();
+	descDepth.Height = (UINT)m_viewPort.Height;//(UINT)DX::getInstance()->getHeight();
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -141,7 +141,7 @@ void GraphicResources::setRasterizerState()
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = true;
+	rasterizerDesc.FrontCounterClockwise = false;
 	rasterizerDesc.DepthBias = 0;
 	rasterizerDesc.DepthBiasClamp = 0;
 	rasterizerDesc.SlopeScaledDepthBias = 0;
@@ -202,11 +202,8 @@ void GraphicResources::setSamplerState()
 
 GraphicResources::GraphicResources()
 {
-	m_width = 1920.0f;
-	m_height = 1080.0f;
-
-	m_viewPort.Width = m_width;
-	m_viewPort.Height = m_height;
+	m_viewPort.Width = DX::getInstance()->getWidth();
+	m_viewPort.Height = DX::getInstance()->getHeight();
 	m_viewPort.MinDepth = 0.0f;
 	m_viewPort.MaxDepth = 1.0f;
 	m_viewPort.TopLeftX = 0;

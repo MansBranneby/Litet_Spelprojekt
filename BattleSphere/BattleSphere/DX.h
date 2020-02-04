@@ -10,9 +10,14 @@ private:
 	DX();
 	static DX* m_instance;
 
+	// DirectX
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;
 	IDXGISwapChain* m_swapChain;
+
+	// Data
+	float m_width = 1920.0f;
+	float m_height = 1080.0f;
 
 public:
 	static DX* getInstance();
@@ -20,7 +25,12 @@ public:
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
+
+	float getWidth();
+	float getHeight();
+
 	HRESULT createDirect3DContext(HWND wndHandle);
+
 	void release();
 };
 
