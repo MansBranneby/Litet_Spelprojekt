@@ -3,7 +3,7 @@
 Camera::Camera(float width, float height, float nearPlane, float farPlane)
 {
 	// Base vectors
-	m_position = XMVectorSet(0.0f, 5.0f, -7.0f, 0.0f);
+	m_position = XMVectorSet(0.0f, 45.0f, -80.0f, 0.0f);
 	
 	m_lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	
@@ -25,6 +25,16 @@ Camera::~Camera()
 {
 	delete m_constantBufferVP;
 	delete m_constantBufferPosition;
+}
+
+XMMATRIX Camera::getViewMatrix()
+{
+	return m_view;
+}
+
+XMMATRIX Camera::getProjectionMatrix()
+{
+	return m_projection;
 }
 
 ConstantBuffer* Camera::getConstantBufferVP()

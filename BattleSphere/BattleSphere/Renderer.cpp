@@ -23,6 +23,7 @@
 #include "Game.h"
 #include "Camera.h"
 #include "Light.h"
+#include "LightCulling.h"
 
 //TODO: Remove
 #include "GameObject.h"
@@ -31,7 +32,6 @@
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
-
 
 //TODO Remove
 Camera* g_camera = nullptr;
@@ -44,6 +44,7 @@ PixelShader gPS;
 
 Clock* g_Clock;
 Game* g_Game;
+LightCulling g_lightCulling;
 
 // TODO delet dis
 //Input* gInput;
@@ -113,7 +114,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
-
+	g_lightCulling.initialize();
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
@@ -125,6 +126,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
+		g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
+
+		g_lightCulling.addDirectionalLight(0.5f, -1, -0.2f, 1, 1, 1, 0.6f);
+		g_lightCulling.addDirectionalLight(-0.5f, -0.1f, 0.5f, 1, 0.2f, 0, 0.8f);
+		g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
+
+		g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
+		g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
+		
 		g_Clock = new Clock();
 		g_Game = new Game();
 
@@ -136,13 +146,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		int counterFrames = 0;
 		int fps = 0;
 
-		/*
+		
 		GameObject test;
 		GameObject test1;
-		test.loadFromFile("BattleSphere");
-		test1.loadFromFile("1mesh1mat");
-		*/
+		test.loadFromFile("Scene");
 
+		test.setPosition(0, 0.0, 0.0f);
+		
+		test.scale(0.6, 0.6, 0.6);
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
@@ -161,7 +172,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//RENDER
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 0, 0, 0, 1 };
-
+				g_lightCulling.cullLights();
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
@@ -184,18 +195,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				/*
-				test.move(0.003f, 0.0f, 0.0f);
-				test.scale(0.2f, 0.2f, 0.2f);
+				
+				//test.move(-0.003f, 0.0f, 0.0f);
+				//test.scale(0.2f, 0.2f, 0.2f);
 				//test1.move(-0.3, 0.0, 0.0);
-				//test.setPosition(3, 0.0, 0.0);
-				test1.setPosition(-3.0f, 0.0f, 0.0f);
-				test.rotate(0, 0.72f, 0.72f, 0.1f);
-				test1.rotate(1.0f, 0.0f, 0.0f, 0.11f);
+
 
 				test.draw();
-				test1.draw();
-				*/
+				
 
 				g_Game->update(g_Clock->getDeltaTime());
 				g_Game->draw();
