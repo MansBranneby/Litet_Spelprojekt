@@ -16,7 +16,10 @@ private:
 	int m_nrOfSubModels;
 	SubModel* m_subModels;
 	XMMATRIX m_modelMatrix;
-	XMVECTOR OBB[4];
+	
+	// Bounding volume variables
+	boundingData m_bData;
+
 
 	ID3D11Buffer* m_modelMatrixCBuffer;
 	XMMATRIX* m_modelMatrixData;
@@ -27,6 +30,8 @@ private:
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
 
+	// To calculate obb
+	void computeOBB();
 
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCBuffer(); // For model matrix

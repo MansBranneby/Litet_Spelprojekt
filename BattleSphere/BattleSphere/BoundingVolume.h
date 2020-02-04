@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include "StructsAndEnums.h"
 #include <vector>
 
 // Information acquired from collision detection

@@ -29,3 +29,19 @@ struct vertex
 	float u, v;
 	float normX, normY, normZ;
 };
+
+struct boundingData {
+	XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
+	XMFLOAT2 halfWD = XMFLOAT2(0, 0);
+	XMVECTOR xAxis = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR zAxis = XMVectorSet(0, 0, 0, 0);
+};
+
+struct vectorPairProjections {
+	XMVECTOR vec1 = XMVectorSet(1, 0, 0, 0); // Vector
+	XMVECTOR vec2 = XMVectorSet(0, 0, 1, 0); // Vector
+	XMVECTOR minVec1 = XMVectorSet(0, 0, 0, 0); // Vertex
+	XMVECTOR maxVec1 = XMVectorSet(0, 0, 0, 0);	// Vertex
+	XMVECTOR minVec2 = XMVectorSet(0, 0, 0, 0);	// Vertex
+	XMVECTOR maxVec2 = XMVectorSet(0, 0, 0, 0);	// Vertex
+};

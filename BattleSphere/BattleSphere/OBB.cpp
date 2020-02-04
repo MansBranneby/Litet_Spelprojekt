@@ -59,7 +59,6 @@ CollisionInfo OBB::intersectsWithSphere(BoundingVolume* other)
 
 OBB::OBB()
 {
-	m_rotationMatrix = DirectX::XMMatrixIdentity();
 	// Local axes
 	m_xAxis = {1.0f, 0.0};
 	m_zAxis = {0.0, 1.0};
@@ -71,16 +70,13 @@ OBB::OBB()
 OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix)
 	:BoundingVolume(pos)
 {
-	// Rotation	matrix
-	m_rotationMatrix = rotationMatrix;
-
 	// Calculate half width and depth
 	m_halfWD.x = halfWD.x;
 	m_halfWD.y = halfWD.y;
 
 	// Define axes
 	m_xAxis = { 1.0f, 0.0f, 0.0f };
-	m_zAxis = { 0.0f, 0.0f, 1.0f};
+	m_zAxis = { 0.0f, 0.0f, 1.0f };
 
 	// Transform axes
 	m_xAxis = DirectX::XMVector3Normalize(DirectX::XMVector3Transform(m_xAxis, rotationMatrix));
@@ -88,6 +84,15 @@ OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rota
 
 	// Push into vector
 	m_axes = { m_xAxis, m_zAxis };
+}
+
+OBB::OBB(boundingData data)
+	:BoundingVolume(data.pos)
+{
+	m_halfWD.x = data.halfWD.x;
+	m_halfWD.y = data.halfWD.y;
+	m_xAxis = data.xAxis;
+	m_zAxis = data.zAxis;
 }
 
 OBB::~OBB()
