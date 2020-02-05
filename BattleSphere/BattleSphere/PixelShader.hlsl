@@ -73,7 +73,8 @@ float4 PS_main(PS_IN input) : SV_Target
 		float3 L = float3(0,0,0);
 		float3 R = float3(0,0,0);
 		float4 lightCol = float4(0,0,0,0);
-		switch (light.Type) {
+		switch (light.Type) 
+		{
 		case 0:
 			//Point light
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light

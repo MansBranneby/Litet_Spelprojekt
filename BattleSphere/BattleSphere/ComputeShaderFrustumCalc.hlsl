@@ -50,17 +50,15 @@ float4 ScreenToView(float4 screen)
 // Global variables
 cbuffer DispatchParams : register(b0)
 {
-	// Number of groups dispatched. (This parameter is not available as an HLSL system value!)
-	uint3   numThreadGroups;
-	uint padding; // implicit padding to 16 bytes.
+	
+	uint3 numThreadGroups;
+	uint padding;
 
-	// Total number of threads dispatched. (Also not available as an HLSL system value!)
-	// Note: This value may be less than the actual number of threads executed 
-	// if the screen size is not evenly divisible by the block size.
 	uint3   numThreads;
-	uint padding2; // implicit padding to 16 bytes.
+	uint padding2;
 }
-struct ComputeShaderInput {
+struct ComputeShaderInput 
+{
 	uint3 groupID           : SV_GroupID;           // 3D index of the thread group in the dispatch.
 	uint3 groupThreadID     : SV_GroupThreadID;     // 3D index of local thread ID in a thread group.
 	uint3 dispatchThreadID  : SV_DispatchThreadID;  // 3D index of global thread ID in the dispatch.

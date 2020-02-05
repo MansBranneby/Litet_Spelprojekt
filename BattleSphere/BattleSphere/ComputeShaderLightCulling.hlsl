@@ -20,15 +20,10 @@ struct Plane
 };
 cbuffer DispatchParams : register(b0)
 {
-	// Number of groups dispatched. (This parameter is not available as an HLSL system value!)
 	uint3   numThreadGroups;
-	uint padding; // implicit padding to 16 bytes.
-
-	// Total number of threads dispatched. (Also not available as an HLSL system value!)
-	// Note: This value may be less than the actual number of threads executed 
-	// if the screen size is not evenly divisible by the block size.
+	uint padding; 
 	uint3   numThreads;
-	uint padding2; // implicit padding to 16 bytes.
+	uint padding2; 
 }
 cbuffer VIEW_CBUFFER : register(b1)
 {
@@ -39,7 +34,8 @@ struct Frustum
 {
 	Plane planes[4];
 };
-struct Light {
+struct Light 
+{
 	int Enabled;
 	int Type;
 	float Range, SpotlightAngle;
@@ -112,7 +108,8 @@ RWStructuredBuffer<uint> o_LightIndexCounter : register(u0);
 RWStructuredBuffer<uint> o_LightIndexList : register(u1);
 RWTexture2D<uint2> o_LightGrid : register(u2);
 
-struct ComputeShaderInput {
+struct ComputeShaderInput 
+{
 	uint3 groupID           : SV_GroupID;           // 3D index of the thread group in the dispatch.
 	uint3 groupThreadID     : SV_GroupThreadID;     // 3D index of local thread ID in a thread group.
 	uint3 dispatchThreadID  : SV_DispatchThreadID;  // 3D index of global thread ID in the dispatch.
@@ -135,9 +132,6 @@ void CS_main(ComputeShaderInput IN)
 	}
 
 
-	// Clipping plane for minimum depth value 
-	// (used for testing lights within the bounds of opaque geometry).
-
 	for (uint i = IN.groupIndex; i < NUM_LIGHTS; i += BLOCK_SIZE * BLOCK_SIZE)
 	{
 		if (Lights[i].Enabled)
@@ -152,10 +146,7 @@ void CS_main(ComputeShaderInput IN)
 				Sphere sphere = { mul(V, light.Position).xyz, light.Range };
 				if (SphereInsideFrustum(sphere, GroupFrustum))
 				{
-					// Add light to light list for transparent geometry.
-					//t_AppendLight(i);
-
-						// Add light to light list for opaque geometry.
+					// Add light to light list for opaque geometry.
 					o_AppendLight(i);
 				}
 			}
@@ -171,8 +162,6 @@ void CS_main(ComputeShaderInput IN)
 				Cone cone = { mul(V, light.Position).xyz, light.Range, mul(V, float4(normalize(light.Direction.xyz), 0.0f)).xyz, coneRadius };
 				if (ConeInsideFrustum(cone, GroupFrustum))
 				{
-					// Add light to light list for transparent geometry.	
-
 
 						// Add light to light list for opaque geometry.
 						o_AppendLight(i);
@@ -191,9 +180,6 @@ void CS_main(ComputeShaderInput IN)
 		InterlockedAdd(o_LightIndexCounter[0], o_LightCount, o_LightIndexStartOffset);
 		o_LightGrid[IN.groupID.xy] = uint2(o_LightIndexStartOffset, o_LightCount);
 		
-		// Update light grid for transparent geometry.
-		/*InterlockedAdd(t_LightIndexCounter[0], t_LightCount, t_LightIndexStartOffset);
-		t_LightGrid[IN.groupID.xy] = uint2(t_LightIndexStartOffset, t_LightCount);*/
 	}
 
 	GroupMemoryBarrierWithGroupSync();

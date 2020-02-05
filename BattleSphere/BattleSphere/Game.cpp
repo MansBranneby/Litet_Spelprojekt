@@ -151,7 +151,7 @@ Game::Game()
 	updatePlayerStatus();
 }
 
-void Game::update(float dt)
+returnInfo Game::update(float dt)
 {
 	handleInputs(dt);
 	updatePlayerStatus();
@@ -186,6 +186,22 @@ void Game::update(float dt)
 			m_projectiles.erase(m_projectiles.begin()+i);
 		}
 	}
+	returnInfo info;
+	if (m_robots[0] != nullptr) {
+		XMVECTOR pos = m_robots[0]->getPosition();
+		info.x = pos.m128_f32[0];
+		info.y = pos.m128_f32[1];
+		info.z = pos.m128_f32[2];
+	}
+	else {
+		info.x = 0;
+		info.y = 0;
+		info.z = 0;
+	}
+	
+	
+	
+	return info;
 }
 
 void Game::updateSec()

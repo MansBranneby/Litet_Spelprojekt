@@ -7,23 +7,8 @@ void LightCulling::setLightData()
 		m_lights[i].enabled = false;
 		m_lights[i].intensity = 1;
 	}
-	m_nrOfLights = 1;
-	m_lights[0].enabled = true;
-	m_lights[0].type = 2;
-	m_lights[0].spotLightAngle = 20.0f;
-	m_lights[0].r = 1;
-	m_lights[0].g = 1;
-	m_lights[0].b = 1;
-	m_lights[0].a = 1;
-	m_lights[0].x = 10;
-	m_lights[0].y = 10;
-	m_lights[0].z = -10;
-	m_lights[0].w = 1;
-	m_lights[0].range = 35;
+	m_nrOfLights = 0;
 
-	m_lights[0].dx = -0.7f;
-	m_lights[0].dy = -0.7f;
-	m_lights[0].dz = 0;
 
 
 

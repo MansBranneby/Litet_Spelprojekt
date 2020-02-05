@@ -12,25 +12,30 @@
 class LightCulling
 {
 private:
-	struct dispatchInfo {
+	struct dispatchInfo 
+	{
 		UINT threadGroupsX, threadGroupsY, threadGroupsZ;
 		UINT padding;
 
 		UINT threadsX, threadsY, threadsZ;
 		UINT padding2;
 	};
-	struct screenToViewInfo {
+	struct screenToViewInfo 
+	{
 		XMMATRIX inverseProj;
 		float width, height, padding, padding2;
 	};
-	struct plane {
+	struct plane 
+	{
 		float nx, ny, nz;
 		float d;
 	};
-	struct frustum {
+	struct frustum 
+	{
 		plane planes[4] = { 0 };
 	};
-	struct Light {
+	struct Light 
+	{
 		int enabled;
 		int type;
 		float range, spotLightAngle;
