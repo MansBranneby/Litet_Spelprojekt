@@ -43,6 +43,7 @@ public:
 	Model();
 	~Model();
 
+	XMFLOAT3* getCollisionMesh(objectData data);
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);

@@ -167,6 +167,11 @@ void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
 }
 
 
+void Model::getCollisionMesh(objectData data)
+{
+
+}
+
 void Model::setObjectData(objectData data)
 {
 	setPosition(data.pos);
