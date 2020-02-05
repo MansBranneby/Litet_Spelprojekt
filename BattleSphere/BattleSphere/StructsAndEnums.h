@@ -16,6 +16,13 @@ enum class objectType
 	e_scene = 6
 };
 
+enum class renderPass
+{
+	e_scene,
+	e_downSample,
+	e_final
+};
+
 struct objectData 
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);

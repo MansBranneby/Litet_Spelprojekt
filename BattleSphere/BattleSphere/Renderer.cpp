@@ -26,8 +26,6 @@
 #include "Camera.h"
 #include "Light.h"
 
-
-
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
@@ -44,6 +42,7 @@ VertexShader gVS;
 PixelShader gPS;
 VertexShader g_vertexShaderFinalRender;
 PixelShader g_pixelShaderFinalRender;
+PixelShader g_pixelShaderDownsample;
 
 Clock* g_Clock;
 Game* g_Game;
@@ -129,6 +128,7 @@ void createFullscreenQuad()
 
 	g_vertexShaderFinalRender = VertexShader(L"VertexShaderFinalRender.hlsl");
 	g_pixelShaderFinalRender = PixelShader(L"PixelShaderFinalRender.hlsl");
+	g_pixelShaderDownsample = PixelShader(L"PixelShaderDownSample.hlsl");
 }
 
 void setupTestTriangle()
@@ -171,6 +171,33 @@ void createRenderResources()
 	g_bloom = new Bloom();
 }
 
+void downsample()
+{
+	g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_downSample);
+
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderDownsample.getPixelShader(), nullptr, 0);
+
+	UINT32 vertexSize = sizeof(PosCol);
+	UINT32 offset = 0;
+
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &g_vertexBufferFSQuad, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
+
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
+	g_bloom->setShaderResource(renderPass::e_downSample);
+
+	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+
+	float clearColour[] = { 0, 0, 0, 1 };
+	ID3D11ShaderResourceView* nullSRV = { NULL };
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullSRV);
+}
+
 void finalRender()
 {
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
@@ -189,7 +216,7 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
 
 	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
-	g_bloom->setShaderResource();
+	g_bloom->setShaderResource(renderPass::e_final);
 	
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
 
@@ -248,7 +275,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				g_bloom->clearRenderTarget();
 
 				// BLOOM
-				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView());
+				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
@@ -273,6 +300,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				g_Game->update(g_Clock->getDeltaTime());
 				g_Game->draw();
 
+				downsample();
 				g_bloom->run();
 
 				finalRender();

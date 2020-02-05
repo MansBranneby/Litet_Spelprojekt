@@ -229,5 +229,8 @@
     <FxCompile Include="PixelShaderFinalRender.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="PixelShaderDownsample.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
