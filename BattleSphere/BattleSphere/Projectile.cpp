@@ -6,15 +6,15 @@ Projectile::Projectile(int type, int damage)
 	m_damage = damage;
 	m_velocity = 0.0f;
 	m_direction = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	setScale(0.1f, 0.1f, 0.1f);
+	setScale(0.08f, 0.08f, 0.2f);
 
 	if (type == PISTOL)
 	{
-		m_velocity = 8.0f;
+		m_velocity = 40.0f;
 	}
 	else if (type == RIFLE)
 	{
-		m_velocity = 10.0f;
+		m_velocity = 50.0f;
 	}
 }
 

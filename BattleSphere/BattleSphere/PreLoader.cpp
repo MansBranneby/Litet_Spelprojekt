@@ -46,7 +46,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_robot, "BattleSphere");
 	loadFromFile(objectType::e_node, "Building");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
-	//loadFromFile(objectType::e_resource, "?");
+	loadFromFile(objectType::e_resource, "1mesh1mat");
 	loadFromFile(objectType::e_scene, "Scene");
 }
 
@@ -74,9 +74,11 @@ void PreLoader::draw(objectType type, int variant)
 		m_objects[typ][variant][i].draw();
 }
 
-void PreLoader::draw(objectType type, objectData data, int variant)
+void PreLoader::draw(objectType type, objectData data, int modelNr, int subModelNr, int variant)
 {
 	int typ = (int)type;
+	if (modelNr != -1) 
+		m_objects[typ][variant][modelNr].setObjectData(data, subModelNr);
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data);
@@ -84,9 +86,11 @@ void PreLoader::draw(objectType type, objectData data, int variant)
 	}
 }
 
-void PreLoader::draw(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant)
 {
 	int typ = (int)type;
+	if (modelNr != -1)
+		m_objects[typ][variant][modelNr].setObjectData(data, subModelNr);
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data, relativeData);

@@ -7,7 +7,7 @@
 #include "DX.h"
 #include "GameObject.h"
 #include "Weapon.h"
-//#include "Resource.h"
+#include "Resource.h"
 
 #define LEFT 0
 #define RIGHT 1
@@ -21,11 +21,12 @@ private:
 	int m_health;
 	float m_velocity;
 	float m_currentRotation;
-	XMVECTOR m_colour;
 	std::vector<Weapon*> m_weapons;
 	int m_currentWeapon[2];
-	//Resource m_resource; pekare?
+	int m_resource;
 	int m_score;
+	float m_time;
+	bool m_ready;
 
 	void addWeapon(int type);
 public:
@@ -39,8 +40,8 @@ public:
 	float getVelocity();
 	void setCurrentRot(float deg);
 	float getCurrentRot();
-	void setColour(XMVECTOR colour);
-	XMVECTOR getColour();
+	bool isReady(float dt);
+
 	void changeWeapon(int side);
 	int getCurrentWeapon(int side);
 	std::vector<Weapon*> getWeapons();
@@ -48,8 +49,9 @@ public:
 	void resetScore();
 
 	bool upgradeWeapon(int type);
-	//bool checkResource(Resource resource);
-	//void removeResource();
+	void setResourceIndex(int index);
+	int getResourceIndex();
+	void removeResource();
 
 	void release();
 };
