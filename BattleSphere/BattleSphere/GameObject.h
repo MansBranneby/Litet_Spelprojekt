@@ -4,36 +4,47 @@
 #include <DirectXMath.h>
 #include <vector>
 #include "DX.h"
-#include "Model.h"
-
+#include "StructsAndEnums.h"
 
 using namespace DirectX;
 
+
+
+
 class GameObject
-	{
+{
 private:
 	XMVECTOR m_position;
-	int m_nrOfModels;
-	Model* m_models;
-	
+	XMVECTOR m_rotation;
+	XMVECTOR m_scale;
 
 public:
 	GameObject();
 	~GameObject();
 
-	void loadFromFile(std::string filename); // Without .nyp file extension
+
 	void update();
-	void draw();
 
-	void setPosition(float x, float y, float z);
+	// Translation
+	void setPosition(float x, float y, float z); // Absolute
 	void setPosition(XMVECTOR pos);
-	XMVECTOR getPosition();
-
+	void move(float dX, float dY, float dZ); // Relative current value
 	void move(XMVECTOR dPos);
-	void move(float dX, float dY, float dZ);
-	void rotate(float vx, float vy, float vz, float rotDeg);
+	// Set relative object
+
+	// Rotation
+	void setRotation(XMVECTOR rotation); // Absolute
 	void setRotation(float vx, float vy, float vz, float rotDeg);
-	void setRotationAfter(float vx, float vy, float vz, float rotDeg);
-	void setPositionRelative(XMVECTOR pos);
+	void rotate(XMVECTOR dRotation); // Relative current value
+	void rotate(float vx, float vy, float vz, float dRotDeg);
+	// Set relative object
+
+	// Scale
+	void setScale(XMVECTOR scale); // Absolute
+	void setScale(float xScale, float yScale, float zScale);
+	void scale(XMVECTOR scale); // Relative
 	void scale(float xScale, float yScale, float zScale);
+
+	XMVECTOR getPosition();
+	objectData const getData();
 };

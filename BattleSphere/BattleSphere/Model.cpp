@@ -8,7 +8,7 @@ void Model::createVertexBuffer()
 	{
 		OutputDebugStringA((std::to_string(m_vertices[i].normX) + " " + std::to_string(m_vertices[i].normY) + " " + std::to_string(m_vertices[i].normZ) + '\n').c_str());
 	}*/
-	
+
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -44,8 +44,18 @@ void Model::createVertexCBuffer()
 
 void Model::updateSubResource()
 {
+	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
+}
+
+void Model::updateRelSubResource()
+{
 	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
-		* m_rotationAfterMat * XMMatrixTranslation(m_posRelative.m128_f32[0], m_posRelative.m128_f32[1], m_posRelative.m128_f32[2]);
+		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -68,7 +78,7 @@ void Model::draw()
 Model::Model()
 {
 	m_pos = XMVectorSet(0, 0, 0, 0);
-	m_posRelative = XMVectorSet(0, 0, 0, 0);
+	m_relPos = XMVectorSet(0, 0, 0, 0);
 	m_vertices = nullptr;
 	m_subModels = nullptr;
 	m_vertexBuffer = nullptr;
@@ -80,6 +90,8 @@ Model::Model()
 	m_rotationMat = XMMatrixIdentity();
 	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
+	m_relRotationMat = XMMatrixIdentity();
+	m_relScalingMat = XMMatrixIdentity();
 }
 
 Model::~Model()
@@ -91,65 +103,84 @@ Model::~Model()
 	if (m_modelMatrixData) delete (m_modelMatrixData);
 }
 
-void Model::move(XMVECTOR dPos)
-{
-	m_pos += dPos;
-	updateSubResource();
-}
-
-void Model::rotate(float vx, float vy, float vz, float rotDeg)
-{
-	float rotInRad = XMConvertToRadians(rotDeg);
-	vx *= sin(rotInRad / 2);
-	vy *= sin(rotInRad / 2);
-	vz *= sin(rotInRad / 2);
-	float rotation = cos(rotInRad / 2);
-	XMVECTOR rotVec = { vx, vy, vz,  rotation };
-	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
-	m_rotationMat = m_rotationMat * dRotation;
-	updateSubResource();
-}
-
-void Model::setRotation(float vx, float vy, float vz, float rotDeg)
-{
-	float rotInRad = XMConvertToRadians(rotDeg);
-	vx *= sin(rotInRad / 2);
-	vy *= sin(rotInRad / 2);
-	vz *= sin(rotInRad / 2);
-	float rotation = cos(rotInRad / 2);
-	XMVECTOR rotVec = { vx, vy, vz,  rotation };
-	m_rotationMat = XMMatrixRotationQuaternion(rotVec);
-	updateSubResource();
-}
-
-void Model::setRotationAfter(float vx, float vy, float vz, float rotDeg)
-{
-	float rotInRad = XMConvertToRadians(rotDeg);
-	vx *= sin(rotInRad / 2);
-	vy *= sin(rotInRad / 2);
-	vz *= sin(rotInRad / 2);
-	float rotation = cos(rotInRad / 2);
-	XMVECTOR rotVec = { vx, vy, vz,  rotation };
-	m_rotationAfterMat = XMMatrixRotationQuaternion(rotVec);
-	updateSubResource();
-}
-
-void Model::scale(float xScale, float yScale, float zScale)
-{
-	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
-	updateSubResource();
-}
-
 void Model::setPosition(XMVECTOR pos)
 {
 	m_pos = pos;
+}
+
+void Model::setPosition(XMVECTOR pos, XMVECTOR relPos)
+{
+	m_pos = pos;
+	m_relPos = relPos;
+}
+
+void Model::setRotation(XMVECTOR rotation)
+{
+	float vx = rotation.m128_f32[0];
+	float vy = rotation.m128_f32[1];
+	float vz = rotation.m128_f32[2];
+	float rotDeg = rotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_rotationMat = dRotation;
+}
+
+void Model::setRotation(XMVECTOR rotation, XMVECTOR relRotation)
+{
+	setRotation(rotation);
+	float vx = relRotation.m128_f32[0];
+	float vy = relRotation.m128_f32[1];
+	float vz = relRotation.m128_f32[2];
+	float rotDeg = relRotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_relRotationMat = dRotation;
+}
+
+void Model::setScale(XMVECTOR scale)
+{
+	float xScale = scale.m128_f32[0];
+	float yScale = scale.m128_f32[1];
+	float zScale = scale.m128_f32[2];
+	m_scalingMat = XMMatrixScaling(xScale, yScale, zScale);
+}
+
+void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
+{
+	setScale(scale);
+	float xScale = relScale.m128_f32[0];
+	float yScale = relScale.m128_f32[1];
+	float zScale = relScale.m128_f32[2];
+	m_relScalingMat = XMMatrixScaling(xScale, yScale, zScale);
+}
+
+
+void Model::setObjectData(objectData data)
+{
+	setPosition(data.pos);
+	setRotation(data.rotation);
+	setScale(data.scale);
 	updateSubResource();
 }
 
-void Model::setPositionRelative(XMVECTOR pos)
+void Model::setObjectData(objectData data, objectData relativeData)
 {
-	m_posRelative = pos;
-	updateSubResource();
+	setPosition(data.pos, relativeData.pos);
+	setRotation(data.rotation, relativeData.rotation);
+	setScale(data.scale, relativeData.scale);
+	updateRelSubResource();
 }
 
 void Model::loadModel(std::ifstream& in)
@@ -167,7 +198,7 @@ void Model::loadModel(std::ifstream& in)
 	for (int i = 0; i < m_nrOfVertices; i++)
 	{
 		std::getline(in, line);
-		inputStream.str(line); 
+		inputStream.str(line);
 		inputStream >>
 			m_vertices[i].posX >> m_vertices[i].posY >> m_vertices[i].posZ >>
 			m_vertices[i].u >> m_vertices[i].v >>
@@ -219,7 +250,7 @@ void Model::loadModel(std::ifstream& in)
 		inputStream.clear();
 
 		// Diffuse texture
-		
+
 		std::getline(in, line);
 
 		//?

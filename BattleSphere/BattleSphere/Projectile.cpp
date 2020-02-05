@@ -6,8 +6,7 @@ Projectile::Projectile(int type, int damage)
 	m_damage = damage;
 	m_velocity = 0.0f;
 	m_direction = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	loadFromFile("1mesh1mat");
-	scale(0.1f, 0.1f, 0.1f);
+	setScale(0.1f, 0.1f, 0.1f);
 
 	if (type == PISTOL)
 	{

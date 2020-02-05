@@ -25,8 +25,6 @@
 #include "Light.h"
 #include "LightCulling.h"
 
-//TODO: Remove
-#include "GameObject.h"
 
 
 using namespace DirectX;
@@ -45,9 +43,6 @@ Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
 
-// TODO delet dis
-//Input* gInput;
-//GameObject* gGameObject;
 
 struct MaterialTest
 {
@@ -117,7 +112,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 
-
 	if (wndHandle)
 	{
 		ShowWindow(wndHandle, nCmdShow);
@@ -138,22 +132,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_Clock = new Clock();
 		g_Game = new Game();
 
-		// TODO: delet dis 
-		//gInput = new Input();
-		//gGameObject = new GameObject();
-		//gGameObject->setPosition(XMVectorSet(0, 0, 0, 0));
-
 		int counterFrames = 0;
 		int fps = 0;
 
 		
-		GameObject test;
-		GameObject test1;
-		test.loadFromFile("Scene");
 
-		test.setPosition(0, -1.0f, 0.0f);
-		
-		test.scale(0.6f, 0.6f, 0.6f);
+		///////////////
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
@@ -193,14 +177,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-				
-				//test.move(-0.003f, 0.0f, 0.0f);
-				//test.scale(0.2f, 0.2f, 0.2f);
-				//test1.move(-0.3, 0.0, 0.0);
-
-
-				test.draw();
-				
+			
 
 				returnInfo a = g_Game->update(g_Clock->getDeltaTime());
 				g_lightCulling.setPosition(0, a.x, a.y, a.z);

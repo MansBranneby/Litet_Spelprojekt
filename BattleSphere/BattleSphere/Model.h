@@ -3,18 +3,14 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "StructsAndEnums.h"
 
-struct vertex {
-	float posX, posY, posZ;
-	float u, v;
-	float normX, normY, normZ;
-};
 
 class Model
 {
 private:
 	XMVECTOR m_pos;
-	XMVECTOR m_posRelative;
+	XMVECTOR m_relPos;
 	int m_nrOfVertices;
 	vertex* m_vertices;
 	int m_nrOfSubModels;
@@ -27,24 +23,28 @@ private:
 	XMMATRIX m_rotationMat;
 	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
+	XMMATRIX m_relRotationMat;
+	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
 
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCBuffer(); // For model matrix
 	void updateSubResource();
+	void updateRelSubResource();
 
+    void setPosition(XMVECTOR pos);
+	void setPosition(XMVECTOR pos, XMVECTOR relPos);
+	void setRotation(XMVECTOR rotation);
+	void setRotation(XMVECTOR rotation, XMVECTOR relRotation);
+	void setScale(XMVECTOR scale);
+	void setScale(XMVECTOR scale, XMVECTOR relScale);
 public:
 	void draw();
 	Model();
 	~Model();
 
-	void move(XMVECTOR dPos);
-	void rotate(float vx, float vy, float vz, float rotDeg);
-	void setRotation(float vx, float vy, float vz, float rotDeg);
-	void setRotationAfter(float vx, float vy, float vz, float rotDeg);
-	void scale(float xScale, float yScale, float zScale);
-	void setPosition(XMVECTOR pos);
-	void setPositionRelative(XMVECTOR pos);
+	void setObjectData(objectData data);
+	void setObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
 };
 

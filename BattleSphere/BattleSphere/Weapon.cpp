@@ -12,16 +12,13 @@ Weapon::Weapon(int type)
 	m_cdTime = 0.0f;
 	m_ready = true;
 
-	//TODO change this yo
-	loadFromFile("1mesh1mat");
-
 	if (type == RIFLE)
 	{
 		m_damage = 10;
 		m_recoil = 0.4f;
 		m_cooldown = 0.2f;
 
-		scale(0.2f, 0.2f, 0.8f);
+		setScale(0.2f, 0.2f, 0.8f);
 	}
 	else if (type == MOVEMENT)
 	{
@@ -40,7 +37,7 @@ Weapon::Weapon(int type)
 		m_recoil = 0.1f;
 		m_cooldown = 0.5f;
 
-		scale(0.2f, 0.2f, 0.8f);
+		setScale(0.2f, 0.2f, 0.8f);
 	}
 }
 

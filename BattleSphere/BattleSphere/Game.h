@@ -8,8 +8,8 @@
 #include "DX.h"
 #include "GameObject.h"
 #include "Input.h"
-#include "Robot.h"
-#include "Projectile.h"
+#include "PreLoader.h"
+
 
 using namespace DirectX;
 struct returnInfo
@@ -26,6 +26,8 @@ private:
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
 	std::vector<Projectile*> m_projectiles;
+
+	PreLoader m_preLoader;
 
 	void handleMovement(float dt, int id);
 	void handleInputs(float dt);
