@@ -35,11 +35,13 @@ public:
 	bool speedUp();
 	bool shield();
 
+	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
 	int getType();
 	int getDamage();
 	float getRecoil();
 	float getSpeed();
+	bool getActive();
 
 	bool updateTime(float dt);
 

@@ -37,12 +37,27 @@ void SubModel::createIndexBuffer()
 
 void SubModel::setMaterialInfo(material mat)
 {
-	
 	*m_mat = mat;
 
 	//TODO: Create constant buffer
 	m_constantBuffer = new ConstantBuffer(m_mat, sizeof(material));
 	m_materialCBuffer = *m_constantBuffer->getConstantBuffer();
+}
+
+void SubModel::updateMaterialInfo(material mat)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		m_mat->ambient.m128_f32[i] = (mat.ambient.m128_f32[i] != -1) ? mat.ambient.m128_f32[i] : m_mat->ambient.m128_f32[i];
+		m_mat->diffuse.m128_f32[i] = (mat.diffuse.m128_f32[i] != -1) ? mat.diffuse.m128_f32[i] : m_mat->diffuse.m128_f32[i];
+		m_mat->specular.m128_f32[i] = (mat.specular.m128_f32[i] != -1) ? mat.specular.m128_f32[i] : m_mat->specular.m128_f32[i];
+		m_mat->emission.m128_f32[i] = (mat.emission.m128_f32[i] != -1) ? mat.emission.m128_f32[i] : m_mat->emission.m128_f32[i];
+	}
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(m_materialCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_mat, sizeof(material));
+	DX::getInstance()->getDeviceContext()->Unmap(m_materialCBuffer, 0);
 }
 
 void SubModel::setFaces(int* indexBuffer, int nrOfIndices)

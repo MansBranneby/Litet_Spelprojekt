@@ -25,11 +25,13 @@ Weapon::Weapon(int type)
 		m_cooldown = 5.0f;
 		m_duration = 5.0f;
 		m_speed = 2.0f;
+		setScale(0.1f, 0.8f, 0.1f);
 	}
 	else if (type == SHIELD)
 	{
 		m_cooldown = 5.0f;
 		m_duration = 5.0f;
+		setScale(0.8f, 0.8f, 0.1f);
 	}
 	else
 	{
@@ -37,7 +39,7 @@ Weapon::Weapon(int type)
 		m_recoil = 0.1f;
 		m_cooldown = 0.5f;
 
-		setScale(0.2f, 0.2f, 0.8f);
+		setScale(0.15f, 0.15f, 0.6f);
 	}
 }
 
@@ -59,6 +61,11 @@ float Weapon::getRecoil()
 float Weapon::getSpeed()
 {
 	return m_speed;
+}
+
+bool Weapon::getActive()
+{
+	return m_cdTime < m_duration;
 }
 
 void Weapon::upgrade()
@@ -135,6 +142,11 @@ bool Weapon::updateTime(float dt)
 		}
 	}
 	return false;
+}
+
+void Weapon::setRelativePos(XMVECTOR pos)
+{
+	m_relativePos = pos;
 }
 
 XMVECTOR Weapon::getRelativePos()

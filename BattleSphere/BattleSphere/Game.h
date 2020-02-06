@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
+#include <stdlib.h>
+#include <time.h>  
 
 #include "DX.h"
 #include "GameObject.h"
@@ -26,6 +28,8 @@ private:
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
 	std::vector<Projectile*> m_projectiles;
+	std::vector<Resource*> m_resources;
+	std::vector<Node*> m_nodes;
 
 	PreLoader m_preLoader;
 

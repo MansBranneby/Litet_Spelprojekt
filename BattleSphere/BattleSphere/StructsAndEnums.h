@@ -5,6 +5,11 @@
 
 using namespace DirectX;
 
+#define PISTOL 0
+#define RIFLE 1
+#define MOVEMENT 2
+#define SHIELD 3
+
 enum class objectType
 {
 	e_drone = 0,
@@ -16,16 +21,26 @@ enum class objectType
 	e_scene = 6
 };
 
-struct objectData 
-{
-	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
-};
 
 struct vertex 
 {
 	float posX, posY, posZ;
 	float u, v;
 	float normX, normY, normZ;
+};
+
+struct material
+{
+	XMVECTOR ambient; // ambient.xyz, illumination model enumeration (illum)
+	XMVECTOR diffuse; // diffuse.xyz, refraction (Ni)
+	XMVECTOR specular; // specular.xyz, shininess (Ns)
+	XMVECTOR emission; // emission.xyz, opacity (d)
+};
+
+struct objectData 
+{
+	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
+	material material;
 };
