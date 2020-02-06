@@ -48,6 +48,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
 	loadFromFile(objectType::e_resource, "1mesh1mat");
 	loadFromFile(objectType::e_scene, "Scene");
+	loadFromFile(objectType::e_scene, "SceneTest");
 }
 
 PreLoader::~PreLoader()

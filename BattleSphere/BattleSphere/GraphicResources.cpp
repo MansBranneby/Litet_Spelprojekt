@@ -162,10 +162,9 @@ void GraphicResources::setSamplerState()
 	HRESULT hr = E_FAIL;
 
 	// SAMPLERS //
-	ID3D11SamplerState* pointClamp;
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -173,33 +172,9 @@ void GraphicResources::setSamplerState()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	hr = DX::getInstance()->getDevice()->CreateSamplerState(&sampDesc, &pointClamp);
+	hr = DX::getInstance()->getDevice()->CreateSamplerState(&sampDesc, &m_samplerState);
 	if (FAILED(hr))
-		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
-
-
-	ID3D11SamplerState* linearWrap;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	hr = DX::getInstance()->getDevice()->CreateSamplerState(&sampDesc, &linearWrap);
-	if (FAILED(hr))
-		MessageBox(NULL, L"_samplerState", L"Error", MB_OK | MB_ICONERROR);
-
-	// Set samplers
-	DX::getInstance()->getDeviceContext()->VSSetSamplers(0, 1, &pointClamp);
-	DX::getInstance()->getDeviceContext()->DSSetSamplers(0, 1, &pointClamp);
-	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, &linearWrap);
-	DX::getInstance()->getDeviceContext()->PSSetSamplers(1, 1, &pointClamp);
-	// release pointers to sampler states
-	pointClamp->Release();
-	linearWrap->Release();
+		MessageBox(NULL, L"m_samplerState", L"Error", MB_OK | MB_ICONERROR);
 }
 
 GraphicResources::GraphicResources()
@@ -247,4 +222,12 @@ ID3D11RenderTargetView** GraphicResources::getBackBuffer()
 ID3D11SamplerState** GraphicResources::getSamplerState()
 {
 	return &m_samplerState;
+}
+
+void GraphicResources::setViewPortDim(UINT width, UINT height)
+{
+	m_viewPort.Width = width;
+	m_viewPort.Height = height;
+	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
+
 }
