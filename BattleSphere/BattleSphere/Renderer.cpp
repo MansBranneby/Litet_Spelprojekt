@@ -191,7 +191,9 @@ void downsample()
 	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 	g_bloom->setShaderResource(renderPass::e_downSample);
 
+	g_graphicResources.setViewPortDim((UINT)(DX::getInstance()->getWidth() * 0.25f), (UINT)(DX::getInstance()->getHeight() * 0.25f));
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+	g_graphicResources.setViewPortDim((UINT)DX::getInstance()->getWidth(), (UINT)DX::getInstance()->getHeight());
 
 	float clearColour[] = { 0, 0, 0, 1 };
 	ID3D11ShaderResourceView* nullSRV = { NULL };
@@ -377,6 +379,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_Game;
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
+		g_pixelShaderDownsample.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
 

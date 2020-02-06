@@ -49,7 +49,7 @@ void CS_main(CS_input input)
 		for (int i = 0; i < kernelHS; i++)
 		{
 			horizontalPoints[i] = InputTex.Load(float3(input.DispatchThreadID.x, input.DispatchThreadID.y - kernelHS + i, input.DispatchThreadID.z));
-			horizontalPoints[size_y + kernelHS + i] = InputTex.Load(float3(input.DispatchThreadID.x, input.DispatchThreadID.y + size_x + i, input.DispatchThreadID.z));
+			horizontalPoints[size_y + kernelHS + i] = InputTex.Load(float3(input.DispatchThreadID.x, input.DispatchThreadID.y + size_y + i, input.DispatchThreadID.z));
 		}
 	}
 	GroupMemoryBarrierWithGroupSync(); // Sync threads

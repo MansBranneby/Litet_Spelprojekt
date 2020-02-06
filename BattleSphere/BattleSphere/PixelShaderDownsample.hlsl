@@ -11,5 +11,6 @@ struct VS_OUT
 float4 PS_main(VS_OUT input) : SV_Target
 {
 	float3 fragmentColour = bloom.Sample(sampAni, input.tex).xyz;
+	
 	return float4(fragmentColour, 1.0f);
 };

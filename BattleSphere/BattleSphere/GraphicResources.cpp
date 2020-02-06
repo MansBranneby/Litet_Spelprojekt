@@ -221,3 +221,11 @@ ID3D11SamplerState** GraphicResources::getSamplerState()
 {
 	return &m_samplerState;
 }
+
+void GraphicResources::setViewPortDim(UINT width, UINT height)
+{
+	m_viewPort.Width = width;
+	m_viewPort.Height = height;
+	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
+
+}
