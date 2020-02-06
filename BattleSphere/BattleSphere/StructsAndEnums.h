@@ -41,8 +41,8 @@ struct boundingData {
 struct vectorPairProjections {
 	XMVECTOR vec1 = XMVectorSet(1, 0, 0, 0); // Vector
 	XMVECTOR vec2 = XMVectorSet(0, 0, 1, 0); // Vector
-	XMVECTOR minVec1 = XMVectorSet(0, 0, 0, 0); // Vertex
-	XMVECTOR maxVec1 = XMVectorSet(0, 0, 0, 0);	// Vertex
-	XMVECTOR minVec2 = XMVectorSet(0, 0, 0, 0);	// Vertex
-	XMVECTOR maxVec2 = XMVectorSet(0, 0, 0, 0);	// Vertex
+	float minVec1 = 0;	// Vertex projection length
+	float maxVec1 = 0;	// Vertex projection length
+	float minVec2 = 0;	// Vertex projection length
+	float maxVec2 = 0;	// Vertex projection length
 };

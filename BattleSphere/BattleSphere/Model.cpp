@@ -33,16 +33,44 @@ void Model::computeOBB()
 
 	// Set all min max values to the first vertex
 	XMVECTOR firstVertex = XMVectorSet(m_vertices[0].posX, m_vertices[0].posY, m_vertices[0].posZ, 0.0f);
+	float projectedV1, projectedV2;
 	for (int i = 0; i < nrOfPairs; i++)
 	{
-		pair[i].minVec1 = firstVertex;
-		pair[i].maxVec1 = firstVertex;
-		pair[i].minVec2 = firstVertex;
-		pair[i].maxVec2 = firstVertex;
+		projectedV1 = (float)XMVector4Dot(firstVertex, pair[i].vec1).m128_f32[0];
+		projectedV2 = (float)XMVector4Dot(firstVertex, pair[i].vec2).m128_f32[0];
+
+		pair[i].minVec1 = projectedV1;
+		pair[i].maxVec1 = projectedV1;
+
+		pair[i].minVec2 = projectedV2;
+		pair[i].maxVec2 = projectedV2;
 	}
 
 	// Project each vertex onto each vector, save min and max value 
 	// for each vector and their projected difference 
+	for (int vectorIndex = 1; vectorIndex < m_nrOfVertices; vectorIndex++)
+	{
+		XMVECTOR vec = XMVectorSet
+		(
+			m_vertices[vectorIndex].posX, 
+			m_vertices[vectorIndex].posY, 
+			m_vertices[vectorIndex].posZ, 
+			0.0f
+		);
+
+		for (int i = 0; i < nrOfPairs; i++)
+		{
+			// Project
+			projectedV1 = (float)XMVector4Dot(vec, pair[i].vec1).m128_f32[0];
+			projectedV2 = (float)XMVector4Dot(vec, pair[i].vec2).m128_f32[0];
+
+			// Compare value and save it if lower or higher
+			if (pair[i].maxVec1 < projectedV1)
+				pair[i].maxVec1 = projectedV1;
+			else if (pair[i].maxVec1 < projectedV1) 
+				pair[i].maxVec1 = projectedV1;
+		}
+	}
 
 
 	// Multiply each pair differences to find the smallest area
