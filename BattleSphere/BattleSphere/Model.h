@@ -15,6 +15,10 @@ private:
 	vertex* m_vertices;
 	int m_nrOfSubModels;
 	SubModel* m_subModels;
+	
+	// Bounding volume variables
+	boundingData m_bData;
+
 	std::vector<int> m_indices;
 
 
@@ -26,6 +30,9 @@ private:
 	XMMATRIX m_relRotationMat;
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
+
+	// To calculate obb
+	void computeOBB();
 
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCBuffer(); // For model matrix
@@ -47,6 +54,6 @@ public:
 	XMFLOAT3* getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
-	void loadModel(std::ifstream& in);
+	void loadModel(std::ifstream& in); // 0 = OBB, 1 = sphere
 };
 

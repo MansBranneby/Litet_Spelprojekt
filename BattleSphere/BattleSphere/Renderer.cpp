@@ -28,6 +28,12 @@
 
 using namespace DirectX;
 
+// TODO test quadtree
+#include "QuadtreeNode.h"
+QuadtreeNode* g_root;
+BoundingVolume* g_BV;
+
+
 GraphicResources g_graphicResources;
 
 
@@ -108,6 +114,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
+
+	// TODO test quadtree
+	DirectX::XMFLOAT3 levelPos = { 0.0f, 0.0f, 0.0f};
+	DirectX::XMFLOAT2 halfWD = { 10.0f, 10.0f };
+	DirectX::XMMATRIX rotMax = DirectX::XMMatrixRotationY(DirectX::XM_PI * 0.25f);
+	//DirectX::XMMATRIX rotMax = DirectX::XMMatrixIdentity();
+	std::vector<BoundingVolume*> BVs = { new OBB({-5.0f, 0.0f, -5.0f}, {1.0f, 1.0f}, DirectX::XMMatrixIdentity()), new OBB({-1.01f, 0.0f, -1.01f}, {1.0f, 1.0f}, DirectX::XMMatrixIdentity()) };
+	g_root = new QuadtreeNode(levelPos, halfWD, BVs, 2, 0);
+
 
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
@@ -252,8 +267,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
 
+		// TODO delete dynamically allocated stuff
+		delete g_root;
+
+		for (int i = 0; i < BVs.size(); ++i)
+			delete BVs[i];
+
 		DestroyWindow(wndHandle);
 	}
+
 
 	return (int)msg.wParam;
 }

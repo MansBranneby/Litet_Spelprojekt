@@ -1,6 +1,57 @@
 #include "Model.h"
 
 
+void Model::computeOBB()
+{
+	const int nrOfPairs = 89;
+
+	// Get 1 degree rotation matrix
+	float vx = 0.0f;
+	float vy = 1.0f; // Rotate around the Y-axis
+	float vz = 0.0f;
+	float rotDeg = -1.0f; // 1 degree
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX rotMat = XMMatrixRotationQuaternion(rotVec);
+
+
+	// Create 89 orthonormal vector pairs with 1 degree between them
+	vectorPairProjections pair[nrOfPairs];
+
+
+	for (int i = 1; i < nrOfPairs; i++)
+	{
+		// Rotate the previous vector one degree and save it to the next one
+		pair[i].vec1 = XMVector3Transform(pair[i - 1].vec1, rotMat);
+		pair[i].vec2 = XMVector3Transform(pair[i - 1].vec2, rotMat);
+	}
+
+	// Set all min max values to the first vertex
+	XMVECTOR firstVertex = XMVectorSet(m_vertices[0].posX, m_vertices[0].posY, m_vertices[0].posZ, 0.0f);
+	for (int i = 0; i < nrOfPairs; i++)
+	{
+		pair[i].minVec1 = firstVertex;
+		pair[i].maxVec1 = firstVertex;
+		pair[i].minVec2 = firstVertex;
+		pair[i].maxVec2 = firstVertex;
+	}
+
+	// Project each vertex onto each vector, save min and max value 
+	// for each vector and their projected difference 
+
+
+	// Multiply each pair differences to find the smallest area
+
+
+	// Calculate and save OBB center, half width and depth, as well as the axes
+	
+}
+
 void Model::createVertexBuffer()
 {
 	//TODO: Remove
@@ -372,4 +423,7 @@ void Model::loadModel(std::ifstream& in)
 
 	// Create model matrix
 	createVertexCBuffer();
+
+	// Create bounding volume
+	computeOBB();
 }
