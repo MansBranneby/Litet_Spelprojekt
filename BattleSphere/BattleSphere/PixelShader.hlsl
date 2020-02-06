@@ -78,13 +78,13 @@ PS_OUT PS_main(PS_IN input)
 	{
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
-		
+
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
-		float3 L = float3(0,0,0);
-		float3 R = float3(0,0,0);
-		float4 lightCol = float4(0,0,0,0);
-		switch (light.Type) 
+		float3 L = float3(0, 0, 0);
+		float3 R = float3(0, 0, 0);
+		float4 lightCol = float4(0, 0, 0, 0);
+		switch (light.Type)
 		{
 		case 0:
 			//Point light
@@ -108,31 +108,31 @@ PS_OUT PS_main(PS_IN input)
 			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
 			break;
 		}
-		
-		
 
 
-	// Illumination models //
-	switch (KaIn.w)
-	{
-	case 0: // Constant colour (diffuse)
-		fragmentCol = Kd;
-		break;
-	case 1: // Lambertian shading (diffuse, ambient)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
-		break;
-	case 2: // "Phong" (diffuse, ambient, specular)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol + Ke;
 
-		break;
-	case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol ;
-		break;
-	default:
-		fragmentCol = float3(1.0f, 1.0f, 1.0f);
-		break;
-	};
-	
+
+		// Illumination models //
+		switch (KaIn.w)
+		{
+		case 0: // Constant colour (diffuse)
+			fragmentCol = Kd;
+			break;
+		case 1: // Lambertian shading (diffuse, ambient)
+			fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
+			break;
+		case 2: // "Phong" (diffuse, ambient, specular)
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol + Ke;
+
+			break;
+		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
+			break;
+		default:
+			fragmentCol = float3(1.0f, 1.0f, 1.0f);
+			break;
+		};
+	}
 	output.scene = float4(fragmentCol, 1.0f);
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		output.bloom = float4(fragmentCol, 1.0f);

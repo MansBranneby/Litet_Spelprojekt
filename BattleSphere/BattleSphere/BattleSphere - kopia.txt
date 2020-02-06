@@ -148,6 +148,7 @@
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Drone.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -178,6 +179,7 @@
   <ItemGroup>
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />

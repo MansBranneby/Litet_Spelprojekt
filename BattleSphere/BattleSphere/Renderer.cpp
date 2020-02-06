@@ -171,7 +171,7 @@ void createRenderResources()
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(1.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	//g_light = new Light(XMVectorSet(1.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 
 	g_bloom = new Bloom();
 }
