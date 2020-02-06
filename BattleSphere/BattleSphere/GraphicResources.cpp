@@ -50,11 +50,12 @@ HWND GraphicResources::initWindow(HINSTANCE hInstance)
 }
 
 // TODO: Not sure if it's suppose to be here
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam); // Tells the compiler this function exists
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	//// check if IMGUI can handle the message (when we click INSIDE ImGui
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
-	//	return true;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 
 	switch (message)
 	{
