@@ -20,12 +20,7 @@ enum class objectType
 	e_resource = 5,
 	e_scene = 6
 };
-enum class renderPass
-{
-	e_scene,
-	e_downSample,
-	e_final
-};
+
 
 struct vertex 
 {

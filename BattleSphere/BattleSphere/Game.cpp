@@ -329,7 +329,7 @@ void Game::updateSec()
 
 void Game::draw()
 {
-	//m_preLoader.draw(objectType::e_scene);
+	m_preLoader.draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
