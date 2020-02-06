@@ -87,11 +87,11 @@ PreLoader::PreLoader()
 	// Load objects
 	//loadFromFile(objectType::e_drone, "?");
 	loadFromFile(objectType::e_weapon, "1mesh1mat");
-	loadFromFile(objectType::e_robot, "BattleSphere");
+	loadFromFile(objectType::e_robot, "BattleSphere", "2mesh2mat");
 	loadFromFile(objectType::e_node, "Building");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
 	//loadFromFile(objectType::e_resource, "?");
-	loadFromFile(objectType::e_scene, "Scene");
+	loadFromFile(objectType::e_scene, "SceneBig");
 }
 
 PreLoader::~PreLoader()
@@ -105,6 +105,17 @@ PreLoader::~PreLoader()
 	}
 }
 
+XMFLOAT3* PreLoader::getCollisionMesh(objectType type, objectData data, int modelNr, int variant)
+{
+	int typ = (int)type;
+	return m_objects[typ][variant][modelNr].getCollisionMesh(data);
+}
+
+XMFLOAT3* PreLoader::getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+{
+	int typ = (int)type;
+	return m_objects[typ][variant][modelNr].getCollisionMesh(data, relativeData);
+}
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
 {

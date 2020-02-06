@@ -15,8 +15,8 @@ private:
 	vertex* m_vertices;
 	int m_nrOfSubModels;
 	SubModel* m_subModels;
+	std::vector<int> m_indices;
 
-	XMMATRIX m_modelMatrix;
 
 	ID3D11Buffer* m_modelMatrixCBuffer;
 	XMMATRIX* m_modelMatrixData;
@@ -43,7 +43,8 @@ public:
 	Model();
 	~Model();
 
-	XMFLOAT3* getCollisionMesh(objectData data);
+	XMFLOAT3* getCollisionMesh(objectData data); // Delete after use
+	XMFLOAT3* getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);

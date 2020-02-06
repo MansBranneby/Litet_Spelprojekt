@@ -86,7 +86,6 @@ Model::Model()
 	m_nrOfVertices = 0;
 	m_modelMatrixCBuffer = nullptr;
 	m_modelMatrixData = nullptr;
-	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
 	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
@@ -166,10 +165,74 @@ void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
 	m_relScalingMat = XMMatrixScaling(xScale, yScale, zScale);
 }
 
-
-void Model::getCollisionMesh(objectData data)
+XMFLOAT3* Model::getCollisionMesh(objectData data)
 {
+	// Update world matrix
+	setObjectData(data);
 
+	// Make the first element the size of the array.
+	float verticeArrSize = float(m_indices.size() + 1);
+	XMFLOAT3* updatedVertices = new XMFLOAT3[(int)verticeArrSize];
+	updatedVertices[0] = XMFLOAT3(verticeArrSize, verticeArrSize, verticeArrSize);
+
+	// Get collision mesh updated with latest world matrix
+	XMVECTOR temp;
+	for (int i = 1; i < verticeArrSize - 1; i++)
+	{
+		// For each indice create a updated triangle to send
+		temp.m128_f32[0] = m_vertices[m_indices[i]].posX;
+		temp.m128_f32[1] = m_vertices[m_indices[i]].posY;
+		temp.m128_f32[2] = m_vertices[m_indices[i]].posZ;
+		temp.m128_f32[3] = 1.0f;
+
+		// Update triangle position with world matrix
+		temp = XMVector3Transform(temp, *m_modelMatrixData);
+
+		// Add triangle to list
+		updatedVertices[i] = XMFLOAT3
+		(
+			temp.m128_f32[0], 
+			temp.m128_f32[1], 
+			temp.m128_f32[2]
+		);
+	}
+
+	return updatedVertices;
+}
+
+XMFLOAT3* Model::getCollisionMesh(objectData data, objectData relativeData)
+{
+	// Update world matrix
+	setObjectData(data, relativeData);
+
+	// Make the first element the size of the array.
+	float verticeArrSize = float(m_indices.size() + 1);
+	XMFLOAT3* updatedVertices = new XMFLOAT3[(int)verticeArrSize];
+	updatedVertices[0] = XMFLOAT3(verticeArrSize, verticeArrSize, verticeArrSize);
+
+	// Get collision mesh updated with latest world matrix
+	XMVECTOR temp;
+	for (int i = 1; i < verticeArrSize - 1; i++)
+	{
+		// For each indice create a updated triangle to send
+		temp.m128_f32[0] = m_vertices[m_indices[i]].posX;
+		temp.m128_f32[1] = m_vertices[m_indices[i]].posY;
+		temp.m128_f32[2] = m_vertices[m_indices[i]].posZ;
+		temp.m128_f32[3] = 1.0f;
+
+		// Update triangle position with world matrix
+		temp = XMVector3Transform(temp, *m_modelMatrixData);
+
+		// Add triangle to list
+		updatedVertices[i] = XMFLOAT3
+		(
+			temp.m128_f32[0],
+			temp.m128_f32[1],
+			temp.m128_f32[2]
+		);
+	}
+
+	return updatedVertices;
 }
 
 void Model::setObjectData(objectData data)
@@ -291,13 +354,19 @@ void Model::loadModel(std::ifstream& in)
 
 		// Read indices
 		int* indices = new int[nrOfIndices];
-		for (int j = 0; j < nrOfIndices; j+=3)
+		for (int j = 0; j < nrOfIndices; j += 3)
 		{
 			std::getline(in, line);
 			inputStream.str(line);
-			inputStream >> indices[j] >> indices[j+1] >> indices[j+2];
+			inputStream >> indices[j] >> indices[j + 1] >> indices[j + 2];
+
+			// Save vertex indices 
+			m_indices.push_back(indices[j]);
+			m_indices.push_back(indices[j + 1]);
+			m_indices.push_back(indices[j + 2]);
 			inputStream.clear();
 		}
+
 		m_subModels[i].setFaces(indices, nrOfIndices);
 	}
 

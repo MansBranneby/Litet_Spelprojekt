@@ -31,7 +31,11 @@ public:
 	PreLoader();
 	~PreLoader();
 
+	XMFLOAT3* getCollisionMesh(objectType type, objectData data, int modelNr, int variant = 0);
+	XMFLOAT3* getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant = 0);
+	
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
+	
 	void draw(objectType type, int variant = 0);
 	void draw(objectType type, objectData data, int variant = 0);
 	void draw(objectType type, objectData data, objectData relativeData, int variant = 0);
