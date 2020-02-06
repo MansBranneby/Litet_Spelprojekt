@@ -1,5 +1,3 @@
-SamplerState sampAni;
-
 #define BLOCK_SIZE 32
 struct PS_IN
 {
@@ -47,16 +45,8 @@ float DoSpotCone(Light light, float4 L)
 Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
-struct PS_OUT
+float4 PS_main(PS_IN input) : SV_Target
 {
-	float4 scene : SV_Target0;
-	float4 bloom : SV_Target1;
-};
-
-PS_OUT PS_main(PS_IN input)
-{
-	PS_OUT output;
-
 	////LIGHTING//// (for one light)
 	uint2 tileIndex = uint2(floor(input.pos.xy / BLOCK_SIZE));
 	uint startOffset = LightGrid[tileIndex].x;
@@ -69,7 +59,6 @@ PS_OUT PS_main(PS_IN input)
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
-	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
@@ -112,32 +101,28 @@ PS_OUT PS_main(PS_IN input)
 		
 
 
-	// Illumination models //
-	switch (KaIn.w)
-	{
-	case 0: // Constant colour (diffuse)
-		fragmentCol = Kd;
-		break;
-	case 1: // Lambertian shading (diffuse, ambient)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
-		break;
-	case 2: // "Phong" (diffuse, ambient, specular)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol + Ke;
+		// Illumination models //
+		switch (KaIn.w)
+		{
+		case 0: // Constant colour (diffuse)
+			fragmentCol = Kd;
+			break;
+		case 1: // Lambertian shading (diffuse, ambient)
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
+			break;
+		case 2: // "Phong" (diffuse, ambient, specular)
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
 
-		break;
-	case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-		fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol  + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol ;
-		break;
-	default:
-		fragmentCol = float3(1.0f, 1.0f, 1.0f);
-		break;
-	};
+			break;
+		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			break;
+		default:
+			break;
+		};
+
+	}
 	
-	output.scene = float4(fragmentCol, 1.0f);
-	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
-		output.bloom = float4(fragmentCol, 1.0f);
-	else
-		output.bloom = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	return float4(fragmentCol, 1.0f);
 
-	return output;
 };

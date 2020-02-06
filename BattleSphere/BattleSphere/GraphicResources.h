@@ -35,6 +35,4 @@ public:
 	ID3D11DepthStencilView* getDepthStencilView() const;
 	ID3D11RenderTargetView** getBackBuffer();
 	ID3D11SamplerState** getSamplerState();
-
-	void setViewPortDim(UINT width, UINT height);
 };
