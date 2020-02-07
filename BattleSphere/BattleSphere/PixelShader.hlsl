@@ -119,7 +119,7 @@ PS_OUT PS_main(PS_IN input)
 			fragmentCol = Kd;
 			break;
 		case 1: // Lambertian shading (diffuse, ambient)
-			fragmentCol = Ka * Ia + Kd * max(dot(normal, L), 0.0f) * (float3)lightCol * d;
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
 			break;
 		case 2: // "Phong" (diffuse, ambient, specular)
 			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol + Ke;

@@ -228,7 +228,7 @@ void Bloom::setShaderResource(renderPass pass)
 
 void Bloom::clearRenderTarget()
 {
-	float clearColour[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float clearColour[] = { 0.0f, 0.0f, 0.05f, 1.0f };
 	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_bloomRTV[0], clearColour);
 	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_bloomRTV[1], clearColour);
 }
