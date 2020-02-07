@@ -1,4 +1,6 @@
 #define BLOCK_SIZE 32
+SamplerState sampAni;
+
 struct PS_IN
 {
 	float4 pos : SV_POSITION;
@@ -59,6 +61,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
+	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
@@ -111,7 +114,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
 			break;
 		case 2: // "Phong" (diffuse, ambient, specular)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol) + Ke;
 
 			break;
 		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
@@ -123,6 +126,8 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	}
 	
-	return float4(fragmentCol, 1.0f);
-
+	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
+		return float4(fragmentCol, 1.0f);
+	else
+		return float4(fragmentCol, 0.0f);
 };
