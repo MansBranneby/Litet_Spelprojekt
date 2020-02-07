@@ -215,14 +215,15 @@ void Game::updateSec()
 
 void Game::draw()
 {
-	//m_preLoader.draw(objectType::e_scene);
+	m_preLoader.draw(objectType::e_scene);
+	
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
 		{
 			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
-			m_preLoader.draw(objectType::e_scene, m_robots[i]->getData(), 1);
+			m_preLoader.draw(objectType::e_robot, m_robots[i]->getData());
 			m_preLoader.draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 
 			if (m_robots[i]->getCurrentWeapon(LEFT) != -1)
