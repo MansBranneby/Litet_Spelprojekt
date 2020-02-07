@@ -63,13 +63,14 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
 	fragmentCol = Ka * Ia;
-	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
+	/*for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
 		
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
+		//float d = dot(lightPos.xyz - input.posWC, lightPos.xyz - input.posWC);
 		float3 L = float3(0,0,0);
 		float3 R = float3(0,0,0);
 		float4 lightCol = float4(0,0,0,0);
@@ -97,7 +98,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
 			break;
 		}
-		
+
 		
 
 
@@ -121,8 +122,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		};
 
-	}
-	
+	}*/
+	fragmentCol = float3(0, 0, 0);
 	return float4(fragmentCol, 1.0f);
 
 };

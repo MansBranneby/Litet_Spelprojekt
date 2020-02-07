@@ -163,14 +163,16 @@ void CS_main(ComputeShaderInput IN)
 				if (ConeInsideFrustum(cone, GroupFrustum))
 				{
 
-						// Add light to light list for opaque geometry.
-						o_AppendLight(i);
+					// Add light to light list for opaque geometry.
+					o_AppendLight(i);
 
 				}
 			}
 			break;
 			}
 		}
+		else
+			break;
 	}
 	GroupMemoryBarrierWithGroupSync();
 	if (IN.groupIndex == 0)
