@@ -27,16 +27,8 @@ cbuffer PS_CONSTANT_BUFFER : register(b2)
 	float4 KeIn; //Ke + d
 };
 
-struct PS_OUT
+float4 PS_main(PS_IN input) : SV_Target
 {
-	float4 scene : SV_Target0;
-	float4 bloom : SV_Target1;
-};
-
-PS_OUT PS_main(PS_IN input)
-{
-	PS_OUT output;
-
 	////LIGHTING//// (for one light)
 
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
@@ -76,11 +68,8 @@ PS_OUT PS_main(PS_IN input)
 		break;
 	};
 
-	output.scene = float4(fragmentCol, 1.0f);
 	if(Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
-		output.bloom = float4(fragmentCol, 1.0f);
+		return float4(fragmentCol, 1.0f);
 	else
-		output.bloom = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	return output;
+		return float4(fragmentCol, 0.0f);
 };

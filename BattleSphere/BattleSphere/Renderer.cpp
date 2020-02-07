@@ -196,8 +196,6 @@ void downsample()
 	g_graphicResources.setViewPortDim((UINT)DX::getInstance()->getWidth(), (UINT)DX::getInstance()->getHeight());
 
 	float clearColour[] = { 0, 0, 0, 1 };
-	ID3D11ShaderResourceView* nullSRV = { NULL };
-	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullSRV);
 }
 
 void finalRender()
