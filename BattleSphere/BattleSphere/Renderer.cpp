@@ -11,6 +11,10 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
+
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
@@ -25,6 +29,7 @@
 #include "Game.h"
 #include "Camera.h"
 #include "Light.h"
+#include "LightCulling.h"
 
 using namespace DirectX;
 
@@ -33,7 +38,6 @@ Bloom* g_bloom = nullptr;
 
 //TODO Remove
 Camera* g_camera = nullptr;
-Light* g_light = nullptr;
 ConstantBuffer* g_constantBufferMaterials = nullptr;
 
 ID3D11Buffer* g_vertexBufferFSQuad = nullptr;
@@ -46,6 +50,7 @@ PixelShader g_pixelShaderDownsample;
 
 Clock* g_Clock;
 Game* g_Game;
+LightCulling g_lightCulling;
 
 
 struct MaterialTest
@@ -60,12 +65,6 @@ struct PosCol
 	float u, v;
 	float nx, ny, nz;
 };
-
-//struct PosUV
-//{
-//	float x, y, z;
-//	float u, v, a;
-//};
 
 PosCol vertexData[3]
 {
@@ -233,21 +232,43 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
-
+	g_lightCulling.initialize();
 	createRenderResources(); // Creates instances of graphics classes etc.
 
 	if (wndHandle)
 	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); // (void)io;
+		ImGui_ImplWin32_Init(wndHandle);
+		ImGui_ImplDX11_Init(DX::getInstance()->getDevice(), DX::getInstance()->getDeviceContext());
+		ImGui::StyleColorsLight();
+		ImGui::GetIO().FontGlobalScale = 1.0;
 		ShowWindow(wndHandle, nCmdShow);
+
 
 		setupTestTriangle();
 
+		int index = g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
+		g_lightCulling.setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
+		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 0.6f);
+		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
+		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		index = g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
+		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
+		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
+		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
+		
 		g_Clock = new Clock();
 		g_Game = new Game();
 
 		int counterFrames = 0;
 		int fps = 0;
-
+		/*For IMGUI*/
+		float lightColor[3] = { 0 };
+		float lightIntensity = 1;
+		float lightRange = 1;
 		
 
 		///////////////
@@ -268,7 +289,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 0, 0, 0, 1 };
-
+				g_lightCulling.cullLights();
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 				
@@ -278,7 +299,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
-				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, g_light->getConstantuffer()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
 				
@@ -297,7 +317,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 			
 
-				g_Game->update(g_Clock->getDeltaTime());
+				returnInfo a = g_Game->update(g_Clock->getDeltaTime());
+				g_lightCulling.setPosition(0, a.x, a.y, a.z);
 				g_Game->draw();
 
 				downsample();
@@ -305,6 +326,22 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				finalRender();
 
+				ImGui_ImplDX11_NewFrame();
+				ImGui_ImplWin32_NewFrame();
+				ImGui::NewFrame();
+				ImGui::Begin("Settings");
+				
+				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
+				
+				ImGui::ColorPicker3("Select color", lightColor);
+				ImGui::SliderFloat("Select Range", &lightRange, 0, 100);
+				ImGui::SliderFloat("Select Intensity", &lightIntensity, 0, 10);
+				g_lightCulling.setColor(0, lightColor[0], lightColor[1], lightColor[2]);
+				g_lightCulling.setRange(0, lightRange);
+				g_lightCulling.setIntensity(0, lightIntensity);
+				ImGui::End();
+				ImGui::Render();
+				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
 				counterFrames++;
@@ -314,59 +351,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					counterFrames = 0;
 					g_Clock->resetSecTimer();
 					g_Game->updateSec();
-					// TODO delet dis (visa fps)
-					OutputDebugStringA(std::to_string(fps).c_str());
-					OutputDebugStringA("\n");
-					
-					// TODO delet dis (testa controllern)
-					/*
-					if (!gInput->refresh(0))
-					{
-						OutputDebugStringA("1 error\n");
-						gInput->reconnectController(0);
-					}
-					else
-					{
-						if (gInput->isPressed(0, XINPUT_GAMEPAD_A))
-						{
-							OutputDebugStringA("1 A\n");
-						}
-						
-						if (gInput->isPressed(0, XINPUT_GAMEPAD_RIGHT_SHOULDER))
-						{
-							OutputDebugStringA("RB\n");
-						}
-						
-						//OutputDebugStringA(std::to_string(gInput->getTriggerR(0)).c_str());
-						
-						OutputDebugStringA("X: ");
-						OutputDebugStringA(std::to_string(XMVectorGetX(gGameObject->getPosition())).c_str());
-						OutputDebugStringA(" Y: ");
-						OutputDebugStringA(std::to_string(XMVectorGetY(gGameObject->getPosition())).c_str());
-						OutputDebugStringA("\n");
-						
-					}
-					
-					if (!gInput->refresh(1))
-					{
-						OutputDebugStringA("2 error\n");
-						gInput->reconnectController(1);
-					}
-					else
-					{
-						if (gInput->isPressed(1, XINPUT_GAMEPAD_A))
-						{
-							OutputDebugStringA("2 A\n");
-						}
-					}
-					*/
+					// TODO: delet dis (visa fps)
+					/*OutputDebugStringA(std::to_string(fps).c_str());
+					OutputDebugStringA("\n");*/
+				
 				}
 				
 
 				g_Clock->resetStartTimer();
 			}
 		}
-
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 		//TODO Release
 		_vertexBuffer->Release();
 		g_vertexBufferFSQuad->Release();

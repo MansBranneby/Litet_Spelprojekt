@@ -29,7 +29,8 @@ private:
 public:
 	Camera(float width, float height, float nearPlane, float farPlane);
 	~Camera();
-
+	XMMATRIX getViewMatrix();
+	XMMATRIX getProjectionMatrix();
 	ConstantBuffer* getConstantBufferVP();
 	ConstantBuffer* getConstantBufferPosition();
 };

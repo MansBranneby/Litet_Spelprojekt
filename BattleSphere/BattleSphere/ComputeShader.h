@@ -11,6 +11,7 @@ private:
 	HRESULT createComputeShader(LPCWSTR fileName, ID3DBlob** pVS, ID3DBlob** errorBlob);
 
 public:
+	
 	ComputeShader();
 	ComputeShader(LPCWSTR fileName);
 

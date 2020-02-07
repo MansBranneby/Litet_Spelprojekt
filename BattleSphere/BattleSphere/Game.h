@@ -12,9 +12,13 @@
 
 
 using namespace DirectX;
-
+struct returnInfo
+{
+	float x, y, z;
+};
 class Game
 {
+	
 private:
 	int m_nrOfPlayers;
 	int m_controllerId[XUSER_MAX_COUNT];
@@ -30,9 +34,10 @@ private:
 
 	void updatePlayerStatus();
 public:
+	
 	Game();
 
-	void update(float dt);
+	returnInfo update(float dt);
 	void updateSec();
 	void draw();
 
