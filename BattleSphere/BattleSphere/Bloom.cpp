@@ -16,8 +16,6 @@ void Bloom::createResources()
 	texDescRS.MiscFlags = 0;
 	texDescRS.SampleDesc.Count = 1;
 
-	// TODO: Ta bort alpha value?
-
 	D3D11_TEXTURE2D_DESC texDescRSU;
 	ZeroMemory(&texDescRSU, sizeof(texDescRSU));
 	texDescRSU.Width = (UINT)DX::getInstance()->getWidth() * 0.25f;
@@ -41,11 +39,6 @@ void Bloom::createResources()
 	texDescGauss.CPUAccessFlags = D3D11_USAGE_DEFAULT;
 	texDescGauss.MiscFlags = 0;
 	texDescGauss.SampleDesc.Count = 1;
-
-	// Scene
-	//HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDescRS, NULL, &m_sceneTex);
-	//if (FAILED(hr))
-	//	MessageBox(NULL, L"sceneTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
 	// Bloom
 	HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDescRSU, NULL, &m_bloomTex);
@@ -165,14 +158,12 @@ Bloom::Bloom()
 Bloom::~Bloom()
 {
 	m_gaussTex->Release();
-	//m_sceneTex->Release();
 	m_bloomTex->Release();
 	m_fullResTex->Release();
 
 	m_fullResRTV->Release();
 	m_lowResRTV->Release();
 
-	//m_materialSRV->Release();
 	m_gaussSRV->Release();
 	m_bloomSRV[0]->Release();
 	m_bloomSRV[1]->Release();
@@ -216,8 +207,7 @@ void Bloom::setShaderResource(renderPass pass)
 
 void Bloom::clearRenderTarget()
 {
-	float clearColour[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_bloomRTV[0], clearColour);
+	float clearColour[] = { 0.0f, 0.0f, 0.1f, 1.0f };
 	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(m_fullResRTV, clearColour);
 }
 

@@ -31,7 +31,7 @@ float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//// (for one light)
 
-	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
+	float3 Ia = { 0.4, 0.4, 0.4 }; // Ambient light
 	float3 fragmentCol;
 	
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
