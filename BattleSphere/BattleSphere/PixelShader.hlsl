@@ -47,16 +47,8 @@ float DoSpotCone(Light light, float4 L)
 Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
-struct PS_OUT
+float4 PS_main(PS_IN input) : SV_Target
 {
-	float4 scene : SV_Target0;
-	float4 bloom : SV_Target1;
-};
-
-PS_OUT PS_main(PS_IN input)
-{
-	PS_OUT output;
-
 	////LIGHTING//// (for one light)
 	uint2 tileIndex = uint2(floor(input.pos.xy / BLOCK_SIZE));
 	uint startOffset = LightGrid[tileIndex].x;
@@ -133,11 +125,6 @@ PS_OUT PS_main(PS_IN input)
 			break;
 		};
 	}
-	output.scene = float4(fragmentCol, 1.0f);
-	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
-		output.bloom = float4(fragmentCol, 1.0f);
-	else
-		output.bloom = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	return output;
+		return float4(fragmentCol, 0.0f);
 };
