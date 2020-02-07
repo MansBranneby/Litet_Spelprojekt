@@ -50,10 +50,12 @@ public:
 	Model();
 	~Model();
 
-	XMFLOAT3* getCollisionMesh(objectData data); // Delete after use
-	XMFLOAT3* getCollisionMesh(objectData data, objectData relativeData); // Delete after use
+	objectData getBVObjectData() const;
+	boundingData getBoundingData() const;
+	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
+	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
-	void loadModel(std::ifstream& in); // 0 = OBB, 1 = sphere
+	void loadModel(std::ifstream& in, bool isCollisionMesh = false);
 };
 

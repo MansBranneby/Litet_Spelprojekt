@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include <vector>
+#include <cmath>
 
 using namespace DirectX;
 
@@ -41,8 +42,8 @@ struct boundingData {
 struct vectorPairProjections {
 	XMVECTOR vec1 = XMVectorSet(1, 0, 0, 0); // Vector
 	XMVECTOR vec2 = XMVectorSet(0, 0, 1, 0); // Vector
-	float minVec1 = 0;	// Vertex projection length
-	float maxVec1 = 0;	// Vertex projection length
-	float minVec2 = 0;	// Vertex projection length
-	float maxVec2 = 0;	// Vertex projection length
+	float minLength1 = 0;	// Vertex projection length
+	float maxLength1 = 0;	// Vertex projection length
+	float minLength2 = 0;	// Vertex projection length
+	float maxLength2 = 0;	// Vertex projection length
 };

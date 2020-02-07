@@ -3,13 +3,13 @@
 
 void Model::computeOBB()
 {
-	const int nrOfPairs = 89;
+	const int nrOfPairs = 179;
 
 	// Get 1 degree rotation matrix
 	float vx = 0.0f;
 	float vy = 1.0f; // Rotate around the Y-axis
 	float vz = 0.0f;
-	float rotDeg = -1.0f; // 1 degree
+	float rotDeg = -0.5f; // 1 degree
 
 	float rotInRad = XMConvertToRadians(rotDeg);
 	vx *= sin(rotInRad / 2);
@@ -39,11 +39,11 @@ void Model::computeOBB()
 		projectedV1 = (float)XMVector4Dot(firstVertex, pair[i].vec1).m128_f32[0];
 		projectedV2 = (float)XMVector4Dot(firstVertex, pair[i].vec2).m128_f32[0];
 
-		pair[i].minVec1 = projectedV1;
-		pair[i].maxVec1 = projectedV1;
+		pair[i].minLength1 = projectedV1;
+		pair[i].maxLength1 = projectedV1;
 
-		pair[i].minVec2 = projectedV2;
-		pair[i].maxVec2 = projectedV2;
+		pair[i].minLength2 = projectedV2;
+		pair[i].maxLength2 = projectedV2;
 	}
 
 	// Project each vertex onto each vector, save min and max value 
@@ -52,9 +52,9 @@ void Model::computeOBB()
 	{
 		XMVECTOR vec = XMVectorSet
 		(
-			m_vertices[vectorIndex].posX, 
-			m_vertices[vectorIndex].posY, 
-			m_vertices[vectorIndex].posZ, 
+			m_vertices[vectorIndex].posX,
+			m_vertices[vectorIndex].posY,
+			m_vertices[vectorIndex].posZ,
 			0.0f
 		);
 
@@ -65,19 +65,54 @@ void Model::computeOBB()
 			projectedV2 = (float)XMVector4Dot(vec, pair[i].vec2).m128_f32[0];
 
 			// Compare value and save it if lower or higher
-			if (pair[i].maxVec1 < projectedV1)
-				pair[i].maxVec1 = projectedV1;
-			else if (pair[i].maxVec1 < projectedV1) 
-				pair[i].maxVec1 = projectedV1;
+			if (pair[i].maxLength1 < projectedV1)
+				pair[i].maxLength1 = projectedV1;
+			else if (pair[i].minLength1 > projectedV1)
+				pair[i].minLength1 = projectedV1;
+
+			if (pair[i].maxLength2 < projectedV2)
+				pair[i].maxLength2 = projectedV2;
+			else if (pair[i].minLength2 > projectedV2)
+				pair[i].minLength2 = projectedV2;
 		}
 	}
 
 
 	// Multiply each pair differences to find the smallest area
+	float length1 = pair[0].maxLength1 - pair[0].minLength1;
+	float length2 = pair[0].maxLength2 - pair[0].minLength2;
+	float smallestArea = length1 * length2;
+	int bestPairIndex = 0;
+	for (int i = 1; i < nrOfPairs; i++)
+	{
+		length1 = pair[i].maxLength1 - pair[i].minLength1;
+		length2 = pair[i].maxLength2 - pair[i].minLength2;
+		float newArea = length1 * length2;
 
+		if (newArea < smallestArea)
+		{
+			smallestArea = newArea;
+			bestPairIndex = i;
+		}
+	}
 
-	// Calculate and save OBB center, half width and depth, as well as the axes
-	
+	// Calculate and save OBB center
+	float vec1Length = 0.5f * (pair[bestPairIndex].maxLength1 + pair[bestPairIndex].minLength1);
+	XMVECTOR vec1Center = pair[bestPairIndex].vec1 * vec1Length;
+
+	float vec2Length = 0.5f * (pair[bestPairIndex].maxLength2 + pair[bestPairIndex].minLength2);
+	XMVECTOR vec2Center = pair[bestPairIndex].vec2 * vec2Length;
+
+	XMVECTOR bPos = vec1Center + vec2Center;
+	m_bData.pos = XMFLOAT3(bPos.m128_f32[0], bPos.m128_f32[1], bPos.m128_f32[2]);
+
+	// Calculate save half width and depth
+	m_bData.halfWD.x = 0.5f * (pair[bestPairIndex].maxLength1 - pair[bestPairIndex].minLength1);
+	m_bData.halfWD.y = 0.5f * (pair[bestPairIndex].maxLength2 - pair[bestPairIndex].minLength2);
+
+	// Calculate save the axes
+	m_bData.xAxis = pair[bestPairIndex].vec1;
+	m_bData.zAxis = pair[bestPairIndex].vec2;
 }
 
 void Model::createVertexBuffer()
@@ -244,19 +279,36 @@ void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
 	m_relScalingMat = XMMatrixScaling(xScale, yScale, zScale);
 }
 
-XMFLOAT3* Model::getCollisionMesh(objectData data)
+objectData Model::getBVObjectData() const
+{
+	objectData temp;
+	temp.pos = XMVectorSet(m_bData.pos.x, m_bData.pos.y, m_bData.pos.z, 1.0);
+	float dotProduct = XMVector3Dot(m_bData.xAxis, XMVectorSet(1.0, 0.0, 0.0, 0.0)).m128_f32[0];
+	float angle = std::acos(dotProduct);
+	angle = XMConvertToDegrees(angle);
+	temp.rotation = XMVectorSet(0, 1, 0, -angle);
+	temp.scale = XMVectorSet(m_bData.halfWD.x, 10, m_bData.halfWD.y, 1.0);
+
+	return temp;
+}
+
+boundingData Model::getBoundingData() const
+{
+	return m_bData;
+}
+
+std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data)
 {
 	// Update world matrix
 	setObjectData(data);
 
 	// Make the first element the size of the array.
-	float verticeArrSize = float(m_indices.size() + 1);
-	XMFLOAT3* updatedVertices = new XMFLOAT3[(int)verticeArrSize];
-	updatedVertices[0] = XMFLOAT3(verticeArrSize, verticeArrSize, verticeArrSize);
+	float verticeArrSize = float(m_indices.size());
+	std::vector<XMFLOAT3> updatedVertices;
 
 	// Get collision mesh updated with latest world matrix
 	XMVECTOR temp;
-	for (int i = 1; i < verticeArrSize - 1; i++)
+	for (int i = 0; i < verticeArrSize; i++)
 	{
 		// For each indice create a updated triangle to send
 		temp.m128_f32[0] = m_vertices[m_indices[i]].posX;
@@ -268,30 +320,32 @@ XMFLOAT3* Model::getCollisionMesh(objectData data)
 		temp = XMVector3Transform(temp, *m_modelMatrixData);
 
 		// Add triangle to list
-		updatedVertices[i] = XMFLOAT3
+		updatedVertices.push_back
 		(
-			temp.m128_f32[0], 
-			temp.m128_f32[1], 
+			XMFLOAT3
+			(
+			temp.m128_f32[0],
+			temp.m128_f32[1],
 			temp.m128_f32[2]
+			)
 		);
 	}
 
 	return updatedVertices;
 }
 
-XMFLOAT3* Model::getCollisionMesh(objectData data, objectData relativeData)
+std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relativeData)
 {
 	// Update world matrix
 	setObjectData(data, relativeData);
 
 	// Make the first element the size of the array.
-	float verticeArrSize = float(m_indices.size() + 1);
-	XMFLOAT3* updatedVertices = new XMFLOAT3[(int)verticeArrSize];
-	updatedVertices[0] = XMFLOAT3(verticeArrSize, verticeArrSize, verticeArrSize);
+	float verticeArrSize = float(m_indices.size());
+	std::vector<XMFLOAT3> updatedVertices;
 
 	// Get collision mesh updated with latest world matrix
 	XMVECTOR temp;
-	for (int i = 1; i < verticeArrSize - 1; i++)
+	for (int i = 0; i < verticeArrSize; i++)
 	{
 		// For each indice create a updated triangle to send
 		temp.m128_f32[0] = m_vertices[m_indices[i]].posX;
@@ -303,11 +357,14 @@ XMFLOAT3* Model::getCollisionMesh(objectData data, objectData relativeData)
 		temp = XMVector3Transform(temp, *m_modelMatrixData);
 
 		// Add triangle to list
-		updatedVertices[i] = XMFLOAT3
+		updatedVertices.push_back
 		(
-			temp.m128_f32[0],
-			temp.m128_f32[1],
-			temp.m128_f32[2]
+			XMFLOAT3
+			(
+				temp.m128_f32[0],
+				temp.m128_f32[1],
+				temp.m128_f32[2]
+			)
 		);
 	}
 
@@ -330,7 +387,7 @@ void Model::setObjectData(objectData data, objectData relativeData)
 	updateRelSubResource();
 }
 
-void Model::loadModel(std::ifstream& in)
+void Model::loadModel(std::ifstream& in, bool isCollisionMesh)
 {
 	std::string line;
 	std::istringstream inputStream;
@@ -453,5 +510,6 @@ void Model::loadModel(std::ifstream& in)
 	createVertexCBuffer();
 
 	// Create bounding volume
-	computeOBB();
+	if (isCollisionMesh)
+		computeOBB();
 }

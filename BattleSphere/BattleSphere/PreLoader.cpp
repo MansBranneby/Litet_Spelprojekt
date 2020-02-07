@@ -48,7 +48,7 @@ void PreLoader::loadCollisionMesh(objectType type, std::string filename)
 
 
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++) // Reads all objects
-		m_cMesh[typ][variant][i].loadModel(in);
+		m_cMesh[typ][variant][i].loadModel(in, true);
 	in.close();
 	objectData tempData;
 	setCMeshData(type, tempData, variant);
@@ -87,11 +87,11 @@ PreLoader::PreLoader()
 	// Load objects
 	//loadFromFile(objectType::e_drone, "?");
 	loadFromFile(objectType::e_weapon, "1mesh1mat");
-	loadFromFile(objectType::e_robot, "BattleSphere", "2mesh2mat");
-	loadFromFile(objectType::e_node, "Building");
+	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
+	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
 	//loadFromFile(objectType::e_resource, "?");
-	loadFromFile(objectType::e_scene, "SceneBig");
+	loadFromFile(objectType::e_scene, "redCube");
 }
 
 PreLoader::~PreLoader()
@@ -105,16 +105,28 @@ PreLoader::~PreLoader()
 	}
 }
 
-XMFLOAT3* PreLoader::getCollisionMesh(objectType type, objectData data, int modelNr, int variant)
+objectData PreLoader::getBVObjectData(objectType type, int modelNr, int variant) const
 {
 	int typ = (int)type;
-	return m_objects[typ][variant][modelNr].getCollisionMesh(data);
+	return m_cMesh[typ][variant][modelNr].getBVObjectData();
 }
 
-XMFLOAT3* PreLoader::getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+boundingData PreLoader::getBoundingData(objectType type, int modelNr, int variant) const
 {
 	int typ = (int)type;
-	return m_objects[typ][variant][modelNr].getCollisionMesh(data, relativeData);
+	return m_cMesh[typ][variant][modelNr].getBoundingData();
+}
+
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData data, int modelNr, int variant) const
+{
+	int typ = (int)type;
+	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data);
+}
+
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant) const
+{
+	int typ = (int)type;
+	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
