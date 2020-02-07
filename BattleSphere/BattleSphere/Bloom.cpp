@@ -18,8 +18,8 @@ void Bloom::createResources()
 
 	D3D11_TEXTURE2D_DESC texDescRSU;
 	ZeroMemory(&texDescRSU, sizeof(texDescRSU));
-	texDescRSU.Width = (UINT)DX::getInstance()->getWidth() * 0.25f;
-	texDescRSU.Height = (UINT)DX::getInstance()->getHeight() * 0.25f;
+	texDescRSU.Width = (UINT)(DX::getInstance()->getWidth() * 0.25f);
+	texDescRSU.Height = (UINT)(DX::getInstance()->getHeight() * 0.25f);
 	texDescRSU.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	texDescRSU.MipLevels = 1;
 	texDescRSU.ArraySize = 1;
@@ -30,8 +30,8 @@ void Bloom::createResources()
 
 	D3D11_TEXTURE2D_DESC texDescGauss;
 	ZeroMemory(&texDescGauss, sizeof(texDescGauss));
-	texDescGauss.Width = (UINT)DX::getInstance()->getWidth() * 0.25f;
-	texDescGauss.Height = (UINT)DX::getInstance()->getHeight() * 0.25f;
+	texDescGauss.Width = (UINT)(DX::getInstance()->getWidth() * 0.25f);
+	texDescGauss.Height = (UINT)(DX::getInstance()->getHeight() * 0.25f);
 	texDescGauss.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	texDescGauss.MipLevels = 1;
 	texDescGauss.ArraySize = 1;
@@ -225,7 +225,7 @@ void Bloom::run()
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_horizontalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_bloomSRV[1]);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_gaussUAV, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch(15, (UINT)DX::getInstance()->getHeight() * 0.25f, 1); 
+	DX::getInstance()->getDeviceContext()->Dispatch(15, (UINT)(DX::getInstance()->getHeight() * 0.25f), 1); 
 
 	ID3D11ShaderResourceView* nullSRV = { NULL };
 	ID3D11UnorderedAccessView* nullUAV = { NULL };
@@ -236,7 +236,7 @@ void Bloom::run()
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_verticalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_gaussSRV);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_bloomUAV, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch((UINT)DX::getInstance()->getWidth() * 0.25f, 9, 1);
+	DX::getInstance()->getDeviceContext()->Dispatch((UINT)(DX::getInstance()->getWidth() * 0.25f), 9, 1);
 
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &nullSRV);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
