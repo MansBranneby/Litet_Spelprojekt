@@ -125,6 +125,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		};
 	}
-
-		return float4(fragmentCol, 0.0f);
+	//if(dot(Ke, Ke) > 0.0f)
+	if(Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
+		return float4(fragmentCol, 1.0f);
+	return float4(fragmentCol, 0.0f);
 };
