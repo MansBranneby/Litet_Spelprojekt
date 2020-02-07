@@ -27,6 +27,16 @@ Camera::~Camera()
 	delete m_constantBufferPosition;
 }
 
+XMMATRIX Camera::getViewMatrix()
+{
+	return m_view;
+}
+
+XMMATRIX Camera::getProjectionMatrix()
+{
+	return m_projection;
+}
+
 ConstantBuffer* Camera::getConstantBufferVP()
 {
 	return m_constantBufferVP;

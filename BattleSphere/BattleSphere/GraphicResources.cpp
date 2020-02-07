@@ -43,18 +43,19 @@ HWND GraphicResources::initWindow(HINSTANCE hInstance)
 		hInstance,
 		nullptr);
 
-	// TODO Wutface?
+	// TODO: Wutface?
 	int dab = GetClientRect(handle, &rc);
 
 	return handle;
 }
 
-// TODO Not sure if it's suppose to be here
+// TODO: Not sure if it's suppose to be here
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam); // Tells the compiler this function exists
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	//// check if IMGUI can handle the message (when we click INSIDE ImGui
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
-	//	return true;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 
 	switch (message)
 	{
@@ -127,6 +128,7 @@ void GraphicResources::createBackBuffer()
 	DX::getInstance()->getSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
 	// use the back buffer address to create the render target
+	
 	DX::getInstance()->getDevice()->CreateRenderTargetView(pBackBuffer, NULL, &m_backbufferRTV);
 	pBackBuffer->Release();
 }
