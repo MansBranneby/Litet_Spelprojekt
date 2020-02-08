@@ -2,6 +2,8 @@
 #include "DX.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include <vector>
+#include <cmath>
 
 using namespace DirectX;
 
@@ -35,4 +37,20 @@ struct vertex
 	float posX, posY, posZ;
 	float u, v;
 	float normX, normY, normZ;
+};
+
+struct boundingData {
+	XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
+	XMFLOAT2 halfWD = XMFLOAT2(0, 0);
+	XMVECTOR xAxis = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR zAxis = XMVectorSet(0, 0, 0, 0);
+};
+
+struct vectorPairProjections {
+	XMVECTOR vec1 = XMVectorSet(1, 0, 0, 0); // Vector
+	XMVECTOR vec2 = XMVectorSet(0, 0, 1, 0); // Vector
+	float minLength1 = 0;	// Vertex projection length
+	float maxLength1 = 0;	// Vertex projection length
+	float minLength2 = 0;	// Vertex projection length
+	float maxLength2 = 0;	// Vertex projection length
 };

@@ -37,7 +37,6 @@ void SubModel::createIndexBuffer()
 
 void SubModel::setMaterialInfo(material mat)
 {
-	
 	*m_mat = mat;
 
 	//TODO: Create constant buffer
