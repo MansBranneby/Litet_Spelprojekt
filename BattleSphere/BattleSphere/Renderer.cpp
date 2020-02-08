@@ -33,12 +33,6 @@
 
 using namespace DirectX;
 
-// TODO test quadtree
-#include "QuadtreeNode.h"
-QuadtreeNode* g_root;
-BoundingVolume* g_BV;
-
-
 GraphicResources g_graphicResources;
 Bloom* g_bloom = nullptr;
 
@@ -385,12 +379,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_bloom;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
-
-		// TODO delete dynamically allocated stuff
-		delete g_root;
-
-		for (int i = 0; i < BVs.size(); ++i)
-			delete BVs[i];
 
 		DestroyWindow(wndHandle);
 	}

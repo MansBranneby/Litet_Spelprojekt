@@ -215,6 +215,7 @@ void Game::updateSec()
 
 void Game::draw()
 {
+	m_preLoader.draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
@@ -228,11 +229,6 @@ void Game::draw()
 				m_preLoader.draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData());
 			}
 		}
-	}
-
-	for (int i = 0; i < m_projectiles.size(); i++)
-	{
-		m_preLoader.draw(objectType::e_projectile, m_projectiles[i]->getData());
 	}
 }
 
