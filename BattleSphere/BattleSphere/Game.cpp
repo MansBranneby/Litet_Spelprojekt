@@ -230,6 +230,10 @@ void Game::draw()
 			}
 		}
 	}
+	for (int i = 0; i < m_projectiles.size(); i++)
+	{
+		m_preLoader.draw(objectType::e_projectile, m_projectiles[i]->getData());
+	}
 }
 
 void Game::release()
