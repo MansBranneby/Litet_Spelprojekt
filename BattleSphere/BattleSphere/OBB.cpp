@@ -1,6 +1,11 @@
 #include "OBB.h"
 //#include <stdlib.h> 
 	
+CollisionInfo OBB::intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c)
+{
+	return CollisionInfo();
+}
+
 CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 {
 	CollisionInfo collisionInfo;
