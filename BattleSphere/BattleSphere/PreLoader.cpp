@@ -129,6 +129,11 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
+std::vector<Model*> PreLoader::getModelsOfType(objectType type)
+{
+	return m_objects[(int)type];
+}
+
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
 {
 	int typ = (int)type;

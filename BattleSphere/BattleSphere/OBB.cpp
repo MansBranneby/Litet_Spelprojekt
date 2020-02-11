@@ -1,6 +1,30 @@
 #include "OBB.h"
-//#include <stdlib.h> 
+#include "BoundingSphere.h"
 	
+DirectX::XMVECTOR OBB::getClosestPointFromPointToOBB(DirectX::XMVECTOR p)
+{
+	DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&getPos());
+
+	// vector from point to OBB
+	DirectX::XMVECTOR d = pos - p;
+
+	// Closest point starts at OBB center and makes steps from there
+	DirectX::XMVECTOR closestPoint = pos;
+
+	for (int i = 0; i < m_axes.size(); ++i)
+	{
+		// Project vector from point to OBB onto axes
+		float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(d, m_axes[i]));
+		// If projection is longer than axis then clamp it that axis' length
+		if (t >= -m_halfWidthDepth[i]) t = -m_halfWidthDepth[i];
+		else if (t <= -m_halfWidthDepth[i]) t = -m_halfWidthDepth[i];
+		// Step along projected axis
+		closestPoint += t * m_axes[i];
+	}
+
+	return closestPoint;
+}
+
 CollisionInfo OBB::intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c)
 {
 	return CollisionInfo();
@@ -59,6 +83,17 @@ CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 CollisionInfo OBB::intersectsWithSphere(BoundingVolume* other)
 {
 	CollisionInfo collisionInfo;
+
+	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToOBB(DirectX::XMLoadFloat3(&other->getPos()));
+	DirectX::XMVECTOR d = DirectX::XMLoadFloat3(&getPos()) - closestPoint;
+	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
+
+	if (dist < dist)
+	{
+		collisionInfo.m_colliding = true;
+		collisionInfo.m_normal = d;
+	}
+
 	return collisionInfo;
 }
 
@@ -78,6 +113,7 @@ OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECT
 	// Calculate half width and depth
 	m_halfWD.x = halfWD.x;
 	m_halfWD.y = halfWD.y;
+	m_halfWidthDepth = { halfWD.x, halfWD.y };
 
 	// Define axes
 	m_xAxis = xAxis;
@@ -116,6 +152,8 @@ CollisionInfo OBB::intersects(BoundingVolume* other)
 
 	if (dynamic_cast<OBB*> (other))
 		collisionInfo = intersectsWithOBB(other);
+	if (dynamic_cast<BoundingSphere*> (other))
+		collisionInfo = intersectsWithSphere(other);
 
 	return collisionInfo;
 }

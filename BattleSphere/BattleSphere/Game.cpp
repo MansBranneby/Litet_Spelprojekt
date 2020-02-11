@@ -198,6 +198,13 @@ returnInfo Game::update(float dt)
 		info.z = 0;
 	}
 	
+	//// TODO sphere triangle collision test
+	//std::vector<Model*> robots = m_preLoader.getModelsOfType(objectType::e_robot);
+	//std::vector<Model*> scene = m_preLoader.getModelsOfType(objectType::e_scene);
+	//for (unsigned int i = 0; i < robots.size(); ++i)
+	//{
+	//	robots[i]->getBoundingVolume()->intersects(scene[i]->getBoundingVolume());
+	//}
 	
 	
 	return info;

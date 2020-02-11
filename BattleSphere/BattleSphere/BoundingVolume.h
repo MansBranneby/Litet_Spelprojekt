@@ -19,4 +19,6 @@ public:
 
 	virtual CollisionInfo intersects(BoundingVolume* other) = 0;
 	DirectX::XMVECTOR getClosestPointFromPointToTriangle(DirectX::XMVECTOR p, DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c);
+
+
 };

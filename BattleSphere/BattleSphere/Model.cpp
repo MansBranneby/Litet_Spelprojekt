@@ -373,6 +373,11 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	return updatedVertices;
 }
 
+BoundingVolume* Model::getBoundingVolume() const
+{
+	return m_boundingVolume;
+}
+
 void Model::setObjectData(objectData data)
 {
 	setPosition(data.pos);
