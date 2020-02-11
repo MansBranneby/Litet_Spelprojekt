@@ -18,8 +18,8 @@ private:
 
 	XMMATRIX m_modelMatrix;
 
-	ID3D11Buffer* m_modelMatrixCBuffer;
-	XMMATRIX* m_modelMatrixData;
+	ID3D11Buffer* m_matrixCBuffer;
+	XMMATRIX* m_matrixData;
 	XMMATRIX m_rotationMat;
 	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
@@ -38,8 +38,13 @@ private:
 	void setRotation(XMVECTOR rotation, XMVECTOR relRotation);
 	void setScale(XMVECTOR scale);
 	void setScale(XMVECTOR scale, XMVECTOR relScale);
+
+	// For backface culling
+	void setVPMatrix();
+
 public:
 	void draw();
+	void cullDraw();
 	Model();
 	~Model();
 

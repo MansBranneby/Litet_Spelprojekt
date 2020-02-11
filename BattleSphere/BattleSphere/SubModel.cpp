@@ -55,11 +55,21 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 
 void SubModel::draw()
 {
-	//Bind indexbuffer
+	// Bind indexbuffer
 	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	//Bind constantbuffer TODO: Change startslot
+	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 	
+}
+
+void SubModel::cullDraw()
+{
+	// Bind indexbuffer
+	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Bind constantbuffer
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
+	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 }

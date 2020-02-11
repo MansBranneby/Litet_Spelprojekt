@@ -23,10 +23,11 @@ private:
 	int m_nrOfIndices = 0;
 	int* m_indexArray;
 
-	
-
 	void createIndexBuffer();
 
+	// Backface culling
+	ID3D11Buffer* culledIndexBuffer;
+	ID3D11RenderTargetView* culledIndexBufferRTV;
 
 public:
 	SubModel();
@@ -36,5 +37,6 @@ public:
 	void setFaces(int* indexBuffer, int nrOfIndices);
 
 	void draw();
+	void cullDraw();
 };
 

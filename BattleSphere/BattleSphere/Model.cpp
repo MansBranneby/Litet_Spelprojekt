@@ -22,8 +22,8 @@ void Model::createVertexBuffer()
 
 void Model::createVertexCBuffer()
 {
-	m_modelMatrixData = new XMMATRIX();
-	*m_modelMatrixData = XMMatrixTranslation(0, 0, 0);
+	m_matrixData = new XMMATRIX();
+	*m_matrixData = XMMatrixTranslation(0, 0, 0);
 
 	D3D11_BUFFER_DESC vsCBufferDesc;
 	ZeroMemory(&vsCBufferDesc, sizeof(D3D11_BUFFER_DESC));
@@ -36,31 +36,31 @@ void Model::createVertexCBuffer()
 
 	D3D11_SUBRESOURCE_DATA vsCBufferData;
 	ZeroMemory(&vsCBufferData, sizeof(D3D11_SUBRESOURCE_DATA));
-	vsCBufferData.pSysMem = m_modelMatrixData;
+	vsCBufferData.pSysMem = m_matrixData;
 	vsCBufferData.SysMemPitch = 0;
 	vsCBufferData.SysMemSlicePitch = 0;
-	DX::getInstance()->getDevice()->CreateBuffer(&vsCBufferDesc, &vsCBufferData, &m_modelMatrixCBuffer);
+	DX::getInstance()->getDevice()->CreateBuffer(&vsCBufferDesc, &vsCBufferData, &m_matrixCBuffer);
 }
 
 void Model::updateSubResource()
 {
-	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));
-	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
+	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_matrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_matrixCBuffer, 0);
 }
 
 void Model::updateRelSubResource()
 {
-	*m_modelMatrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
+	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
 		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	DX::getInstance()->getDeviceContext()->Map(m_modelMatrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, m_modelMatrixData, sizeof(XMMATRIX));
-	DX::getInstance()->getDeviceContext()->Unmap(m_modelMatrixCBuffer, 0);
+	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_matrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_matrixCBuffer, 0);
 }
 
 void Model::draw()
@@ -68,7 +68,20 @@ void Model::draw()
 	UINT32 vertexSize = sizeof(vertex);
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
-	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_modelMatrixCBuffer);
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].draw();
+	}
+}
+
+void Model::cullDraw()
+{
+	UINT32 vertexSize = sizeof(vertex);
+	UINT32 offset = 0;
+	setVPMatrix(); // Set world view matrix instead of only world matrix
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw();
@@ -84,8 +97,8 @@ Model::Model()
 	m_vertexBuffer = nullptr;
 	m_nrOfSubModels = 0;
 	m_nrOfVertices = 0;
-	m_modelMatrixCBuffer = nullptr;
-	m_modelMatrixData = nullptr;
+	m_matrixCBuffer = nullptr;
+	m_matrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
 	m_rotationAfterMat = XMMatrixIdentity();
@@ -99,8 +112,8 @@ Model::~Model()
 	if (m_vertices) delete[] m_vertices;
 	if (m_subModels) delete[] m_subModels;
 	if (m_vertexBuffer) m_vertexBuffer->Release();
-	if (m_modelMatrixCBuffer) m_modelMatrixCBuffer->Release();
-	if (m_modelMatrixData) delete (m_modelMatrixData);
+	if (m_matrixCBuffer) m_matrixCBuffer->Release();
+	if (m_matrixData) delete (m_matrixData);
 }
 
 void Model::setPosition(XMVECTOR pos)
@@ -164,6 +177,16 @@ void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
 	float yScale = relScale.m128_f32[1];
 	float zScale = relScale.m128_f32[2];
 	m_relScalingMat = XMMatrixScaling(xScale, yScale, zScale);
+}
+
+void Model::setVPMatrix()
+{
+	*m_matrixData *= DX::getInstance()->getCam()->getViewMatrix();
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_matrixData, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(m_matrixCBuffer, 0);
 }
 
 

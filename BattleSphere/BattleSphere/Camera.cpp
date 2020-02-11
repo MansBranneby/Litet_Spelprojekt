@@ -1,12 +1,22 @@
 #include "Camera.h"
 
-Camera::Camera(float width, float height, float nearPlane, float farPlane)
+Camera::Camera()
+{
+}
+
+Camera::~Camera()
+{
+	delete m_constantBufferVP;
+	delete m_constantBufferPosition;
+}
+
+void Camera::initialize(float width, float height, float nearPlane, float farPlane)
 {
 	// Base vectors
 	m_position = XMVectorSet(0.0f, 70.0f, -60.0f, 0.0f);
-	
+
 	m_lookAt = XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
-	
+
 	m_up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -17,14 +27,11 @@ Camera::Camera(float width, float height, float nearPlane, float farPlane)
 	m_viewProjection = XMMatrixMultiply(m_view, m_projection);
 
 	// Create constant buffers
+	if (m_constantBufferVP) delete m_constantBufferVP;
+	if (m_constantBufferPosition) delete m_constantBufferPosition;
+
 	m_constantBufferVP = new ConstantBuffer(&m_viewProjection, sizeof(m_viewProjection));
 	m_constantBufferPosition = new ConstantBuffer(&m_position, sizeof(m_position));
-}
-
-Camera::~Camera()
-{
-	delete m_constantBufferVP;
-	delete m_constantBufferPosition;
 }
 
 XMMATRIX Camera::getViewMatrix()

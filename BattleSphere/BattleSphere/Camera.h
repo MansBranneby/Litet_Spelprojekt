@@ -6,6 +6,9 @@
 
 using namespace DirectX;
 
+class DX; // Forward declaration
+class ConstantBuffer; // Do not touch sacred ground
+
 class Camera
 {
 private:
@@ -27,8 +30,9 @@ private:
 	ConstantBuffer* m_constantBufferPosition = nullptr;
 
 public:
-	Camera(float width, float height, float nearPlane, float farPlane);
+	Camera();
 	~Camera();
+	void initialize(float width, float height, float nearPlane, float farPlane);
 	XMMATRIX getViewMatrix();
 	XMMATRIX getProjectionMatrix();
 	ConstantBuffer* getConstantBufferVP();
