@@ -30,6 +30,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "LightCulling.h"
+#include "ShadowMapping.h"
 
 using namespace DirectX;
 
@@ -47,11 +48,14 @@ PixelShader gPS;
 VertexShader g_vertexShaderFinalRender;
 PixelShader g_pixelShaderFinalRender;
 PixelShader g_pixelShaderDownsample;
+VertexShader g_vertexShaderShadowMapping;
+PixelShader g_pixelShaderShadowMapping;
 
 Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
-
+ShadowMapping* g_shadowMapping;
+Camera* g_lightCamera = nullptr;
 
 struct MaterialTest
 {
@@ -175,6 +179,11 @@ void createRenderResources()
 
 	
 	g_bloom = new Bloom();
+
+	g_shadowMapping = new ShadowMapping();
+	g_vertexShaderShadowMapping = VertexShader(L"VertexShaderShadowMapping.hlsl");
+	g_pixelShaderShadowMapping = PixelShader(L"PixelShaderShadowMapping.hlsl");
+	g_lightCamera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 }
 
 void downsample()
@@ -202,6 +211,32 @@ void downsample()
 	g_graphicResources.setViewPortDim((UINT)DX::getInstance()->getWidth(), (UINT)DX::getInstance()->getHeight());
 
 	float clearColour[] = { 0, 0, 0, 1 };
+}
+
+void shadowRender()
+{
+	float clearColour[] = { 1.0f, 0, 0.2f, 1 };
+
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_shadowMapping->getDepthStencilView());
+	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+	DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_shadowMapping->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_lightCamera->getConstantBufferVP()->getConstantBuffer());
+
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderShadowMapping.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderShadowMapping.getPixelShader(), nullptr, 0);
+
+	UINT32 vertexSize = sizeof(PosCol);
+	UINT32 offset = 0;
+
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderShadowMapping.getvertexLayout());
+
+	g_Game->draw();
 }
 
 void finalRender()
