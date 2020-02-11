@@ -157,20 +157,11 @@ void Game::handleInputs(float dt)
 				for (int j = 0; j < m_resources.size() && m_robots[i]->getResourceIndex() == -1; j++)
 				{
 					// TODO: collision yo
-					if (XMVectorGetX(XMVector3Length(m_robots[i]->getPosition() - m_resources[j]->getPosition())) < 1.5f)
+					if (XMVectorGetX(XMVector3Length(m_robots[i]->getPosition() - m_resources[j]->getPosition())) < 1.5f &&
+						!m_resources[j]->isBlocked())
 					{
-						bool hasAlready = false;
-						for (int k = 0; k < XUSER_MAX_COUNT; k++)
-						{
-							if (m_robots[k] != nullptr && k != i)
-							{
-								if (m_robots[k]->getResourceIndex() == j)
-									hasAlready = true;
-							}
-						}
-						if (!hasAlready) {
-							m_robots[i]->setResourceIndex(j);
-						}
+						m_robots[i]->setResourceIndex(j);
+						m_resources[j]->setBlocked(true);
 					}
 				}
 
@@ -222,6 +213,21 @@ void Game::handleInputs(float dt)
 					}
 
 					m_robots[i]->changeWeapon(LEFT);
+				}
+
+				// TODO: add collision and remove projectile
+				if (m_input.isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN))
+				{
+					if (m_robots[i]->getResourceIndex() != -1)
+					{
+						m_resources[m_robots[i]->getResourceIndex()]->setPosition(m_robots[i]->getPosition());
+						m_resources[m_robots[i]->getResourceIndex()]->setBlocked(false);
+					}
+					m_robots[i]->damagePlayer(1);
+				}
+				if (m_input.isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
+				{
+					m_robots[i]->setHealth(100);
 				}
 			}
 		}
@@ -297,6 +303,11 @@ void Game::update(float dt)
 			delete m_projectiles[i];
 			m_projectiles.erase(m_projectiles.begin()+i);
 		}
+	}
+
+	for (int i = 0; i < m_resources.size(); i++)
+	{
+		m_resources[i]->updateTime(dt);
 	}
 }
 
