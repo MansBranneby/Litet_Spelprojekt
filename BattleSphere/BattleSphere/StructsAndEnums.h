@@ -54,3 +54,16 @@ struct vectorPairProjections {
 	float minLength2 = 0;	// Vertex projection length
 	float maxLength2 = 0;	// Vertex projection length
 };
+
+// Information acquired from collision detection
+struct CollisionInfo
+{
+	bool m_colliding;
+	DirectX::XMVECTOR m_normal;
+
+	CollisionInfo()
+	{
+		m_colliding = false;
+		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
+	}
+};

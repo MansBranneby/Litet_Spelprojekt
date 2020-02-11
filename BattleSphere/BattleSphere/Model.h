@@ -4,6 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include "StructsAndEnums.h"
+#include "BoundingVolume.h"
+#include "OBB.h"
+#include "BoundingSphere.h"
 
 
 class Model
@@ -18,9 +21,8 @@ private:
 	
 	// Bounding volume variables
 	boundingData m_bData;
-
 	std::vector<int> m_indices;
-
+	BoundingVolume* m_boundingVolume;
 
 	ID3D11Buffer* m_modelMatrixCBuffer;
 	XMMATRIX* m_modelMatrixData;
@@ -31,7 +33,7 @@ private:
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
 
-	// To calculate obb
+	// To calculate bounding volumes
 	void computeOBB();
 
 	void createVertexBuffer(); // For vertex buffer
@@ -56,6 +58,6 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
-	void loadModel(std::ifstream& in, bool isCollisionMesh = false);
+	void loadModel(std::ifstream& in, objectType type);
 };
 

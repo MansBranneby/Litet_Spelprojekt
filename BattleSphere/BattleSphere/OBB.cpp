@@ -72,7 +72,7 @@ OBB::OBB()
 	m_halfWD = { 0.0f, 0.0f };
 }
 
-OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix)
+OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis)
 	:BoundingVolume(pos)
 {
 	// Calculate half width and depth
@@ -80,12 +80,8 @@ OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rota
 	m_halfWD.y = halfWD.y;
 
 	// Define axes
-	m_xAxis = { 1.0f, 0.0f, 0.0f };
-	m_zAxis = { 0.0f, 0.0f, 1.0f };
-
-	// Transform axes
-	m_xAxis = DirectX::XMVector3Normalize(DirectX::XMVector3Transform(m_xAxis, rotationMatrix));
-	m_zAxis = DirectX::XMVector3Normalize(DirectX::XMVector3Transform(m_zAxis, rotationMatrix));
+	m_xAxis = xAxis;
+	m_zAxis = zAxis;
 
 	// Push into vector
 	m_axes = { m_xAxis, m_zAxis };

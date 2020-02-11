@@ -16,12 +16,12 @@ std::vector<DirectX::XMFLOAT3> QuadtreeNode::calculateNewNodePositions(DirectX::
 
 QuadtreeNode::QuadtreeNode()
 {
-	m_boundingVolume = new OBB({ 0.0f, 0.0f, 0.0f}, { 0.0, 0.0 }, DirectX::XMMatrixIdentity());
+	m_boundingVolume = new OBB({ 0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f});
 }
 
 QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, std::vector<BoundingVolume*> models, unsigned int levels, unsigned int currentLevel)
 {
-	m_boundingVolume = new OBB(pos, halfWD, DirectX::XMMatrixIdentity());
+	m_boundingVolume = new OBB(pos, halfWD, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 	std::vector<DirectX::XMFLOAT3> nodePositions = calculateNewNodePositions(pos, halfWD);
 	
 	// TODO replace with models instead of bounding volumes

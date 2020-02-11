@@ -21,7 +21,7 @@ private:
 
 public:
 	OBB();
-	OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, DirectX::XMMATRIX rotationMatrix);
+	OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis);
 	OBB(boundingData data);
 	~OBB();
 

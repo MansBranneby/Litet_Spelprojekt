@@ -19,7 +19,7 @@ void PreLoader::loadFromFile(objectType type, std::string filename, std::string 
 
 
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++) // Reads all objects
-		m_objects[typ][variant][i].loadModel(in);
+		m_objects[typ][variant][i].loadModel(in, type);
 	in.close();
 
 	objectData tempData;
@@ -48,7 +48,7 @@ void PreLoader::loadCollisionMesh(objectType type, std::string filename)
 
 
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++) // Reads all objects
-		m_cMesh[typ][variant][i].loadModel(in, true);
+		m_cMesh[typ][variant][i].loadModel(in, type);
 	in.close();
 	objectData tempData;
 	setCMeshData(type, tempData, variant);

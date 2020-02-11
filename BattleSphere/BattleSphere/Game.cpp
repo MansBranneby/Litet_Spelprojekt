@@ -174,6 +174,7 @@ returnInfo Game::update(float dt)
 			}
 		}
 	}
+	
 
 	// TODO remove with collision instead aswell as game field?
 	for (int i = 0; i < m_projectiles.size(); i++)

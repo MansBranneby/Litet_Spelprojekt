@@ -205,6 +205,7 @@ Model::Model()
 	m_scalingMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();
+	m_boundingVolume = nullptr;
 }
 
 Model::~Model()
@@ -214,6 +215,7 @@ Model::~Model()
 	if (m_vertexBuffer) m_vertexBuffer->Release();
 	if (m_modelMatrixCBuffer) m_modelMatrixCBuffer->Release();
 	if (m_modelMatrixData) delete (m_modelMatrixData);
+	if (m_boundingVolume) delete m_boundingVolume;
 }
 
 void Model::setPosition(XMVECTOR pos)
@@ -387,7 +389,7 @@ void Model::setObjectData(objectData data, objectData relativeData)
 	updateRelSubResource();
 }
 
-void Model::loadModel(std::ifstream& in, bool isCollisionMesh)
+void Model::loadModel(std::ifstream& in, objectType type)
 {
 	std::string line;
 	std::istringstream inputStream;
@@ -510,6 +512,15 @@ void Model::loadModel(std::ifstream& in, bool isCollisionMesh)
 	createVertexCBuffer();
 
 	// Create bounding volume
-	if (isCollisionMesh)
-		computeOBB();
+	computeOBB(); // Calculate information for bounding volume data
+	// Hardcoded bounding volume based on object type, e.g. robots will have bounding spheres
+	switch (type)
+	{
+	case objectType::e_robot:
+		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
+		break;
+	default:
+		m_boundingVolume = new OBB(m_bData.pos, m_bData.halfWD, m_bData.xAxis, m_bData.zAxis);
+	}
+
 }
