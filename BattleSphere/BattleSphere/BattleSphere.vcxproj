@@ -153,6 +153,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gamepad.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GraphicResources.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightCulling.cpp" />
+    <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PixelShader.cpp" />
@@ -170,6 +172,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="State.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -186,6 +189,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gamepad.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="GraphicResources.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -198,6 +202,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightCulling.h" />
+    <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PixelShader.h" />
@@ -205,6 +210,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
     <ClInclude Include="VertexShader.h" />
