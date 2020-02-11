@@ -172,6 +172,7 @@
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
+    <ClCompile Include="Transparency.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -207,6 +208,7 @@
     <ClInclude Include="Robot.h" />
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
+    <ClInclude Include="Transparency.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>

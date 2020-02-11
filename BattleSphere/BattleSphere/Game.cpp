@@ -153,10 +153,16 @@ Game::Game()
 	sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
 	m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	
 }
 
 returnInfo Game::update(float dt)
 {
+	//TODO: REMOOOOVEEE
+	XMVECTOR position = m_robots[0]->getPosition();
+
+
+
 	handleInputs(dt);
 	updatePlayerStatus();
 
@@ -215,7 +221,8 @@ void Game::updateSec()
 
 void Game::draw()
 {
-	m_preLoader.draw(objectType::e_scene);
+
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
@@ -236,6 +243,7 @@ void Game::draw()
 	{
 		m_preLoader.draw(objectType::e_projectile, m_projectiles[i]->getData());
 	}
+	m_preLoader.draw(objectType::e_scene);
 }
 
 void Game::release()

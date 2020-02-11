@@ -7,6 +7,7 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 
 	createDepthStencil();
 	createBackBuffer();
+	createBlendState();
 	setRasterizerState();
 	setSamplerState();
 	setViewPort();
@@ -177,6 +178,20 @@ void GraphicResources::setSamplerState()
 		MessageBox(NULL, L"m_samplerState", L"Error", MB_OK | MB_ICONERROR);
 }
 
+void GraphicResources::createBlendState()
+{
+	D3D11_BLEND_DESC blendStateDescription = {};
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+	DX::getInstance()->getDevice()->CreateBlendState(&blendStateDescription, &m_blendState);
+}
+
 GraphicResources::GraphicResources()
 {
 	m_viewPort.Width = DX::getInstance()->getWidth();
@@ -196,6 +211,8 @@ GraphicResources::~GraphicResources()
 {
 	if (m_rasterizerState)
 		m_rasterizerState->Release();
+	if (m_blendState)
+		m_blendState->Release();
 	if (m_depthStencilView)
 		m_depthStencilView->Release();
 	if (m_backbufferRTV)
@@ -222,6 +239,11 @@ ID3D11RenderTargetView** GraphicResources::getBackBuffer()
 ID3D11SamplerState** GraphicResources::getSamplerState()
 {
 	return &m_samplerState;
+}
+
+ID3D11BlendState* GraphicResources::getBlendState() const
+{
+	return m_blendState;
 }
 
 void GraphicResources::setViewPortDim(UINT width, UINT height)

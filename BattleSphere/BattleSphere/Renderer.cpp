@@ -30,6 +30,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "LightCulling.h"
+#include "Transparency.h"
 
 using namespace DirectX;
 
@@ -51,6 +52,7 @@ PixelShader g_pixelShaderDownsample;
 Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
+Transparency g_transparency;
 
 
 struct MaterialTest
@@ -196,7 +198,8 @@ void downsample()
 void finalRender()
 {
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
-
+	//*ID3D11ShaderResourceView* nullSRV;
+	/*DX::getInstance()->getDeviceContext()->PSSetShaderResources(2, 1, &nullSRV);*/
 	DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
@@ -209,7 +212,6 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &g_vertexBufferFSQuad, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
-
 	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 	g_bloom->setShaderResource(renderPass::e_final);
 	
@@ -230,6 +232,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 	g_lightCulling.initialize();
 	createRenderResources(); // Creates instances of graphics classes etc.
+	g_transparency.initialize();
 
 	if (wndHandle)
 	{
@@ -242,15 +245,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		ImGui::GetIO().FontGlobalScale = 1.0;
 		ShowWindow(wndHandle, nCmdShow);
 
+		
 
 		setupTestTriangle();
 
 		int index = g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 		g_lightCulling.setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 0.6f);
+		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 8.0f);
 		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
 		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
-		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		g_lightCulling.setColor(index, float(255) / 255, float(62) / 255, float(255) / 255);
 		index = g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
 		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
 		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
@@ -258,7 +262,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
-
+		
 		int counterFrames = 0;
 		int fps = 0;
 		/*For IMGUI*/
@@ -282,7 +286,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			else
 			{
 				//// RENDER ////
-
+				DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 0, 0, 0, 1 };
 				g_lightCulling.cullLights();
@@ -297,7 +301,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
-				
+				g_transparency.bindConstantBuffer();
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
@@ -315,11 +319,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				returnInfo a = g_Game->update(g_Clock->getDeltaTime());
 				g_lightCulling.setPosition(0, a.x, a.y, a.z);
+				XMVECTOR position = XMVectorSet(a.x, a.y, a.z, 1);
+				g_transparency.update(position, g_camera->getViewMatrix(), g_camera->getProjectionMatrix());
+				
+
 				g_Game->draw();
 
 				downsample();
 				g_bloom->run();
-
+				
 				finalRender();
 
 				ImGui_ImplDX11_NewFrame();

@@ -30,7 +30,11 @@ cbuffer PS_CONSTANT_BUFFER : register(b2)
 	float4 KsIn; //Ks + Ns
 	float4 KeIn; //Ke + d
 };
-
+cbuffer PS_ROBOT_DATA : register (b3) 
+{
+	float3 playerPosition;
+	float radius;
+};
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
@@ -125,9 +129,19 @@ float4 PS_main(PS_IN input) : SV_Target
 		};
 
 	}
-	
+	float3 ndcSpace = float3(0,0,0);
+	ndcSpace.x = input.pos.x / 1920; // 0 - 1
+	ndcSpace.x = ndcSpace.x * 2 - 1;
+	ndcSpace.y = -input.pos.y / 1080; // 0 - 1
+
+	ndcSpace.y = (ndcSpace.y * 2 + 1);
+	ndcSpace.z = input.pos.z;
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		return float4(fragmentCol, 1.0f);
-	else
-		return float4(fragmentCol, 0.0f);
+	float2 dist = playerPosition.xy - ndcSpace.xy;
+	float aspectRatio = 9.0f / 16.0f;
+	dist.y *= aspectRatio;
+	if (length(dist) < radius * 4 && ndcSpace.z < playerPosition.z && input.posWC.y > -0.8f)
+		return float4(fragmentCol, 0.5f);
+	return float4(fragmentCol, 1.0f);
 };

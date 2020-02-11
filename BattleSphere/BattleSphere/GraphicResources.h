@@ -17,6 +17,7 @@ private:
 
 	// SAMPLERS //
 	ID3D11SamplerState* m_samplerState = nullptr;
+	ID3D11BlendState* m_blendState = nullptr;
 
 	HWND initWindow(HINSTANCE hInstance);
 	void createDepthStencil();
@@ -24,6 +25,7 @@ private:
 	void setViewPort();
 	void setRasterizerState();
 	void setSamplerState();
+	void createBlendState();
 public:
 
 	// Member functions
@@ -35,6 +37,6 @@ public:
 	ID3D11DepthStencilView* getDepthStencilView() const;
 	ID3D11RenderTargetView** getBackBuffer();
 	ID3D11SamplerState** getSamplerState();
-
+	ID3D11BlendState* getBlendState() const;
 	void setViewPortDim(UINT width, UINT height);
 };
