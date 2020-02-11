@@ -93,7 +93,7 @@
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-     <ClCompile Include="Weapon.cpp">
+    <ClCompile Include="Weapon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PreLoader.cpp">
@@ -243,6 +243,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BoundingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tri_tri_test3D_tropp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

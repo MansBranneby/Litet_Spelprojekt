@@ -215,6 +215,7 @@
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
     <ClInclude Include="QuadtreeNode.h" />
+    <ClInclude Include="Tri_tri_test3D_tropp.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
