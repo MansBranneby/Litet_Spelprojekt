@@ -99,9 +99,11 @@ void PreLoader::draw(objectType type, objectData data, objectData relativeData, 
 	}
 }
 
-void PreLoader::cullDraw(objectType type, int variant)
+void PreLoader::cull(objectType type, int variant)
 {
+	m_bFCuller->turnOnCullingPipeline();
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].cullDraw();
+	m_bFCuller->turnOffCullingPipeline();
 }

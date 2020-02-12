@@ -2,6 +2,23 @@
 
 Camera::Camera()
 {
+	// Base vectors
+	m_position = XMVectorSet(0.0f, 70.0f, -60.0f, 0.0f);
+
+	m_lookAt = XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
+
+	m_up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+	// Setup VP
+	m_view = XMMatrixIdentity();
+	m_projection = XMMatrixIdentity();
+	m_viewProjection = XMMatrixIdentity();
+
+	// DX
+	m_constantBufferVP = nullptr;
+	m_constantBufferPosition = nullptr;
 }
 
 Camera::~Camera()

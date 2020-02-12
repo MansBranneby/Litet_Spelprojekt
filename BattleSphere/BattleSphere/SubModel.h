@@ -20,14 +20,16 @@ private:
 	ID3D11Buffer* m_materialCBuffer;
 	ConstantBuffer* m_constantBuffer;
 	material* m_mat = nullptr;
-	int m_nrOfIndices = 0;
+	int m_nrOfIndices;
 	int* m_indexArray;
 
 	void createIndexBuffer();
+	void createCulledIndexBuffer();
 
 	// Backface culling
-	ID3D11Buffer* culledIndexBuffer;
-	ID3D11RenderTargetView* culledIndexBufferRTV;
+	ID3D11Buffer* m_culledIndiceBuffer;
+	int m_nrOfCulledIndices;
+	int* m_culledIndices;
 
 public:
 	SubModel();

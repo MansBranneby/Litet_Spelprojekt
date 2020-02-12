@@ -26,8 +26,8 @@ private:
 	XMMATRIX m_viewProjection;
 
 	// Constant buffers
-	ConstantBuffer* m_constantBufferVP = nullptr;
-	ConstantBuffer* m_constantBufferPosition = nullptr;
+	ConstantBuffer* m_constantBufferVP;
+	ConstantBuffer* m_constantBufferPosition;
 
 public:
 	Camera();

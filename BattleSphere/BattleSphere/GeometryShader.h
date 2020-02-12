@@ -10,10 +10,12 @@ private:
 
 	// Creates VertexBuffer, this is called upon in the Constructor
 	HRESULT createGeometryShader(LPCWSTR fileName, ID3DBlob** pGS, ID3DBlob** errorBlob);
+	HRESULT createSOGeometryShader(LPCWSTR fileName, ID3DBlob** pGS, ID3DBlob** errorBlob); // Stream Output
+
 
 public:
 	GeometryShader();
-	GeometryShader(LPCWSTR fileName);
+	GeometryShader(LPCWSTR fileName, int type = 0); // 0: Standard, 1: Stream Output
 
 	ID3D11GeometryShader& getGeometryShader() const;
 

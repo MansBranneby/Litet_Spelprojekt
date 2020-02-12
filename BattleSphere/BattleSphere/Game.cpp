@@ -153,6 +153,7 @@ Game::Game()
 	sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
 	m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	m_preLoader.cull(objectType::e_scene);
 }
 
 returnInfo Game::update(float dt)

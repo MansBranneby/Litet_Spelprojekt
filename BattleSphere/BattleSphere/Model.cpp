@@ -84,7 +84,7 @@ void Model::cullDraw()
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
-		m_subModels[i].draw();
+		m_subModels[i].cullDraw();
 	}
 }
 

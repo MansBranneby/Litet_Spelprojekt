@@ -14,6 +14,9 @@ private:
 	GeometryShader m_gShader;
 
 public:
+	void turnOnCullingPipeline();
+	void turnOffCullingPipeline();
+
 	BackfaceCuller();
 	~BackfaceCuller();
 };
