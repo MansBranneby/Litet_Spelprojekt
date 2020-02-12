@@ -3,8 +3,6 @@
 #include "DX.h"
 #include "GameObject.h"
 
-using namespace DirectX;
-
 class Resource : public GameObject
 {
 private:

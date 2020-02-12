@@ -46,7 +46,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_robot, "BattleSphere");
 	loadFromFile(objectType::e_node, "Building");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
-	//loadFromFile(objectType::e_resource, "?");
+	loadFromFile(objectType::e_resource, "1mesh1mat");
 	loadFromFile(objectType::e_scene, "SceneBig");
 }
 

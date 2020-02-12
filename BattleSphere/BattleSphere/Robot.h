@@ -42,16 +42,21 @@ public:
 	float getCurrentRot();
 	bool isReady(float dt);
 
+	void useWeapon(int side, float dt);
 	void changeWeapon(int side);
 	int getCurrentWeapon(int side);
 	std::vector<Weapon*> getWeapons();
+	bool upgradeWeapon(int type);
+
 	void addScore(int score);
 	void resetScore();
 
-	bool upgradeWeapon(int type);
 	void setResourceIndex(int index);
 	int getResourceIndex();
 	void removeResource();
+
+	void update(float dt);
+	void move(XMVECTOR dPos);
 
 	void release();
 };

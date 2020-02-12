@@ -8,6 +8,7 @@
 #include <time.h>  
 
 #include "DX.h"
+#include "ProjectileBank.h"
 #include "GameObject.h"
 #include "Input.h"
 #include "PreLoader.h"

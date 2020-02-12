@@ -170,6 +170,7 @@
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PreLoader.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="ProjectileBank.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="PreLoader.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="ProjectileBank.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="ShadowMapping.h" />

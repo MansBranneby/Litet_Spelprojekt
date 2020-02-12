@@ -6,6 +6,8 @@
 
 #include "DX.h"
 #include "GameObject.h"
+#include "ProjectileBank.h"
+
 using namespace DirectX;
 
 #define PISTOL 0
@@ -25,13 +27,15 @@ private:
 	float m_duration;
 	float m_cdTime;
 	bool m_ready;
+	float m_currentRecoil;
+	float m_currentSpeed;
 
 public:
 	Weapon(int type = 0);
 
 	void upgrade();
 
-	bool shoot();
+	bool shoot(XMVECTOR robotPos, float rot, int side, float dt);
 	bool speedUp();
 	bool shield();
 
