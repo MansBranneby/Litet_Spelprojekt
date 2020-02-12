@@ -19,7 +19,8 @@ private:
 
 public:
 	QuadtreeNode();
-	//	Dimensions of box
-	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader preLoader, unsigned int levels, unsigned int currentLevel);
+	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader* preLoader, unsigned int levels, unsigned int currentLevel);
 	~QuadtreeNode();
+
+	CollisionInfo testCollision(BoundingVolume* other);
 };

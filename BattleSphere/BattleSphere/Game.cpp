@@ -138,7 +138,7 @@ void Game::updatePlayerStatus()
 			m_robots[i] = robot;
 		}
 	}
-	m_nrOfPlayers = m_input.getNrOfGamepads();
+	m_nrOfPlayers = m_input.getNrOfGamepads() + 4;
 }
 
 Game::Game()
@@ -147,7 +147,7 @@ Game::Game()
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
-	m_QuadTreeRoot = new QuadtreeNode(XMFLOAT3(0.0, 0.0f, 0.0f), XMFLOAT2(100.0f, 100.0f), m_preLoader, 1, 0);
+	m_QuadTreeRoot = new QuadtreeNode(XMFLOAT3(0.0, 0.0f, 0.0f), XMFLOAT2(100.0f, 100.0f), &m_preLoader, 1, 0);
 	objectData sceneData;
 	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
 	//sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -199,14 +199,13 @@ returnInfo Game::update(float dt)
 	}
 	
 	// TODO sphere triangle collision test
-	for (unsigned int i = 0; i < 1; ++i)
+	for (int i = 0; i < m_nrOfPlayers; ++i)
 	{
-		//CollisionInfo collisionInfo = m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0)->intersects(m_preLoader.getStaticBoundingVolume(objectType::e_scene, 0, 0));
-		std::vector<XMFLOAT3> test = m_preLoader.getCollisionMesh(objectType::e_scene, 0, 0); // Get collision mesh
-		for (unsigned int j = 0; j < test.size(); j += 3)
+		// Get bounding volume, call intersectWithTriangle on collisionMesh triangles
+		if (m_robots[i] != nullptr)
 		{
-			// get bounding volume, call intersectWithTriangle on collisionMesh triangles
-			CollisionInfo collisionInfo = m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0)->intersectsWithTriangle(XMVECTOR{test[j].x, test[j].y, test[j].z}, XMVECTOR{ test[j+1].x, test[j+1].y, test[j+1].z }, XMVECTOR{ test[j+2].x, test[j+2].y, test[j+2].z });
+			// Get collision info
+			CollisionInfo collisionInfo = m_QuadTreeRoot->testCollision(m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
 			// Use the returned "CollisionInfo" to check if collision is true
 			if (collisionInfo.m_colliding)
 			{
@@ -271,4 +270,6 @@ void Game::release()
 	{
 		delete m_projectiles[i];
 	}
+
+	delete m_QuadTreeRoot;
 }
