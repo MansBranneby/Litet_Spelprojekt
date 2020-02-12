@@ -25,6 +25,6 @@ void MainMenuState::update(Game* game, float dt)
 {
 }
 
-void MainMenuState::draw(Game* game)
+void MainMenuState::draw(Game* game, renderPass pass)
 {
 }

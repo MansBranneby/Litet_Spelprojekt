@@ -12,7 +12,10 @@ DX::DX()
 DX* DX::getInstance()
 {
 	if (m_instance == nullptr)
+	{
 		m_instance = new DX();
+	}
+
 
 	return m_instance;
 }

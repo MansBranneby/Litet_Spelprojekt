@@ -23,12 +23,11 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "Camera.h"
-#include "Light.h"
+#include "Lights.h"
 #include "Bloom.h"
 #include "Clock.h"
 #include "Game.h"
 #include "Camera.h"
-#include "Light.h"
 #include "LightCulling.h"
 #include "GameState.h"
 #include "MainMenuState.h"
@@ -54,7 +53,7 @@ PixelShader g_pixelShaderDownsample;
 Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
-GameState g_gameState;
+
 MainMenuState g_mainMenuState;
 Transparency g_transparency;
 
@@ -235,6 +234,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	g_lightCulling.initialize();
 	createRenderResources(); // Creates instances of graphics classes etc.
 	g_transparency.initialize();
+	GameState g_gameState;
 
 	if (wndHandle)
 	{
@@ -250,16 +250,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		int index = g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
-		g_lightCulling.setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 8.0f);
-		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
-		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
-		g_lightCulling.setColor(index, float(255) / 255, float(62) / 255, float(255) / 255);
-		index = g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
-		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
-		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
-		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
+		
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
@@ -269,10 +260,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		int counterFrames = 0;
 		int fps = 0;
-		/*For IMGUI*/
-		float lightColor[3] = { 0 };
-		float lightIntensity = 1;
-		float lightRange = 1;
+		float color[4] = { 0 };
+		float range = 1;
+		float intensity = 1;
+
 		
 
 		///////////////
@@ -292,7 +283,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//// UPDATE ////
 
 				g_Game->update(g_Clock->getDeltaTime());
-
+				
 				//// SET PIPELINE ////
 				float clearColour[] = { 0, 0, 0, 1 };
 				UINT32 vertexSize = sizeof(PosCol);
@@ -301,6 +292,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -327,6 +319,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				else if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -355,8 +348,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				
 				if (g_Game->isActive(stateType::e_gameState))
 				{
-					g_Game->draw();
-
+					//DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
+					g_Game->draw(renderPass::e_opaque);
+					//DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
+					g_Game->draw(renderPass::e_transparent);
 					downsample();
 					g_bloom->run();
 
@@ -373,13 +368,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::Begin("Settings");
 				
 				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-				
-				ImGui::ColorPicker3("Select color", lightColor);
-				ImGui::SliderFloat("Select Range", &lightRange, 0, 100);
-				ImGui::SliderFloat("Select Intensity", &lightIntensity, 0, 10);
-				g_lightCulling.setColor(0, lightColor[0], lightColor[1], lightColor[2]);
-				g_lightCulling.setRange(0, lightRange);
-				g_lightCulling.setIntensity(0, lightIntensity);
+				ImGui::ColorPicker4("Pick a color", color);
+				ImGui::SliderFloat("Range: ", &range, 0, 100);
+				ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+
+				Lights::getInstance()->setColor(0, color[0], color[1], color[2]);
+				Lights::getInstance()->setRange(0, range);
+				Lights::getInstance()->setIntensity(0, intensity);
+
 				ImGui::End();
 				ImGui::Render();
 				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -69,7 +69,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
-	fragmentCol = Ka * Ia;
+	fragmentCol = Ka * Ia * Kd;
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
 		Light light = Lights[LightIndex[i]];

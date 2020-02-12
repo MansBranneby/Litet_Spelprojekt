@@ -10,7 +10,7 @@ Projectile::Projectile(int type, int damage)
 
 	if (type == PISTOL)
 	{
-		m_velocity = 8.0f;
+		m_velocity = 20.0f;
 	}
 	else if (type == RIFLE)
 	{

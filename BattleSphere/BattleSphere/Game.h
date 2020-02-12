@@ -24,7 +24,7 @@ private:
 	int m_controllerId[XUSER_MAX_COUNT];
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
-
+	
 	PreLoader m_preLoader;
 
 public:
@@ -33,7 +33,7 @@ public:
 
 	void update(float dt);
 	//void updateSec();
-	void draw();
+	void draw(renderPass pass = renderPass::e_scene);
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);

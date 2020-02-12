@@ -162,7 +162,7 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Lights.cpp" />
     <ClCompile Include="LightCulling.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -201,7 +201,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Light.h" />
+    <ClInclude Include="Lights.h" />
     <ClInclude Include="LightCulling.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Model.h" />

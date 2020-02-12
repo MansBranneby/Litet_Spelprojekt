@@ -64,12 +64,12 @@ void Game::update(float dt)
 //	}
 //}
 
-void Game::draw()
+void Game::draw(renderPass pass)
 {
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (!m_states[i]->isPaused())
-			m_states[i]->draw(this);
+			m_states[i]->draw(this, pass);
 	}
 }
 

@@ -15,6 +15,6 @@ public:
 
 	void handleInput(Game* game);
 	void update(Game* game, float dt);
-	void draw(Game* game);
+	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
 

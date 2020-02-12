@@ -1,11 +1,14 @@
 #pragma once
 
 #include "State.h"
-
+#include "Transparency.h"
+#include "Lights.h"
 class GameState : public State 
 {
 private:
-
+	Lights* m_lights;
+	Transparency m_transparency;
+	
 	std::vector<GameObject> m_gameObjects;
 	std::vector<Projectile*> m_projectiles;
 
@@ -21,6 +24,6 @@ public:
 	
 	void handleInput(Game* game);
 	void update(Game* game, float dt);
-	void draw(Game* game);
+	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
 

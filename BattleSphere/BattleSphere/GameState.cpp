@@ -130,6 +130,18 @@ void GameState::handleInputs(Game* game, float dt)
 GameState::GameState()
 {
 	m_type = stateType::e_gameState;
+	m_transparency.initialize();
+	m_transparency.bindConstantBuffer();
+	m_lights = Lights::getInstance();
+	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
+	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
+	index = m_lights->addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 8.0f);
+	m_lights->setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+	
+	index = m_lights->addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
+	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
+	index = m_lights->addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
+	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
 }
 
 GameState::~GameState()
@@ -157,21 +169,26 @@ void GameState::update(Game* game, float dt)
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
 
+	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (game->getRobots()[i] != nullptr)
+		if (robots[i] != nullptr)
 		{
-			game->getRobots()[i]->update();
+			robots[i]->update();
 
-			std::vector<Weapon*> weapons = game->getRobots()[i]->getWeapons();
-			weapons[game->getRobots()[i]->getCurrentWeapon(RIGHT)]->updateTime(dt);
-			if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+			std::vector<Weapon*> weapons = robots[i]->getWeapons();
+			weapons[robots[i]->getCurrentWeapon(RIGHT)]->updateTime(dt);
+			if (robots[i]->getCurrentWeapon(LEFT) != -1)
 			{
-				weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->updateTime(dt);
+				weapons[robots[i]->getCurrentWeapon(LEFT)]->updateTime(dt);
 			}
 		}
 	}
-
+	if (robots[0] != nullptr) {
+		XMVECTOR position = robots[0]->getPosition();
+		m_lights->setPosition(0, position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]);
+	}
+	
 	// TODO remove with collision instead aswell as game field?
 	for (int i = 0; i < m_projectiles.size(); i++)
 	{
@@ -195,27 +212,34 @@ void GameState::update(Game* game, float dt)
 	}
 }
 
-void GameState::draw(Game* game)
+void GameState::draw(Game* game, renderPass pass)
 {
-	game->getPreLoader()->draw(objectType::e_scene);
-	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	if (pass != renderPass::e_transparent)
 	{
-		if (game->getRobots()[i] != nullptr)
+
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			std::vector<Weapon*> weapons = game->getRobots()[i]->getWeapons();
-
-			game->getPreLoader()->draw(objectType::e_robot, game->getRobots()[i]->getData());
-			game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(RIGHT)]->getData(), game->getRobots()[i]->getData());
-
-			if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+			if (game->getRobots()[i] != nullptr)
 			{
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+				std::vector<Weapon*> weapons = game->getRobots()[i]->getWeapons();
+
+				game->getPreLoader()->draw(objectType::e_robot, game->getRobots()[i]->getData());
+				game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(RIGHT)]->getData(), game->getRobots()[i]->getData());
+
+				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+				{
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+				}
 			}
 		}
+		
 	}
-
 	for (int i = 0; i < m_projectiles.size(); i++)
 	{
 		game->getPreLoader()->draw(objectType::e_projectile, m_projectiles[i]->getData());
+	}
+	if (pass != renderPass::e_opaque)
+	{
+		game->getPreLoader()->draw(objectType::e_scene);
 	}
 }
