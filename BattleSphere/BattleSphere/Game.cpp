@@ -31,8 +31,6 @@ PreLoader* Game::getPreLoader()
 
 Game::Game()
 {
-	srand(time(NULL));
-
 	m_nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
@@ -104,6 +102,9 @@ bool Game::isActive(stateType state)
 
 void Game::release()
 {
+	ProjectileBank::getInstance()->release();
+	delete ProjectileBank::getInstance();
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
