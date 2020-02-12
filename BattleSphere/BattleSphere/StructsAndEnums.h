@@ -36,3 +36,9 @@ struct vertex
 	float u, v;
 	float normX, normY, normZ;
 };
+
+struct vertexAndId
+{
+	float posX, posY, posZ;
+	unsigned int iD;
+};

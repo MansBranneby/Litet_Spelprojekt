@@ -28,6 +28,7 @@ private:
 	ID3D11Buffer* m_vertexBuffer;
 
 	void createVertexBuffer(); // For vertex buffer
+	void createVertexCullingBuffer(); // For vertex culling buffer
 	void createVertexCBuffer(); // For model matrix
 	void updateSubResource();
 	void updateRelSubResource();
@@ -40,6 +41,8 @@ private:
 	void setScale(XMVECTOR scale, XMVECTOR relScale);
 
 	// For backface culling
+	ID3D11Buffer* m_vertexCullingBuffer;
+	vertexAndId* m_vertexAndId;
 	void setVPMatrix();
 
 public:

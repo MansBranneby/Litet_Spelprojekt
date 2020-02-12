@@ -76,7 +76,7 @@ void VertexShader::createBCInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
 		0							 // used for INSTANCING (ignore)
 	},
 	{
-		"TRIANGLE_ID",
+		"VERTEX_ID",
 		0,				// same slot as previous (same vertexBuffer)
 		DXGI_FORMAT_R32_UINT,
 		0,

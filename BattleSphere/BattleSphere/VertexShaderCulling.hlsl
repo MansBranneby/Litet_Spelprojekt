@@ -1,13 +1,13 @@
 struct VS_IN
 {
 	float3 pos : POSITION;
-	uint iD : TRIANGLE_ID;
+	uint iD : VERTEX_ID;
 };
 
 struct VS_OUT
 {
 	float4 pos : SV_POSITION;
-	uint iD : TRIANGLE_ID;
+	uint iD : VERTEX_ID;
 };
 
 cbuffer VS_CONSTANT_BUFFER : register(b1)

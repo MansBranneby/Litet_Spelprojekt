@@ -13,7 +13,6 @@ SubModel::SubModel()
 	// Backface culling
 	m_culledIndiceBuffer = nullptr;
 	m_nrOfCulledIndices = 0;
-	m_culledIndices = nullptr;
 }
 
 SubModel::~SubModel()
@@ -24,7 +23,6 @@ SubModel::~SubModel()
 	if (m_mat) _aligned_free(m_mat);
 	if (m_indexArray) delete[] m_indexArray;
 	if (m_culledIndiceBuffer) m_culledIndiceBuffer->Release();
-	if (m_culledIndices) delete m_culledIndices;
 }
 
 void SubModel::createIndexBuffer()
@@ -42,14 +40,17 @@ void SubModel::createIndexBuffer()
 
 void SubModel::createCulledIndexBuffer()
 {
-	D3D11_BUFFER_DESC triangleBufferDesc;
-	ZeroMemory(&triangleBufferDesc, sizeof(D3D11_BUFFER_DESC));
-	triangleBufferDesc.BindFlags = D3D11_BIND_STREAM_OUTPUT;
-	triangleBufferDesc.StructureByteStride = sizeof(UINT);
-	triangleBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	triangleBufferDesc.ByteWidth = sizeof(int) * m_nrOfIndices / 3;
+	D3D11_BUFFER_DESC culledIndexBufferDesc;
+	ZeroMemory(&culledIndexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	culledIndexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER | D3D11_BIND_STREAM_OUTPUT;
+	culledIndexBufferDesc.StructureByteStride = sizeof(UINT);
+	culledIndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	culledIndexBufferDesc.ByteWidth = sizeof(int) * m_nrOfIndices;
+	D3D11_SUBRESOURCE_DATA indexData;
+	ZeroMemory(&indexData, sizeof(indexData));
+	indexData.pSysMem = m_indexArray;
 
-	DX::getInstance()->getDevice()->CreateBuffer(&triangleBufferDesc, NULL, &m_culledIndiceBuffer);
+	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
 }
 
 
@@ -75,7 +76,7 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 void SubModel::draw()
 {
 	// Bind indexbuffer
-	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_culledIndiceBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
@@ -90,5 +91,10 @@ void SubModel::cullDraw()
 
 	// Bind geometry stream output shader
 	DX::getInstance()->getDeviceContext()->SOSetTargets(1, &m_culledIndiceBuffer, NULL);
+
+	// Draw
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
+
+	// Unbind index buffer as output shader
+	DX::getInstance()->getDeviceContext()->SOSetTargets(NULL, nullptr, NULL);
 }

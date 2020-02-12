@@ -29,7 +29,6 @@ private:
 	// Backface culling
 	ID3D11Buffer* m_culledIndiceBuffer;
 	int m_nrOfCulledIndices;
-	int* m_culledIndices;
 
 public:
 	SubModel();

@@ -3,12 +3,6 @@
 
 void Model::createVertexBuffer()
 {
-	//TODO: Remove
-	/*for (int i = 0; i < m_nrOfVertices; i++)
-	{
-		OutputDebugStringA((std::to_string(m_vertices[i].normX) + " " + std::to_string(m_vertices[i].normY) + " " + std::to_string(m_vertices[i].normZ) + '\n').c_str());
-	}*/
-
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -18,6 +12,19 @@ void Model::createVertexBuffer()
 	ZeroMemory(&vertexData, sizeof(vertexData));
 	vertexData.pSysMem = m_vertices;
 	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+}
+
+void Model::createVertexCullingBuffer()
+{
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(vertexAndId) * m_nrOfVertices;
+	D3D11_SUBRESOURCE_DATA vertexData;
+	ZeroMemory(&vertexData, sizeof(vertexData));
+	vertexData.pSysMem = m_vertexAndId;
+	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexCullingBuffer);
 }
 
 void Model::createVertexCBuffer()
@@ -77,15 +84,16 @@ void Model::draw()
 
 void Model::cullDraw()
 {
-	UINT32 vertexSize = sizeof(vertex);
+	UINT32 vertexSize = sizeof(vertexAndId);
 	UINT32 offset = 0;
 	setVPMatrix(); // Set world view matrix instead of only world matrix
-	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexCullingBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].cullDraw();
 	}
+	updateSubResource(); // Reset world matrix
 }
 
 Model::Model()
@@ -105,6 +113,9 @@ Model::Model()
 	m_scalingMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();
+	m_vertexBuffer = nullptr;
+	m_vertexCullingBuffer = nullptr;
+	m_vertexAndId = nullptr;
 }
 
 Model::~Model()
@@ -114,6 +125,8 @@ Model::~Model()
 	if (m_vertexBuffer) m_vertexBuffer->Release();
 	if (m_matrixCBuffer) m_matrixCBuffer->Release();
 	if (m_matrixData) delete (m_matrixData);
+	if (m_vertexCullingBuffer) m_vertexCullingBuffer->Release();
+	if (m_vertexAndId) delete[] m_vertexAndId;
 }
 
 void Model::setPosition(XMVECTOR pos)
@@ -216,6 +229,7 @@ void Model::loadModel(std::ifstream& in)
 	inputStream >> m_nrOfVertices;
 	inputStream.clear();
 	m_vertices = new vertex[m_nrOfVertices];
+	m_vertexAndId = new vertexAndId[m_nrOfVertices];
 
 	// Read vertices
 	for (int i = 0; i < m_nrOfVertices; i++)
@@ -227,9 +241,16 @@ void Model::loadModel(std::ifstream& in)
 			m_vertices[i].u >> m_vertices[i].v >>
 			m_vertices[i].normX >> m_vertices[i].normY >> m_vertices[i].normZ;
 		inputStream.clear();
+		m_vertexAndId[i].posX = m_vertices[i].posX;
+		m_vertexAndId[i].posY = m_vertices[i].posY;
+		m_vertexAndId[i].posZ = m_vertices[i].posZ;
+		m_vertexAndId[i].iD = i;
 	}
 	// Creates a vertex buffer
 	createVertexBuffer();
+
+	// Creates the vertex culling buffer, contains position and vertex ID
+	createVertexCullingBuffer();
 
 
 	// Get number of materials to read

@@ -50,7 +50,7 @@ HRESULT GeometryShader::createSOGeometryShader(LPCWSTR fileName, ID3DBlob** pGS,
 	D3D11_SO_DECLARATION_ENTRY pDecl[] =
 	{
 		// Stream, semantic name, semantic index, start component, component count, output slot
-		{ 0, "TRIANGLE_ID", 0, 0, 1, 0 }
+		{ 0, "VERTEX_ID", 0, 0, 1, 0 }
 	};
 
 	HRESULT hr = DX::getInstance()->getDevice()->CreateGeometryShaderWithStreamOutput(

@@ -5,6 +5,8 @@ void BackfaceCuller::turnOnCullingPipeline()
 	DX::getInstance()->getDeviceContext()->VSSetShader(&m_vShader.getVertexShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(&m_gShader.getGeometryShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX::getInstance()->getDeviceContext()->IASetInputLayout(&m_vShader.getvertexLayout());
 }
 
 void BackfaceCuller::turnOffCullingPipeline()
