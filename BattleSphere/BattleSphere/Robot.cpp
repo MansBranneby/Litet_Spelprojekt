@@ -58,6 +58,10 @@ void Robot::setVelocity(float velocity)
 
 float Robot::getVelocity()
 {
+	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == MOVEMENT)
+		return m_velocity * m_weapons[m_currentWeapon[RIGHT]]->getSpeed();
+	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == MOVEMENT)
+		return m_velocity * m_weapons[m_currentWeapon[LEFT]]->getSpeed();
 	return m_velocity;
 }
 
@@ -76,7 +80,7 @@ bool Robot::isReady(float dt)
 	if (!m_ready)
 	{
 		m_time += dt;
-		if (m_time > 0.8f)
+		if (m_time > 0.5f)
 		{
 			m_time = 0;
 			m_ready = true;
@@ -84,6 +88,16 @@ bool Robot::isReady(float dt)
 		return false;
 	}
 	return true;
+}
+
+void Robot::useWeapon(int side, float dt)
+{
+	if (m_currentWeapon[side] != -1 && (m_weapons[m_currentWeapon[side]]->getType() == PISTOL || m_weapons[m_currentWeapon[side]]->getType() == RIFLE))
+		m_weapons[m_currentWeapon[side]]->shoot(getPosition(), m_currentRotation, side, dt);
+	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == MOVEMENT)
+		m_weapons[m_currentWeapon[side]]->speedUp();
+	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == SHIELD)
+		m_weapons[m_currentWeapon[side]]->shield();
 }
 
 void Robot::changeWeapon(int side)
@@ -160,6 +174,32 @@ int Robot::getResourceIndex()
 void Robot::removeResource()
 {
 	m_resource = -1;
+}
+
+void Robot::update(float dt)
+{
+	GameObject::update();
+
+	for (int i = 0; i < m_weapons.size(); i++)
+	{
+		m_weapons[i]->updateTime(dt);
+	}
+}
+
+void Robot::move(XMVECTOR dPos)
+{
+	GameObject::move(dPos);
+	
+	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
+		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
+	);
+
+	if (getCurrentWeapon(LEFT) != -1)
+	{
+		m_weapons[m_currentWeapon[LEFT]]->setPosition(
+			m_weapons[m_currentWeapon[LEFT]]->getRelativePos()
+		);
+	}
 }
 
 void Robot::release()

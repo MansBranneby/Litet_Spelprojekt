@@ -44,6 +44,8 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 	float3 R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
 
+	Ka = Kd;
+
 	// Illumination models //
 	switch (KaIn.w)
 	{

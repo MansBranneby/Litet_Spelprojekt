@@ -112,7 +112,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	g_light = new Light(XMVectorSet(5.0f, 8.0f, -15.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	g_light = new Light(XMVectorSet(5.0f, 18.0f, -15.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 
 	if (wndHandle)
 	{
