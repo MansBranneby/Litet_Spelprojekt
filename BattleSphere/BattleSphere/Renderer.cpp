@@ -49,7 +49,6 @@ VertexShader g_vertexShaderFinalRender;
 PixelShader g_pixelShaderFinalRender;
 PixelShader g_pixelShaderDownsample;
 VertexShader g_vertexShaderShadowMapping;
-PixelShader g_pixelShaderShadowMapping;
 
 Clock* g_Clock;
 Game* g_Game;
@@ -182,8 +181,7 @@ void createRenderResources()
 
 	g_shadowMapping = new ShadowMapping();
 	g_vertexShaderShadowMapping = VertexShader(L"VertexShaderShadowMapping.hlsl");
-	g_pixelShaderShadowMapping = PixelShader(L"PixelShaderShadowMapping.hlsl");
-	g_lightCamera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+	g_lightCamera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 10.0f, 500.0f, XMVectorSet(100.0f, 110.0f, -50.0f, 0.0f));
 }
 
 void downsample()
@@ -227,7 +225,7 @@ void shadowRender()
 	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderShadowMapping.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(nullptr, nullptr, 0);
 
 	UINT32 vertexSize = sizeof(PosCol);
 	UINT32 offset = 0;
@@ -276,7 +274,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 	g_lightCulling.initialize();
 	// TODO: Move camera and light to game?
-	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+	//g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 
 	createRenderResources(); // Creates instances of graphics classes etc.
 
@@ -333,28 +331,40 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			}
 			else
 			{
+				// SHADOW MAPPING
+				ID3D11ShaderResourceView* nullSRV = nullptr;
+				DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &nullSRV);
+				ID3D11RenderTargetView* nullRTV = nullptr;
+				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullRTV, NULL);
+				shadowRender();
+
 				//// RENDER ////
 				
 				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 				float clearColour[] = { 1.0f, 0, 0.2f, 1 };
 				g_lightCulling.cullLights();
+
 				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 				
-				g_bloom->clearRenderTarget();
 
 				// BLOOM
+				g_bloom->clearRenderTarget();
 				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
+				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(3, 1, g_lightCamera->getConstantBufferVP()->getConstantBuffer());
 				
 				DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
 				DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+
+				ID3D11ShaderResourceView* shadowSRV = g_shadowMapping->getShaderResourceView();
+				DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &shadowSRV);
 
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
@@ -423,6 +433,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
 		g_pixelShaderDownsample.release();
+		g_vertexShaderShadowMapping.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
 
@@ -431,6 +442,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_bloom;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
+		delete g_lightCamera;
+		delete g_shadowMapping;
 
 		DestroyWindow(wndHandle);
 	}

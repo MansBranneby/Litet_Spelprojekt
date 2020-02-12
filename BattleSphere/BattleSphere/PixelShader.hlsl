@@ -31,6 +31,11 @@ cbuffer PS_CONSTANT_BUFFER : register(b2)
 	float4 KeIn; //Ke + d
 };
 
+cbuffer PS_CONSTANT_BUFFER : register(b3)
+{
+	matrix lightVP;
+};
+
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
@@ -47,6 +52,7 @@ float DoSpotCone(Light light, float4 L)
 Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
+Texture2D txShadowMap : register(t3);
 float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//// (for one light)
@@ -54,7 +60,28 @@ float4 PS_main(PS_IN input) : SV_Target
 	uint startOffset = LightGrid[tileIndex].x;
 	uint lightCount = LightGrid[tileIndex].y;
 
+	// Shadow
+	float4 PosRelLight = mul(lightVP, float4(input.posWC.xyz, 1.0f));
+
+	PosRelLight.xy /= PosRelLight.w;
 	
+	float smSize = 1920 * 1080;
+	float2 shadowMapTex = float2(0.5f * PosRelLight.x + 0.5f, -0.5f * PosRelLight.y + 0.5f);
+	float depth = PosRelLight.z / PosRelLight.w;
+
+	float dx = 1.0f / smSize;
+	float ep = 0.0001f;
+
+	float s0 = (txShadowMap.Sample(sampAni, shadowMapTex).r + ep < depth) ? 0.0f : 1.0f;
+	float s1 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx, 0.0f)).r + ep < depth) ? 0.0f : 1.0f;
+	float s2 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(0.0f, dx)).r + ep < depth) ? 0.0f : 1.0f;
+	float s3 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx, dx)).r + ep < depth) ? 0.0f : 1.0f;
+
+	float2 texelPos = shadowMapTex * smSize;
+	float2 lerps = frac(texelPos);
+	float shadowCoeff = lerp(lerp(s0, s1, lerps.x), lerp(s2, s3, lerps.x), lerps.y);
+
+
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
 	float3 fragmentCol;
 	
@@ -89,7 +116,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			lightCol = Lights[LightIndex[i]].color * light.Intensity;
+			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
 			break;
 		case 2:
 			//return float4(1, 1, 1, 1);

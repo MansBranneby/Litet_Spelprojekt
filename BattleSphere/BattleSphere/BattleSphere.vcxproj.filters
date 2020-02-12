@@ -259,8 +259,5 @@
     <FxCompile Include="VertexShaderShadowMapping.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShaderShadowMapping.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
