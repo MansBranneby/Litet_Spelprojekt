@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <DirectXMath.h>
+#include "GameObject.h"
+#include "PreLoader.h"
 #include "BoundingVolume.h"
 #include "OBB.h"
 
@@ -8,7 +10,7 @@ class QuadtreeNode
 {
 private:
 	std::vector <QuadtreeNode*> m_children;
-	std::vector <BoundingVolume*> m_models;
+	std::vector <DirectX::XMFLOAT3> m_cMeshes;
 
 	// Bounding volume
 	BoundingVolume* m_boundingVolume;
@@ -18,6 +20,6 @@ private:
 public:
 	QuadtreeNode();
 	//	Dimensions of box
-	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, std::vector<BoundingVolume*> models, unsigned int levels, unsigned int currentLevel);
+	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader preLoader, unsigned int levels, unsigned int currentLevel);
 	~QuadtreeNode();
 };

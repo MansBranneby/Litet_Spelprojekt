@@ -9,7 +9,7 @@
 #include "GameObject.h"
 #include "Input.h"
 #include "PreLoader.h"
-
+#include "QuadtreeNode.h"
 
 using namespace DirectX;
 struct returnInfo
@@ -22,13 +22,13 @@ class Game
 private:
 	int m_nrOfPlayers;
 	int m_controllerId[XUSER_MAX_COUNT];
-	std::vector<GameObject> m_gameObjects;
+	std::vector<GameObject*> m_gameObjects;
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
 	std::vector<Projectile*> m_projectiles;
 
 	PreLoader m_preLoader;
-
+	QuadtreeNode* m_QuadTreeRoot;
 	void handleMovement(float dt, int id);
 	void handleInputs(float dt);
 

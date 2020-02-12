@@ -19,16 +19,22 @@ QuadtreeNode::QuadtreeNode()
 	m_boundingVolume = new OBB({ 0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f});
 }
 
-QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, std::vector<BoundingVolume*> models, unsigned int levels, unsigned int currentLevel)
+QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader preLoader, unsigned int levels, unsigned int currentLevel)
 {
 	m_boundingVolume = new OBB(DirectX::XMLoadFloat3(&pos), halfWD, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 	std::vector<DirectX::XMFLOAT3> nodePositions = calculateNewNodePositions(pos, halfWD);
-	
+
 	// TODO replace with models instead of bounding volumes
-	for (unsigned int i = 0; i < models.size(); ++i)
+	boundingData bd = preLoader.getBoundingData(objectType::e_scene, 0, 0);
+	OBB tempOBB(bd.pos, bd.halfWD, bd.xAxis, bd.zAxis);
+	for (unsigned int i = 0; i < 1; ++i)
 	{
-		if (m_boundingVolume->intersects(models[i]).m_colliding)
-			m_models.push_back(models[i]);
+		if (m_boundingVolume->intersects(&tempOBB).m_colliding)
+		{
+			// Append to m_cMeshes
+			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader.getCollisionMesh(objectType::e_scene, 0, 0);
+			m_cMeshes.insert(std::end(m_cMeshes), std::begin(tempCMesh), std::end(tempCMesh));
+		}
 	}
 
 	// Recursive creation of nodes
@@ -37,7 +43,7 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, std:
 		halfWD.x *= 0.5f;
 		halfWD.y *= 0.5f;
 		for (size_t i = 0; i < 4; i++)
-			m_children.push_back(new QuadtreeNode(nodePositions[i], halfWD, m_models, levels, currentLevel + 1));
+			m_children.push_back(new QuadtreeNode(nodePositions[i], halfWD, preLoader, levels, currentLevel + 1));
 	}
 }
 
