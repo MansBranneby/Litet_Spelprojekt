@@ -35,6 +35,7 @@ public:
 	void setPlayerId(int playerId);
 	int getPlayerId();
 	void damagePlayer(int damage);
+	void setHealth(int health);
 	int getHealth();
 	void setVelocity(float velocity);
 	float getVelocity();
