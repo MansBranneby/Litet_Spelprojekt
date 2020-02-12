@@ -192,8 +192,6 @@ void downsample()
 	g_graphicResources.setViewPortDim((UINT)(DX::getInstance()->getWidth() * 0.25f), (UINT)(DX::getInstance()->getHeight() * 0.25f));
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
 	g_graphicResources.setViewPortDim((UINT)DX::getInstance()->getWidth(), (UINT)DX::getInstance()->getHeight());
-
-	float clearColour[] = { 0, 0, 0, 1 };
 }
 
 void finalRender()
@@ -359,6 +357,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_bloom->run();
 
 					finalRender();
+					g_bloom->changeOrder();
 				}
 				else if (g_Game->isActive(stateType::e_gameState))
 				{
