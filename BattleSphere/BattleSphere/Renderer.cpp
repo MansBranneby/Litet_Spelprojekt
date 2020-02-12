@@ -30,6 +30,8 @@
 #include "Camera.h"
 #include "Light.h"
 #include "LightCulling.h"
+#include "GameState.h"
+#include "MainMenuState.h"
 #include "ShadowMapping.h"
 
 using namespace DirectX;
@@ -53,6 +55,8 @@ VertexShader g_vertexShaderShadowMapping;
 Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
+GameState g_gameState;
+MainMenuState g_mainMenuState;
 ShadowMapping* g_shadowMapping;
 Camera* g_lightCamera = nullptr;
 
@@ -171,12 +175,7 @@ void createRenderResources()
 {
 	createFullscreenQuad();
 
-	// TODO: Move camera and light to game?
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
-	//g_light = new Light(XMVectorSet(-2.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-	//g_light = new Light(XMVectorSet(1.0f, 5.0f, -5.0f, 1.0f), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-
-	
 	g_bloom = new Bloom();
 
 	g_shadowMapping = new ShadowMapping();
@@ -273,9 +272,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
 	g_lightCulling.initialize();
-	// TODO: Move camera and light to game?
-	//g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
-
 	createRenderResources(); // Creates instances of graphics classes etc.
 
 	if (wndHandle)
@@ -294,20 +290,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		int index = g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 		g_lightCulling.setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-		index = g_lightCulling.addDirectionalLight(0.3f, -1, 0.3f, 1, 1, 1, 0.6);
-		g_lightCulling.setColor(index, float(255) / 255, float(255) / 255, float(255) / 255);
-		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, 0.2f, 0.1f, 0.2f, 0.6f, 0.8f);
-		g_lightCulling.setColor(index, float(255) / 255, float(255) / 255, float(255) / 255);
-		/*index = g_lightCulling.addSpotLight(0, 70, -30, 100, -0.3f, -1, 0.0f, 1.0f, 0.9f, 0.9f, 25, 5);
-		g_lightCulling.setColor(index, float(255) / 255, float(234) / 255, float(80) / 255);*/
-		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 25, 1);
+		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 0.6f);
+		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
+		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		index = g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
 		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
-
-		/*index = g_lightCulling.addSpotLight(30, 70, -30, 100, 0.0f, -1, 0.0f, 1.0f, 0.9f, 0.9f, 25, 5);
-		g_lightCulling.setColor(index, float(255) / 255, float(40) / 255, float(80) / 255);*/
+		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
+		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
+		g_Game->pushState(&g_gameState);
+		g_Game->pushState(&g_mainMenuState);
+		g_Game->changeState(stateType::e_gameState); // Set initial state for the game
 
 		int counterFrames = 0;
 		int fps = 0;
@@ -331,26 +327,33 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			}
 			else
 			{
-				// SHADOW MAPPING
-				ID3D11ShaderResourceView* nullSRV = nullptr;
-				DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &nullSRV);
-				ID3D11RenderTargetView* nullRTV = nullptr;
-				DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullRTV, NULL);
-				shadowRender();
+				//// UPDATE ////
 
-				//// RENDER ////
+				g_Game->update(g_Clock->getDeltaTime());
+
+				//// SET PIPELINE ////
+				float clearColour[] = { 0, 0, 0, 1 };
+				UINT32 vertexSize = sizeof(PosCol);
+				UINT32 offset = 0;
 				
-				DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-				float clearColour[] = { 1.0f, 0, 0.2f, 1 };
-				g_lightCulling.cullLights();
+				if (g_Game->isActive(stateType::e_gameState))
+				{
+					// SHADOW MAPPING
+					ID3D11ShaderResourceView* nullSRV = nullptr;
+					DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &nullSRV);
+					ID3D11RenderTargetView* nullRTV = nullptr;
+					DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullRTV, NULL);
+					shadowRender();
 
-				DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-				DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-				
+					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					g_lightCulling.cullLights();
+					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-				// BLOOM
-				g_bloom->clearRenderTarget();
-				g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
+					g_bloom->clearRenderTarget();
+
+					// BLOOM
+					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 				DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
 				DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
@@ -363,26 +366,55 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 				DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
 
-				ID3D11ShaderResourceView* shadowSRV = g_shadowMapping->getShaderResourceView();
-				DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &shadowSRV);
+					DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+				}
+				else if (g_Game->isActive(stateType::e_gameState))
+				{
+					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					g_lightCulling.cullLights();
+					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-				UINT32 vertexSize = sizeof(PosCol);
-				UINT32 offset = 0;
+					g_bloom->clearRenderTarget();
 
-				DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
-				DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+					// BLOOM
+					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
+					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
+
+					DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
+					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+
+					ID3D11ShaderResourceView* shadowSRV = g_shadowMapping->getShaderResourceView();
+					DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &shadowSRV);
+
+					DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+				}
 			
+				//// RENDER ////
+				
+				if (g_Game->isActive(stateType::e_gameState))
+				{
+					g_Game->draw();
 
-				returnInfo a = g_Game->update(g_Clock->getDeltaTime());
-				g_lightCulling.setPosition(0, a.x, a.y, a.z);
-				g_Game->draw();
+					downsample();
+					g_bloom->run();
 
-				downsample();
-				g_bloom->run();
+					finalRender();
+				}
+				else if (g_Game->isActive(stateType::e_gameState))
+				{
 
-				finalRender();
+				}
 
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
@@ -408,7 +440,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					fps = counterFrames;
 					counterFrames = 0;
 					g_Clock->resetSecTimer();
-					g_Game->updateSec();
+					//g_Game->updateSec();
 					// TODO: delet dis (visa fps)
 					/*OutputDebugStringA(std::to_string(fps).c_str());
 					OutputDebugStringA("\n");*/
