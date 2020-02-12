@@ -44,19 +44,6 @@ Game::Game()
 	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
 	m_preLoader.setStaticData(objectType::e_scene, sceneData);
 
-	for (int i = 0; i < 25; i++)
-	{
-		Resource* resource = new Resource(i % 4);
-		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), -0.4f, (float)(rand() % 20 - 40), 0.0f));
-		m_resources.push_back(resource);
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		Node* node = new Node(i % 4);
-		node->setPosition(XMVectorSet((float)(i * 8 - 15), -0.2f, (float)(10.0f), 0.0f));
-		m_nodes.push_back(node);
-	}
 }
 
 void Game::update(float dt)
@@ -124,15 +111,5 @@ void Game::release()
 			m_robots[i]->release();
 			delete m_robots[i];
 		}
-	}
-
-	for (int i = 0; i < m_resources.size(); i++)
-	{
-		delete m_resources[i];
-	}
-
-	for (int i = 0; i < m_nodes.size(); i++)
-	{
-		delete m_nodes[i];
 	}
 }

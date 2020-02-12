@@ -35,13 +35,6 @@ enum class stateType
 	e_default
 };
 
-struct objectData 
-{
-	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
-};
-
 struct vertex 
 {
 	float posX, posY, posZ;
@@ -57,7 +50,13 @@ struct material
 	XMVECTOR emission; // emission.xyz, opacity (d)
 };
 
-
+struct objectData
+{
+	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
+	material material;
+};
 
 // Game update return data
 struct returnInfo

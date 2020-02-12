@@ -1,7 +1,6 @@
-SamplerState sampAni;
+SamplerState sampAni : register(s0);
 
 #define BLOCK_SIZE 32
-SamplerState sampAni;
 
 struct PS_IN
 {
@@ -94,6 +93,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
+	Ka *= Kd;
 	fragmentCol = Ka * Ia;
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
