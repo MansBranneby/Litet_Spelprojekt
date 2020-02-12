@@ -9,15 +9,19 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int d
 	m_damage = damage;
 	m_velocity = 0.0f;
 
+	m_material.emission = XMVectorSet(0.0f, 1.0f, 0.0f, -1);
+
 	if (type == PISTOL)
 	{
 		m_velocity = 40.0f;
-		setScale(0.08f, 0.08f, 0.2f);
+		//setScale(0.5f, 0.5f, 0.8f);
+		setScale(0.15f, 0.15f, 0.3f);
 	}
 	else if (type == RIFLE)
 	{
 		m_velocity = 50.0f;
-		setScale(0.08f, 0.08f, 0.2f);
+		//setScale(0.5f, 0.5f, 0.8f);
+		setScale(0.15f, 0.15f, 0.3f);
 	}
 }
 

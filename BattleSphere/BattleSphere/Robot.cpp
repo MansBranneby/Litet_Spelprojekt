@@ -15,22 +15,23 @@ Robot::Robot(int playerId)
 	m_ready = true;
 	m_time = 0;
 
-	m_material.ambient = XMVector3Normalize(XMVectorSet(0, 0, 0, 0));
+	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 
 	if (playerId == 0)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 0, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(80, 10, 180, 0));
 	else if (playerId == 1)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 1, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 1, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(10, 189, 198, 0));
 	else if (playerId == 2)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 0, 1, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 0, 1, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(255, 0, 255, 0));
 	else if (playerId == 3)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 1, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 1, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(19, 62, 255, 0));
 	// TODO add init
-	//Resource m_resource;
+	
+	m_material.emission = m_material.diffuse * 0.5f;
 }
 
 void Robot::setPlayerId(int playerId)
@@ -47,6 +48,7 @@ void Robot::damagePlayer(int damage)
 {
 	m_health -= damage;
 	m_material.diffuse = XMVector3Normalize(m_material.diffuse) * (float)m_health / 100.0f;
+	m_material.emission = m_material.diffuse * 0.5f;
 	removeResource();
 }
 
@@ -54,13 +56,16 @@ void Robot::setHealth(int health)
 {
 	m_health = health;
 	if (m_playerId == 0)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 0, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
 	else if (m_playerId == 1)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 1, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 1, 0, -1));
 	else if (m_playerId == 2)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 0, 1, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(0, 0, 1, -1));
 	else if (m_playerId == 3)
-		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 1, 0, 0));
+		m_material.diffuse = XMVector3Normalize(XMVectorSet(1, 1, 0, -1));
+
+	XMVectorSetW(m_material.diffuse, -1);
+	m_material.emission = m_material.diffuse * 0.5f;
 }
 
 int Robot::getHealth()

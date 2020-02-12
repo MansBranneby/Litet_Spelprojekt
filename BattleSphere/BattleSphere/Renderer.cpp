@@ -290,10 +290,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		int index = g_lightCulling.addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 		g_lightCulling.setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 20.6f);
-		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		index = g_lightCulling.addDirectionalLight(-0.5f, -1, 0.5f, 1, 1, 1, 3.0f);
+		g_lightCulling.setColor(index, float(255) / 255, float(255) / 255, float(255) / 255);
 		index = g_lightCulling.addDirectionalLight(0.5f, -0.1f, -0.5f, 0.1f, 0.2f, 0.6f, 0.8f);
-		g_lightCulling.setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+		g_lightCulling.setColor(index, float(255) / 255, float(255) / 255, float(255) / 255);
 		index = g_lightCulling.addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
 		g_lightCulling.setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
 		index = g_lightCulling.addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
