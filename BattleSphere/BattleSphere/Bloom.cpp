@@ -54,10 +54,7 @@ void Bloom::createResources()
 		MessageBox(NULL, L"fullResTex[1] in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
 	// Gauss
-	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDescGauss, NULL, &m_gaussTex[0]);
-	if (FAILED(hr))
-		MessageBox(NULL, L"gaussTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
-	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDescGauss, NULL, &m_gaussTex[1]);
+	hr = DX::getInstance()->getDevice()->CreateTexture2D(&texDescGauss, NULL, &m_gaussTex);
 	if (FAILED(hr))
 		MessageBox(NULL, L"gaussTex in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
@@ -113,11 +110,7 @@ void Bloom::createResources()
 		SRVDescGauss.Texture2D.MipLevels = texDescGauss.MipLevels;
 
 		// Gauss
-		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_gaussTex[0], &SRVDescGauss, &m_gaussSRV[0]);
-		if (FAILED(hr))
-			MessageBox(NULL, L"gaussSRV in Bloom", L"Error", MB_OK | MB_ICONERROR);
-
-		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_gaussTex[1], &SRVDescGauss, &m_gaussSRV[1]);
+		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(m_gaussTex, &SRVDescGauss, &m_gaussSRV);
 		if (FAILED(hr))
 			MessageBox(NULL, L"gaussSRV in Bloom", L"Error", MB_OK | MB_ICONERROR);
 		
@@ -149,10 +142,7 @@ void Bloom::createResources()
 		UAVdescGauss.Texture2D.MipSlice = 0;
 		
 		// Gauss
-		hr = DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_gaussTex[0], &UAVdescGauss, &m_gaussUAV[0]);
-		if (FAILED(hr))
-			MessageBox(NULL, L"gaussUAV in Bloom", L"Error", MB_OK | MB_ICONERROR);
-		hr = DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_gaussTex[1], &UAVdescGauss, &m_gaussUAV[1]);
+		hr = DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_gaussTex, &UAVdescGauss, &m_gaussUAV);
 		if (FAILED(hr))
 			MessageBox(NULL, L"gaussUAV in Bloom", L"Error", MB_OK | MB_ICONERROR);
 
@@ -177,8 +167,7 @@ Bloom::Bloom()
 
 Bloom::~Bloom()
 {
-	m_gaussTex[0]->Release();
-	m_gaussTex[1]->Release();
+	m_gaussTex->Release();
 	m_bloomTex->Release();
 	m_fullResTex[0]->Release();
 	m_fullResTex[1]->Release();
@@ -188,14 +177,14 @@ Bloom::~Bloom()
 	m_lowResRTV->Release();
 	
 
-	m_gaussSRV[0]->Release();
-	m_gaussSRV[1]->Release();
+	m_gaussSRV->Release();
+
 	m_bloomSRV[0]->Release();
 	m_bloomSRV[1]->Release();
 	m_bloomSRV[2]->Release();
 
-	m_gaussUAV[0]->Release();
-	m_gaussUAV[1]->Release();
+	m_gaussUAV->Release();
+
 	m_bloomUAV->Release();
 
 	m_horizontalCS.release();
@@ -265,10 +254,8 @@ void Bloom::run()
 	//// HORIZONTAL PASS ////
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_horizontalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_bloomSRV[2]);
-	if(m_fullResZero)
-		DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_gaussUAV[0], 0);
-	else
-		DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_gaussUAV[1], 0);
+
+	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_gaussUAV, 0);
 	DX::getInstance()->getDeviceContext()->Dispatch(15, (UINT)(DX::getInstance()->getHeight() * 0.25f), 1); 
 
 	ID3D11ShaderResourceView* nullSRV = { NULL };
@@ -278,10 +265,9 @@ void Bloom::run()
 
 	//// VERTICAL PASS ////
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_verticalCS.getComputeShader(), nullptr, 0);
-	if (m_fullResZero)
-		DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_gaussSRV[1]);
-	else
-		DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_gaussSRV[0]);
+
+		DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_gaussSRV);
+
 
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_bloomUAV, 0);
 	DX::getInstance()->getDeviceContext()->Dispatch((UINT)(DX::getInstance()->getWidth() * 0.25f), 9, 1);
