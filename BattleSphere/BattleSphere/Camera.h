@@ -27,7 +27,7 @@ private:
 	ConstantBuffer* m_constantBufferPosition = nullptr;
 
 public:
-	Camera(float width, float height, float nearPlane, float farPlane);
+	Camera(float width, float height, float nearPlane, float farPlane, bool isPerspective = true);
 	~Camera();
 	XMMATRIX getViewMatrix();
 	XMMATRIX getProjectionMatrix();

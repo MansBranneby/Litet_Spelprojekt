@@ -1,10 +1,12 @@
 #pragma once
 
 #include "State.h"
+#include "UI_Element.h"
 
 class MainMenuState : public State
 {
 private:
+	std::vector<UI_Element*> m_uiElements;
 
 public:
 	MainMenuState();

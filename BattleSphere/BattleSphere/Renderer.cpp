@@ -32,11 +32,13 @@
 #include "LightCulling.h"
 #include "GameState.h"
 #include "MainMenuState.h"
+#include "Menu.h"
 
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
 Bloom* g_bloom = nullptr;
+Menu* g_menu = nullptr;
 
 //TODO Remove
 Camera* g_camera = nullptr;
@@ -167,6 +169,7 @@ void createRenderResources()
 
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	g_bloom = new Bloom();
+	g_menu = new Menu();
 }
 
 void downsample()
@@ -322,31 +325,26 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 				}
-				else if (g_Game->isActive(stateType::e_gameState))
+				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
-					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-					g_lightCulling.cullLights();
-					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+					//DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 
-					g_bloom->clearRenderTarget();
+					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-					// BLOOM
-					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
+					//DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
 
-					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_camera->getConstantBufferVP()->getConstantBuffer());
-					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_camera->getConstantBufferPosition()->getConstantBuffer());
-					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
+					//DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera->getConstantBufferVP()->getConstantBuffer());
 
-					DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
-					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+					//DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
+					//DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+					//DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+					//DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+					//DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
 
-					DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
-					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+					//DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
+					//DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 				}
 			
 				//// RENDER ////
@@ -354,13 +352,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					g_Game->draw();
-
 					downsample();
+
 					g_bloom->run();
 
 					finalRender();
 				}
-				else if (g_Game->isActive(stateType::e_gameState))
+				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
 
 				}
