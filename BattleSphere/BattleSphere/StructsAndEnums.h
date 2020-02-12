@@ -23,6 +23,13 @@ enum class renderPass
 	e_final
 };
 
+enum class stateType
+{
+	e_gameState,
+	e_mainMenu,
+	e_default
+};
+
 struct objectData 
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
@@ -35,4 +42,10 @@ struct vertex
 	float posX, posY, posZ;
 	float u, v;
 	float normX, normY, normZ;
+};
+
+// Game update return data
+struct returnInfo
+{
+	float x, y, z;
 };
