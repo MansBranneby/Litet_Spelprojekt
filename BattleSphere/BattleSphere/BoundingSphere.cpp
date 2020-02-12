@@ -3,21 +3,61 @@
 CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c)
 {
 	CollisionInfo collisionInfo;
-	DirectX::XMVECTOR p = DirectX::XMLoadFloat3(&getPos());
+	DirectX::XMVECTOR p = getPos();
 	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToTriangle(p, a, b, c);
-
-	if (DirectX::XMVectorGetX(DirectX::XMVector3Length(closestPoint - p)) <= m_radius)
+	DirectX::XMVECTOR d = closestPoint - p;
+	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(closestPoint - p));
+	if (dist <= m_radius)
 	{
 		collisionInfo.m_colliding = true;
-		collisionInfo.m_normal = DirectX::XMVector3Cross(c - a, b - a);
+		collisionInfo.m_normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a)) * (m_radius - dist);
 	}
 
 	return collisionInfo;
 }
 
+DirectX::XMVECTOR BoundingSphere::getClosestPointFromPointToOBB(OBB* other)
+{
+	OBB* obb = dynamic_cast<OBB*>(other);
+	DirectX::XMVECTOR closestPoint{0.0f, 0.0f, 0.0f, 0.0f};
+	if(obb)
+	{ 
+		// vector from point to OBB
+		DirectX::XMVECTOR d = getPos() - obb->getPos();
+
+		// Closest point starts at OBB center and makes steps from there
+		closestPoint = obb->getPos();
+
+		for (int i = 0; i < obb->getAxes().size(); ++i)
+		{
+			// Project vector from point to OBB onto axes
+			float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(d, obb->getAxes()[i]));
+			// If projection is longer than axis then clamp it that axis' length
+			if (t >= obb->getHalfWDVector()[i]) t = obb->getHalfWDVector()[i];
+			else if (t <= -obb->getHalfWDVector()[i]) t = -obb->getHalfWDVector()[i];
+			// Step along projected axis
+			closestPoint += t * obb->getAxes()[i];
+		}
+	}
+
+	return closestPoint;
+}
+
 CollisionInfo BoundingSphere::intersectsWithOBB(BoundingVolume* other)
 {
+
 	CollisionInfo collisionInfo;
+	OBB* obb = static_cast<OBB*>(other);
+
+	DirectX::XMVECTOR d = getPos() - getClosestPointFromPointToOBB(obb);
+	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
+
+	if (dist < m_radius)
+	{
+		collisionInfo.m_colliding = true;
+		collisionInfo.m_normal = DirectX::XMVector3Normalize(d) * (m_radius-dist);
+	}
+
 	return collisionInfo;
 }
 
@@ -28,7 +68,7 @@ CollisionInfo BoundingSphere::intersectsWithSphere(BoundingVolume* other)
 	BoundingSphere* otherSphere = dynamic_cast <BoundingSphere*> (other);
 
 	
-	DirectX::XMVECTOR sphereToOther = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&getPos()), DirectX::XMLoadFloat3(&otherSphere->getPos()));
+	DirectX::XMVECTOR sphereToOther = DirectX::XMVectorSubtract(getPos(), otherSphere->getPos());
 	float dSphere = DirectX::XMVectorGetX(DirectX::XMVector3Length(sphereToOther));
 
 	if (m_radius + otherSphere->getRadius() > dSphere)
@@ -45,7 +85,7 @@ BoundingSphere::BoundingSphere()
 	m_radius = 0.0f;
 }
 
-BoundingSphere::BoundingSphere(DirectX::XMFLOAT3 pos, float radius)
+BoundingSphere::BoundingSphere(DirectX::XMVECTOR pos, float radius)
 	:BoundingVolume(pos)
 {
 	m_radius = radius;
@@ -53,6 +93,11 @@ BoundingSphere::BoundingSphere(DirectX::XMFLOAT3 pos, float radius)
 
 BoundingSphere::~BoundingSphere()
 {
+}
+
+void BoundingSphere::update(DirectX::XMMATRIX modelMatrix)
+{
+	setPos(DirectX::XMVector4Transform(getPos(), modelMatrix));
 }
 
 float BoundingSphere::getRadius() const

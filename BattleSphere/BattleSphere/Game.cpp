@@ -149,10 +149,10 @@ Game::Game()
 	updatePlayerStatus();
 
 	objectData sceneData;
-	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
-	sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
-	m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+	//sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	//sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
+	//m_preLoader.setStaticData(objectType::e_scene, sceneData);
 }
 
 returnInfo Game::update(float dt)
@@ -198,13 +198,23 @@ returnInfo Game::update(float dt)
 		info.z = 0;
 	}
 	
-	//// TODO sphere triangle collision test
-	//std::vector<Model*> robots = m_preLoader.getModelsOfType(objectType::e_robot);
-	//std::vector<Model*> scene = m_preLoader.getModelsOfType(objectType::e_scene);
-	//for (unsigned int i = 0; i < robots.size(); ++i)
-	//{
-	//	robots[i]->getBoundingVolume()->intersects(scene[i]->getBoundingVolume());
-	//}
+	// TODO sphere triangle collision test
+	for (unsigned int i = 0; i < 1; ++i)
+	{
+		//CollisionInfo collisionInfo = m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0)->intersects(m_preLoader.getStaticBoundingVolume(objectType::e_scene, 0, 0));
+		std::vector<XMFLOAT3> test = m_preLoader.getCollisionMesh(objectType::e_scene, 0, 0); // Get collision mesh
+		for (unsigned int j = 0; j < test.size(); j += 3)
+		{
+			// get bounding volume, call intersectWithTriangle on collisionMesh triangles
+			CollisionInfo collisionInfo = m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0)->intersectsWithTriangle(XMVECTOR{test[j].x, test[j].y, test[j].z}, XMVECTOR{ test[j+1].x, test[j+1].y, test[j+1].z }, XMVECTOR{ test[j+2].x, test[j+2].y, test[j+2].z });
+			// Use the returned "CollisionInfo" to check if collision is true
+			if (collisionInfo.m_colliding)
+			{
+				// Use the collision normal to move the player and resolve the collision!
+				m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
+			}
+		}
+	}
 	
 	
 	return info;
@@ -223,6 +233,8 @@ void Game::updateSec()
 
 void Game::draw()
 {
+	//objectData test = m_preLoader.getBVObjectData(objectType::e_scene, 0);
+	//m_preLoader.draw(objectType::e_weapon, test);
 	m_preLoader.draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{

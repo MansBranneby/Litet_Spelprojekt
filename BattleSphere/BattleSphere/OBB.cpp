@@ -3,20 +3,18 @@
 	
 DirectX::XMVECTOR OBB::getClosestPointFromPointToOBB(DirectX::XMVECTOR p)
 {
-	DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&getPos());
-
 	// vector from point to OBB
-	DirectX::XMVECTOR d = pos - p;
+	DirectX::XMVECTOR d = getPos() - p;
 
 	// Closest point starts at OBB center and makes steps from there
-	DirectX::XMVECTOR closestPoint = pos;
+	DirectX::XMVECTOR closestPoint = getPos();
 
 	for (int i = 0; i < m_axes.size(); ++i)
 	{
 		// Project vector from point to OBB onto axes
 		float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(d, m_axes[i]));
 		// If projection is longer than axis then clamp it that axis' length
-		if (t >= -m_halfWidthDepth[i]) t = -m_halfWidthDepth[i];
+		if (t >= m_halfWidthDepth[i]) t = m_halfWidthDepth[i];
 		else if (t <= -m_halfWidthDepth[i]) t = -m_halfWidthDepth[i];
 		// Step along projected axis
 		closestPoint += t * m_axes[i];
@@ -37,8 +35,8 @@ CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 	// Cast bounding volume to OBB
 	OBB* otherOBB = static_cast<OBB*> (other);
 
-	DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&getPos());
-	DirectX::XMVECTOR otherPos = DirectX::XMLoadFloat3(&other->getPos());
+	DirectX::XMVECTOR pos = getPos();
+	DirectX::XMVECTOR otherPos = other->getPos();
 	DirectX::XMVECTOR vecToOBB = DirectX::XMVectorSubtract(otherPos, pos);
 	
 	// SA stands for seperating axis
@@ -83,12 +81,12 @@ CollisionInfo OBB::intersectsWithOBB(BoundingVolume* other)
 CollisionInfo OBB::intersectsWithSphere(BoundingVolume* other)
 {
 	CollisionInfo collisionInfo;
-
-	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToOBB(DirectX::XMLoadFloat3(&other->getPos()));
-	DirectX::XMVECTOR d = DirectX::XMLoadFloat3(&getPos()) - closestPoint;
+	BoundingSphere* sphere = static_cast<BoundingSphere*> (other);
+	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToOBB(sphere->getPos());
+	DirectX::XMVECTOR d = closestPoint - sphere->getPos();
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
 
-	if (dist < dist)
+	if (dist < sphere->getRadius())
 	{
 		collisionInfo.m_colliding = true;
 		collisionInfo.m_normal = d;
@@ -107,7 +105,7 @@ OBB::OBB()
 	m_halfWD = { 0.0f, 0.0f };
 }
 
-OBB::OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis)
+OBB::OBB(DirectX::XMVECTOR pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis)
 	:BoundingVolume(pos)
 {
 	// Calculate half width and depth
@@ -136,9 +134,19 @@ OBB::~OBB()
 {
 }
 
+void OBB::update(DirectX::XMMATRIX modelMatrix)
+{
+	setPos(DirectX::XMVector4Transform(getPos(), modelMatrix));
+}
+
 DirectX::XMFLOAT2 OBB::getHalfWD() const
 {
 	return m_halfWD;
+}
+
+std::vector<float> OBB::getHalfWDVector() const
+{
+	return m_halfWidthDepth;
 }
 
 std::vector<DirectX::XMVECTOR> OBB::getAxes() const

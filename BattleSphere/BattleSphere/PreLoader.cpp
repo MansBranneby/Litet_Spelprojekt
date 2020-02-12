@@ -91,7 +91,9 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
 	//loadFromFile(objectType::e_resource, "?");
-	loadFromFile(objectType::e_scene, "SceneBig");
+	loadFromFile(objectType::e_scene, "SceneBig", "BarColl");
+	//loadFromFile(objectType::e_scene, "1mesh1mat");
+	//loadFromFile(objectType::e_scene, "Bar", "BarColl");
 }
 
 PreLoader::~PreLoader()
@@ -117,6 +119,12 @@ boundingData PreLoader::getBoundingData(objectType type, int modelNr, int varian
 	return m_cMesh[typ][variant][modelNr].getBoundingData();
 }
 
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, int modelNr, int variant) const
+{
+	int typ = (int)type;
+	return m_cMesh[typ][variant][modelNr].getCollisionMesh();
+}
+
 std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData data, int modelNr, int variant) const
 {
 	int typ = (int)type;
@@ -129,10 +137,16 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
-std::vector<Model*> PreLoader::getModelsOfType(objectType type)
+BoundingVolume* PreLoader::getStaticBoundingVolume(objectType type, int modelNr, int variant) const
 {
-	return m_objects[(int)type];
+	return m_objects[(int)type][variant][modelNr].getStaticBoundingVolume();
 }
+
+BoundingVolume* PreLoader::getDynamicBoundingVolume(objectType type, objectData data, int modelNr, int variant) const
+{
+	return m_objects[(int)type][variant][modelNr].getDynamicBoundingVolume(data);
+}
+
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
 {

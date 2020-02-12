@@ -18,18 +18,19 @@ private:
 	DirectX::XMVECTOR getClosestPointFromPointToOBB(DirectX::XMVECTOR p);
 
 	// intersection tests for basic primitives
-	CollisionInfo intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c);
 	CollisionInfo intersectsWithOBB(BoundingVolume* other);
 	CollisionInfo intersectsWithSphere(BoundingVolume* other);
 
 public:
 	OBB();
-	OBB(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis);
+	OBB(DirectX::XMVECTOR pos, DirectX::XMFLOAT2 halfWD, XMVECTOR xAxis, XMVECTOR zAxis);
 	OBB(boundingData data);
 	~OBB();
-
+	void update(DirectX::XMMATRIX modelMatrix);
 	DirectX::XMFLOAT2 getHalfWD() const;
+	std::vector<float> getHalfWDVector() const;
 	std::vector<DirectX::XMVECTOR> getAxes() const;
 
 	CollisionInfo intersects(BoundingVolume* other);
+	CollisionInfo intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c);
 };

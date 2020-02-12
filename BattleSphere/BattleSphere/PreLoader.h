@@ -33,9 +33,11 @@ public:
 
 	objectData getBVObjectData(objectType type, int modelNr, int variant = 0) const;
 	boundingData getBoundingData(objectType type, int modelNr, int variant = 0) const;
+	std::vector<XMFLOAT3> getCollisionMesh(objectType type, int modelNr, int variant = 0) const;
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, int modelNr, int variant = 0) const;
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant = 0) const;
-	std::vector<Model*> getModelsOfType(objectType type);
+	BoundingVolume* getStaticBoundingVolume(objectType type, int modelNr, int variant = 0) const;
+	BoundingVolume* getDynamicBoundingVolume(objectType type, objectData data, int modelNr, int variant) const;
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 	

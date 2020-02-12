@@ -104,7 +104,7 @@ void Model::computeOBB()
 	XMVECTOR vec2Center = pair[bestPairIndex].vec2 * vec2Length;
 
 	XMVECTOR bPos = vec1Center + vec2Center;
-	m_bData.pos = XMFLOAT3(bPos.m128_f32[0], bPos.m128_f32[1], bPos.m128_f32[2]);
+	m_bData.pos = XMVectorSet(bPos.m128_f32[0], bPos.m128_f32[1], bPos.m128_f32[2], 1.0f);
 
 	// Calculate save half width and depth
 	m_bData.halfWD.x = 0.5f * (pair[bestPairIndex].maxLength1 - pair[bestPairIndex].minLength1);
@@ -284,12 +284,12 @@ void Model::setScale(XMVECTOR scale, XMVECTOR relScale)
 objectData Model::getBVObjectData() const
 {
 	objectData temp;
-	temp.pos = XMVectorSet(m_bData.pos.x, m_bData.pos.y, m_bData.pos.z, 1.0);
-	float dotProduct = XMVector3Dot(m_bData.xAxis, XMVectorSet(1.0, 0.0, 0.0, 0.0)).m128_f32[0];
+	temp.pos = XMVectorSet(XMVectorGetX(m_bData.pos), XMVectorGetY(m_bData.pos), XMVectorGetZ(m_bData.pos), 1.0f);
+	float dotProduct = XMVector3Dot(m_bData.xAxis, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f)).m128_f32[0];
 	float angle = std::acos(dotProduct);
 	angle = XMConvertToDegrees(angle);
-	temp.rotation = XMVectorSet(0, 1, 0, -angle);
-	temp.scale = XMVectorSet(m_bData.halfWD.x, 10, m_bData.halfWD.y, 1.0);
+	temp.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, -angle);
+	temp.scale = XMVectorSet(m_bData.halfWD.x, 10.0f, m_bData.halfWD.y, 1.0f);
 
 	return temp;
 }
@@ -297,6 +297,45 @@ objectData Model::getBVObjectData() const
 boundingData Model::getBoundingData() const
 {
 	return m_bData;
+}
+
+XMMATRIX Model::getModelMatrix() const
+{
+	return *m_modelMatrixData;
+}
+
+std::vector<XMFLOAT3> Model::getCollisionMesh()
+{
+	// Make the first element the size of the array.
+	float verticeArrSize = float(m_indices.size());
+	std::vector<XMFLOAT3> updatedVertices;
+
+	// Get collision mesh updated with latest world matrix
+	XMVECTOR temp;
+	for (int i = 0; i < verticeArrSize; i++)
+	{
+		// For each indice create a updated triangle to send
+		temp.m128_f32[0] = m_vertices[m_indices[i]].posX;
+		temp.m128_f32[1] = m_vertices[m_indices[i]].posY;
+		temp.m128_f32[2] = m_vertices[m_indices[i]].posZ;
+		temp.m128_f32[3] = 1.0f;
+
+		// Update triangle position with world matrix
+		temp = XMVector3Transform(temp, *m_modelMatrixData);
+
+		// Add triangle to list
+		updatedVertices.push_back
+		(
+			XMFLOAT3
+			(
+				temp.m128_f32[0],
+				temp.m128_f32[1],
+				temp.m128_f32[2]
+			)
+		);
+	}
+
+	return updatedVertices;
 }
 
 std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data)
@@ -373,9 +412,15 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	return updatedVertices;
 }
 
-BoundingVolume* Model::getBoundingVolume() const
+BoundingVolume* Model::getStaticBoundingVolume() const
 {
 	return m_boundingVolume;
+}
+
+BoundingVolume* Model::getDynamicBoundingVolume(objectData data)
+{
+	m_boundingVolume->setPos(data.pos);
+	return m_boundingVolume;	
 }
 
 void Model::setObjectData(objectData data)

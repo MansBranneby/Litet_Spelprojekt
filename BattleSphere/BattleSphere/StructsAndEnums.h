@@ -40,10 +40,10 @@ struct vertex
 };
 
 struct boundingData {
-	XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
-	XMFLOAT2 halfWD = XMFLOAT2(0, 0);
-	XMVECTOR xAxis = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR zAxis = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT2 halfWD = XMFLOAT2(0.0f, 0.0f);
+	XMVECTOR xAxis = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	XMVECTOR zAxis = XMVectorSet(0.0f, 0.0f, 0.f, 0.0f);
 };
 
 struct vectorPairProjections {

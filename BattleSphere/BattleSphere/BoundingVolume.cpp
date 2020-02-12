@@ -75,7 +75,7 @@ BoundingVolume::BoundingVolume()
 	m_pos = { 0.0f, 0.0f, 0.0f};
 }
 
-BoundingVolume::BoundingVolume(DirectX::XMFLOAT3 pos)
+BoundingVolume::BoundingVolume(DirectX::XMVECTOR pos)
 {
 	m_pos = pos;
 }
@@ -84,9 +84,14 @@ BoundingVolume::~BoundingVolume()
 {
 }
 
-DirectX::XMFLOAT3 BoundingVolume::getPos()
+DirectX::XMVECTOR BoundingVolume::getPos() const
 {
 	return m_pos;
+}
+
+void BoundingVolume::setPos(DirectX::XMVECTOR pos)
+{
+	m_pos = pos;
 }
 
 

@@ -54,9 +54,12 @@ public:
 
 	objectData getBVObjectData() const;
 	boundingData getBoundingData() const;
+	XMMATRIX getModelMatrix() const;
+	std::vector<XMFLOAT3> getCollisionMesh(); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
-	BoundingVolume* getBoundingVolume() const;
+	BoundingVolume* getStaticBoundingVolume() const;
+	BoundingVolume* getDynamicBoundingVolume(objectData data);
 	void setObjectData(objectData data);
 	void setObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in, objectType type);
