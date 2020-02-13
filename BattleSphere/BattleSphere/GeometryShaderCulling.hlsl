@@ -15,13 +15,14 @@ void GS_main(
 )
 {
 	GSOutput element;
-	float3 camLookAt = { 0.0f, 0.0f, 1.0f };
-	float3 vec1 = normalize(input[2].pos.xyz - input[0].pos.xyz);
-	float3 vec2 = normalize(input[1].pos.xyz - input[0].pos.xyz);
+	float3 triangleCenter = (input[0].pos.xyz + input[1].pos.xyz + input[2].pos.xyz);
+	float3 camLookAt = normalize(triangleCenter);
+	float3 vec1 = input[2].pos.xyz - input[0].pos.xyz;
+	float3 vec2 = input[1].pos.xyz - input[0].pos.xyz;
 	float3 triangleNormal = cross(vec2, vec1);
 	
 	// If the triangle is facing the camera, save indice IDs.
-	if (dot(triangleNormal, camLookAt) > 0) 
+	if (dot(triangleNormal, camLookAt) <= 0) 
 	{
 		for (int i = 0; i < 3; i++)
 		{

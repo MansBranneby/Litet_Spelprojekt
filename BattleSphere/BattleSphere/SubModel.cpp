@@ -12,6 +12,7 @@ SubModel::SubModel()
 
 	// Backface culling
 	m_culledIndiceBuffer = nullptr;
+	m_clearedIndiceBuffer = nullptr;
 	m_nrOfCulledIndices = 0;
 }
 
@@ -23,6 +24,7 @@ SubModel::~SubModel()
 	if (m_mat) _aligned_free(m_mat);
 	if (m_indexArray) delete[] m_indexArray;
 	if (m_culledIndiceBuffer) m_culledIndiceBuffer->Release();
+	if (m_clearedIndiceBuffer) m_clearedIndiceBuffer->Release();
 }
 
 void SubModel::createIndexBuffer()
@@ -46,6 +48,9 @@ void SubModel::createCulledIndexBuffer()
 	culledIndexBufferDesc.StructureByteStride = sizeof(UINT);
 	culledIndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	culledIndexBufferDesc.ByteWidth = sizeof(int) * m_nrOfIndices;
+
+	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, nullptr, &m_clearedIndiceBuffer);
+
 	D3D11_SUBRESOURCE_DATA indexData;
 	ZeroMemory(&indexData, sizeof(indexData));
 	indexData.pSysMem = m_indexArray;
@@ -53,10 +58,8 @@ void SubModel::createCulledIndexBuffer()
 	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
 }
 
-
 void SubModel::setMaterialInfo(material mat)
 {
-	
 	*m_mat = mat;
 
 	//TODO: Create constant buffer
@@ -88,6 +91,9 @@ void SubModel::cullDraw()
 {
 	// Bind indexbuffer
 	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Clear culled index buffer
+	DX::getInstance()->getDeviceContext()->CopyResource(m_culledIndiceBuffer, m_clearedIndiceBuffer);
 
 	// Bind geometry stream output shader
 	DX::getInstance()->getDeviceContext()->SOSetTargets(1, &m_culledIndiceBuffer, NULL);

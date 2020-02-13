@@ -24,10 +24,11 @@ private:
 	int* m_indexArray;
 
 	void createIndexBuffer();
-	void createCulledIndexBuffer();
+	void createCulledIndexBuffer(); // Create culled index buffer and it's clear buffer
 
 	// Backface culling
 	ID3D11Buffer* m_culledIndiceBuffer;
+	ID3D11Buffer* m_clearedIndiceBuffer;
 	int m_nrOfCulledIndices;
 
 public:
