@@ -28,16 +28,16 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreL
 	std::vector<DirectX::XMFLOAT3> nodePositions = calculateNewNodePositions(pos, halfWD); 
 
 	// Get bounding data to create bounding volume
-	boundingData bd = preLoader->getBoundingData(objectType::e_scene, 0, 0);
-	OBB tempOBB(bd.pos, bd.halfWD, bd.xAxis, bd.zAxis);
 	// Test collision of node OBB and other OBB
-	for (unsigned int i = 0; i < 1; ++i)
+	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_static); ++i)
 	{
+		boundingData bd = preLoader->getBoundingData(objectType::e_static, 0, i);
+		OBB tempOBB(bd.pos, bd.halfWD, bd.xAxis, bd.zAxis);
 		// Test collision
 		if (m_boundingVolume->intersects(&tempOBB).m_colliding)
 		{
 			// Append collisionMesh to to m_cMeshes
-			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_scene, 0, 0);
+			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, 0, i);
 			m_cMeshes.insert(std::end(m_cMeshes), std::begin(tempCMesh), std::end(tempCMesh));
 		}
 	}
@@ -70,22 +70,45 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 		// If this node has no children then start triangle intersection test with other
 		if (m_children.size() == 0)
 		{
+			unsigned int nrOfCollisions = 0;
+			DirectX::XMVECTOR normal{ 0.0f, 0.0f, 0.0f, 0.0f };
+
 			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
 			{
 				collisionInfo = other->intersectsWithTriangle(
 					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
-					XMVECTOR{ m_cMeshes[i + 1.0].x, m_cMeshes[i + 1.0].y, m_cMeshes[i + 1.0].z },
-					XMVECTOR{ m_cMeshes[i + 2.0].x, m_cMeshes[i + 2.0].y, m_cMeshes[i + 2.0].z });
-				// Collision detected, return information
+					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
+					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
+				// Collision detected!
 				if (collisionInfo.m_colliding)
-					return collisionInfo;
+				{
+					// Average normals in case bounding volume intersects with corner
+					normal += collisionInfo.m_normal;
+					nrOfCollisions++;
+					// Early return in case collision with two triangles detected
+					if (nrOfCollisions >= 2)
+					{
+						collisionInfo.m_normal = normal;
+						return collisionInfo;
+					}
+				}
 			}
+
+			if (nrOfCollisions >= 1)
+			{
+				collisionInfo.m_colliding = true;
+				collisionInfo.m_normal = normal;
+			}
+				
 		}
 		else
 		{
 			// Recursive function call testCollision
 			for (unsigned int i = 0; i < m_children.size(); ++i)
-				m_children[i]->testCollision(other);
+			{
+				collisionInfo = m_children[i]->testCollision(other);
+				if (collisionInfo.m_colliding) return collisionInfo;
+			}
 		}
 	}
 

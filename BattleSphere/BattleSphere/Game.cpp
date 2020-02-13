@@ -138,7 +138,7 @@ void Game::updatePlayerStatus()
 			m_robots[i] = robot;
 		}
 	}
-	m_nrOfPlayers = m_input.getNrOfGamepads() + 4;
+	m_nrOfPlayers = m_input.getNrOfGamepads();
 }
 
 Game::Game()
@@ -147,7 +147,7 @@ Game::Game()
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
-	m_QuadTreeRoot = new QuadtreeNode(XMFLOAT3(0.0, 0.0f, 0.0f), XMFLOAT2(100.0f, 100.0f), &m_preLoader, 1, 0);
+ 	m_QuadTreeRoot = new QuadtreeNode(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(100.0f, 100.0f), &m_preLoader, 1, 0);
 	objectData sceneData;
 	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
 	//sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -175,16 +175,6 @@ returnInfo Game::update(float dt)
 		}
 	}
 	
-
-	// TODO remove with collision instead aswell as game field?
-	for (int i = 0; i < m_projectiles.size(); i++)
-	{
-		if (XMVectorGetX(XMVector3Length(m_projectiles[i]->getPosition())) > 50.0f)
-		{
-			delete m_projectiles[i];
-			m_projectiles.erase(m_projectiles.begin()+i);
-		}
-	}
 	returnInfo info;
 	if (m_robots[0] != nullptr) {
 		XMVECTOR pos = m_robots[0]->getPosition();
@@ -198,6 +188,20 @@ returnInfo Game::update(float dt)
 		info.z = 0;
 	}
 	
+	for (int i = 0; i < m_projectiles.size(); ++i)
+	{
+		// Get collision info
+		CollisionInfo collisionInfo = m_QuadTreeRoot->testCollision(m_preLoader.getDynamicBoundingVolume(objectType::e_projectile, m_projectiles[i]->getData(), 0, 0));
+
+		// Use the returned "CollisionInfo" to check if collision is true
+		if (collisionInfo.m_colliding || XMVectorGetX(XMVector3Length(m_projectiles[i]->getPosition())) >= 100.0f)
+		{
+			//delete m_projectiles[i];
+			//m_projectiles.erase(m_projectiles.begin() + i);
+			m_projectiles[i]->setDirection(collisionInfo.m_normal);
+		}
+	}
+
 	// TODO sphere triangle collision test
 	for (int i = 0; i < m_nrOfPlayers; ++i)
 	{
@@ -206,14 +210,17 @@ returnInfo Game::update(float dt)
 		{
 			// Get collision info
 			CollisionInfo collisionInfo = m_QuadTreeRoot->testCollision(m_preLoader.getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
+
 			// Use the returned "CollisionInfo" to check if collision is true
-			if (collisionInfo.m_colliding)
+			if (collisionInfo.m_colliding )
 			{
 				// Use the collision normal to move the player and resolve the collision!
 				m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
 			}
 		}
 	}
+
+
 	
 	
 	return info;
@@ -234,7 +241,11 @@ void Game::draw()
 {
 	//objectData test = m_preLoader.getBVObjectData(objectType::e_scene, 0);
 	//m_preLoader.draw(objectType::e_weapon, test);
-	m_preLoader.draw(objectType::e_scene);
+	for (int i = 0; i < m_preLoader.getNrOfVariants(objectType::e_scene); ++i)
+	{
+		m_preLoader.draw(objectType::e_scene, i);
+	}
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)

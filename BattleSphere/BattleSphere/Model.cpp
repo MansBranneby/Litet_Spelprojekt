@@ -569,6 +569,9 @@ void Model::loadModel(std::ifstream& in, objectType type)
 	case objectType::e_robot:
 		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
 		break;
+	case objectType::e_projectile:
+		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
+		break;
 	default:
 		m_boundingVolume = new OBB(m_bData.pos, m_bData.halfWD, m_bData.xAxis, m_bData.zAxis);
 	}

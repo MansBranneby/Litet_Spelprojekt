@@ -4,7 +4,7 @@
 DirectX::XMVECTOR OBB::getClosestPointFromPointToOBB(DirectX::XMVECTOR p)
 {
 	// vector from point to OBB
-	DirectX::XMVECTOR d = getPos() - p;
+	DirectX::XMVECTOR d = p - getPos();
 
 	// Closest point starts at OBB center and makes steps from there
 	DirectX::XMVECTOR closestPoint = getPos();
@@ -98,8 +98,8 @@ CollisionInfo OBB::intersectsWithSphere(BoundingVolume* other)
 OBB::OBB()
 {
 	// Local axes
-	m_xAxis = {1.0f, 0.0};
-	m_zAxis = {0.0, 1.0};
+	m_xAxis = {1.0f, 0.0, 0.0};
+	m_zAxis = {0.0, 0.0, 1.0f};
 
 	// half width and height
 	m_halfWD = { 0.0f, 0.0f };

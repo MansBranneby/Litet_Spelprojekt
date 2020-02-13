@@ -89,10 +89,11 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_weapon, "1mesh1mat");
 	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
-	loadFromFile(objectType::e_projectile, "1mesh1mat");
+	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
 	//loadFromFile(objectType::e_resource, "?");
-	loadFromFile(objectType::e_scene, "SceneBig", "BarColl");
-	//loadFromFile(objectType::e_scene, "1mesh1mat");
+	loadFromFile(objectType::e_static, "Bar", "BarColl");
+	loadFromFile(objectType::e_static, "Wall", "WallColl");
+	loadFromFile(objectType::e_scene, "SceneBig");
 	//loadFromFile(objectType::e_scene, "Bar", "BarColl");
 }
 
@@ -147,6 +148,10 @@ BoundingVolume* PreLoader::getDynamicBoundingVolume(objectType type, objectData 
 	return m_objects[(int)type][variant][modelNr].getDynamicBoundingVolume(data);
 }
 
+int PreLoader::getNrOfVariants(objectType type) const
+{
+	return m_objects[(int)type].size();
+}
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
 {

@@ -7,8 +7,8 @@
 #include "Projectile.h"
 #include "Resource.h"
 
-#define OBJECT_TYPES 7
-// objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource
+#define OBJECT_TYPES 8
+// objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource, e_scene, e_static
 
 
 class PreLoader
@@ -38,6 +38,7 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant = 0) const;
 	BoundingVolume* getStaticBoundingVolume(objectType type, int modelNr, int variant = 0) const;
 	BoundingVolume* getDynamicBoundingVolume(objectType type, objectData data, int modelNr, int variant) const;
+	int getNrOfVariants(objectType type) const;
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 	

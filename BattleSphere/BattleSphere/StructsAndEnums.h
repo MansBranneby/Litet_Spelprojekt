@@ -15,7 +15,8 @@ enum class objectType
 	e_node = 3,
 	e_projectile = 4,
 	e_resource = 5,
-	e_scene = 6
+	e_scene = 6,
+	e_static = 7
 };
 
 enum class renderPass
