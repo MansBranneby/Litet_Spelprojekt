@@ -7,7 +7,9 @@ void Menu::initializeResources()
 Menu::Menu()
 {
 	m_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.01f, 200.0f, false);
-	m_depthState = nullptr;
+	//m_depthState = nullptr;
+	m_vertexShader = new VertexShader(L"VertexShaderMenu.hlsl");
+	m_pixelShader = new PixelShader(L"PixelShaderMenu.hlsl");
 
 	initializeResources();
 }
@@ -15,15 +17,31 @@ Menu::Menu()
 Menu::~Menu()
 {
 	delete m_camera;
-	m_depthState->Release();
+	
+	m_vertexShader->release();
+	m_pixelShader->release();
+//	m_depthState->Release();
+
+	delete m_vertexShader;
+	delete m_pixelShader;
 }
 
-ID3D11DepthStencilState* Menu::getDepthStencilState()
-{
-	return m_depthState;
-}
+//ID3D11DepthStencilState* Menu::getDepthStencilState()
+//{
+//	//return m_depthState;
+//}
 
 Camera* Menu::getCamera()
 {
 	return m_camera;
+}
+
+VertexShader* Menu::getVertexShader()
+{
+	return m_vertexShader;
+}
+
+PixelShader* Menu::getPixelShader()
+{
+	return m_pixelShader;
 }

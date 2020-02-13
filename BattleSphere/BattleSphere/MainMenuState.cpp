@@ -4,7 +4,7 @@ MainMenuState::MainMenuState()
 {
 	m_type = stateType::e_mainMenu;
 
-	m_uiElements.push_back(new UI_Element(L"pink.png"));
+	m_uiElements.push_back(new UI_Element(L"Textures\\pink.png", 0.0f, 0.0f, 700.0f, 100.0f));
 }
 
 MainMenuState::~MainMenuState()

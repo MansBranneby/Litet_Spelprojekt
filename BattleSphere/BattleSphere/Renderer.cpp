@@ -55,8 +55,8 @@ PixelShader g_pixelShaderDownsample;
 Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
-GameState g_gameState;
-MainMenuState g_mainMenuState;
+GameState* g_gameState;
+MainMenuState* g_mainMenuState;
 
 struct MaterialTest
 {
@@ -170,6 +170,9 @@ void createRenderResources()
 	g_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	g_bloom = new Bloom();
 	g_menu = new Menu();
+
+	g_gameState = new GameState();
+	g_mainMenuState = new MainMenuState();
 }
 
 void downsample()
@@ -264,9 +267,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
-		g_Game->pushState(&g_gameState);
-		g_Game->pushState(&g_mainMenuState);
-		g_Game->changeState(stateType::e_gameState); // Set initial state for the game
+		g_Game->pushState(g_gameState);
+		g_Game->pushState(g_mainMenuState);
+		g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
 
 		int counterFrames = 0;
 		int fps = 0;
@@ -327,24 +330,24 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
-					//DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 
-					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-					//DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+					DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
 
-					//DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera->getConstantBufferVP()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera()->getConstantBufferVP()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 
-					//DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
-					//DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-					//DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-					//DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-					//DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+					DX::getInstance()->getDeviceContext()->VSSetShader(&g_menu->getVertexShader()->getVertexShader(), nullptr, 0);
+					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader()->getPixelShader(), nullptr, 0);
 
-					//DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
-					//DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					//DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
+
+					DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_menu->getVertexShader()->getvertexLayout());
 				}
 			
 				//// RENDER ////
@@ -360,7 +363,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
+					g_Game->draw();
 
+					ID3D11ShaderResourceView* nullRTV = { NULL };
+					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
 				}
 
 				ImGui_ImplDX11_NewFrame();
@@ -420,6 +426,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_bloom;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
+		delete g_mainMenuState;
+		delete g_gameState;
+		delete g_menu;
 
 		DestroyWindow(wndHandle);
 	}
