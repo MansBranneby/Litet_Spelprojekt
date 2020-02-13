@@ -2,6 +2,9 @@
 
 ShadowMapping::ShadowMapping()
 {
+	m_shadowVS = VertexShader(L"VertexShaderShadowMapping.hlsl");
+	m_shadowCam = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 10.0f, 250.0f, XMVectorSet(100.0f, 80.0f, -50.0f, 0.0f));
+
 	D3D11_TEXTURE2D_DESC descTex;
 	ZeroMemory(&descTex, sizeof(descTex));
 	descTex.Width = (UINT)DX::getInstance()->getWidth();
@@ -59,11 +62,23 @@ ShadowMapping::ShadowMapping()
 
 ShadowMapping::~ShadowMapping()
 {
-	m_shadowTex->Release();
+	m_shadowVS.release();
+	delete m_shadowCam;
 
+	m_shadowTex->Release();
 	m_shadowSampler->Release();
 	m_shadowDSV->Release();
 	m_shadowSRV->Release();
+}
+
+VertexShader ShadowMapping::getVertexShader()
+{
+	return m_shadowVS;
+}
+
+Camera* ShadowMapping::getCamera()
+{
+	return m_shadowCam;
 }
 
 ID3D11SamplerState* ShadowMapping::getSamplerState()

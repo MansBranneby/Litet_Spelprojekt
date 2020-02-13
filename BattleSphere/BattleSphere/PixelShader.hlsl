@@ -66,23 +66,20 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	PosRelLight.xy /= PosRelLight.w;
 	
-	float smSize = 1920 * 1080;
 	float2 shadowMapTex = float2(0.5f * PosRelLight.x + 0.5f, -0.5f * PosRelLight.y + 0.5f);
 	float depth = PosRelLight.z / PosRelLight.w;
 
-	float dx = 1.0f / smSize;
-	float ep = 0.0001f;
+	float ep = 0.0005f;	
+	float dx = 1.0f / 1920;
+	float dy = 1.0f / 1080;
 
-	float s0 = (txShadowMap.Sample(sampAni, shadowMapTex).r + ep < depth) ? 0.0f : 1.0f;
-	float s1 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx, 0.0f)).r + ep < depth) ? 0.0f : 1.0f;
-	float s2 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(0.0f, dx)).r + ep < depth) ? 0.0f : 1.0f;
-	float s3 = (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx, dx)).r + ep < depth) ? 0.0f : 1.0f;
-
-	float2 texelPos = shadowMapTex * smSize;
-	float2 lerps = frac(texelPos);
-	float shadowCoeff = lerp(lerp(s0, s1, lerps.x), lerp(s2, s3, lerps.x), lerps.y);
-
-
+	float sum = 0;
+	float x, y;
+	for (y = -1.0; y <= 1.0; y += 0.5)
+		for (x = -1.0; x <= 1.0; x += 0.5) 
+			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
+	float shadowCoeff = sum / 25.0;
+	
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
 	float3 fragmentCol;
 	
