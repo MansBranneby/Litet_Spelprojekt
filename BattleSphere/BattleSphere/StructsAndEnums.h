@@ -47,10 +47,10 @@ struct vertex
 
 struct material
 {
-	XMVECTOR ambient; // ambient.xyz, illumination model enumeration (illum)
-	XMVECTOR diffuse; // diffuse.xyz, refraction (Ni)
-	XMVECTOR specular; // specular.xyz, shininess (Ns)
-	XMVECTOR emission; // emission.xyz, opacity (d)
+	XMVECTOR ambient = XMVectorSet(0.5f, 0, 0.5f, 0); // ambient.xyz, illumination model enumeration (illum)
+	XMVECTOR diffuse = XMVectorSet(0.5f, 0, 0.5f, 0); // diffuse.xyz, refraction (Ni)
+	XMVECTOR specular = XMVectorSet(0.5f, 0, 0.5f, 0); // specular.xyz, shininess (Ns)
+	XMVECTOR emission = XMVectorSet(0.5f, 0, 0.5f, 0); // emission.xyz, opacity (d)
 };
 
 struct objectData
@@ -96,4 +96,12 @@ struct CollisionInfo
 		m_colliding = false;
 		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
 	}
+};
+	float x, y, z;
+};
+
+struct vertexAndId
+{
+	float posX, posY, posZ;
+	unsigned int iD;
 };

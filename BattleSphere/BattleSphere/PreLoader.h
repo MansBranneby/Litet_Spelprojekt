@@ -1,4 +1,5 @@
 #pragma once
+#include "BackfaceCuller.h"
 #include "Model.h"
 
 #include "Weapon.h"
@@ -20,6 +21,12 @@ private:
 	std::vector<int> m_nrOfCMeshes[OBJECT_TYPES];
 	std::vector<Model*> m_cMesh[OBJECT_TYPES];
 
+	// Backface culler
+	BackfaceCuller* m_bFCuller;
+
+	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
+	void setObjectData(objectType type, objectData data, int variant = 0);
+	void setObjectData(objectType type, objectData data, objectData relativeData, int variant = 0);
 	void loadFromFile(objectType type, std::string filename, std::string collisionFilename = ""); // Without .nyp file extension
 	void loadCollisionMesh(objectType type, std::string filename); // Without .nyp file extension
 	void setModelData(objectType type, objectData data, int variant = 0);
@@ -48,5 +55,8 @@ public:
 	void drawCM(objectType type, int variant = 0);
 	void drawCM(objectType type, objectData data, int variant = 0);
 	void drawCM(objectType type, objectData data, objectData relativeData, int variant = 0);
+	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void cull(objectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.
 };
 

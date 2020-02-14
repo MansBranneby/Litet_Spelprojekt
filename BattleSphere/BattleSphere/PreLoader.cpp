@@ -84,6 +84,9 @@ void PreLoader::setCMeshData(objectType type, objectData data, objectData relati
 
 PreLoader::PreLoader()
 {	
+	// Initialize backface culler
+	m_bFCuller = new BackfaceCuller;
+
 	// Load objects
 	loadFromFile(objectType::e_weapon, "1mesh1mat");
 	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
@@ -97,6 +100,8 @@ PreLoader::PreLoader()
 
 PreLoader::~PreLoader()
 {	
+	if (m_bFCuller) delete m_bFCuller;
+
 	for (int i = 0; i < OBJECT_TYPES; i++)
 	{
 		for (int j = 0; j < m_objects[i].size(); j++)
@@ -221,4 +226,13 @@ void PreLoader::drawCM(objectType type, objectData data, objectData relativeData
 		m_cMesh[typ][variant][i].setObjectData(data, relativeData);
 		m_cMesh[typ][variant][i].draw();
 	}
+}
+
+void PreLoader::cull(objectType type, int variant)
+{
+	m_bFCuller->turnOnCullingPipeline();
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+		m_objects[typ][variant][i].cullDraw();
+	m_bFCuller->turnOffCullingPipeline();
 }

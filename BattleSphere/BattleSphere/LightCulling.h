@@ -64,8 +64,6 @@ private:
 	ID3D11ShaderResourceView* m_lightSRV;
 	ID3D11ShaderResourceView* m_frustumSRV;
 
-
-	Camera* m_camera;
 	ComputeShader* m_computeShaderFrustum;
 	ComputeShader* m_computeShaderLightCulling;
 

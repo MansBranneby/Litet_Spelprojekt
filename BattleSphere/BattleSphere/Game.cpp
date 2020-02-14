@@ -40,6 +40,13 @@ Game::Game()
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
+
+	objectData sceneData;
+	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+	sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
+	m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	m_preLoader.cull(objectType::e_scene);
 	// TODO: this ruins collision tests because we don't recalculate bounding volume data
 	//objectData sceneData;
 	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
@@ -57,17 +64,6 @@ void Game::update(float dt)
 			m_states[i]->update(this, dt);
 	}
 }
-
-//void Game::updateSec()
-//{
-//	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-//	{
-//		if (m_input.isPressed(i, XINPUT_GAMEPAD_A))
-//		{
-//			m_robots[i]->upgradeWeapon(RIFLE);
-//		}
-//	}
-//}
 
 void Game::draw()
 {

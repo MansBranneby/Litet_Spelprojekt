@@ -24,8 +24,8 @@ private:
 	std::vector<int> m_indices;
 	BoundingVolume* m_boundingVolume;
 
-	ID3D11Buffer* m_modelMatrixCBuffer;
-	XMMATRIX* m_modelMatrixData;
+	ID3D11Buffer* m_matrixCBuffer;
+	XMMATRIX* m_matrixData;
 	XMMATRIX m_rotationMat;
 	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
@@ -37,6 +37,7 @@ private:
 	void computeOBB();
 
 	void createVertexBuffer(); // For vertex buffer
+	void createVertexCullingBuffer(); // For vertex culling buffer
 	void createVertexCBuffer(); // For model matrix
 	void updateSubResource();
 	void updateRelSubResource();
@@ -47,8 +48,15 @@ private:
 	void setRotation(XMVECTOR rotation, XMVECTOR relRotation);
 	void setScale(XMVECTOR scale);
 	void setScale(XMVECTOR scale, XMVECTOR relScale);
+
+	// For backface culling
+	ID3D11Buffer* m_vertexCullingBuffer;
+	vertexAndId* m_vertexAndId;
+	void setVPMatrix();
+
 public:
 	void draw();
+	void cullDraw();
 	Model();
 	~Model();
 
