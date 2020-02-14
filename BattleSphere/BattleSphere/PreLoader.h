@@ -19,7 +19,7 @@ private:
 	std::vector<Model*> m_objects[OBJECT_TYPES];
 	std::vector<int> m_nrOfCMeshes[OBJECT_TYPES];
 	std::vector<Model*> m_cMesh[OBJECT_TYPES];
-
+	// TODO GLENN
 	void loadFromFile(objectType type, std::string filename, std::string collisionFilename = ""); // Without .nyp file extension
 	void loadCollisionMesh(objectType type, std::string filename); // Without .nyp file extension
 	void setModelData(objectType type, objectData data, int variant = 0);
