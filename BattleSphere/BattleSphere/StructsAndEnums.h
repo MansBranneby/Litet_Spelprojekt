@@ -30,6 +30,27 @@ enum class stateType
 	e_default
 };
 
+enum class activeMainMenu
+{
+	e_startGame,
+	e_options,
+	e_quit
+};
+
+enum class uiUpdate
+{
+	e_startAnimation,
+	e_mainMenuSelection,
+	e_quitAnimation
+};
+
+enum class uiType
+{
+	e_mainMenuSelection,
+	e_mainMenuBox,
+	e_static
+};
+
 struct objectData 
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);

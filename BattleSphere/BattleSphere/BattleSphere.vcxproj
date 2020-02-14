@@ -176,6 +176,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
+    <ClCompile Include="UI_Animation.cpp" />
     <ClCompile Include="UI_Element.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
+    <ClInclude Include="UI_Animation.h" />
     <ClInclude Include="UI_Element.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />

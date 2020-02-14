@@ -7,6 +7,9 @@ class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
+	activeMainMenu m_activeMenu;
+	
+	float m_selectionTimer;
 
 public:
 	MainMenuState();

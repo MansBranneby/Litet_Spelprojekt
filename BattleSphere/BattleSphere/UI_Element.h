@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DX.h"
-#include "StructsAndEnums.h"
+#include "UI_Animation.h"
 #include "ConstantBuffer.h"
 #include <string>
 #include <wchar.h>
@@ -24,13 +24,20 @@
 #include "SpriteFont.h"
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
+#include "imgui/imgui.h"
 
 class UI_Element
 {
 private:
+	uiType m_type;
+
 	float m_posX, m_posY;
+	float m_destinationX, m_destinationY;
 	float m_sizeX, m_sizeY;
 	float m_screenWidth, m_screenHeight;
+
+	bool m_isReady;
+	float m_selectionTimer;
 
 	ID3D11ShaderResourceView* m_elementSRV;
 	//ID3D11Texture2D* m_texture;
@@ -40,11 +47,20 @@ private:
 	void initializeResources(std::wstring fileName);
 
 public:
-	UI_Element(std::wstring fileName, float posX = 0.0f, float posY = 0.0f, float sizeX = 0.0f, float sizeY = 0.0f);
+	UI_Element(std::wstring fileName, uiType type, float posX = 0.0f, float posY = 0.0f, float sizeX = 0.0f, float sizeY = 0.0f);
 	~UI_Element();
 
-	void updateElement(float posX, float posY);
+	void updateElement(uiUpdate updateType,float dt);
 	void updateVertexBuffer();
 	void draw();
+
+	float getPosX();
+	float getPosY();
+	void setDestinationX(float deltaX);
+	void setDestinationY(float deltaY);
+	
+	void setReady(bool isReady);
+	bool isReady();
+	void setSelectionTimer(float time);
 };
 

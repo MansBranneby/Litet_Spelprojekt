@@ -10,7 +10,7 @@ struct VS_OUT
 
 float4 PS_main(VS_OUT input) : SV_Target
 {
-	float3 elementColour = elementTex.Sample(sampAni, input.tex).xyz;
+	float4 elementColour = elementTex.Sample(sampAni, input.tex).xyzw;
 
-	return float4(elementColour, 1.0f);
+	return elementColour;
 };

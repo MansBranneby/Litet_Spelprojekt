@@ -85,12 +85,20 @@ void UI_Element::initializeResources(std::wstring fileName)
 		MessageBox(NULL, L"Error in m_elementSRV", L"Error", MB_OK | MB_ICONERROR);
 }
 
-UI_Element::UI_Element(std::wstring fileName, float posX, float posY, float sizeX, float sizeY)
+UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float posY, float sizeX, float sizeY)
 {
+	m_type = type;
+
 	m_posX = posX;
 	m_posY = posY;
 	m_sizeX = sizeX;
 	m_sizeY = sizeY;
+
+	m_destinationX = m_posX;
+	m_destinationY = m_posY;
+
+	m_isReady = true;
+	m_selectionTimer = 0.0f;
 
 	m_screenWidth = DX::getInstance()->getWidth();
 	m_screenHeight = DX::getInstance()->getHeight();
@@ -102,15 +110,69 @@ UI_Element::~UI_Element()
 {
 	m_vertexBuffer->Release();
 	m_elementSRV->Release();
-	//m_texture->Release();
 }
 
-void UI_Element::updateElement(float posX, float posY)
+void UI_Element::updateElement(uiUpdate updateType, float dt)
 {
-	//if (posX != m_posX || posY != m_posY) // Has something happened?
-	//{
-	//	m_vertexList[0].
-	//}
+	if (m_selectionTimer > 0.0f)
+	{
+		//isReady = false;
+		m_selectionTimer += dt;
+		if (m_selectionTimer > 0.2)
+		{
+			m_isReady = true;
+			m_selectionTimer = 0.0f;
+		}
+	}
+
+	if (m_destinationX != m_posX || m_destinationY != m_posY) // Only update if element needs to move
+	{
+		m_isReady = false;
+		float left, right, top, bottom;
+		float animationSpeed = 1000.0f;
+		if (m_destinationY < m_posY) // Down
+		{
+			if (m_posY - dt * animationSpeed < m_destinationY)
+				m_posY = m_destinationY;
+			else
+				m_posY -= dt * animationSpeed;
+		}
+		if (m_destinationY > m_posY) // Up
+		{
+			if (m_posY + dt * animationSpeed > m_destinationY)
+				m_posY = m_destinationY;
+			else
+				m_posY += dt * animationSpeed;
+		}
+
+		left = m_posX - m_sizeX / 2.0f;
+		right = left + m_sizeX;
+		top = m_posY + m_sizeY / 2.0f;
+		bottom = top - m_sizeY;
+
+		m_vertexList[0].posX = left;
+		m_vertexList[0].posY = top;
+
+		m_vertexList[1].posX = right;
+		m_vertexList[1].posY = bottom;
+
+		m_vertexList[2].posX = left;
+		m_vertexList[2].posY = bottom;
+
+		m_vertexList[3].posX = left;
+		m_vertexList[3].posY = top;
+
+		m_vertexList[4].posX = right;
+		m_vertexList[4].posY = top;
+
+		m_vertexList[5].posX = right;
+		m_vertexList[5].posY = bottom;
+
+		updateVertexBuffer();
+
+		if (m_destinationX == m_posX && m_destinationY == m_posY)
+			m_selectionTimer += dt;
+	}
 }
 
 void UI_Element::updateVertexBuffer()
@@ -130,4 +192,40 @@ void UI_Element::draw()
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+}
+
+float UI_Element::getPosX()
+{
+	return m_posX;
+}
+
+float UI_Element::getPosY()
+{
+	return m_posY;
+}
+
+void UI_Element::setDestinationX(float deltaX)
+{
+	m_destinationX += deltaX;
+}
+
+void UI_Element::setDestinationY(float deltaY)
+{
+	m_destinationY += deltaY;
+}
+
+void UI_Element::setReady(bool isReady)
+{
+	m_isReady = isReady;
+}
+
+bool UI_Element::isReady()
+{
+	//return m_posX == m_destinationX && m_posY == m_destinationY;
+	return m_isReady;
+}
+
+void UI_Element::setSelectionTimer(float time)
+{
+	m_selectionTimer = time;
 }
