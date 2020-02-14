@@ -60,6 +60,17 @@ void GameState::handleInputs(Game* game, float dt)
 					}
 				}
 
+				// Drop resources
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_B))
+				{
+					if (m_robots[i]->getResourceIndex() != -1)
+					{
+						m_resources[m_robots[i]->getResourceIndex()]->setPosition(m_robots[i]->getPosition());
+						m_resources[m_robots[i]->getResourceIndex()]->setBlocked(false);
+						m_robots[i]->removeResource();
+					}
+				}
+
 				// Turn in resources
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
 				{

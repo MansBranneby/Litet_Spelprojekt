@@ -3,7 +3,7 @@
 Camera::Camera()
 {
 	// Base vectors
-	m_position = XMVectorSet(0.0f, 90.0f, -40.0f, 0.0f);
+	m_position = XMVectorSet(0.0f, 70.0f, -60.0f, 0.0f);
 	
 	m_lookAt = XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
 
