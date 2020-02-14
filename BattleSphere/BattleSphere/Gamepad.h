@@ -15,6 +15,9 @@ class Gamepad
 private:
 	int m_controllerId;
 	XINPUT_STATE m_state;
+	XINPUT_VIBRATION m_vibration;
+	float m_time;
+	bool m_vibActive;
 
 	float m_deadZoneX;
 	float m_deadZoneY;
@@ -32,8 +35,9 @@ public:
 	void setId(int id);
 	void setDeadZone(float x, float y);
 	XINPUT_GAMEPAD* getState();
-	bool refresh();
+	bool refresh(float dt);
 	bool isPressed(WORD button);
+	void setVibration(float speed);
 
 	float getThumbLX();
 	float getThumbLY();

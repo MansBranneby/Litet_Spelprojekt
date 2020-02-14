@@ -9,6 +9,7 @@ using namespace DirectX;
 #define RIFLE 1
 #define MOVEMENT 2
 #define SHIELD 3
+#define DASH 4
 
 enum class objectType
 {

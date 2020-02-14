@@ -42,11 +42,22 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
-void Robot::damagePlayer(int damage)
+bool Robot::damagePlayer(int damage, XMVECTOR projDir)
 {
-	m_health -= damage;
-	m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
-	removeResource();
+	float dmg = damage;
+	if (m_currentWeapon[RIGHT] != -1)
+		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(projDir, m_currentRotation);
+	if (m_currentWeapon[LEFT] != -1)
+		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, m_currentRotation);
+
+	if (dmg != 0.0f) 
+	{
+		m_health -= (int)floorf(dmg);
+		m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
+		removeResource();
+		return true;
+	}
+	return false;
 }
 
 void Robot::setHealth(int health)
@@ -74,11 +85,12 @@ void Robot::setVelocity(float velocity)
 
 float Robot::getVelocity()
 {
-	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == MOVEMENT)
-		return m_velocity * m_weapons[m_currentWeapon[RIGHT]]->getSpeed();
-	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == MOVEMENT)
-		return m_velocity * m_weapons[m_currentWeapon[LEFT]]->getSpeed();
-	return m_velocity;
+	float velocity = m_velocity;
+	if (m_currentWeapon[RIGHT] != -1)
+		velocity *= m_weapons[m_currentWeapon[RIGHT]]->getSpeed();
+	if (m_currentWeapon[LEFT] != -1)
+		velocity *= m_weapons[m_currentWeapon[LEFT]]->getSpeed();
+	return velocity;
 }
 
 void Robot::setCurrentRot(float deg)
@@ -108,12 +120,12 @@ bool Robot::isReady(float dt)
 
 void Robot::useWeapon(int side, float dt)
 {
-	if (m_currentWeapon[side] != -1 && (m_weapons[m_currentWeapon[side]]->getType() == PISTOL || m_weapons[m_currentWeapon[side]]->getType() == RIFLE))
+	if (m_currentWeapon[side] != -1)
+	{
 		m_weapons[m_currentWeapon[side]]->shoot(getPosition(), m_currentRotation, side, dt);
-	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == MOVEMENT)
 		m_weapons[m_currentWeapon[side]]->speedUp();
-	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == SHIELD)
 		m_weapons[m_currentWeapon[side]]->shield();
+	}
 }
 
 void Robot::changeWeapon(int side)

@@ -30,15 +30,13 @@ void GameState::handleInputs(Game* game, float dt)
 	{
 		if (m_robots[i] != nullptr)
 		{
-			if (!m_input->refresh(i))
+			if (!m_input->refresh(i, dt))
 			{
 				m_input->reconnectController(i);
 			}
 			else
 			{
-				handleMovement(game, dt, i);
-
-				// Shoot
+				// Use weapon
 				if (m_input->getTriggerR(i) > 0.2)
 				{
 					m_robots[i]->useWeapon(RIGHT, dt);
@@ -47,6 +45,8 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					m_robots[i]->useWeapon(LEFT, dt);
 				}
+
+				handleMovement(game, dt, i);
 
 				// Pick up resources
 				for (int j = 0; j < m_resources.size() && m_robots[i]->getResourceIndex() == -1; j++)
@@ -106,16 +106,21 @@ void GameState::handleInputs(Game* game, float dt)
 				// TODO: add collision and remove projectile
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN))
 				{
-					if (m_robots[i]->getResourceIndex() != -1)
+					int resourceIndex = m_robots[i]->getResourceIndex();
+					if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f)))
 					{
-						m_resources[m_robots[i]->getResourceIndex()]->setPosition(m_robots[i]->getPosition());
-						m_resources[m_robots[i]->getResourceIndex()]->setBlocked(false);
+						m_input->setVibration(i, 0.5f);
+						if (resourceIndex != -1)
+						{
+							m_resources[resourceIndex]->setPosition(m_robots[i]->getPosition());
+							m_resources[resourceIndex]->setBlocked(false);
+						}
 					}
-					m_robots[i]->damagePlayer(1);
 				}
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
 				{
 					m_robots[i]->setHealth(100);
+					m_input->setVibration(i, 0.0f);
 				}
 
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_B))
@@ -135,16 +140,16 @@ GameState::GameState()
 	m_input = nullptr;
 	m_robots = nullptr;
 
-	for (int i = 0; i < 25; i++)
+	for (int i = 0; i < 30; i++)
 	{
-		Resource* resource = new Resource(i % 4);
+		Resource* resource = new Resource(i % 5);
 		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), -0.4f, (float)(rand() % 20 - 40), 0.0f));
 		m_resources.push_back(resource);
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		Node* node = new Node(i % 4);
+		Node* node = new Node(i % 5);
 		node->setPosition(XMVectorSet((float)(i * 10), -0.2f, (float)(-60.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
