@@ -3,7 +3,7 @@
 CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c)
 {
 	CollisionInfo collisionInfo;
-	DirectX::XMVECTOR p = getPos();
+	XMVECTOR p = getPos();
 	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToTriangle(p, a, b, c);
 	DirectX::XMVECTOR d = closestPoint - p;
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(closestPoint - p));
@@ -14,6 +14,7 @@ CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, Direct
 	}
 
 	return collisionInfo;
+
 }
 
 DirectX::XMVECTOR BoundingSphere::getClosestPointFromPointToOBB(OBB* other)
@@ -49,7 +50,7 @@ CollisionInfo BoundingSphere::intersectsWithOBB(BoundingVolume* other)
 	CollisionInfo collisionInfo;
 	OBB* obb = static_cast<OBB*>(other);
 
-	DirectX::XMVECTOR d = getPos() - getClosestPointFromPointToOBB(obb);
+	DirectX::XMVECTOR d = DirectX::XMVectorSetY(getPos(), 0.0f) - getClosestPointFromPointToOBB(obb);
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
 
 	if (dist < m_radius)
@@ -71,7 +72,7 @@ CollisionInfo BoundingSphere::intersectsWithSphere(BoundingVolume* other)
 	DirectX::XMVECTOR sphereToOther = DirectX::XMVectorSubtract(getPos(), otherSphere->getPos());
 	float dSphere = DirectX::XMVectorGetX(DirectX::XMVector3Length(sphereToOther));
 
-	if (m_radius + otherSphere->getRadius() > dSphere)
+	if (dSphere < m_radius + otherSphere->getRadius())
 	{
 		collisionInfo.m_colliding = true;
 		collisionInfo.m_normal = sphereToOther;

@@ -14,9 +14,10 @@ Robot::Robot(int playerId)
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
-
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
+	// Raise player
+	setPosition(XMVECTOR{ 0.0f, 1.0f, 0.0f });
 	if (playerId == 0)
 		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(80, 10, 180, 0));

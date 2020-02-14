@@ -82,8 +82,9 @@ CollisionInfo OBB::intersectsWithSphere(BoundingVolume* other)
 {
 	CollisionInfo collisionInfo;
 	BoundingSphere* sphere = static_cast<BoundingSphere*> (other);
-	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToOBB(sphere->getPos());
-	DirectX::XMVECTOR d = closestPoint - sphere->getPos();
+	DirectX::XMVECTOR spherePos = DirectX::XMVectorSetY(other->getPos(), 0.0f);
+	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToOBB(spherePos);
+	DirectX::XMVECTOR d = closestPoint - spherePos;
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
 
 	if (dist < sphere->getRadius())
