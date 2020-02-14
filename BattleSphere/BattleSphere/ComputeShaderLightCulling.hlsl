@@ -171,7 +171,8 @@ void CS_main(ComputeShaderInput IN)
 			break;
 			}
 		}
-		else {
+		else
+		{
 			break;
 		}
 	}

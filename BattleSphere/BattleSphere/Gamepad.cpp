@@ -73,6 +73,7 @@ bool Gamepad::refresh()
 
 bool Gamepad::isPressed(WORD button)
 {
+	
 	return (m_state.Gamepad.wButtons & button) != 0;
 }
 

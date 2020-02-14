@@ -7,6 +7,11 @@
 
 using namespace DirectX;
 
+#define PISTOL 0
+#define RIFLE 1
+#define MOVEMENT 2
+#define SHIELD 3
+
 enum class objectType
 {
 	e_drone = 0,
@@ -26,14 +31,38 @@ enum class renderPass
 	e_final
 };
 
-struct objectData 
+enum class stateType
+{
+	e_gameState,
+	e_mainMenu,
+	e_default
+};
+
+struct vertex 
+{
+	float posX, posY, posZ;
+	float u, v;
+	float normX, normY, normZ;
+};
+
+struct material
+{
+	XMVECTOR ambient; // ambient.xyz, illumination model enumeration (illum)
+	XMVECTOR diffuse; // diffuse.xyz, refraction (Ni)
+	XMVECTOR specular; // specular.xyz, shininess (Ns)
+	XMVECTOR emission; // emission.xyz, opacity (d)
+};
+
+struct objectData
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
 	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
+	material material;
 };
 
-struct vertex 
+// Game update return data
+struct returnInfo
 {
 	float posX, posY, posZ;
 	float u, v;
