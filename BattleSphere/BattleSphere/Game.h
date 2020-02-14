@@ -4,42 +4,47 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
+#include <stdlib.h>
+#include <time.h>  
 
 #include "DX.h"
+#include "ProjectileBank.h"
 #include "GameObject.h"
 #include "Input.h"
 #include "PreLoader.h"
-#include "QuadtreeNode.h"
+#include "State.h"
 
 using namespace DirectX;
-struct returnInfo
-{
-	float x, y, z;
-};
+
+class State;
 class Game
 {
 	
 private:
+	std::vector<State*> m_states;
+
 	int m_nrOfPlayers;
 	int m_controllerId[XUSER_MAX_COUNT];
-	std::vector<GameObject*> m_gameObjects;
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
-	std::vector<Projectile*> m_projectiles;
 
 	PreLoader m_preLoader;
-	QuadtreeNode* m_QuadTreeRoot;
-	void handleMovement(float dt, int id);
-	void handleInputs(float dt);
 
-	void updatePlayerStatus();
 public:
 	
 	Game();
 
-	returnInfo update(float dt);
-	void updateSec();
+	void update(float dt);
+	//void updateSec();
 	void draw();
+	void pushState(State* state);
+	void changeState(stateType state);
+	bool isActive(stateType state);
+	
+	void updatePlayerStatus();
+	Robot** getRobots();
+	Input* getInput();
+	PreLoader* getPreLoader();
 
 	void release();
 };

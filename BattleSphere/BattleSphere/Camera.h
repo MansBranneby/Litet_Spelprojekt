@@ -28,6 +28,7 @@ private:
 
 public:
 	Camera(float width, float height, float nearPlane, float farPlane);
+	Camera(float width, float height, float nearPlane, float farPlane, XMVECTOR pos);
 	~Camera();
 	XMMATRIX getViewMatrix();
 	XMMATRIX getProjectionMatrix();
