@@ -18,7 +18,7 @@ void LightCulling::setLightData()
 void LightCulling::createConstantBuffers()
 {
 	m_viewMatrixData = new XMMATRIX();
-	*m_viewMatrixData = m_camera->getViewMatrix();
+	*m_viewMatrixData = DX::getInstance()->getCam()->getViewMatrix();
 	m_viewMatrixCBuffer = new ConstantBuffer(m_viewMatrixData, sizeof(XMMATRIX));
 
 	/*Data for compute shader, gives increased thread information*/
@@ -36,7 +36,7 @@ void LightCulling::createConstantBuffers()
 	m_screenToViewData = new screenToViewInfo();
 	m_screenToViewData->height = DX::getInstance()->getHeight();
 	m_screenToViewData->width = DX::getInstance()->getWidth();
-	m_screenToViewData->inverseProj = XMMatrixInverse(nullptr, m_camera->getProjectionMatrix());
+	m_screenToViewData->inverseProj = XMMatrixInverse(nullptr, DX::getInstance()->getCam()->getProjectionMatrix());
 	m_screenToViewCBuffer = new ConstantBuffer(m_screenToViewData, sizeof(screenToViewInfo));
 }
 
@@ -177,8 +177,6 @@ void LightCulling::updateSubresource()
 
 LightCulling::LightCulling()
 {
-	
-	m_camera = nullptr;
 	m_computeShaderFrustum = nullptr;
 	m_computeShaderLightCulling = nullptr;
 	m_dispatchCBuffer = nullptr;
@@ -253,11 +251,6 @@ LightCulling::~LightCulling()
 	{
 		m_lightIndexCountUAV->Release();
 		m_lightIndexCountUAV = nullptr;
-	}
-	if (m_camera)
-	{
-		delete m_camera;
-		m_camera = nullptr;
 	}
 	if (m_structuredBufferOut)
 	{
@@ -496,7 +489,6 @@ void LightCulling::setAngle(int index, float angleDeg)
 
 void LightCulling::initialize()
 {
-	m_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
 	m_computeShaderFrustum = new ComputeShader(L"ComputeShaderFrustumCalc.hlsl");
 	createConstantBuffers();
 	createFrustumData();
