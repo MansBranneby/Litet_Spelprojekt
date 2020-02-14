@@ -60,8 +60,8 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	BoundingVolume* getStaticBoundingVolume() const;
 	BoundingVolume* getDynamicBoundingVolume(objectData data);
-	void setObjectData(objectData data);
-	void setObjectData(objectData data, objectData relativeData);
+	void setObjectData(objectData data, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
 	void loadModel(std::ifstream& in, objectType type);
 };
 

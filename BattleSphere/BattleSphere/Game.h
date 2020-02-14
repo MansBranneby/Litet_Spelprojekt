@@ -13,6 +13,7 @@
 #include "Input.h"
 #include "PreLoader.h"
 #include "State.h"
+#include "QuadtreeNode.h"
 
 using namespace DirectX;
 
@@ -29,6 +30,7 @@ private:
 	Robot* m_robots[XUSER_MAX_COUNT];
 
 	PreLoader m_preLoader;
+	QuadtreeNode* m_quadtree;
 
 public:
 	
@@ -45,6 +47,7 @@ public:
 	Robot** getRobots();
 	Input* getInput();
 	PreLoader* getPreLoader();
+	QuadtreeNode* getQuadtree();
 
 	void release();
 };

@@ -123,6 +123,11 @@ void GameState::handleInputs(Game* game, float dt)
 					m_robots[i]->upgradeWeapon(RIFLE);
 				}
 			}
+
+			BoundingVolume* robotBV = game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0);
+			CollisionInfo collisionInfo = game->getQuadtree()->testCollision(robotBV);
+			if (collisionInfo.m_colliding)
+				m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
 		}
 	}
 }
@@ -148,6 +153,7 @@ GameState::GameState()
 		node->setPosition(XMVectorSet((float)(i * 10), -0.2f, (float)(-60.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
+
 }
 
 GameState::~GameState()
@@ -213,11 +219,11 @@ void GameState::draw(Game* game)
 			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
 			game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
-			game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
+			game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
 
 			if (m_robots[i]->getCurrentWeapon(LEFT) != -1)
 			{
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData());
+				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0);
 			}
 		}
 	}
