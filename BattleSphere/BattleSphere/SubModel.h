@@ -2,16 +2,9 @@
 #include "DX.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include "StructsAndEnums.h"
 
 using namespace DirectX;
-
-struct material 
-{
-	XMVECTOR ambient; // ambient.xyz, illumination model enumeration (illum)
-	XMVECTOR diffuse; // diffuse.xyz, refraction (Ni)
-	XMVECTOR specular; // specular.xyz, shininess (Ns)
-	XMVECTOR emission; // emission.xyz, opacity (d)
-};
 
 class SubModel
 {
@@ -23,8 +16,6 @@ private:
 	int m_nrOfIndices = 0;
 	int* m_indexArray;
 
-	
-
 	void createIndexBuffer();
 
 
@@ -33,6 +24,7 @@ public:
 	~SubModel();
 
 	void setMaterialInfo(material mat);
+	void updateMaterialInfo(material mat);
 	void setFaces(int* indexBuffer, int nrOfIndices);
 
 	void draw();

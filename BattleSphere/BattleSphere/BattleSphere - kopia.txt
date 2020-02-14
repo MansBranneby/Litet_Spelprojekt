@@ -145,17 +145,15 @@
   <ItemGroup>
     <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Drone.cpp" />
-    <ClCompile Include="BoundingSphere.cpp" />
-    <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gamepad.cpp" />
-    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GraphicResources.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -166,19 +164,13 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightCulling.cpp" />
-    <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PreLoader.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="ProjectileBank.cpp" />
-    <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
-    <ClCompile Include="ShadowMapping.cpp" />
-    <ClCompile Include="State.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -187,17 +179,15 @@
   <ItemGroup>
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="Drone.h" />
-    <ClInclude Include="BoundingSphere.h" />
-    <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gamepad.h" />
-    <ClInclude Include="GameState.h" />
     <ClInclude Include="GraphicResources.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -210,42 +200,19 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightCulling.h" />
-    <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="OBB.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="PreLoader.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileBank.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
-    <ClInclude Include="ShadowMapping.h" />
-    <ClInclude Include="State.h" />
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
-    <ClInclude Include="QuadtreeNode.h" />
-    <ClInclude Include="Tri_tri_test3D_tropp.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CS_main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CS_main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="ComputeShaderVGaussian.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CS_main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CS_main</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
     <FxCompile Include="ComputeShaderLightCulling.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -331,16 +298,6 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="VertexShaderShadowMapping.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS_main</EntryPointName>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS_main</EntryPointName>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
