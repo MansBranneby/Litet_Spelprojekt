@@ -32,8 +32,8 @@ public:
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 	void draw(objectType type, int variant = 0);
-	void draw(objectType type, objectData data, int variant = 0);
-	void draw(objectType type, objectData data, objectData relativeData, int variant = 0);
+	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
 	void cull(objectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.
 };
 

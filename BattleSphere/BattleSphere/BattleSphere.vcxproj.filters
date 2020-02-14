@@ -117,6 +117,21 @@
     <ClCompile Include="ComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileBank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="GeometryShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -227,6 +242,21 @@
     <ClInclude Include="StructsAndEnums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileBank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GeometryShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -265,6 +295,11 @@
     <FxCompile Include="PixelShaderDownsample.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="VertexShaderShadowMapping.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="GeometryShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>

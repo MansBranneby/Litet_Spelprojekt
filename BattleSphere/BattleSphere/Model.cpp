@@ -203,19 +203,23 @@ void Model::setVPMatrix()
 }
 
 
-void Model::setObjectData(objectData data)
+void Model::setObjectData(objectData data, int modelNr)
 {
 	setPosition(data.pos);
 	setRotation(data.rotation);
 	setScale(data.scale);
+	if (modelNr != -1)
+	m_subModels[modelNr].updateMaterialInfo(data.material);
 	updateSubResource();
 }
 
-void Model::setObjectData(objectData data, objectData relativeData)
+void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
 {
 	setPosition(data.pos, relativeData.pos);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
+	if (modelNr != -1)
+		m_subModels[modelNr].updateMaterialInfo(data.material);
 	updateRelSubResource();
 }
 

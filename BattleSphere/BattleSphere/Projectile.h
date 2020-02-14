@@ -1,3 +1,5 @@
+#pragma once
+
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <vector>
@@ -10,7 +12,6 @@ using namespace DirectX;
 #define PISTOL 0
 #define RIFLE 1
 
-
 class Projectile : public GameObject
 {
 private:
@@ -20,13 +21,12 @@ private:
 	XMVECTOR m_direction;
 
 public:
-	Projectile(int type, int damage);
-
-	void setDamage(int damage);
-	void setDirection(XMVECTOR direction);
+	Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage);
 
 	int getType();
 	int getDamage();
 	float getVelocity();
 	XMVECTOR getDirection();
+
+	void move(float dt);
 };

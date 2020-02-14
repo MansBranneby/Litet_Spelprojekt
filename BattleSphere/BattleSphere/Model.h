@@ -3,7 +3,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include "StructsAndEnums.h"
 
 
 class Model
@@ -51,8 +50,8 @@ public:
 	Model();
 	~Model();
 
-	void setObjectData(objectData data);
-	void setObjectData(objectData data, objectData relativeData);
+	void setObjectData(objectData data, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
 	void loadModel(std::ifstream& in);
 };
 
