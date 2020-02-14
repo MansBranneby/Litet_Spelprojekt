@@ -41,11 +41,6 @@ Game::Game()
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
 
-	objectData sceneData;
-	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
-	sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
-	m_preLoader.setStaticData(objectType::e_scene, sceneData);
 	m_preLoader.cull(objectType::e_scene);
 	// TODO: this ruins collision tests because we don't recalculate bounding volume data
 	//objectData sceneData;

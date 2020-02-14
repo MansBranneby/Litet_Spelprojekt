@@ -97,8 +97,6 @@ struct CollisionInfo
 		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
 	}
 };
-	float x, y, z;
-};
 
 struct vertexAndId
 {

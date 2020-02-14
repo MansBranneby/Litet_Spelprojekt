@@ -24,10 +24,9 @@ private:
 	// Backface culler
 	BackfaceCuller* m_bFCuller;
 
-	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
+	void loadFromFile(objectType type, std::string filename, std::string collisionFilename = ""); // Without .nyp file extension
 	void setObjectData(objectType type, objectData data, int variant = 0);
 	void setObjectData(objectType type, objectData data, objectData relativeData, int variant = 0);
-	void loadFromFile(objectType type, std::string filename, std::string collisionFilename = ""); // Without .nyp file extension
 	void loadCollisionMesh(objectType type, std::string filename); // Without .nyp file extension
 	void setModelData(objectType type, objectData data, int variant = 0);
 	void setModelData(objectType type, objectData data, objectData relativeData, int variant = 0);
@@ -49,12 +48,10 @@ public:
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 
-	void draw(objectType type, int variant = 0);
-	void draw(objectType type, objectData data, int modelNr, int subModelNr, int variant = 0);
-	void draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant = 0);
 	void drawCM(objectType type, int variant = 0);
 	void drawCM(objectType type, objectData data, int variant = 0);
 	void drawCM(objectType type, objectData data, objectData relativeData, int variant = 0);
+	void draw(objectType type, int variant = 0);
 	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
 	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
 	void cull(objectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.

@@ -117,6 +117,9 @@ void Model::computeOBB()
 
 void Model::createVertexBuffer()
 {
+	m_modelMatrixData = new XMMATRIX();
+	*m_modelMatrixData = XMMatrixTranslation(0, 0, 0);
+
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -222,7 +225,6 @@ Model::Model()
 	m_matrixCBuffer = nullptr;
 	m_matrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
-	m_modelMatrixCBuffer = nullptr;
 	m_modelMatrixData = nullptr;
 	m_rotationMat = XMMatrixIdentity();
 	m_rotationAfterMat = XMMatrixIdentity();
@@ -244,7 +246,6 @@ Model::~Model()
 	if (m_matrixData) delete (m_matrixData);
 	if (m_vertexCullingBuffer) m_vertexCullingBuffer->Release();
 	if (m_vertexAndId) delete[] m_vertexAndId;
-	if (m_modelMatrixCBuffer) m_modelMatrixCBuffer->Release();
 	if (m_modelMatrixData) delete (m_modelMatrixData);
 	if (m_boundingVolume) delete m_boundingVolume;
 }
@@ -406,10 +407,6 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data)
 	return updatedVertices;
 }
 
-std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relativeData)
-{
-	// Update world matrix
-	setObjectData(data, relativeData);
 void Model::setVPMatrix()
 {
 	*m_matrixData = *m_matrixData * DX::getInstance()->getCam()->getViewMatrix();
@@ -419,6 +416,11 @@ void Model::setVPMatrix()
 	memcpy(mappedMemory.pData, m_matrixData, sizeof(XMMATRIX));
 	DX::getInstance()->getDeviceContext()->Unmap(m_matrixCBuffer, 0);
 }
+
+std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relativeData)
+{
+	// Update world matrix
+	setObjectData(data, relativeData);
 
 
 	// Make the first element the size of the array.
@@ -470,7 +472,7 @@ void Model::setObjectData(objectData data, int modelNr)
 	setRotation(data.rotation);
 	setScale(data.scale);
 	if (modelNr != -1)
-	m_subModels[modelNr].updateMaterialInfo(data.material);
+		m_subModels[modelNr].updateMaterialInfo(data.material);
 	updateSubResource();
 }
 

@@ -29,6 +29,20 @@ void PreLoader::loadFromFile(objectType type, std::string filename, std::string 
 	(collisionFilename == "") ? m_nrOfCMeshes[typ].push_back(0) : loadCollisionMesh(type, collisionFilename);
 }
 
+void PreLoader::setObjectData(objectType type, objectData data, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+		m_objects[typ][variant][i].setObjectData(data);
+}
+
+void PreLoader::setObjectData(objectType type, objectData data, objectData relativeData, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+		m_objects[typ][variant][i].setObjectData(data, relativeData);
+}
+
 void PreLoader::loadCollisionMesh(objectType type, std::string filename)
 {
 	int typ = (int)type;
