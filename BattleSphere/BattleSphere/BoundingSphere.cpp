@@ -10,7 +10,7 @@ CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, Direct
 	if (dist <= m_radius)
 	{
 		collisionInfo.m_colliding = true;
-		collisionInfo.m_normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a)) * (m_radius - dist);
+		collisionInfo.m_normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a)) * (m_radius - dist) * 1.6f;
 	}
 
 	return collisionInfo;
@@ -77,7 +77,7 @@ CollisionInfo BoundingSphere::intersectsWithSphere(BoundingVolume* other)
 		collisionInfo.m_colliding = true;
 		collisionInfo.m_normal = sphereToOther;
 	}
-
+	
 	return collisionInfo;
 }
 

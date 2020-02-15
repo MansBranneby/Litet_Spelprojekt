@@ -28,6 +28,12 @@ private:
 	float m_time;
 	bool m_ready;
 
+	// Position history of robot
+	XMVECTOR* m_positionHistory;		// Array of positions
+	unsigned int m_positionHistorySize; // Current size
+	unsigned int m_positionHistoryCap;  // Cap
+	unsigned int m_positionHistoryPtr;	// Point to last inserted position
+
 	void addWeapon(int type);
 public:
 	Robot(int playerId);
@@ -58,6 +64,10 @@ public:
 
 	void update(float dt);
 	void move(XMVECTOR dPos);
+
+	// History of positions
+	void storePositionInHistory(DirectX::XMVECTOR position);
+	XMVECTOR getPreviousPosition() const;
 
 	void release();
 };

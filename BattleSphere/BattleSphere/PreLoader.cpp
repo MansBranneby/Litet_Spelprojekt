@@ -167,7 +167,7 @@ BoundingVolume* PreLoader::getDynamicBoundingVolume(objectType type, objectData 
 
 int PreLoader::getNrOfVariants(objectType type) const
 {
-	return m_objects[(int)type].size();
+	return (int)m_objects[(int)type].size();
 }
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)

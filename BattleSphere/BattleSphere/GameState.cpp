@@ -127,7 +127,16 @@ void GameState::handleInputs(Game* game, float dt)
 			BoundingVolume* robotBV = game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0);
 			CollisionInfo collisionInfo = game->getQuadtree()->testCollision(robotBV);
 			if (collisionInfo.m_colliding)
-				m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
+			{
+				if (XMVectorGetX(XMVector3Length(collisionInfo.m_normal)) > 0.45f)
+					m_robots[i]->setPosition(m_robots[i]->getPreviousPosition());
+				else
+					m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
+			}
+
+			m_robots[i]->storePositionInHistory(m_robots[i]->getPosition());
+
+			
 		}
 	}
 }

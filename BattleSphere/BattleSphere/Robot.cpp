@@ -17,7 +17,14 @@ Robot::Robot(int playerId)
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
 	// Raise player
-	setPosition(XMVECTOR{ 0.0f, 1.0f, 0.0f });
+	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
+
+	// Position history
+	m_positionHistorySize = 0; 
+	m_positionHistoryCap = 100;
+	m_positionHistoryPtr = 0;	
+	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
+
 	if (playerId == 0)
 		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(80, 10, 180, 0));
@@ -94,6 +101,7 @@ float Robot::getCurrentRot()
 
 bool Robot::isReady(float dt)
 {
+	
 	if (!m_ready)
 	{
 		m_time += dt;
@@ -219,6 +227,35 @@ void Robot::move(XMVECTOR dPos)
 	}
 }
 
+void Robot::storePositionInHistory(DirectX::XMVECTOR position)
+{
+	if (m_positionHistorySize < m_positionHistoryCap)
+	{
+		// size is less than cap
+		m_positionHistory[m_positionHistoryPtr] = position; // insert at historyPtr
+		m_positionHistoryPtr++;								// step historyPtr
+		m_positionHistorySize++;							// increase size
+	}
+	else
+	{
+		// size has grown past cap
+		m_positionHistoryPtr = 0;							// reset ptr
+		m_positionHistorySize = 0;							// reset size
+		m_positionHistory[m_positionHistoryPtr] = position; // replace element at ptr 
+	}
+	
+}
+
+XMVECTOR Robot::getPreviousPosition() const
+{
+	if (m_positionHistoryPtr == 0)
+	{
+		return m_positionHistory[m_positionHistoryPtr];
+	}
+
+	return m_positionHistory[m_positionHistoryPtr - 1];
+}
+
 void Robot::release()
 {
 	// TODO realease resource?
@@ -226,4 +263,6 @@ void Robot::release()
 	{
 		delete m_weapons[i];
 	}
+
+	delete[] m_positionHistory;
 }
