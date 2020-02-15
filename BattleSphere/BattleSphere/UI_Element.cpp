@@ -3,49 +3,65 @@
 void UI_Element::initializeResources(std::wstring fileName)
 {
 	// Vertex list //
-	float left, right, top, bottom;
+	float left, right, top, bottom, texU, texV;
 	
-	left = m_posX - m_sizeX / 2.0f;
-	right = left + m_sizeX;
-	top = m_posY + m_sizeY / 2.0f;
-	bottom = top - m_sizeY;
+	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
+	{
+		left = m_posX - m_spriteSizeX / 2.0f;
+		right = left + m_spriteSizeX;
+		top = m_posY + m_spriteSizeY / 2.0f;
+		bottom = top - m_spriteSizeY;
 
-	m_vertexList[0] =
+		texU = m_spriteSizeX / m_sizeX;
+		texV = m_spriteSizeY / m_sizeY;
+	}
+	else
 	{
-		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
-		0.0f, 0.0f,			//v0 tex
-		0.0f, 0.0f, 0.0f,
-	};
-	m_vertexList[1] =
-	{
-		1.0, -1.0f, 0.0f,	//v1 pos	R B
-		1.0f, 1.0f,			//v1 tex
-		0.0f, 0.0f, 0.0f,
-	};
-	m_vertexList[2] =
-	{
-		-1.0f, -1.0f, 0.0f, //v2 pos	L B
-		0.0f, 1.0f,			//v2 tex
-		0.0f, 0.0f, 0.0f,
-	};
-	m_vertexList[3] =
-	{
-		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
-		0.0f, 0.0f,			//v3 tex
-		0.0f, 0.0f, 0.0f,
-	};
-	m_vertexList[4] =
-	{
-		1.0f, 1.0f, 0.0f,	//v4 pos	R T
-		1.0f, 0.0f,			//v4 tex
-		0.0f, 0.0f, 0.0f,
-	};
-	m_vertexList[5] =
-	{
-		1.0f, -1.0f, 0.0f,	//v5 pos	R B
-		1.0f, 1.0f,			//v5 tex
-		0.0f, 0.0f, 0.0f
-	};
+		left = m_posX - m_sizeX / 2.0f;
+		right = left + m_sizeX;
+		top = m_posY + m_sizeY / 2.0f;
+		bottom = top - m_sizeY;
+
+		texU = 1.0f;
+		texV = 1.0f;
+	}
+
+		m_vertexList[0] =
+		{
+			-1.0f, 1.0f, 0.0f,	//v0 pos	L T
+			0.0f, 0.0f,			//v0 tex
+			0.0f, 0.0f, 0.0f,
+		};
+		m_vertexList[1] =
+		{
+			1.0f, -1.0f, 0.0f,	//v1 pos	R B
+			texU, texV,			//v1 tex
+			0.0f, 0.0f, 0.0f,
+		};
+		m_vertexList[2] =
+		{
+			-1.0f, 1.0f, 0.0f,	//v2 pos	L B
+			0.0f, texV,			//v2 tex
+			0.0f, 0.0f, 0.0f,
+		};
+		m_vertexList[3] =
+		{
+			-1.0f, 1.0f, 0.0f,	//v3 pos	L T
+			0.0f, 0.0f,			//v3 tex
+			0.0f, 0.0f, 0.0f,
+		};
+		m_vertexList[4] =
+		{
+			1.0f, 1.0f, 0.0f,	//v4 pos	R T
+			texU, 0.0f,			//v4 tex
+			0.0f, 0.0f, 0.0f,
+		};
+		m_vertexList[5] =
+		{
+			1.0f, -1.0f, 0.0f,	//v5 pos	R B
+			texU, texV,			//v5 tex
+			0.0f, 0.0f, 0.0f
+		};	
 
 	m_vertexList[0].posX = left;
 	m_vertexList[0].posY = top;
@@ -85,7 +101,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 		MessageBox(NULL, L"Error in m_elementSRV", L"Error", MB_OK | MB_ICONERROR);
 }
 
-UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float posY, float sizeX, float sizeY)
+UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float posY, float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames)
 {
 	m_type = type;
 
@@ -100,78 +116,52 @@ UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float pos
 	m_isReady = true;
 	m_selectionTimer = 0.0f;
 
-	m_screenWidth = DX::getInstance()->getWidth();
-	m_screenHeight = DX::getInstance()->getHeight();
+	m_spriteSizeX = spriteSizeX;
+	m_spriteSizeY = spriteSizeY;
 
 	initializeResources(fileName);
+
+	switch (type)
+	{
+	case uiType::e_mainMenuSelection:
+		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames, 1000.0f);
+		break;
+	case uiType::e_mainMenuBox:
+		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames, 1000.0f);
+		break;
+	case uiType::e_static:
+		break;
+	default:
+		break;
+	}
 }
 
 UI_Element::~UI_Element()
 {
 	m_vertexBuffer->Release();
 	m_elementSRV->Release();
+	delete m_animation;
 }
 
-void UI_Element::updateElement(uiUpdate updateType, float dt)
+void UI_Element::updateElement(AnimationType animationType, float dt)
 {
-	if (m_selectionTimer > 0.0f)
+	switch (animationType)
 	{
-		//isReady = false;
-		m_selectionTimer += dt;
-		if (m_selectionTimer > 0.2)
+	case e_translate:
+		if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Only update if element needs to move
 		{
-			m_isReady = true;
-			m_selectionTimer = 0.0f;
+
+			m_isReady = m_animation->animateElement(animationType, m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt);
+
+			updateVertexBuffer();
 		}
-	}
-
-	if (m_destinationX != m_posX || m_destinationY != m_posY) // Only update if element needs to move
-	{
-		m_isReady = false;
-		float left, right, top, bottom;
-		float animationSpeed = 1000.0f;
-		if (m_destinationY < m_posY) // Down
-		{
-			if (m_posY - dt * animationSpeed < m_destinationY)
-				m_posY = m_destinationY;
-			else
-				m_posY -= dt * animationSpeed;
-		}
-		if (m_destinationY > m_posY) // Up
-		{
-			if (m_posY + dt * animationSpeed > m_destinationY)
-				m_posY = m_destinationY;
-			else
-				m_posY += dt * animationSpeed;
-		}
-
-		left = m_posX - m_sizeX / 2.0f;
-		right = left + m_sizeX;
-		top = m_posY + m_sizeY / 2.0f;
-		bottom = top - m_sizeY;
-
-		m_vertexList[0].posX = left;
-		m_vertexList[0].posY = top;
-
-		m_vertexList[1].posX = right;
-		m_vertexList[1].posY = bottom;
-
-		m_vertexList[2].posX = left;
-		m_vertexList[2].posY = bottom;
-
-		m_vertexList[3].posX = left;
-		m_vertexList[3].posY = top;
-
-		m_vertexList[4].posX = right;
-		m_vertexList[4].posY = top;
-
-		m_vertexList[5].posX = right;
-		m_vertexList[5].posY = bottom;
-
+		break;
+	case e_sprite:
+		m_animation->animateElement(animationType, m_vertexList, dt);
 		updateVertexBuffer();
-
-		if (m_destinationX == m_posX && m_destinationY == m_posY)
-			m_selectionTimer += dt;
+		break;
+	default:
+		break;
 	}
 }
 

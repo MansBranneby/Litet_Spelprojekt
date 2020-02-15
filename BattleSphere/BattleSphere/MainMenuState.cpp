@@ -7,8 +7,11 @@ MainMenuState::MainMenuState()
 
 	m_selectionTimer = 0.0f;
 
-	m_uiElements.push_back(new UI_Element(L"Textures\\menu_background.png", uiType::e_static, 0.0f, 0.0f, 1920.0f, 1080.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\menu_background2.png", uiType::e_static, 0.0f, 0.0f, 1920.0f, 1080.0f));
 	m_uiElements.push_back(new UI_Element(L"Textures\\menu_selection.png", uiType::e_mainMenuSelection, 0.0f, 30.0f, 844.0f, 67.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenuAnimation\\box_ani_sprite3.png", uiType::e_mainMenuBox, 0.0f, 33.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenuAnimation\\box_ani_sprite3.png", uiType::e_mainMenuBox, 0.0f, -140.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenuAnimation\\box_ani_sprite3.png", uiType::e_mainMenuBox, 0.0f, -309.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
 }
 
 MainMenuState::~MainMenuState()
@@ -31,7 +34,7 @@ void MainMenuState::handleInput(Game* game)
 {
 	game->getInput()->refresh(0);
 
-	if (game->getInput()->isPressed(0, XINPUT_GAMEPAD_A))
+	if (game->getInput()->isPressed(0, XINPUT_GAMEPAD_A) && m_activeMenu == activeMainMenu::e_startGame)
 	{
 		setPaused(true);
 		game->changeState(stateType::e_gameState);
@@ -84,10 +87,13 @@ void MainMenuState::handleInput(Game* game)
 void MainMenuState::update(Game* game, float dt)
 {
 	handleInput(game);
-	for (int i = 0; i < m_uiElements.size(); i++)
-	{
-		m_uiElements[i]->updateElement(uiUpdate::e_mainMenuSelection, dt);
-	}
+	m_uiElements[1]->updateElement(AnimationType::e_translate, dt);
+	if(m_activeMenu == activeMainMenu::e_startGame)
+		m_uiElements[2]->updateElement(AnimationType::e_sprite, dt);
+	if (m_activeMenu == activeMainMenu::e_options)
+		m_uiElements[3]->updateElement(AnimationType::e_sprite, dt);
+	if (m_activeMenu == activeMainMenu::e_quit)
+		m_uiElements[4]->updateElement(AnimationType::e_sprite, dt);
 }
 
 void MainMenuState::draw(Game* game)

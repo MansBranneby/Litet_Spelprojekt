@@ -30,19 +30,12 @@ enum class stateType
 	e_default
 };
 
-enum class activeMainMenu
-{
-	e_startGame,
-	e_options,
-	e_quit
-};
-
-enum class uiUpdate
-{
-	e_startAnimation,
-	e_mainMenuSelection,
-	e_quitAnimation
-};
+//enum class uiUpdate
+//{
+//	e_startAnimation,
+//	e_mainMenuSelection,
+//	e_quitAnimation
+//};
 
 enum class uiType
 {

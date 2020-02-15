@@ -3,6 +3,13 @@
 #include "State.h"
 #include "UI_Element.h"
 
+enum activeMainMenu
+{
+	e_startGame,
+	e_options,
+	e_quit
+};
+
 class MainMenuState : public State
 {
 private:
