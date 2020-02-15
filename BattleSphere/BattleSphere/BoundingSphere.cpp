@@ -5,12 +5,17 @@ CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, Direct
 	CollisionInfo collisionInfo;
 	XMVECTOR p = getPos();
 	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToTriangle(p, a, b, c);
-	DirectX::XMVECTOR d = closestPoint - p;
-	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(closestPoint - p));
+	DirectX::XMVECTOR d = p - closestPoint;
+	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
 	if (dist <= m_radius)
 	{
 		collisionInfo.m_colliding = true;
-		collisionInfo.m_normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a)) * (m_radius - dist) * 1.6f;
+		DirectX::XMVECTOR triNormal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a));
+
+		if(DirectX::XMVectorGetX(DirectX::XMVector3Dot(triNormal, d)) < 0.0f)
+			collisionInfo.m_normal = triNormal * (m_radius + dist);
+		else
+			collisionInfo.m_normal = triNormal * (m_radius - dist);
 	}
 
 	return collisionInfo;
