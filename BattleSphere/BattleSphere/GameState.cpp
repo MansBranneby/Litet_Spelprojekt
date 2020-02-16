@@ -124,16 +124,35 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 			}
 
-			BoundingVolume* robotBV = game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0);
-			CollisionInfo collisionInfo = game->getQuadtree()->testCollision(robotBV);
+			CollisionInfo collisionInfo;
+			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
+			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
+			float l = XMVectorGetX(XMVector3Length(v));
+			float r = robotBV->getRadius();
+			XMVECTOR newPos = m_robots[i]->getPosition();
+			// if robot moved further than its radius
+			if (r < l)
+			{
+				float tIncrement = r / l;
+				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
+				{
+					robotBV->setPos(m_robots[i]->getPreviousPosition() + (v * t));
+					collisionInfo = game->getQuadtree()->testCollision(robotBV);
 
-
-			if (collisionInfo.m_colliding)
-				m_robots[i]->setPosition(m_robots[i]->getPosition() + collisionInfo.m_normal);
+					if (collisionInfo.m_colliding)
+						newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
+				}
+			}
 			else
-				m_robots[i]->storePositionInHistory(m_robots[i]->getPosition());
-
-			
+			{
+				// Normal collision
+				//robotBV->setPos(m_robots[i]->getPosition());
+				collisionInfo = game->getQuadtree()->testCollision(robotBV);
+				if (collisionInfo.m_colliding)
+					newPos = m_robots[i]->getPosition() + collisionInfo.m_normal;
+			}
+			m_robots[i]->setPosition(newPos);
+			m_robots[i]->storePositionInHistory(newPos);
 		}
 	}
 }

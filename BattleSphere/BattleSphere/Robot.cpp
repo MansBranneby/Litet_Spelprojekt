@@ -24,6 +24,7 @@ Robot::Robot(int playerId)
 	m_positionHistoryCap = 100;
 	m_positionHistoryPtr = 0;	
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
+	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
 
 	if (playerId == 0)
 		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
@@ -250,7 +251,7 @@ XMVECTOR Robot::getPreviousPosition() const
 {
 	if (m_positionHistoryPtr == 0)
 	{
-		return m_positionHistory[m_positionHistoryPtr];
+		return m_positionHistory[m_positionHistoryCap - 1];
 	}
 
 	return m_positionHistory[m_positionHistoryPtr - 1];
