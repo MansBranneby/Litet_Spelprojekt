@@ -221,11 +221,14 @@ void GameState::update(Game* game, float dt)
 
 	// TODO remove with collision instead aswell as game field?
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-	{
-		if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 50.0f)
-		{
-			//ProjectileBank::getInstance()->removeProjectile(i);
-		}
+	{	
+		// Normal collision
+		BoundingSphere* projBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0));
+		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projBV);
+		if (collisionInfo.m_colliding)
+			ProjectileBank::getInstance()->removeProjectile(i);
+		else if(XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 300.0f)
+			ProjectileBank::getInstance()->removeProjectile(i);	
 	}
 
 	for (int i = 0; i < m_resources.size(); i++)
