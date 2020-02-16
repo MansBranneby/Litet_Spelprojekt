@@ -146,11 +146,11 @@ void GameState::handleInputs(Game* game, float dt)
 			else
 			{
 				// Normal collision
-				//robotBV->setPos(m_robots[i]->getPosition());
 				collisionInfo = game->getQuadtree()->testCollision(robotBV);
 				if (collisionInfo.m_colliding)
 					newPos = m_robots[i]->getPosition() + collisionInfo.m_normal;
 			}
+
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
 		}
