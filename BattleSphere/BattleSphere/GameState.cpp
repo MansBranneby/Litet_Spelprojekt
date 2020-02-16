@@ -52,7 +52,11 @@ void GameState::handleInputs(Game* game, float dt)
 				for (int j = 0; j < m_resources.size() && m_robots[i]->getResourceIndex() == -1; j++)
 				{
 					// TODO: collision yo
-					if (XMVectorGetX(XMVector3Length(m_robots[i]->getPosition() - m_resources[j]->getPosition())) < 1.5f &&
+					XMVECTOR rob = m_robots[i]->getPosition();
+					rob.m128_f32[1] = 0.0f; // Set Y to 0;
+					XMVECTOR resource = m_resources[j]->getPosition();
+					resource.m128_f32[1] = 0.0f; // Set Y to 0; 
+					if (XMVectorGetX(XMVector3Length(rob - resource)) < 1.5f &&
 						!m_resources[j]->isBlocked())
 					{
 						m_robots[i]->setResourceIndex(j);
@@ -129,7 +133,7 @@ void GameState::handleInputs(Game* game, float dt)
 					m_robots[i]->setHealth(100);
 				}
 
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_B))
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_X))
 				{
 					m_robots[i]->upgradeWeapon(RIFLE);
 				}
@@ -240,7 +244,7 @@ void GameState::draw(Game* game)
 
 	for (int i = 0; i < m_resources.size(); i++)
 	{
-		game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+		game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData());
 	}
 
 	for (int i = 0; i < m_nodes.size(); i++)

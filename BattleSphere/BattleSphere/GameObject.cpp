@@ -55,12 +55,14 @@ void GameObject::setRotation(float vx, float vy, float vz, float rotDeg)
 
 void GameObject::rotate(XMVECTOR dRotation)
 {
-	m_rotation += dRotation;
+	m_rotation.m128_f32[0] = dRotation.m128_f32[0];
+	m_rotation.m128_f32[1] = dRotation.m128_f32[1];
+	m_rotation.m128_f32[2] = dRotation.m128_f32[2];
+	m_rotation.m128_f32[3] += dRotation.m128_f32[3];
 }
 
 void GameObject::rotate(float vx, float vy, float vz, float dRotDeg)
 {
-	XMVECTOR dRotate = { vx, vy, vz, dRotDeg };
 	m_rotation.m128_f32[0] = vx;
 	m_rotation.m128_f32[1] = vy;
 	m_rotation.m128_f32[2] = vz;

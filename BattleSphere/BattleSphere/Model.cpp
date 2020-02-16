@@ -223,6 +223,30 @@ void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
 	updateRelSubResource();
 }
 
+void Model::setAllObjectData(objectData data)
+{
+	setPosition(data.pos);
+	setRotation(data.rotation);
+	setScale(data.scale);
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].updateMaterialInfo(data.material);
+	}
+	updateSubResource();
+}
+
+void Model::setAllObjectData(objectData data, objectData relativeData)
+{
+	setPosition(data.pos, relativeData.pos);
+	setRotation(data.rotation, relativeData.rotation);
+	setScale(data.scale, relativeData.scale);
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].updateMaterialInfo(data.material);
+	}
+	updateRelSubResource();
+}
+
 void Model::loadModel(std::ifstream& in)
 {
 	std::string line;

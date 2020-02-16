@@ -95,7 +95,35 @@ void PreLoader::draw(objectType type, objectData data, objectData relativeData, 
 {
 	int typ = (int)type;
 	if (modelNr != -1)
-		m_objects[typ][variant][modelNr].setObjectData(data, subModelNr);
+		m_objects[typ][variant][modelNr].setObjectData(data, relativeData, subModelNr);
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+	{
+		m_objects[typ][variant][i].setObjectData(data, relativeData);
+		m_objects[typ][variant][i].draw();
+	}
+}
+
+void PreLoader::drawOneMaterial(objectType type, objectData data, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+	{
+		m_objects[typ][variant][i].setAllObjectData(data);
+	}
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+	{
+		m_objects[typ][variant][i].setObjectData(data);
+		m_objects[typ][variant][i].draw();
+	}
+}
+
+void PreLoader::drawOneMaterial(objectType type, objectData data, objectData relativeData, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+	{
+		m_objects[typ][variant][i].setAllObjectData(data, relativeData);
+	}
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data, relativeData);

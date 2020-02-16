@@ -52,6 +52,8 @@ public:
 
 	void setObjectData(objectData data, int modelNr = -1);
 	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
+	void setAllObjectData(objectData data);
+	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
 };
 
