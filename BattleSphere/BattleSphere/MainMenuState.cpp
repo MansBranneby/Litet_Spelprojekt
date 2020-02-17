@@ -35,13 +35,17 @@ void MainMenuState::hi_mainMenu(Game* game)
 		/*setPaused(true);
 		game->changeState(stateType::e_gameState);*/
 		m_menuState = MenuState::e_robotSelection;
-		m_uiElements[5]->setDestinationX(2000.0f, 1000.0f, 1000.0f, 0.2f, 0.2f);
-		m_uiElements[6]->setDestinationX(-2000.0f, 1000.0f, 1000.0f, 0.7f, 0.2f);
-		m_uiElements[7]->setDestinationX(2000.0f, 1000.0f, 1000.0f, 1.2f, 0.2f);
+		m_uiElements[1]->fadeOut(1.0f);
+		m_uiElements[2]->fadeOut(1.0f);
+		m_uiElements[3]->fadeOut(1.0f);
+		m_uiElements[4]->fadeOut(1.0f);
+		//m_uiElements[5]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.0f, 0.2f);
+		//m_uiElements[6]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.5f, 0.2f);
+		//m_uiElements[7]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 2.0f, 0.2f);
+		m_uiElements[5]->fadeOut(1.0f);
+		m_uiElements[6]->fadeOut(1.0f);
+		m_uiElements[7]->fadeOut(1.0f);
 
-		m_uiElements[2]->fadeOut(2.0f);
-		//m_uiElements[3]->setDestinationX(2000.0f, 200.0f, 1000.0f, 0.7f, 0.2f);
-		//m_uiElements[4]->setDestinationX(2000.0f, 200.0f, 1000.0f, 1.2f, 0.2f);
 		return;
 	}
 

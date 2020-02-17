@@ -19,7 +19,7 @@ private:
 	float m_spriteSizeX, m_spriteSizeY, m_nrOfFrames;
 	float m_texU, m_texV;
 
-	float m_fadeOut;
+	float m_fadeOut, m_initialFadeTime;
 	float m_fadeIn;
 	bool m_isAnimated; // Controls if spriteSheet is updated
 
