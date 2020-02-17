@@ -1,3 +1,4 @@
+
 #include "LightCulling.h"
 
 
@@ -373,4 +374,9 @@ void LightCulling::cullLights()
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(2, 1, &m_lightSRV);
 
 	
+}
+
+void LightCulling::bindResources()
+{
+
 }

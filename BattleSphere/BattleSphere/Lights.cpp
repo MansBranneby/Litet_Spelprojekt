@@ -77,8 +77,8 @@ int Lights::addSpotLight(float x, float y, float z, float range, float dx, float
 	m_lights[m_nrOfLights].type = 2;
 	m_lights[m_nrOfLights].spotLightAngle = angleDeg;
 	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = b;
-	m_lights[m_nrOfLights].b = g;
+	m_lights[m_nrOfLights].g = g;
+	m_lights[m_nrOfLights].b = b;
 	m_lights[m_nrOfLights].a = 1;
 	m_lights[m_nrOfLights].x = x;
 	m_lights[m_nrOfLights].y = y;
@@ -199,4 +199,9 @@ void Lights::setAngle(int index, float angleDeg)
 void Lights::Initialize()
 {
 	setLightData();
+}
+
+void Lights::Release()
+{
+	delete m_instance;
 }

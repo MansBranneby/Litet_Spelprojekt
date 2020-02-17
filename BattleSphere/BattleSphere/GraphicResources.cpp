@@ -77,32 +77,19 @@ void GraphicResources::createDepthStencil()
 	descDepth.Height = (UINT)m_viewPort.Height;//(UINT)DX::getInstance()->getHeight();
 	descDepth.MipLevels = 1;
 	descDepth.ArraySize = 1;
-	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	descDepth.Format = DXGI_FORMAT_R24G8_TYPELESS; // D24_UNORM_S8_UINT; // D24_UNORM_S8_UINT;
 	descDepth.SampleDesc.Count = 1;
 	descDepth.SampleDesc.Quality = 0;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
-	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
 	HRESULT hr = DX::getInstance()->getDevice()->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDepthStencil", L"Error", MB_OK | MB_ICONERROR);
 
-	D3D11_DEPTH_STENCIL_DESC dsDesc;
-	ZeroMemory(&dsDesc, sizeof(dsDesc));
-	// Depth test parameters
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	// Create depth stencil state
-	ID3D11DepthStencilState* pDSState;
-	hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &pDSState);
-	if (FAILED(hr))
-		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
 
 	// Bind depth stencil state
-	DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(pDSState, 1);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	ZeroMemory(&descDSV, sizeof(descDSV));
@@ -112,14 +99,28 @@ void GraphicResources::createDepthStencil()
 
 	// Create the depth stencil view
 	if(pDepthStencil != nullptr)
-		hr = DX::getInstance()->getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthStencilView);
+		hr = DX::getInstance()->getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthDSV);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
-	if(pDepthStencil != nullptr)
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	
+	srvDesc.Format = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+	srvDesc.Texture2D.MipLevels = 1;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+	
+	// Create the depth stencil view
+	if (pDepthStencil != nullptr)
+		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(pDepthStencil, &srvDesc, &m_depthSRV);
+	if (FAILED(hr))
+		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
+
+
+	if(pDepthStencil)
 		pDepthStencil->Release();
-	if(pDSState != nullptr)
-		pDSState->Release();
+
 }
 
 void GraphicResources::createBackBuffer()
@@ -129,8 +130,8 @@ void GraphicResources::createBackBuffer()
 	DX::getInstance()->getSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
 	// use the back buffer address to create the render target
-	
-	DX::getInstance()->getDevice()->CreateRenderTargetView(pBackBuffer, NULL, &m_backbufferRTV);
+	if(pBackBuffer != nullptr)
+		DX::getInstance()->getDevice()->CreateRenderTargetView(pBackBuffer, NULL, &m_backbufferRTV);
 	pBackBuffer->Release();
 }
 
@@ -202,7 +203,7 @@ GraphicResources::GraphicResources()
 	m_viewPort.TopLeftY = 0;
 
 	m_rasterizerState = nullptr;
-	m_depthStencilView = nullptr;
+	m_depthDSV = nullptr;
 	m_backbufferRTV = nullptr;
 	m_samplerState = nullptr;
 }
@@ -213,12 +214,20 @@ GraphicResources::~GraphicResources()
 		m_rasterizerState->Release();
 	if (m_blendState)
 		m_blendState->Release();
-	if (m_depthStencilView)
-		m_depthStencilView->Release();
+	if (m_depthDSV)
+		m_depthDSV->Release();
 	if (m_backbufferRTV)
 		m_backbufferRTV->Release();
 	if (m_samplerState)
 		m_samplerState->Release();
+	if (m_depthSRV)
+		m_depthSRV->Release();
+	
+}
+
+void GraphicResources::bindDepthStencilState()
+{
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &m_depthSRV);
 }
 
 ID3D11RasterizerState* GraphicResources::getRasterizerState() const
@@ -228,7 +237,7 @@ ID3D11RasterizerState* GraphicResources::getRasterizerState() const
 
 ID3D11DepthStencilView* GraphicResources::getDepthStencilView() const
 {
-	return m_depthStencilView;
+	return m_depthDSV;
 }
 
 ID3D11RenderTargetView** GraphicResources::getBackBuffer()

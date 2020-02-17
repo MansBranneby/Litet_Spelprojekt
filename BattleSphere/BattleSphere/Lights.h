@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#define LIGHT_COUNT 1024
+#define LIGHT_COUNT 48
 
 using namespace DirectX;
 
@@ -38,6 +38,7 @@ public:
 	void setIntensity(int index, float intensity);
 	void setAngle(int index, float angleDeg);
 	void Initialize();
+	
 	Lights();
 	~Lights();
 };
