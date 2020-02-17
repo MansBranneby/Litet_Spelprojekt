@@ -183,7 +183,7 @@ void Bloom::setRenderTarget(ID3D11DepthStencilView* depthStencil, renderPass pas
 		DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &m_fullResRTV, depthStencil);
 		break;
 	case renderPass::e_downSample:
-		DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &m_lowResRTV, NULL);
+		DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &m_lowResRTV, depthStencil);
 		break;
 	default:
 		break;

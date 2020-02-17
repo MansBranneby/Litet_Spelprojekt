@@ -201,7 +201,3 @@ void Lights::Initialize()
 	setLightData();
 }
 
-void Lights::Release()
-{
-	delete m_instance;
-}

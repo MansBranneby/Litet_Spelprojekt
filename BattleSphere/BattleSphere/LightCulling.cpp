@@ -376,7 +376,4 @@ void LightCulling::cullLights()
 	
 }
 
-void LightCulling::bindResources()
-{
 
-}

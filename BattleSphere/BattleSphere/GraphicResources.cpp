@@ -118,8 +118,8 @@ void GraphicResources::createDepthStencil()
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
 
-	if(pDepthStencil)
-		pDepthStencil->Release();
+	
+	pDepthStencil->Release();
 
 }
 
@@ -206,6 +206,7 @@ GraphicResources::GraphicResources()
 	m_depthDSV = nullptr;
 	m_backbufferRTV = nullptr;
 	m_samplerState = nullptr;
+	m_depthSRV = nullptr;
 }
 
 GraphicResources::~GraphicResources()

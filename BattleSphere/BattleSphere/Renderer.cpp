@@ -195,9 +195,10 @@ void downsample()
 	g_graphicResources.setViewPortDim((UINT)(DX::getInstance()->getWidth() * 0.25f), (UINT)(DX::getInstance()->getHeight() * 0.25f));
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
 	g_graphicResources.setViewPortDim((UINT)DX::getInstance()->getWidth(), (UINT)DX::getInstance()->getHeight());
-	ID3D11ShaderResourceView* nullSRV;
-	DX::getInstance()->getDeviceContext()->PSGetShaderResources(1, 1, &nullSRV);
-	float clearColour[] = { 0, 0, 0, 1 };
+
+	ID3D11ShaderResourceView* nullSRV = { nullptr };
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullSRV);
+	
 }
 
 void finalRender()
@@ -299,10 +300,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					//g_lightCulling.updateSubresource();
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
-					DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
+					//DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
-					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 					//DX::getInstance()->getDeviceContext()->ClearState();
 
 					g_bloom->clearRenderTarget();
@@ -330,7 +331,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 					g_bloom->clearRenderTarget();
 
@@ -357,7 +358,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
-					g_lightCulling.bindResources();
+					
 					g_Game->draw(renderPass::e_opaque);
 
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
@@ -426,7 +427,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_pixelShaderDownsample.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
-		Lights::getInstance()->Release();
+
 		//Remove
 		delete g_camera;
 		delete g_bloom;

@@ -81,6 +81,6 @@ public:
 	void initialize();
 	void computeFrustum();
 	void cullLights();
-	void bindResources();
+
 };
 
