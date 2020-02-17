@@ -37,6 +37,7 @@ public:
 	bool shoot(XMVECTOR robotPos, float rot, int side, float dt);
 	bool speedUp();
 	bool shield();
+	bool reflect();
 
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
@@ -45,7 +46,7 @@ public:
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
-	float getDefense(XMVECTOR projDir, float robotRot);
+	float getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int projIndex);
 
 	bool updateTime(float dt);
 

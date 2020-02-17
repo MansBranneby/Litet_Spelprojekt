@@ -13,6 +13,7 @@ Weapon::Weapon(int type)
 	m_ready = true;
 	m_currentRecoil = 0.0f;
 	m_currentSpeed = 1.0f;
+	m_currentDefense = 1.0f;
 	m_defense = 1.0f;
 
 	if (type == RIFLE)
@@ -43,6 +44,13 @@ Weapon::Weapon(int type)
 		m_duration = 0.15f;
 		m_speed = 5.0f;
 		setScale(0.2f, 1.6f, 0.2f);
+	}
+	else if (type == REFLECT)
+	{
+		m_cooldown = 2.0f;
+		m_duration = 10.0f;
+		m_defense = 0.0f;
+		setScale(1.8f, 1.8f, 0.2f);
 	}
 	else
 	{
@@ -76,8 +84,12 @@ float Weapon::getSpeed()
 	return m_currentSpeed;
 }
 
-float Weapon::getDefense(XMVECTOR projDir, float robotRot)
+float Weapon::getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int projIndex)
 {
+	if (m_type == REFLECT && m_cdTime < m_duration && !m_ready)
+	{
+		ProjectileBank::getInstance()->changeDirection(projIndex, robotPos);
+	}
 	if (m_type == SHIELD)
 	{
 		float rotInRad = XMConvertToRadians(robotRot);
@@ -188,6 +200,16 @@ bool Weapon::speedUp()
 bool Weapon::shield()
 {
 	if ((m_type == SHIELD) && m_ready)
+	{
+		m_ready = false;
+		return true;
+	}
+	return false;
+}
+
+bool Weapon::reflect()
+{
+	if ((m_type == REFLECT) && m_ready)
 	{
 		m_ready = false;
 		return true;

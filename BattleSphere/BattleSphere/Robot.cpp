@@ -42,13 +42,13 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
-bool Robot::damagePlayer(int damage, XMVECTOR projDir)
+bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 {
-	float dmg = damage;
+	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
-		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(projDir, m_currentRotation);
+		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
 	if (m_currentWeapon[LEFT] != -1)
-		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, m_currentRotation);
+		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
 
 	if (dmg != 0.0f) 
 	{
@@ -125,6 +125,7 @@ void Robot::useWeapon(int side, float dt)
 		m_weapons[m_currentWeapon[side]]->shoot(getPosition(), m_currentRotation, side, dt);
 		m_weapons[m_currentWeapon[side]]->speedUp();
 		m_weapons[m_currentWeapon[side]]->shield();
+		m_weapons[m_currentWeapon[side]]->reflect();
 	}
 }
 

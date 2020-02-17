@@ -107,7 +107,7 @@ void GameState::handleInputs(Game* game, float dt)
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN))
 				{
 					int resourceIndex = m_robots[i]->getResourceIndex();
-					if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f)))
+					if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), 0))
 					{
 						m_input->setVibration(i, 0.5f);
 						if (resourceIndex != -1)
@@ -134,7 +134,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 GameState::GameState()
 {
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	m_type = stateType::e_gameState;
 	m_input = nullptr;
@@ -142,14 +142,14 @@ GameState::GameState()
 
 	for (int i = 0; i < 30; i++)
 	{
-		Resource* resource = new Resource(i % 5);
+		Resource* resource = new Resource(i % 6);
 		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), -0.4f, (float)(rand() % 20 - 40), 0.0f));
 		m_resources.push_back(resource);
 	}
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		Node* node = new Node(i % 5);
+		Node* node = new Node(i % 6);
 		node->setPosition(XMVectorSet((float)(i * 10), -0.2f, (float)(-60.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
