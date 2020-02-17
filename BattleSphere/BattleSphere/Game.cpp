@@ -53,7 +53,7 @@ void Game::update(float dt)
 	}
 }
 
-void Game::draw()
+void Game::draw(renderPass pass)
 {
 	for (int i = 0; i < m_states.size(); i++)
 	{

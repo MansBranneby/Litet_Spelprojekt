@@ -252,9 +252,17 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		
 	}
-	for (int i = 0; i < m_projectiles.size(); i++)
+	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+	{
+		game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+	}
+	for (int i = 0; i < m_nodes.size(); i++)
 	{
 		game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+	}
+	for (int i = 0; i < m_resources.size(); i++)
+	{
+		game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
 	}
 	if (pass != renderPass::e_opaque)
 	{
