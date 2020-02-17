@@ -1,5 +1,6 @@
+SamplerState sampAni : register(s0);
+
 #define BLOCK_SIZE 32
-SamplerState sampAni;
 
 struct PS_IN
 {
@@ -30,7 +31,13 @@ cbuffer PS_CONSTANT_BUFFER : register(b2)
 	float4 KsIn; //Ks + Ns
 	float4 KeIn; //Ke + d
 };
-cbuffer PS_ROBOT_DATA : register (b3) 
+
+cbuffer PS_CONSTANT_BUFFER : register(b3)
+{
+	matrix lightVP;
+};
+
+cbuffer PS_ROBOT_DATA : register (b4) 
 {
 	float3 playerPosition;
 	float radius;
@@ -51,6 +58,7 @@ float DoSpotCone(Light light, float4 L)
 Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
+Texture2D txShadowMap : register(t3);
 float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//// (for one light)
@@ -58,6 +66,25 @@ float4 PS_main(PS_IN input) : SV_Target
 	uint startOffset = LightGrid[tileIndex].x;
 	uint lightCount = LightGrid[tileIndex].y;
 
+	// Shadow
+	float4 PosRelLight = mul(lightVP, float4(input.posWC.xyz, 1.0f));
+
+	PosRelLight.xy /= PosRelLight.w;
+	
+	float2 shadowMapTex = float2(0.5f * PosRelLight.x + 0.5f, -0.5f * PosRelLight.y + 0.5f);
+	float depth = PosRelLight.z / PosRelLight.w;
+
+	float ep = 0.0005f;	
+	float dx = 1.0f / 1920;
+	float dy = 1.0f / 1080;
+
+	float sum = 0;
+	float x, y;
+	for (y = -1.0; y <= 1.0; y += 0.5)
+		for (x = -1.0; x <= 1.0; x += 0.5) 
+			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
+	float shadowCoeff = sum / 25.0;
+	
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
 	float3 fragmentCol;
 	
@@ -76,13 +103,13 @@ float4 PS_main(PS_IN input) : SV_Target
 		
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
-		
+
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
-		float3 L = float3(0,0,0);
-		float3 R = float3(0,0,0);
-		float4 lightCol = float4(0,0,0,0);
-		switch (light.Type) 
+		float3 L = float3(0, 0, 0);
+		float3 R = float3(0, 0, 0);
+		float4 lightCol = float4(0, 0, 0, 0);
+		switch (light.Type)
 		{
 		case 0:
 			//Point light
@@ -95,7 +122,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			lightCol = Lights[LightIndex[i]].color * light.Intensity;
+			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
 			break;
 		case 2:
 			//return float4(1, 1, 1, 1);
@@ -124,12 +151,12 @@ float4 PS_main(PS_IN input) : SV_Target
 
 			break;
 		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol);// +Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
 			break;
 		default:
+			fragmentCol = float3(1.0f, 1.0f, 1.0f);
 			break;
 		};
-
 	}
 	float3 ndcSpace = float3(0,0,0);
 	ndcSpace.x = input.pos.x / 1920; // 0 - 1

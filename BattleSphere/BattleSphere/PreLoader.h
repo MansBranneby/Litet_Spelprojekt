@@ -1,4 +1,5 @@
 #pragma once
+#include "BackfaceCuller.h"
 #include "Model.h"
 
 #include "Weapon.h"
@@ -18,6 +19,9 @@ private:
 	std::vector<int> m_nrOfmodels[OBJECT_TYPES];
 	std::vector<Model*> m_objects[OBJECT_TYPES];
 
+	// Backface culler
+	BackfaceCuller* m_bFCuller;
+
 	void loadFromFile(objectType type, std::string filename); // Without .nyp file extension
 	void setObjectData(objectType type, objectData data, int variant = 0);
 	void setObjectData(objectType type, objectData data, objectData relativeData, int variant = 0);
@@ -28,7 +32,8 @@ public:
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 	void draw(objectType type, int variant = 0);
-	void draw(objectType type, objectData data, int variant = 0);
-	void draw(objectType type, objectData data, objectData relativeData, int variant = 0);
+	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void cull(objectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.
 };
 

@@ -53,8 +53,12 @@ DX* DX::getInstance()
 		m_instance = new DX();
 	}
 
-
 	return m_instance;
+}
+
+Camera* DX::getCam()
+{
+	return m_camera;
 }
 
 ID3D11Device* DX::getDevice()
@@ -135,8 +139,15 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	return hr;
 }
 
+void DX::initializeCam(float width, float height, float nearPlane, float farPlane)
+{
+	m_camera = new Camera();
+	m_camera->initialize(width, height, nearPlane, farPlane);
+}
+
 void DX::release()
 {
+	if (m_camera) delete m_camera;
 	getDevice()->Release();
 	getDeviceContext()->Release();
 	getSwapChain()->Release();

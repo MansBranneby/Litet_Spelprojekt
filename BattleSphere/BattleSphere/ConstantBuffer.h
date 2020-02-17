@@ -2,8 +2,8 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-
 #include "DX.h"
+
 
 class ConstantBuffer
 {

@@ -4,6 +4,11 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 {
 	HWND wndHandle = initWindow(hInstance);
 	DX::getInstance()->createDirect3DContext(wndHandle);
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+	float nearPlane = 0.1f;
+	float farPlane = 200.0f;
+	DX::getInstance()->initializeCam(width, height, nearPlane, farPlane);
 
 	createDepthStencil();
 	createBackBuffer();

@@ -123,6 +123,18 @@
     <ClCompile Include="MainMenuState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileBank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BackfaceCuller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Transparency.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -239,6 +251,21 @@
     <ClInclude Include="MainMenuState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileBank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackfaceCuller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Transparency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -272,6 +299,17 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="PixelShaderDownsample.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShaderShadowMapping.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="GeometryShaderCulling.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

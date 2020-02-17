@@ -5,6 +5,11 @@
 
 using namespace DirectX;
 
+#define PISTOL 0
+#define RIFLE 1
+#define MOVEMENT 2
+#define SHIELD 3
+
 enum class objectType
 {
 	e_drone = 0,
@@ -32,13 +37,6 @@ enum class stateType
 	e_default
 };
 
-struct objectData 
-{
-	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
-};
-
 struct vertex 
 {
 	float posX, posY, posZ;
@@ -46,8 +44,30 @@ struct vertex
 	float normX, normY, normZ;
 };
 
+struct material
+{
+	XMVECTOR ambient = XMVectorSet(0.5f, 0, 0.5f, 0); // ambient.xyz, illumination model enumeration (illum)
+	XMVECTOR diffuse = XMVectorSet(0.5f, 0, 0.5f, 0); // diffuse.xyz, refraction (Ni)
+	XMVECTOR specular = XMVectorSet(0.5f, 0, 0.5f, 0); // specular.xyz, shininess (Ns)
+	XMVECTOR emission = XMVectorSet(0.5f, 0, 0.5f, 0); // emission.xyz, opacity (d)
+};
+
+struct objectData
+{
+	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
+	material material;
+};
+
 // Game update return data
 struct returnInfo
 {
 	float x, y, z;
+};
+
+struct vertexAndId
+{
+	float posX, posY, posZ;
+	unsigned int iD;
 };

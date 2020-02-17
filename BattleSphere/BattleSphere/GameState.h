@@ -6,11 +6,12 @@
 class GameState : public State 
 {
 private:
+	Input* m_input;
+	Robot** m_robots;
+	std::vector<Resource*> m_resources;
+	std::vector<Node*> m_nodes;
 	Lights* m_lights;
 	Transparency m_transparency;
-	
-	std::vector<GameObject> m_gameObjects;
-	std::vector<Projectile*> m_projectiles;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

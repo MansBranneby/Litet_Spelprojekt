@@ -3,7 +3,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include "StructsAndEnums.h"
 
 
 class Model
@@ -18,8 +17,8 @@ private:
 
 	XMMATRIX m_modelMatrix;
 
-	ID3D11Buffer* m_modelMatrixCBuffer;
-	XMMATRIX* m_modelMatrixData;
+	ID3D11Buffer* m_matrixCBuffer;
+	XMMATRIX* m_matrixData;
 	XMMATRIX m_rotationMat;
 	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
@@ -28,6 +27,7 @@ private:
 	ID3D11Buffer* m_vertexBuffer;
 
 	void createVertexBuffer(); // For vertex buffer
+	void createVertexCullingBuffer(); // For vertex culling buffer
 	void createVertexCBuffer(); // For model matrix
 	void updateSubResource();
 	void updateRelSubResource();
@@ -38,13 +38,20 @@ private:
 	void setRotation(XMVECTOR rotation, XMVECTOR relRotation);
 	void setScale(XMVECTOR scale);
 	void setScale(XMVECTOR scale, XMVECTOR relScale);
+
+	// For backface culling
+	ID3D11Buffer* m_vertexCullingBuffer;
+	vertexAndId* m_vertexAndId;
+	void setVPMatrix();
+
 public:
 	void draw();
+	void cullDraw();
 	Model();
 	~Model();
 
-	void setObjectData(objectData data);
-	void setObjectData(objectData data, objectData relativeData);
+	void setObjectData(objectData data, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
 	void loadModel(std::ifstream& in);
 };
 
