@@ -1,5 +1,5 @@
 #define BLOCK_SIZE 4
-#define NUM_LIGHTS 1024
+#define NUM_LIGHTS 48
 
 struct Sphere 
 {
@@ -97,7 +97,7 @@ void o_AppendLight(uint lightIndex)
 {
 	uint index; // Index into the visible lights array.
 	InterlockedAdd(o_LightCount, 1, index);
-	if (index < 1024)
+	if (index < NUM_LIGHTS)
 	{
 		o_LightList[index] = lightIndex;
 	}
@@ -171,9 +171,9 @@ void CS_main(ComputeShaderInput IN)
 			break;
 			}
 		}
-		else {
-			break;
-		}
+		//else {
+		//	break;
+		//}
 	}
 	GroupMemoryBarrierWithGroupSync();
 	if (IN.groupIndex == 0)

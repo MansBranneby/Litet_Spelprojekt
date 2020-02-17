@@ -12,8 +12,11 @@ private:
 	ID3D11RasterizerState* m_rasterizerState;
 
 	// VIEWS //
-	ID3D11DepthStencilView* m_depthStencilView;
+	ID3D11DepthStencilView* m_depthDSV;
+	ID3D11ShaderResourceView* m_depthSRV;
 	ID3D11RenderTargetView* m_backbufferRTV;
+
+
 
 	// SAMPLERS //
 	ID3D11SamplerState* m_samplerState = nullptr;
@@ -31,7 +34,7 @@ public:
 	// Member functions
 	GraphicResources();
 	~GraphicResources();
-	
+	void bindDepthStencilState();
 	HWND initializeResources(HINSTANCE hInstance);
 	ID3D11RasterizerState* getRasterizerState() const;
 	ID3D11DepthStencilView* getDepthStencilView() const;
