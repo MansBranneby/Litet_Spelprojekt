@@ -56,13 +56,6 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 void SubModel::draw()
 {
 	//Bind indexbuffer
-	DX* instance = DX::getInstance();
-	XMVECTOR emission = m_mat->emission;
-	if (emission.m128_f32[0] > 0 || emission.m128_f32[1] > 0 || emission.m128_f32[2] > 0)
-		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSEnabled(), 1);
-	else
-		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
-
 	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	//Bind constantbuffer TODO: Change startslot

@@ -58,6 +58,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	uint startOffset = LightGrid[tileIndex].x;
 	uint lightCount = LightGrid[tileIndex].y;
 
+	
 	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
 	float3 fragmentCol;
 	
@@ -65,15 +66,12 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
 	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
-	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
-		return float4(Ke, 1.0f);
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
 	fragmentCol = Ka * Ia * Kd;
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
-		
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
 		
@@ -120,11 +118,11 @@ float4 PS_main(PS_IN input) : SV_Target
 			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
 			break;
 		case 2: // "Phong" (diffuse, ambient, specular)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol);// +Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol) + Ke;
 
 			break;
 		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol);// +Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
 			break;
 		default:
 			break;
@@ -138,7 +136,8 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	ndcSpace.y = (ndcSpace.y * 2 + 1);
 	ndcSpace.z = input.pos.z;
-	
+	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
+		return float4(fragmentCol, 1.0f);
 	float2 dist = playerPosition.xy - ndcSpace.xy;
 	float aspectRatio = 9.0f / 16.0f;
 	dist.y *= aspectRatio;

@@ -7,43 +7,6 @@ DX::DX()
 	m_device = nullptr;
 	m_deviceContext = nullptr;
 	m_swapChain = nullptr;
-	m_pDSStateEnabled = nullptr;
-	m_pDSStateDisabled = nullptr;
-}
-
-void DX::createStencilStates()
-{
-	D3D11_DEPTH_STENCIL_DESC dsDesc = { 0 };
-	ZeroMemory(&dsDesc, sizeof(dsDesc));
-	// Depth test parameters
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	// Create depth stencil state
-	dsDesc.StencilEnable = false;
-	HRESULT hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &m_pDSStateDisabled);
-	if (FAILED(hr))
-		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
-
-	dsDesc.StencilEnable = true;
-	dsDesc.StencilReadMask = 0xFF;
-	dsDesc.StencilWriteMask = 0xFF;
-	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_INCR_SAT;
-	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
-
-
-	hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &m_pDSStateEnabled);
-	if (FAILED(hr))
-		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
 }
 
 DX* DX::getInstance()
@@ -70,16 +33,6 @@ ID3D11DeviceContext* DX::getDeviceContext()
 IDXGISwapChain* DX::getSwapChain() 
 {
 	return m_swapChain;
-}
-
-ID3D11DepthStencilState* DX::getDSSEnabled()
-{
-	return m_pDSStateEnabled;
-}
-
-ID3D11DepthStencilState* DX::getDSSDisabled()
-{
-	return m_pDSStateDisabled;
 }
 
 float DX::getWidth()
@@ -131,7 +84,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 		NULL,
 		&m_deviceContext);
 
-	createStencilStates();
+
 	return hr;
 }
 
@@ -140,6 +93,4 @@ void DX::release()
 	getDevice()->Release();
 	getDeviceContext()->Release();
 	getSwapChain()->Release();
-	m_pDSStateDisabled->Release();
-	m_pDSStateEnabled->Release();
 }

@@ -15,10 +15,6 @@ private:
 	ID3D11DeviceContext* m_deviceContext;
 	IDXGISwapChain* m_swapChain;
 
-	ID3D11DepthStencilState* m_pDSStateEnabled;
-	ID3D11DepthStencilState* m_pDSStateDisabled;
-
-	void createStencilStates();
 	// Data
 	float m_width = 1920.0f;
 	float m_height = 1080.0f;
@@ -29,8 +25,7 @@ public:
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
-	ID3D11DepthStencilState* getDSSEnabled();
-	ID3D11DepthStencilState* getDSSDisabled();
+
 	float getWidth();
 	float getHeight();
 

@@ -8,7 +8,7 @@
 #include "Lights.h"
 
 #define FRUSTUM_COUNT 14000
-#define INDEX_COUNT FRUSTUM_COUNT * LIGHT_COUNT
+#define INDEX_COUNT 3000000
 class LightCulling
 {
 private:
@@ -81,6 +81,6 @@ public:
 	void initialize();
 	void computeFrustum();
 	void cullLights();
-	void bindResources();
+	
 };
 
