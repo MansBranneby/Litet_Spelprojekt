@@ -3,7 +3,15 @@
 #include "State.h"
 #include "UI_Element.h"
 
-enum activeMainMenu
+#define SELECTIONSPEED 1000.0f
+
+enum MenuState
+{
+	e_mainMenu,
+	e_robotSelection,
+	e_optionsMenu
+};
+enum ActiveMainMenu
 {
 	e_startGame,
 	e_options,
@@ -14,13 +22,18 @@ class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
-	activeMainMenu m_activeMenu;
+	MenuState m_menuState;
+	ActiveMainMenu m_activeMenu;
 	
 	float m_selectionTimer;
 
 public:
 	MainMenuState();
 	virtual ~MainMenuState();
+
+	void hi_mainMenu(Game* game);
+	void hi_robotSelection(Game* game);
+	void hi_options(Game* game);
 
 	void pause();
 	void resume();

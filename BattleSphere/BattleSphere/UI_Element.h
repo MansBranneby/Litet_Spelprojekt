@@ -57,8 +57,11 @@ public:
 
 	float getPosX();
 	float getPosY();
-	void setDestinationX(float deltaX);
-	void setDestinationY(float deltaY);
+	void setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest);
+	void setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest);
+	void fadeOut(float fadeTime);
+	void fadeIn(float fadeTime);
+	void setAnimated(bool isAnimated);
 	
 	void setReady(bool isReady);
 	bool isReady();

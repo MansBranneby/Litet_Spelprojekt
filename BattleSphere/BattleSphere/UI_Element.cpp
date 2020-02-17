@@ -30,37 +30,37 @@ void UI_Element::initializeResources(std::wstring fileName)
 		{
 			-1.0f, 1.0f, 0.0f,	//v0 pos	L T
 			0.0f, 0.0f,			//v0 tex
-			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
 		};
 		m_vertexList[1] =
 		{
 			1.0f, -1.0f, 0.0f,	//v1 pos	R B
 			texU, texV,			//v1 tex
-			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
 		};
 		m_vertexList[2] =
 		{
 			-1.0f, 1.0f, 0.0f,	//v2 pos	L B
 			0.0f, texV,			//v2 tex
-			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
 		};
 		m_vertexList[3] =
 		{
 			-1.0f, 1.0f, 0.0f,	//v3 pos	L T
 			0.0f, 0.0f,			//v3 tex
-			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
 		};
 		m_vertexList[4] =
 		{
 			1.0f, 1.0f, 0.0f,	//v4 pos	R T
 			texU, 0.0f,			//v4 tex
-			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
 		};
 		m_vertexList[5] =
 		{
 			1.0f, -1.0f, 0.0f,	//v5 pos	R B
 			texU, texV,			//v5 tex
-			0.0f, 0.0f, 0.0f
+			1.0f, 0.0f, 0.0f
 		};	
 
 	m_vertexList[0].posX = left;
@@ -121,19 +121,22 @@ UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float pos
 
 	initializeResources(fileName);
 
-	switch (type)
+	if(type != uiType::e_static)
+		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames);
+
+	/*switch (type)
 	{
 	case uiType::e_mainMenuSelection:
-		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames, 1000.0f);
+		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames);
 		break;
 	case uiType::e_mainMenuBox:
-		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames, 1000.0f);
+		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames);
 		break;
 	case uiType::e_static:
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 UI_Element::~UI_Element()
@@ -145,23 +148,18 @@ UI_Element::~UI_Element()
 
 void UI_Element::updateElement(AnimationType animationType, float dt)
 {
-	switch (animationType)
+
+	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
 	{
-	case e_translate:
-		if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Only update if element needs to move
-		{
 
-			m_isReady = m_animation->animateElement(animationType, m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt);
+		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt);
 
-			updateVertexBuffer();
-		}
-		break;
-	case e_sprite:
-		m_animation->animateElement(animationType, m_vertexList, dt);
 		updateVertexBuffer();
-		break;
-	default:
-		break;
+	}
+	if (m_animation->isAnimated()) // Spritesheet or fading
+	{
+		m_animation->animateElement(m_vertexList, dt);
+		updateVertexBuffer();
 	}
 }
 
@@ -194,14 +192,31 @@ float UI_Element::getPosY()
 	return m_posY;
 }
 
-void UI_Element::setDestinationX(float deltaX)
+void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest)
 {
 	m_destinationX += deltaX;
+	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
-void UI_Element::setDestinationY(float deltaY)
+void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest)
 {
 	m_destinationY += deltaY;
+	m_animation->setAnimationData(speed, acceleration, delay, rest);
+}
+
+void UI_Element::fadeOut(float fadeTime)
+{
+	m_animation->setFadeOut(fadeTime);
+}
+
+void UI_Element::fadeIn(float fadeTime)
+{
+	m_animation->setFadeIn(fadeTime);
+}
+
+void UI_Element::setAnimated(bool isAnimated)
+{
+	m_animation->setAnimated(isAnimated);
 }
 
 void UI_Element::setReady(bool isReady)

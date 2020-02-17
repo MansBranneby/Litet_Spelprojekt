@@ -41,6 +41,7 @@ enum class uiType
 {
 	e_mainMenuSelection,
 	e_mainMenuBox,
+	e_mainMenuText,
 	e_static
 };
 
