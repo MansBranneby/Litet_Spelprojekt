@@ -3,7 +3,9 @@
 void UI_Element::initializeResources(std::wstring fileName)
 {
 	// Vertex list //
-	float left, right, top, bottom, texU, texV;
+	float left, right, top, bottom, texU, texV, alpha;
+
+	if (m_isDrawn ? alpha = 1.0f : alpha = 0.0f);
 	
 	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
 	{
@@ -30,37 +32,37 @@ void UI_Element::initializeResources(std::wstring fileName)
 		{
 			-1.0f, 1.0f, 0.0f,	//v0 pos	L T
 			0.0f, 0.0f,			//v0 tex
-			1.0f, 0.0f, 0.0f,
+			alpha, 0.0f, 0.0f,
 		};
 		m_vertexList[1] =
 		{
 			1.0f, -1.0f, 0.0f,	//v1 pos	R B
 			texU, texV,			//v1 tex
-			1.0f, 0.0f, 0.0f,
+			alpha, 0.0f, 0.0f,
 		};
 		m_vertexList[2] =
 		{
 			-1.0f, 1.0f, 0.0f,	//v2 pos	L B
 			0.0f, texV,			//v2 tex
-			1.0f, 0.0f, 0.0f,
+			alpha, 0.0f, 0.0f,
 		};
 		m_vertexList[3] =
 		{
 			-1.0f, 1.0f, 0.0f,	//v3 pos	L T
 			0.0f, 0.0f,			//v3 tex
-			1.0f, 0.0f, 0.0f,
+			alpha, 0.0f, 0.0f,
 		};
 		m_vertexList[4] =
 		{
 			1.0f, 1.0f, 0.0f,	//v4 pos	R T
 			texU, 0.0f,			//v4 tex
-			1.0f, 0.0f, 0.0f,
+			alpha, 0.0f, 0.0f,
 		};
 		m_vertexList[5] =
 		{
 			1.0f, -1.0f, 0.0f,	//v5 pos	R B
 			texU, texV,			//v5 tex
-			1.0f, 0.0f, 0.0f
+			alpha, 0.0f, 0.0f
 		};	
 
 	m_vertexList[0].posX = left;
@@ -101,9 +103,9 @@ void UI_Element::initializeResources(std::wstring fileName)
 		MessageBox(NULL, L"Error in m_elementSRV", L"Error", MB_OK | MB_ICONERROR);
 }
 
-UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float posY, float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames)
+UI_Element::UI_Element(std::wstring fileName, bool isDrawn, float posX, float posY, float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames)
 {
-	m_type = type;
+	//m_type = type;
 
 	m_posX = posX;
 	m_posY = posY;
@@ -113,6 +115,8 @@ UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float pos
 	m_destinationX = m_posX;
 	m_destinationY = m_posY;
 
+	m_alpha = isDrawn;
+	m_isDrawn = isDrawn;
 	m_isReady = true;
 	m_selectionTimer = 0.0f;
 
@@ -121,8 +125,8 @@ UI_Element::UI_Element(std::wstring fileName, uiType type, float posX, float pos
 
 	initializeResources(fileName);
 
-	if(type != uiType::e_static)
-		m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames);
+	/*if(type != uiType::e_static)*/
+	m_animation = new UI_Animation(sizeX, sizeY, spriteSizeX, spriteSizeY, nrOfFrames);
 
 	/*switch (type)
 	{
@@ -146,7 +150,7 @@ UI_Element::~UI_Element()
 	delete m_animation;
 }
 
-void UI_Element::updateElement(AnimationType animationType, float dt)
+void UI_Element::updateElement(float dt)
 {
 
 	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
@@ -159,6 +163,7 @@ void UI_Element::updateElement(AnimationType animationType, float dt)
 	if (m_animation->isAnimated()) // Spritesheet or fading
 	{
 		m_animation->animateElement(m_vertexList, dt);
+		m_isReady = m_animation->fadeElement(m_vertexList, dt);
 		updateVertexBuffer();
 	}
 }
@@ -173,13 +178,16 @@ void UI_Element::updateVertexBuffer()
 
 void UI_Element::draw()
 {
-	UINT32 vertexSize = sizeof(vertex);
-	UINT32 offset = 0;
+	if (m_vertexList[0].normX)
+	{
+		UINT32 vertexSize = sizeof(vertex);
+		UINT32 offset = 0;
 
-	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &m_elementSRV);
-	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
-	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+		DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &m_elementSRV);
+		DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+		DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		DX::getInstance()->getDeviceContext()->Draw(6, 0);
+	}
 }
 
 float UI_Element::getPosX()
@@ -204,14 +212,14 @@ void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, 
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
-void UI_Element::fadeOut(float fadeTime)
+void UI_Element::fadeOut(float fadeTime, float delay)
 {
-	m_animation->setFadeOut(fadeTime);
+	m_animation->setFadeOut(fadeTime, delay);
 }
 
-void UI_Element::fadeIn(float fadeTime)
+void UI_Element::fadeIn(float fadeTime, float delay)
 {
-	m_animation->setFadeIn(fadeTime);
+	m_animation->setFadeIn(fadeTime, delay);
 }
 
 void UI_Element::setAnimated(bool isAnimated)
@@ -219,9 +227,24 @@ void UI_Element::setAnimated(bool isAnimated)
 	m_animation->setAnimated(isAnimated);
 }
 
+float UI_Element::getAlpha()
+{
+	return m_vertexList[0].normX;
+}
+
+void UI_Element::setDrawn(bool isDrawn)
+{
+	m_isDrawn = isDrawn;
+}
+
 void UI_Element::setReady(bool isReady)
 {
 	m_isReady = isReady;
+}
+
+bool UI_Element::isDrawn()
+{
+	return m_isDrawn;
 }
 
 bool UI_Element::isReady()

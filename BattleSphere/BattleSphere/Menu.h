@@ -9,6 +9,7 @@ class Menu
 {
 private:
 	Camera* m_camera;
+	Camera* m_cameraPerspective;
 //	ID3D11DepthStencilState* m_depthState;
 	VertexShader* m_vertexShader;
 	PixelShader* m_pixelShader;
@@ -20,7 +21,7 @@ public:
 	~Menu();
 
 	//ID3D11DepthStencilState* getDepthStencilState();
-	Camera* getCamera();
+	Camera* getCamera(bool perspective);
 	VertexShader* getVertexShader();
 	PixelShader* getPixelShader();
 };

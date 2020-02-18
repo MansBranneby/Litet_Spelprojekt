@@ -33,7 +33,7 @@ public:
 
 	void update(float dt);
 	//void updateSec();
-	void draw();
+	void draw(int index);
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);

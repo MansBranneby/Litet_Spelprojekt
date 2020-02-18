@@ -102,7 +102,7 @@ bool UI_Animation::translateElement(vertex* vertexList, float* posX, float* posY
 void UI_Animation::animateElement(vertex* vertexList, float dt)
 {
 	// Sprite
-	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
+	if ((m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f) && m_isAnimated)
 	{
 		m_timer += dt;
 		if (m_timer >= 0.1f)
@@ -148,23 +148,82 @@ void UI_Animation::animateElement(vertex* vertexList, float dt)
 			vertexList[5].v = m_texV;
 		}
 	}
+}
+
+bool UI_Animation::fadeElement(vertex* vertexList, float dt)
+{
+	bool returnValue = false;
+	float alpha = 0.0f;
 	if (m_fadeOut > 0.0f)
 	{
-		vertexList[0].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
-		vertexList[1].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
-		vertexList[2].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
-		vertexList[3].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
-		vertexList[4].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
-		vertexList[5].normX = 1.0f - (1 - m_fadeOut/m_initialFadeTime);
+		if (m_delay <= 0.0f)
+		{
+			alpha = 1.0f - (1 - m_fadeOut / m_initialFadeTime);
+			if (alpha < 0.01f)
+			{
+				vertexList[0].normX = 0.0f;
+				vertexList[1].normX = 0.0f;
+				vertexList[2].normX = 0.0f;
+				vertexList[3].normX = 0.0f;
+				vertexList[4].normX = 0.0f;
+				vertexList[5].normX = 0.0f;
+			}
+			else
+			{
+				vertexList[0].normX = alpha;
+				vertexList[1].normX = alpha;
+				vertexList[2].normX = alpha;
+				vertexList[3].normX = alpha;
+				vertexList[4].normX = alpha;
+				vertexList[5].normX = alpha;
+			}
+			m_fadeOut -= dt;
+			if (m_fadeOut <= 0.0f)
+				returnValue = true;
+		}
+		else
+			m_delay -= dt;
 
-		m_fadeOut -= dt;
 	}
+	if (m_fadeIn > 0.0f)
+	{
+		if (m_delay2 <= 0.0f)
+		{
+			alpha = 1.0f - (m_fadeIn / m_initialFadeTime);
+			if (alpha > 0.99f)
+			{
+				vertexList[0].normX = 1.0f;
+				vertexList[1].normX = 1.0f;
+				vertexList[2].normX = 1.0f;
+				vertexList[3].normX = 1.0f;
+				vertexList[4].normX = 1.0f;
+				vertexList[5].normX = 1.0f;
+			}
+			else
+			{
+				vertexList[0].normX = alpha;
+				vertexList[1].normX = alpha;
+				vertexList[2].normX = alpha;
+				vertexList[3].normX = alpha;
+				vertexList[4].normX = alpha;
+				vertexList[5].normX = alpha;
+			}
+			m_fadeIn -= dt;
+			if (m_fadeIn <= 0.0f)
+				returnValue = true;
+		}
+		else
+			m_delay2 -= dt;
+
+	}
+	return returnValue;
 }
 
 UI_Animation::UI_Animation(float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames)
 {
 	m_timer = 0.0f;
 	m_delay = 0.0f;
+	m_delay2 = 0.0f;
 	m_rest = 0.0f;
 	m_sizeX = sizeX;
 	m_sizeY = sizeY;
@@ -206,16 +265,18 @@ bool UI_Animation::isFadeIn()
 	return m_fadeIn;
 }
 
-void UI_Animation::setFadeOut(float fadeOut)
+void UI_Animation::setFadeOut(float fadeOut, float delay)
 {
 	m_fadeOut = fadeOut;
 	m_initialFadeTime = fadeOut;
+	m_delay = delay;
 }
 
-void UI_Animation::setFadeIn(float fadeIn)
+void UI_Animation::setFadeIn(float fadeIn, float delay)
 {
 	m_fadeIn = fadeIn;
 	m_initialFadeTime = fadeIn;
+	m_delay2 = delay;
 }
 
 void UI_Animation::setAnimationData(float speed, float acceleration, float delay, float rest)

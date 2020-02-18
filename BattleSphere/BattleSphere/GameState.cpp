@@ -195,7 +195,7 @@ void GameState::update(Game* game, float dt)
 	}
 }
 
-void GameState::draw(Game* game)
+void GameState::draw(Game* game, int index)
 {
 	game->getPreLoader()->draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)

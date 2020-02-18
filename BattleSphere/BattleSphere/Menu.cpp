@@ -7,6 +7,7 @@ void Menu::initializeResources()
 Menu::Menu()
 {
 	m_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.01f, 200.0f, false);
+	m_cameraPerspective = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.01f, 200.0f, true);
 	//m_depthState = nullptr;
 	m_vertexShader = new VertexShader(L"VertexShaderMenu.hlsl");
 	m_pixelShader = new PixelShader(L"PixelShaderMenu.hlsl");
@@ -17,6 +18,7 @@ Menu::Menu()
 Menu::~Menu()
 {
 	delete m_camera;
+	delete m_cameraPerspective;
 	
 	m_vertexShader->release();
 	m_pixelShader->release();
@@ -31,9 +33,12 @@ Menu::~Menu()
 //	//return m_depthState;
 //}
 
-Camera* Menu::getCamera()
+Camera* Menu::getCamera(bool perspective)
 {
-	return m_camera;
+	if (perspective)
+		return m_cameraPerspective;
+	else
+		return m_camera;
 }
 
 VertexShader* Menu::getVertexShader()

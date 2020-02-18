@@ -34,7 +34,7 @@ Game::Game()
 	m_nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_robots[i] = nullptr;
-	updatePlayerStatus();
+	//updatePlayerStatus();
 
 	objectData sceneData;
 	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
@@ -63,12 +63,12 @@ void Game::update(float dt)
 //	}
 //}
 
-void Game::draw()
+void Game::draw(int index)
 {
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (!m_states[i]->isPaused())
-			m_states[i]->draw(this);
+			m_states[i]->draw(this, index);
 	}
 }
 

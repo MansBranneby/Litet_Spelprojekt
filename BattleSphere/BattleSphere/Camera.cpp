@@ -5,9 +5,9 @@ Camera::Camera(float width, float height, float nearPlane, float farPlane, bool 
 	if (isPerspective)
 	{
 		// Base vectors
-		m_position = XMVectorSet(0.0f, 70.0f, -60.0f, 0.0f);
+		m_position = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
 	
-		m_lookAt = XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
+		m_lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	
 		m_up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
@@ -25,7 +25,7 @@ Camera::Camera(float width, float height, float nearPlane, float farPlane, bool 
 	else
 	{
 		// Base vectors
-		m_position = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		m_position = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
 
 		m_lookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 
