@@ -12,11 +12,15 @@ private:
 	ID3D11RasterizerState* m_rasterizerState;
 
 	// VIEWS //
-	ID3D11DepthStencilView* m_depthStencilView;
+	ID3D11DepthStencilView* m_depthDSV;
+	ID3D11ShaderResourceView* m_depthSRV;
 	ID3D11RenderTargetView* m_backbufferRTV;
+
+
 
 	// SAMPLERS //
 	ID3D11SamplerState* m_samplerState = nullptr;
+	ID3D11BlendState* m_blendState = nullptr;
 
 	HWND initWindow(HINSTANCE hInstance);
 	void createDepthStencil();
@@ -24,17 +28,18 @@ private:
 	void setViewPort();
 	void setRasterizerState();
 	void setSamplerState();
+	void createBlendState();
 public:
 
 	// Member functions
 	GraphicResources();
 	~GraphicResources();
-	
+	void bindDepthStencilState();
 	HWND initializeResources(HINSTANCE hInstance);
 	ID3D11RasterizerState* getRasterizerState() const;
 	ID3D11DepthStencilView* getDepthStencilView() const;
 	ID3D11RenderTargetView** getBackBuffer();
 	ID3D11SamplerState** getSamplerState();
-
+	ID3D11BlendState* getBlendState() const;
 	void setViewPortDim(UINT width, UINT height);
 };
