@@ -222,14 +222,25 @@ void GameState::update(Game* game, float dt)
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-	{	
+	{
 		// Normal collision
 		BoundingSphere* projBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0));
 		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projBV);
 		if (collisionInfo.m_colliding)
 			ProjectileBank::getInstance()->removeProjectile(i);
-		else if(XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
-			ProjectileBank::getInstance()->removeProjectile(i);	
+		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
+			ProjectileBank::getInstance()->removeProjectile(i);
+
+		// COLLISION PROJECTILE VS PLAYERS
+		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+		{
+			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
+			collisionInfo = robotBV->intersects(projBV);
+
+			// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
+			//if(collisionInfo.m_colliding)
+				//ProjectileBank::getInstance()->removeProjectile(i);	
+		}
 	}
 
 	for (int i = 0; i < m_resources.size(); i++)
