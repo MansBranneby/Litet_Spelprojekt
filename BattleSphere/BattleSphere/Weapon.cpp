@@ -84,13 +84,18 @@ float Weapon::getSpeed()
 	return m_currentSpeed;
 }
 
-float Weapon::getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int projIndex)
+float Weapon::getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int &projIndex)
 {
-	if (m_type == REFLECT && m_cdTime < m_duration && !m_ready)
+	if (m_type == DASH && m_cdTime < m_duration + 0.1f && !m_ready)
+	{
+		return 0.0f;
+	}
+	else if (m_type == REFLECT && m_cdTime < m_duration && !m_ready && projIndex != -1)
 	{
 		ProjectileBank::getInstance()->changeDirection(projIndex, robotPos);
+		projIndex = -1;
 	}
-	if (m_type == SHIELD)
+	else if (m_type == SHIELD)
 	{
 		float rotInRad = XMConvertToRadians(robotRot);
 
@@ -137,7 +142,7 @@ void Weapon::upgrade()
 	/*
 	if (m_damage > 25.0f) m_damage = 25.0f;
 	if (m_recoil < 0.0f) m_recoil = 0.0f;
-	if (m_cooldown < 2.0f) m_recoil = 2.0f;
+	if (m_cooldown < 2.0f) m_cooldown = 2.0f;
 	if (m_duration > 8.0) m_duration = 8.0f;
 	*/
 }
@@ -180,7 +185,7 @@ bool Weapon::shoot(XMVECTOR robotPos, float rot, int side, float dt)
 		else
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
-		ProjectileBank::getInstance()->addProjectile(projPos, projRot, projDir, m_type, m_damage);
+		ProjectileBank::getInstance()->addProjectile(projPos+projDir, projRot, projDir, m_type, m_damage);
 
 		return true;
 	}

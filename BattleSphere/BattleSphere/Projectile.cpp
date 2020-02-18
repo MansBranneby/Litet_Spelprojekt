@@ -19,7 +19,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int d
 	}
 	else if (type == RIFLE)
 	{
-		m_velocity = 5.0f;
+		m_velocity = 50.0f;
 		//setScale(0.5f, 0.5f, 0.8f);
 		setScale(0.15f, 0.15f, 0.3f);
 	}

@@ -174,14 +174,14 @@ GameState::GameState()
 	for (int i = 0; i < 30; i++)
 	{
 		Resource* resource = new Resource(i % 6);
-		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), -0.4f, (float)(rand() % 20 - 40), 0.0f));
+		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), 0.4f, (float)(rand() % 20 - 40), 0.0f));
 		m_resources.push_back(resource);
 	}
 
 	for (int i = 0; i < 6; i++)
 	{
 		Node* node = new Node(i % 6);
-		node->setPosition(XMVectorSet((float)(i * 10), -0.2f, (float)(-60.0f), 0.0f));
+		node->setPosition(XMVectorSet((float)(i * 10), 0.2f, (float)(-90.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
 
@@ -235,16 +235,29 @@ void GameState::update(Game* game, float dt)
 			ProjectileBank::getInstance()->removeProjectile(i);
 		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
 			ProjectileBank::getInstance()->removeProjectile(i);
-
-		// COLLISION PROJECTILE VS PLAYERS
-		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+		else
 		{
-			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
-			collisionInfo = robotBV->intersects(projBV);
+			// COLLISION PROJECTILE VS PLAYERS
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+			{
+				BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
+				collisionInfo = robotBV->intersects(projBV);
 
-			// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
-			//if(collisionInfo.m_colliding)
-				//ProjectileBank::getInstance()->removeProjectile(i);	
+				// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
+				if (collisionInfo.m_colliding)
+				{
+					int resourceIndex = m_robots[j]->getResourceIndex();
+					if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
+					{
+						m_input->setVibration(j, 0.5f);
+						if (resourceIndex != -1)
+						{
+							m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+							m_resources[resourceIndex]->setBlocked(false);
+						}
+					}
+				}
+			}
 		}
 	}
 

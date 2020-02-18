@@ -16,6 +16,7 @@ Robot::Robot(int playerId)
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
+	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
 
@@ -60,9 +61,14 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 	if (m_currentWeapon[LEFT] != -1)
 		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
 
+	if (projIndex != -1)
+		ProjectileBank::getInstance()->removeProjectile(projIndex);
+
 	if (dmg != 0.0f)
 	{
 		m_health -= (int)floorf(dmg);
+		if (m_health < 0)
+			m_health = 0;
 		m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
 		removeResource();
 		return true;
@@ -277,4 +283,6 @@ void Robot::release()
 	{
 		delete m_weapons[i];
 	}
+
+	delete[] m_positionHistory;
 }

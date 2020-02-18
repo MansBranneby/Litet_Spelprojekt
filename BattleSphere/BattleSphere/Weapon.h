@@ -46,7 +46,7 @@ public:
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
-	float getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int projIndex);
+	float getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int& projIndex);
 
 	bool updateTime(float dt);
 

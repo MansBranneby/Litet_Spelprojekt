@@ -102,7 +102,7 @@ PreLoader::PreLoader()
 	m_bFCuller = new BackfaceCuller;
 
 	// Load objects
-	loadFromFile(objectType::e_weapon, "1mesh1mat");
+	loadFromFile(objectType::e_weapon, "Weapon1");
 	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");

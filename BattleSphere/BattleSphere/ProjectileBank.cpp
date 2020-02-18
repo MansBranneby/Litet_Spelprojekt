@@ -36,11 +36,7 @@ void ProjectileBank::moveProjectiles(float dt)
 
 void ProjectileBank::changeDirection(int index, XMVECTOR relPos)
 {
-	for (int i = 0; i < m_projectiles.size(); i++)
-	{
-		m_projectiles[i]->setDirection(relPos);
-	}
-	//m_projectiles[index]->setDirection(relPos);
+	m_projectiles[index]->setDirection(relPos);
 }
 
 std::vector<Projectile*> ProjectileBank::getList()
