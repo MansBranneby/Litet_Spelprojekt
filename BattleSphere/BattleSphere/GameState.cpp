@@ -184,7 +184,33 @@ GameState::GameState()
 		node->setPosition(XMVectorSet((float)(i * 10), 0.2f, (float)(-90.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
+	m_transparency.initialize();
+	m_transparency.bindConstantBuffer();
+	m_lights = Lights::getInstance();
+	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
+	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
+	index = m_lights->addDirectionalLight(0.5f, -1, 0.5f, 0.6f, 0.6f, 1.0f, 4.0f);
+	index = m_lights->addSpotLight(-1.5f, 6, -40, 10, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+	index = m_lights->addSpotLight(1.5f, 6, -40, 10, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+	m_lights->addPointLight(-31, 6, -43, 10, 1, 1, 0, 5);
+	m_lights->addPointLight(27.5f, 4, -36, 10, 1, 0, 1, 5);
+	m_lights->addPointLight(50, 15.0, 42, 30, 1, 0.5f, 0, 25);
+	m_lights->addPointLight(-3, 10.0, 45, 20, 0, 1, 1, 10);
+	m_lights->addPointLight(20, 5.0, 40, 30, 0, 0, 1, 15);
+	m_lights->addPointLight(107, 5.0, 40, 30, 1, 1, 0, 20);
+	m_lights->addPointLight(90, 5.0, 33, 10, 1, 0, 0, 20);
+	m_lights->addPointLight(-40, 6.0, -1, 30, 1, 1, 0.6f, 15);
+	m_lights->addPointLight(-71.5, 1.0, 59.5, 10, 1, 0.6f, 0, 10);
+	
 
+	//m_lights->setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
+	/*
+	index = m_lights->addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
+	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
+	index = m_lights->addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
+	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);*/
+	
+	
 }
 
 GameState::~GameState()
@@ -198,6 +224,7 @@ GameState::~GameState()
 	{
 		delete m_nodes[i];
 	}
+	
 }
 
 void GameState::pause()
@@ -219,13 +246,14 @@ void GameState::update(Game* game, float dt)
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
 
+	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
 			m_robots[i]->update(dt);
 	}
 
-	// COLLISION PROJECTILES VS STATIC OBJECTS
+	// TODO remove with collision instead aswell as game field?
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
 		// Normal collision
@@ -267,37 +295,46 @@ void GameState::update(Game* game, float dt)
 	}
 }
 
-void GameState::draw(Game* game)
+void GameState::draw(Game* game, renderPass pass)
 {
-	game->getPreLoader()->draw(objectType::e_scene);
-	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	if (pass != renderPass::e_transparent)
 	{
-		if (m_robots[i] != nullptr)
+
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+			if (m_robots[i] != nullptr)
+			{
+				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
 			game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
 			game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
 
-			if (m_robots[i]->getCurrentWeapon(LEFT) != -1)
-			{
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0);
+				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+				{
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+				}
 			}
 		}
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+		}
+		for (int i = 0; i < m_resources.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+		}
 	}
-
-	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+	if(pass != renderPass::e_opaque)
 	{
-		game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
-	}
+		
+			game->getPreLoader()->draw(objectType::e_scene);
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+		}
+		
+		
 
-	for (int i = 0; i < m_resources.size(); i++)
-	{
-		game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
 	}
-
-	for (int i = 0; i < m_nodes.size(); i++)
-	{
-		game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
-	}
+	
 }

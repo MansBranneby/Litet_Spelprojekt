@@ -30,7 +30,9 @@ enum class renderPass
 {
 	e_scene,
 	e_downSample,
-	e_final
+	e_final,
+	e_opaque,
+	e_transparent
 };
 
 enum class stateType
