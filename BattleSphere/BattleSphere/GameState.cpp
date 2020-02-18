@@ -131,8 +131,8 @@ void GameState::handleInputs(Game* game, float dt)
 			float l = XMVectorGetX(XMVector3Length(v));
 			float r = robotBV->getRadius();
 			XMVECTOR newPos = m_robots[i]->getPosition();
-			// if robot moved further than its diameter
-			if (r * 2.0f < l)
+			// if robot moved further than its radius
+			if (r < l)
 			{
 				float tIncrement = r / l;
 				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
