@@ -171,7 +171,7 @@ float4 PS_main(PS_IN input) : SV_Target
 		float2 dist = playerPosition[j].xy - ndcSpace.xy;
 
 		dist.y *= aspectRatio;
-		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > -0.8f)
+		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > 0.2f)
 			return float4(fragmentCol, 0.5f);
 	}
 	

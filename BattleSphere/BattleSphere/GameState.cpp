@@ -249,8 +249,14 @@ void GameState::update(Game* game, float dt)
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr)
+		if (m_robots[i] != nullptr) 
+		{
 			m_robots[i]->update(dt);
+			XMVECTOR pos = m_robots[i]->getPosition();
+			pos.m128_f32[3] = 1;
+			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
+		}
+			
 	}
 
 	// TODO remove with collision instead aswell as game field?
