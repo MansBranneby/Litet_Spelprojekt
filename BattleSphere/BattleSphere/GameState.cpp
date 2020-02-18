@@ -165,6 +165,7 @@ GameState::GameState()
 	m_lights->addPointLight(90, 5.0, 33, 10, 1, 0, 0, 20);
 	m_lights->addPointLight(-40, 6.0, -1, 30, 1, 1, 0.6f, 15);
 	m_lights->addPointLight(-71.5, 1.0, 59.5, 10, 1, 0.6f, 0, 10);
+	
 
 	//m_lights->setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
 	/*
@@ -262,26 +263,26 @@ void GameState::draw(Game* game, renderPass pass)
 				}
 			}
 		}
-		
-	}
-	if(pass != renderPass::e_opaque)
-	{
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
-		}
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
 		}
-		if (pass != renderPass::e_opaque)
-		{
+	}
+	if(pass != renderPass::e_opaque)
+	{
+		
 			game->getPreLoader()->draw(objectType::e_scene);
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
+		
+		
+
 	}
 	
 }

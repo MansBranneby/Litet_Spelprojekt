@@ -175,5 +175,5 @@ float4 PS_main(PS_IN input) : SV_Target
 			return float4(fragmentCol, 0.5f);
 	}
 	
-	return float4(fragmentCol, kdIn.w);
+	return float4(fragmentCol, KeIn.w);
 };
