@@ -3,8 +3,10 @@
 #include "State.h"
 #include "Transparency.h"
 #include "Lights.h"
+
 class GameState : public State 
 {
+	
 private:
 	Input* m_input;
 	Robot** m_robots;

@@ -9,6 +9,7 @@ DX::DX()
 	m_swapChain = nullptr;
 	m_pDSStateEnabled = nullptr;
 	m_pDSStateDisabled = nullptr;
+	m_camera = nullptr;
 }
 
 void DX::createStencilStates()

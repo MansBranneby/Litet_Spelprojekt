@@ -3,8 +3,8 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 struct robotInfo {
-	XMFLOAT3 position;
-	float radius;
+	XMFLOAT4 position[4];
+
 };
 class Transparency
 {
@@ -15,7 +15,7 @@ private:
 	robotInfo* m_info;
 public:
 	void initialize();
-	void update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projMatrix);
+	void update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projMatrix, int index);
 	void bindConstantBuffer();
 	Transparency();
 	~Transparency();

@@ -39,8 +39,8 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 
 cbuffer PS_ROBOT_DATA : register (b4) 
 {
-	float3 playerPosition;
-	float radius;
+	float4 playerPosition[4];
+
 };
 float DoAttenuation(Light light, float d)
 {
@@ -165,11 +165,15 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	ndcSpace.y = (ndcSpace.y * 2 + 1);
 	ndcSpace.z = input.pos.z;
-	
-	float2 dist = playerPosition.xy - ndcSpace.xy;
 	float aspectRatio = 9.0f / 16.0f;
-	dist.y *= aspectRatio;
-	if (length(dist) < radius * 4 && ndcSpace.z < playerPosition.z && input.posWC.y > -0.8f)
-		return float4(fragmentCol, 0.5f);
+	for (int j = 0; j < 4; j++)
+	{
+		float2 dist = playerPosition[j].xy - ndcSpace.xy;
+
+		dist.y *= aspectRatio;
+		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > -0.8f)
+			return float4(fragmentCol, 0.5f);
+	}
+	
 	return float4(fragmentCol, 1.0f);
 };

@@ -187,6 +187,7 @@ GameState::~GameState()
 	{
 		delete m_nodes[i];
 	}
+	
 }
 
 void GameState::pause()
@@ -214,6 +215,17 @@ void GameState::update(Game* game, float dt)
 		if (m_robots[i] != nullptr)
 			m_robots[i]->update(dt);
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_robots[i] != nullptr)
+		{
+			XMVECTOR pos = m_robots[i]->getPosition();
+			pos.m128_f32[3] = 1;
+			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
+		}
+		
+	}
+	
 
 	// TODO remove with collision instead aswell as game field?
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
@@ -252,20 +264,24 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		
 	}
-	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+	else if(pass != renderPass::e_opaque)
 	{
-		game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+		}
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+		}
+		for (int i = 0; i < m_resources.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+		}
+		if (pass != renderPass::e_opaque)
+		{
+			game->getPreLoader()->draw(objectType::e_scene);
+		}
 	}
-	for (int i = 0; i < m_nodes.size(); i++)
-	{
-		game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
-	}
-	for (int i = 0; i < m_resources.size(); i++)
-	{
-		game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
-	}
-	if (pass != renderPass::e_opaque)
-	{
-		game->getPreLoader()->draw(objectType::e_scene);
-	}
+	
 }

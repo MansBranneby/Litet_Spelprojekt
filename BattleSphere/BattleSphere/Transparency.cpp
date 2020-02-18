@@ -4,12 +4,15 @@
 void Transparency::initialize()
 {
 	m_info = new robotInfo();
-	m_info->position = XMFLOAT3(0, 0, 0);
-	m_info->radius = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_info->position[0] = XMFLOAT4(0, 0, 0,0);
+	}
+	
 	m_constantBuffer = new ConstantBuffer(m_info, sizeof(robotInfo));
 }
 
-void Transparency::update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projMatrix)
+void Transparency::update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projMatrix, int index)
 {
 	XMVECTOR edge = XMVectorSet(position.m128_f32[0] + 1, position.m128_f32[1], position.m128_f32[2], 1);
 	position = XMVector4Transform(position, viewMatrix);
@@ -22,10 +25,10 @@ void Transparency::update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projM
 	float radius = edge.m128_f32[0] - position.m128_f32[0];
 	if (radius < 0)
 		radius *= -1;
-	m_info->position.x = position.m128_f32[0];
-	m_info->position.y = position.m128_f32[1];
-	m_info->position.z = position.m128_f32[2];
-	m_info->radius = radius;
+	m_info->position[index].x = position.m128_f32[0];
+	m_info->position[index].y = position.m128_f32[1];
+	m_info->position[index].z = position.m128_f32[2];
+	m_info->position[index].w = radius;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, m_info, sizeof(robotInfo));
@@ -35,7 +38,7 @@ void Transparency::update(XMVECTOR position, XMMATRIX viewMatrix, XMMATRIX projM
 
 void Transparency::bindConstantBuffer()
 {
-	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(3, 1, m_constantBuffer->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(4, 1, m_constantBuffer->getConstantBuffer());
 }
 
 Transparency::Transparency()

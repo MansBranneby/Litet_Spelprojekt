@@ -211,7 +211,7 @@ void downsample()
 
 void shadowRender()
 {
-	float clearColour[] = { 1.0f, 0, 0.2f, 1 };
+	float clearColour[] = { 0, 0, 0, 0 };
 
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_shadowMapping->getDepthStencilView());
 	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
@@ -323,7 +323,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				g_Game->update(g_Clock->getDeltaTime());
 				
 				//// SET PIPELINE ////
-				float clearColour[] = { 0, 0, 0, 1 };
+				float clearColour[] = { 0, 0, 0, 0  };
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
