@@ -264,7 +264,7 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		
 	}
-	else if(pass != renderPass::e_opaque)
+	if(pass != renderPass::e_opaque)
 	{
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
