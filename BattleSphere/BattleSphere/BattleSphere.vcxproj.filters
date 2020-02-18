@@ -81,9 +81,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LightCulling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +108,18 @@
     <ClCompile Include="Drone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="QuadtreeNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingVolume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OBB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Bloom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,6 +145,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BackfaceCuller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transparency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,9 +218,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LightCulling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -261,6 +273,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BackfaceCuller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadtreeNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingVolume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OBB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tri_tri_test3D_tropp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transparency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

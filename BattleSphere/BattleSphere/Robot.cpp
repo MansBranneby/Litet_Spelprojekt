@@ -14,9 +14,19 @@ Robot::Robot(int playerId)
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
-
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
+	//setScale(2.2f, 2.2f, 2.2f);
+	// Raise player
+	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
+
+	// Position history
+	m_positionHistorySize = 0; 
+	m_positionHistoryCap = 100;
+	m_positionHistoryPtr = 0;	
+	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
+	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+
 	if (playerId == 0)
 		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
 		//m_material.diffuse = XMVector3Normalize(XMVectorSet(80, 10, 180, 0));
@@ -42,11 +52,28 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
-void Robot::damagePlayer(int damage)
+
+bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 {
-	m_health -= damage;
-	m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
-	removeResource();
+	float dmg = (float)damage;
+	if (m_currentWeapon[RIGHT] != -1)
+		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
+	if (m_currentWeapon[LEFT] != -1)
+		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
+
+	if (projIndex != -1)
+		ProjectileBank::getInstance()->removeProjectile(projIndex);
+
+	if (dmg != 0.0f)
+	{
+		m_health -= (int)floorf(dmg);
+		if (m_health < 0)
+			m_health = 0;
+		m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
+		removeResource();
+		return true;
+	}
+	return false;
 }
 
 void Robot::setHealth(int health)
@@ -74,11 +101,12 @@ void Robot::setVelocity(float velocity)
 
 float Robot::getVelocity()
 {
-	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == MOVEMENT)
-		return m_velocity * m_weapons[m_currentWeapon[RIGHT]]->getSpeed();
-	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == MOVEMENT)
-		return m_velocity * m_weapons[m_currentWeapon[LEFT]]->getSpeed();
-	return m_velocity;
+	float velocity = m_velocity;
+	if (m_currentWeapon[RIGHT] != -1)
+		velocity *= m_weapons[m_currentWeapon[RIGHT]]->getSpeed();
+	if (m_currentWeapon[LEFT] != -1)
+		velocity *= m_weapons[m_currentWeapon[LEFT]]->getSpeed();
+	return velocity;
 }
 
 void Robot::setCurrentRot(float deg)
@@ -108,12 +136,13 @@ bool Robot::isReady(float dt)
 
 void Robot::useWeapon(int side, float dt)
 {
-	if (m_currentWeapon[side] != -1 && (m_weapons[m_currentWeapon[side]]->getType() == PISTOL || m_weapons[m_currentWeapon[side]]->getType() == RIFLE))
+	if (m_currentWeapon[side] != -1)
+	{
 		m_weapons[m_currentWeapon[side]]->shoot(getPosition(), m_currentRotation, side, dt);
-	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == MOVEMENT)
 		m_weapons[m_currentWeapon[side]]->speedUp();
-	else if (m_currentWeapon[side] != -1 && m_weapons[m_currentWeapon[side]]->getType() == SHIELD)
 		m_weapons[m_currentWeapon[side]]->shield();
+		m_weapons[m_currentWeapon[side]]->reflect();
+	}
 }
 
 void Robot::changeWeapon(int side)
@@ -218,6 +247,35 @@ void Robot::move(XMVECTOR dPos)
 	}
 }
 
+void Robot::storePositionInHistory(DirectX::XMVECTOR position)
+{
+	if (m_positionHistorySize < m_positionHistoryCap)
+	{
+		// size is less than cap
+		m_positionHistory[m_positionHistoryPtr] = position; // insert at historyPtr
+		m_positionHistoryPtr++;								// step historyPtr
+		m_positionHistorySize++;							// increase size
+	}
+	else
+	{
+		// size has grown past cap
+		m_positionHistoryPtr = 0;							// reset ptr
+		m_positionHistorySize = 0;							// reset size
+		m_positionHistory[m_positionHistoryPtr] = position; // replace element at ptr 
+	}
+
+}
+
+XMVECTOR Robot::getPreviousPosition() const
+{
+	if (m_positionHistoryPtr == 0)
+	{
+		return m_positionHistory[m_positionHistoryCap - 1];
+	}
+
+	return m_positionHistory[m_positionHistoryPtr - 1];
+}
+
 void Robot::release()
 {
 	// TODO realease resource?
@@ -225,4 +283,6 @@ void Robot::release()
 	{
 		delete m_weapons[i];
 	}
+
+	delete[] m_positionHistory;
 }

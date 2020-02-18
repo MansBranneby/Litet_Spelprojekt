@@ -7,13 +7,9 @@
 #include "DX.h"
 #include "GameObject.h"
 #include "ProjectileBank.h"
+#include "StructsAndEnums.h"
 
 using namespace DirectX;
-
-#define PISTOL 0
-#define RIFLE 1
-#define MOVEMENT 2
-#define SHIELD 3
 
 class Weapon : public GameObject
 {
@@ -22,13 +18,16 @@ private:
 	int m_damage;
 	int m_type;
 	float m_recoil;
+	float m_currentRecoil;
 	float m_speed;
+	float m_currentSpeed;
+	float m_defense;
+	float m_currentDefense;
+
+	bool m_ready;
 	float m_cooldown;
 	float m_duration;
 	float m_cdTime;
-	bool m_ready;
-	float m_currentRecoil;
-	float m_currentSpeed;
 
 public:
 	Weapon(int type = 0);
@@ -38,6 +37,7 @@ public:
 	bool shoot(XMVECTOR robotPos, float rot, int side, float dt);
 	bool speedUp();
 	bool shield();
+	bool reflect();
 
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
@@ -46,6 +46,7 @@ public:
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
+	float getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int& projIndex);
 
 	bool updateTime(float dt);
 

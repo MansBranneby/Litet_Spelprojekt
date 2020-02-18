@@ -34,6 +34,11 @@ void ProjectileBank::moveProjectiles(float dt)
 	}
 }
 
+void ProjectileBank::changeDirection(int index, XMVECTOR relPos)
+{
+	m_projectiles[index]->setDirection(relPos);
+}
+
 std::vector<Projectile*> ProjectileBank::getList()
 {
 	return m_projectiles;

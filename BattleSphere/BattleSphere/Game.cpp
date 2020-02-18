@@ -29,6 +29,11 @@ PreLoader* Game::getPreLoader()
 	return &m_preLoader;
 }
 
+QuadtreeNode* Game::getQuadtree()
+{
+	return m_quadtree;
+}
+
 Game::Game()
 {
 	m_nrOfPlayers = 0;
@@ -36,12 +41,14 @@ Game::Game()
 		m_robots[i] = nullptr;
 	updatePlayerStatus();
 
-	objectData sceneData;
-	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
-	sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
-	m_preLoader.setStaticData(objectType::e_scene, sceneData);
-	m_preLoader.cull(objectType::e_scene);
+	//m_preLoader.cull(objectType::e_scene);
+	// TODO: this ruins collision tests because we don't recalculate bounding volume data
+	//objectData sceneData;
+	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+	//sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
+	//m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{100.0f, 100.0f}, &m_preLoader, 2, 0);
 }
 
 void Game::update(float dt)
@@ -53,12 +60,12 @@ void Game::update(float dt)
 	}
 }
 
-void Game::draw()
+void Game::draw(renderPass pass)
 {
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (!m_states[i]->isPaused())
-			m_states[i]->draw(this);
+			m_states[i]->draw(this, pass);
 	}
 }
 
@@ -102,4 +109,6 @@ void Game::release()
 			delete m_robots[i];
 		}
 	}
+
+	delete m_quadtree;
 }

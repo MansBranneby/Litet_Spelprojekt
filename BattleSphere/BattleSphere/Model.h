@@ -3,6 +3,10 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "StructsAndEnums.h"
+#include "BoundingVolume.h"
+#include "OBB.h"
+#include "BoundingSphere.h"
 
 
 class Model
@@ -14,11 +18,16 @@ private:
 	vertex* m_vertices;
 	int m_nrOfSubModels;
 	SubModel* m_subModels;
-
-	XMMATRIX m_modelMatrix;
+	
+	// Bounding volume variables
+	boundingData m_bData;
+	std::vector<int> m_indices;
+	BoundingVolume* m_boundingVolume;
 
 	ID3D11Buffer* m_matrixCBuffer;
 	XMMATRIX* m_matrixData;
+	XMMATRIX* m_modelMatrixData;
+	XMMATRIX m_modelMatrix;
 	XMMATRIX m_staticRotationMat;
 	XMMATRIX m_rotationMat;
 	XMMATRIX m_scalingMat;
@@ -26,6 +35,9 @@ private:
 	XMMATRIX m_relRotationMat;
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
+
+	// To calculate bounding volumes
+	void computeOBB();
 
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCullingBuffer(); // For vertex culling buffer
@@ -53,10 +65,19 @@ public:
 	Model();
 	~Model();
 
+	objectData getBVObjectData() const;
+	boundingData getBoundingData() const;
+	XMMATRIX getModelMatrix() const;
+	std::vector<XMFLOAT3> getCollisionMesh(); // Delete after use
+	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
+	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
+	BoundingVolume* getStaticBoundingVolume() const;
+	BoundingVolume* getDynamicBoundingVolume(objectData data);
 	void setObjectData(objectData data, int modelNr = -1);
 	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
+	void loadModel(std::ifstream& in, objectType type);
 };
 

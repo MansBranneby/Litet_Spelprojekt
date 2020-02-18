@@ -23,9 +23,10 @@ public:
 	int getNrOfGamepads();
 
 	bool reconnectController(int user);
-	bool refresh(int user);
+	bool refresh(int user, float dt);
 
 	bool isPressed(int user, WORD button);
+	void setVibration(int user, float speed);
 
 	float getThumbLX(int user);
 	float getThumbLY(int user);

@@ -150,6 +150,8 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Drone.cpp" />
+    <ClCompile Include="BoundingSphere.cpp" />
+    <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -164,21 +166,24 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Lights.cpp" />
     <ClCompile Include="LightCulling.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PreLoader.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileBank.cpp" />
+    <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="SubModel.cpp" />
     <ClCompile Include="Robot.cpp" />
+    <ClCompile Include="Transparency.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -190,6 +195,8 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="Drone.h" />
+    <ClInclude Include="BoundingSphere.h" />
+    <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -206,11 +213,12 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Light.h" />
+    <ClInclude Include="Lights.h" />
     <ClInclude Include="LightCulling.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="OBB.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="PreLoader.h" />
     <ClInclude Include="Projectile.h" />
@@ -221,6 +229,9 @@
     <ClInclude Include="State.h" />
     <ClInclude Include="StructsAndEnums.h" />
     <ClInclude Include="SubModel.h" />
+    <ClInclude Include="QuadtreeNode.h" />
+    <ClInclude Include="Tri_tri_test3D_tropp.h" />
+    <ClInclude Include="Transparency.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>

@@ -12,6 +12,7 @@
 #include "Input.h"
 #include "PreLoader.h"
 #include "State.h"
+#include "QuadtreeNode.h"
 
 using namespace DirectX;
 
@@ -26,8 +27,9 @@ private:
 	int m_controllerId[XUSER_MAX_COUNT];
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
-
+	
 	PreLoader m_preLoader;
+	QuadtreeNode* m_quadtree;
 
 public:
 	
@@ -35,7 +37,7 @@ public:
 
 	void update(float dt);
 	//void updateSec();
-	void draw();
+	void draw(renderPass pass = renderPass::e_scene);
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);
@@ -44,6 +46,7 @@ public:
 	Robot** getRobots();
 	Input* getInput();
 	PreLoader* getPreLoader();
+	QuadtreeNode* getQuadtree();
 
 	void release();
 };
