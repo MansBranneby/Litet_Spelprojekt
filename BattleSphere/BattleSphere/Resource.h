@@ -6,7 +6,8 @@
 #define FLOAT_INTENSITY 6.0f // Default 6
 #define FLOAT_HEIGHT 3.0f // Default 3
 #define SPIN_INTENSITY 20.0f // Default 20
-#define SMALL_SCALE 0.75f // Default 0.75
+#define SMALL_SCALE 0.9f // Default 0.9
+
 
 class Resource : public GameObject
 {
@@ -26,7 +27,7 @@ private:
 	void updateSpinning(float dT, float modifier = 1.0f);
 
 public:
-	Resource(int type = 0);
+	Resource(int type = 0, float scale = 1.0f);
 	~Resource();
 
 	int getType();

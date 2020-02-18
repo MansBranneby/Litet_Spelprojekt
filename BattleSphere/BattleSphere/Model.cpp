@@ -51,7 +51,7 @@ void Model::createVertexCBuffer()
 
 void Model::updateSubResource()
 {
-	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+	*m_matrixData = m_scalingMat * m_staticRotationMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -62,7 +62,7 @@ void Model::updateSubResource()
 void Model::updateRelSubResource()
 {
 	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
-		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
+		* m_relScalingMat * m_relStaticRotationMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -108,9 +108,10 @@ Model::Model()
 	m_matrixCBuffer = nullptr;
 	m_matrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
+	m_staticRotationMat = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
-	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
+	m_relStaticRotationMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();
 	m_vertexBuffer = nullptr;
@@ -138,6 +139,41 @@ void Model::setPosition(XMVECTOR pos, XMVECTOR relPos)
 {
 	m_pos = pos;
 	m_relPos = relPos;
+}
+
+void Model::setStaticRotation(XMVECTOR rotation)
+{
+	float vx = rotation.m128_f32[0];
+	float vy = rotation.m128_f32[1];
+	float vz = rotation.m128_f32[2];
+	float rotDeg = rotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_staticRotationMat = dRotation;
+}
+
+void Model::setStaticRotation(XMVECTOR rotation, XMVECTOR relRotation)
+{
+	setStaticRotation(rotation);
+	float vx = relRotation.m128_f32[0];
+	float vy = relRotation.m128_f32[1];
+	float vz = relRotation.m128_f32[2];
+	float rotDeg = relRotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_relStaticRotationMat = dRotation;
 }
 
 void Model::setRotation(XMVECTOR rotation)
@@ -206,6 +242,7 @@ void Model::setVPMatrix()
 void Model::setObjectData(objectData data, int modelNr)
 {
 	setPosition(data.pos);
+	setStaticRotation(data.staticRotation);
 	setRotation(data.rotation);
 	setScale(data.scale);
 	if (modelNr != -1)
@@ -216,6 +253,7 @@ void Model::setObjectData(objectData data, int modelNr)
 void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
 {
 	setPosition(data.pos, relativeData.pos);
+	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	if (modelNr != -1)
@@ -226,6 +264,7 @@ void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
 void Model::setAllObjectData(objectData data)
 {
 	setPosition(data.pos);
+	setStaticRotation(data.staticRotation);
 	setRotation(data.rotation);
 	setScale(data.scale);
 	for (int i = 0; i < m_nrOfSubModels; i++)
@@ -238,6 +277,7 @@ void Model::setAllObjectData(objectData data)
 void Model::setAllObjectData(objectData data, objectData relativeData)
 {
 	setPosition(data.pos, relativeData.pos);
+	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	for (int i = 0; i < m_nrOfSubModels; i++)

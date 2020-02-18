@@ -82,9 +82,9 @@ void GameState::handleInputs(Game* game, float dt)
 					{
 						// TODO: change range or way to calc?
 						if (XMVectorGetX(XMVector3Length(m_robots[i]->getPosition() - m_nodes[j]->getPosition())) < 5.0f &&
-							m_resources[m_robots[i]->getResourceIndex()]->getType() == m_nodes[j]->getType())
+							m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
-							m_robots[i]->upgradeWeapon(m_nodes[j]->getType());
+							m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType());
 
 							for (int k = 0; k < XUSER_MAX_COUNT; k++)
 							{
@@ -152,14 +152,14 @@ GameState::GameState()
 
 	for (int i = 0; i < 25; i++)
 	{
-		Resource* resource = new Resource(i % 4);
+		Resource* resource = new Resource(i % 4, 0.5f);
 		resource->setPosition(XMVectorSet((float)(rand() % 30 - 15), -0.4f, (float)(rand() % 20 - 40), 0.0f));
 		m_resources.push_back(resource);
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		Node* node = new Node(i % 4);
+		Node* node = new Node(i % 3);
 		node->setPosition(XMVectorSet((float)(i * 10), -0.2f, (float)(-60.0f), 0.0f));
 		m_nodes.push_back(node);
 	}
@@ -216,6 +216,11 @@ void GameState::update(Game* game, float dt)
 	{
 		m_resources[i]->updateTime(dt);
 	}
+
+	for (int i = 0; i < m_nodes.size(); i++)
+	{
+		m_nodes[i]->updateTime(dt);
+	}
 }
 
 void GameState::draw(Game* game)
@@ -249,6 +254,6 @@ void GameState::draw(Game* game)
 
 	for (int i = 0; i < m_nodes.size(); i++)
 	{
-		game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+		game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 1, 0);
 	}
 }

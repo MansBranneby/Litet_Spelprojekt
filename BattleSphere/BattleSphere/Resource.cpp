@@ -33,7 +33,7 @@ void Resource::updateSpinning(float dT, float modifier)
 	rotate(0.0f, 1.0f, 0.0f, -relativeSpin);
 }
 
-Resource::Resource(int type)
+Resource::Resource(int type, float scale)
 {
 	m_type = type;
 	m_blocked = false;
@@ -41,23 +41,21 @@ Resource::Resource(int type)
 	m_time = 0.0f;
 	m_floatRadian = 0;
 	m_spinDegree = 0;
-	m_originalScale = XMVectorSet(0.16f, 0.08f, 0.08f, 1.0f);
+	m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
 	m_smallScale = XMVectorMultiply(m_originalScale, XMVectorSet(SMALL_SCALE, SMALL_SCALE, SMALL_SCALE, 1.0f));
 
 	//setScale(0.4f, 0.4f, 0.4f);
 	setScale(m_originalScale);
-	setRotation(XMVectorSet(1.0, 0.0, 0.0, 90));
+	setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+	//m_material.diffuse = XMVectorSet(0, 0, 0, -1);
+	m_material.ambient = XMVectorSet(-1, -1, -1, 2); // Enable illum model 2 for emission
 
-	m_material.diffuse = XMVectorSet(0, 0, 0, -1);
-	if (type == 1)
-		m_material.emission = XMVectorSet(1, 0, 0, -1);
-	else if (type == 2)
-		m_material.emission = XMVectorSet(1, 1, 0, -1);
-	else if (type == 3)
-		m_material.emission = XMVectorSet(1, 0, 1, -1);
+	if (type == PISTOL || type == RIFLE)
+		m_material.emission = RED_EMISSION;
+	else if (type == MOVEMENT)
+		m_material.emission = GREEN_EMISSION;
 	else
-		m_material.emission = XMVectorSet(0, 1, 1, -1);
-
+		m_material.emission = BLUE_EMISSION;
 }
 
 Resource::~Resource()
@@ -102,14 +100,12 @@ void Resource::updateTime(float dt)
 			m_blocked = false;
 			m_floatRadian = 0;
 
-			if (m_type == 1)
-				m_material.emission = XMVectorSet(1, 0, 0, -1);
-			else if (m_type == 2)
-				m_material.emission = XMVectorSet(1, 1, 0, -1);
-			else if (m_type == 3)
-				m_material.emission = XMVectorSet(1, 0, 1, -1);
+			if (m_type == 0)
+				m_material.emission = RED_EMISSION;
+			else if (m_type == 1)
+				m_material.emission = GREEN_EMISSION;
 			else
-				m_material.emission = XMVectorSet(0, 1, 1, -1);
+				m_material.emission = BLUE_EMISSION;
 		}
 	}
 
@@ -122,7 +118,7 @@ void Resource::updateTime(float dt)
 		}
 		else
 		{
-			updateSpinning(dt, 10.0f);
+			updateSpinning(dt, 10.0f); // Spin faster if picked up
 		}
 	}
 }

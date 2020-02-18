@@ -2,6 +2,17 @@
 #include "DX.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include <time.h> 
+
+#define RED 0
+#define GREEN 1
+#define BLUE 2
+#define RED_DIFFUSE XMVectorSet(1.0f, 0, 0, -1)
+#define GREEN_DIFFUSE XMVectorSet(0, 1.0f, 0, -1)
+#define BLUE_DIFFUSE XMVectorSet(0, 0, 1.0f, -1)
+#define RED_EMISSION XMVectorSet(0.2f, 0, 0, -1)
+#define GREEN_EMISSION XMVectorSet(0, 0.2f, 0, -1)
+#define BLUE_EMISSION XMVectorSet(0, 0, 0.2f, -1)
 
 using namespace DirectX;
 
@@ -53,6 +64,7 @@ struct material
 struct objectData
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR staticRotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
 	material material;

@@ -49,7 +49,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_robot, "BattleSphere");
 	loadFromFile(objectType::e_node, "Building");
 	loadFromFile(objectType::e_projectile, "1mesh1mat");
-	loadFromFile(objectType::e_resource, "Building");
+	loadFromFile(objectType::e_resource, "Weapon1");
 	loadFromFile(objectType::e_scene, "SceneBig");
 }
 
@@ -112,7 +112,6 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, int variant)
 	}
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
-		m_objects[typ][variant][i].setObjectData(data);
 		m_objects[typ][variant][i].draw();
 	}
 }
@@ -126,7 +125,6 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, objectData rel
 	}
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
-		m_objects[typ][variant][i].setObjectData(data, relativeData);
 		m_objects[typ][variant][i].draw();
 	}
 }
