@@ -124,14 +124,15 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 			}
 
+			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
 			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			float l = XMVectorGetX(XMVector3Length(v));
 			float r = robotBV->getRadius();
 			XMVECTOR newPos = m_robots[i]->getPosition();
-			// if robot moved further than its radius
-			if (r < l)
+			// if robot moved further than its diameter
+			if (r * 2.0f < l)
 			{
 				float tIncrement = r / l;
 				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
@@ -159,7 +160,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 GameState::GameState()
 {
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	m_type = stateType::e_gameState;
 	m_input = nullptr;
@@ -219,7 +220,7 @@ void GameState::update(Game* game, float dt)
 			m_robots[i]->update(dt);
 	}
 
-	// TODO remove with collision instead aswell as game field?
+	// COLLISION PROJECTILES VS STATIC OBJECTS
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{	
 		// Normal collision
@@ -227,7 +228,7 @@ void GameState::update(Game* game, float dt)
 		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projBV);
 		if (collisionInfo.m_colliding)
 			ProjectileBank::getInstance()->removeProjectile(i);
-		else if(XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 300.0f)
+		else if(XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
 			ProjectileBank::getInstance()->removeProjectile(i);	
 	}
 
