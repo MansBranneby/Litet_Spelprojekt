@@ -23,4 +23,5 @@ public:
 	~QuadtreeNode();
 
 	CollisionInfo testCollision(BoundingVolume* other);
+	CollisionInfo testCollision(BoundingVolume* other, DirectX::XMVECTOR previousPos);
 };

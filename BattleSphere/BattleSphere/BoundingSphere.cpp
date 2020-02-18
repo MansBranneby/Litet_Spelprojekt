@@ -10,6 +10,7 @@ CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, Direct
 	if (dist <= m_radius)
 	{
 		collisionInfo.m_colliding = true;
+		collisionInfo.m_contactPoint = closestPoint;
 		DirectX::XMVECTOR triNormal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a));
 
 		// Signed distance between triangle and sphere

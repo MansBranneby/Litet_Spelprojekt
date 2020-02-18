@@ -129,28 +129,43 @@ void GameState::handleInputs(Game* game, float dt)
 			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			float l = XMVectorGetX(XMVector3Length(v));
-			float r = robotBV->getRadius();
+			float d = robotBV->getRadius() * 2.0f;
 			XMVECTOR newPos = m_robots[i]->getPosition();
-			// if robot moved further than its radius
-			if (r < l)
+			// if robot moved further than its diameter
+			if (d < l)
 			{
-				float tIncrement = r / l;
+				float tIncrement = 1.0f - l / (l + d);
 				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
 				{
 					robotBV->setPos(m_robots[i]->getPreviousPosition() + (v * t));
-					collisionInfo = game->getQuadtree()->testCollision(robotBV);
+					collisionInfo = game->getQuadtree()->testCollision(robotBV, m_robots[i]->getPreviousPosition());
 
 					if (collisionInfo.m_colliding)
 						newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
 				}
+
+				for (int j = 0; j < 10; ++j)
+				{
+					// Normal collision
+					robotBV->setPos(newPos);
+					collisionInfo = game->getQuadtree()->testCollision(robotBV, m_robots[i]->getPreviousPosition());
+					if (collisionInfo.m_colliding)
+						newPos += collisionInfo.m_normal;
+					else break;
+				}
 			}
 			else
 			{
-				// Normal collision
-				collisionInfo = game->getQuadtree()->testCollision(robotBV);
-				if (collisionInfo.m_colliding)
-					newPos = m_robots[i]->getPosition() + collisionInfo.m_normal;
-			}
+				for (int j = 0; j < 10; ++j)
+				{
+					// Normal collision
+					robotBV->setPos(newPos);
+					collisionInfo = game->getQuadtree()->testCollision(robotBV, m_robots[i]->getPreviousPosition());
+					if (collisionInfo.m_colliding)
+						newPos += collisionInfo.m_normal;
+					else break;
+				}
+			}	
 
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
@@ -229,7 +244,7 @@ void GameState::update(Game* game, float dt)
 		if (collisionInfo.m_colliding)
 			ProjectileBank::getInstance()->removeProjectile(i);
 		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
-			ProjectileBank::getInstance()->removeProjectile(i);
+			//ProjectileBank::getInstance()->removeProjectile(i);
 
 		// COLLISION PROJECTILE VS PLAYERS
 		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)

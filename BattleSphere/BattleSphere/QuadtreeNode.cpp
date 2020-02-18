@@ -66,7 +66,7 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 
 	// Test if other intersects with this node
 	if (m_boundingVolume->intersects(other).m_colliding)
-	{	
+	{
 		// If this node has no children then start triangle intersection test with other
 		if (m_children.size() == 0)
 		{
@@ -83,8 +83,10 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 				if (collisionInfo.m_colliding)
 				{
 					// Average normals in case bounding volume intersects with corner
-					normal += collisionInfo.m_normal;
+
+					normal = collisionInfo.m_normal;
 					nrOfCollisions++;
+
 					// Early return in case collision with two triangles detected
 					if (nrOfCollisions >= 2)
 					{
@@ -99,7 +101,7 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 				collisionInfo.m_colliding = true;
 				collisionInfo.m_normal = normal;
 			}
-				
+
 		}
 		else
 		{
@@ -107,6 +109,64 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 			for (unsigned int i = 0; i < m_children.size(); ++i)
 			{
 				collisionInfo = m_children[i]->testCollision(other);
+				if (collisionInfo.m_colliding) return collisionInfo;
+			}
+		}
+	}
+
+	return collisionInfo;
+}
+
+CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other, DirectX::XMVECTOR previousPos)
+{
+	CollisionInfo collisionInfo;
+
+	// Test if other intersects with this node
+	if (m_boundingVolume->intersects(other).m_colliding)
+	{	
+		// If this node has no children then start triangle intersection test with other
+		if (m_children.size() == 0)
+		{
+			unsigned int nrOfCollisions = 0;
+			float shortest = INFINITY;
+
+			std::vector<DirectX::XMVECTOR> normals;
+			std::vector<DirectX::XMVECTOR> contactPoints;
+
+			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
+			{
+				collisionInfo = other->intersectsWithTriangle(
+					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
+					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
+					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
+				// Collision detected!
+				if (collisionInfo.m_colliding)
+				{
+					// Average normals in case bounding volume intersects with corner					
+					normals.push_back(collisionInfo.m_normal);
+					contactPoints.push_back(collisionInfo.m_contactPoint);
+					nrOfCollisions++;
+				}
+			}
+
+			for (int j = 0; j < normals.size(); ++j)
+			{
+				float length = DirectX::XMVectorGetX(DirectX::XMVector3Length(contactPoints[j] - other->getPos()));
+
+				if (length < shortest)
+				{
+					shortest = length;
+					collisionInfo.m_normal = normals[j];
+					collisionInfo.m_colliding = true;
+				}
+			}	
+		}
+		else
+		{
+			// Recursive function call testCollision
+			for (unsigned int i = 0; i < m_children.size(); ++i)
+			{
+				collisionInfo = m_children[i]->testCollision(other, previousPos);
 				if (collisionInfo.m_colliding) return collisionInfo;
 			}
 		}
