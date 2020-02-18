@@ -5,9 +5,9 @@ Input::Input()
     m_nrOfGamepads = getControllerState();
 }
 
-bool Input::refresh(int user)
+bool Input::refresh(int user, float dt)
 {
-    return m_gamepads[user].refresh();
+    return m_gamepads[user].refresh(dt);
 }
 
 int Input::getId(int user)
@@ -29,6 +29,11 @@ bool Input::reconnectController(int user)
 bool Input::isPressed(int user, WORD button)
 {
     return m_gamepads[user].isPressed(button);
+}
+
+void Input::setVibration(int user, float speed)
+{
+    m_gamepads[user].setVibration(speed);
 }
 
 float Input::getThumbLX(int user)

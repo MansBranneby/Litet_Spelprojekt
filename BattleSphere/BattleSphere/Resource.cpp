@@ -15,6 +15,10 @@ Resource::Resource(int type)
 		m_material.emission = XMVectorSet(1, 1, 0, -1);
 	else if (type == 3)
 		m_material.emission = XMVectorSet(1, 0, 1, -1);
+	else if (type == 4)
+		m_material.emission = XMVectorSet(1, 1, 1, -1);
+	else if (type == 5)
+		m_material.emission = XMVectorSet(0.2f, 0.2f, 1, -1);
 	else
 		m_material.emission = XMVectorSet(0, 1, 1, -1);
 
@@ -61,6 +65,10 @@ void Resource::updateTime(float dt)
 				m_material.emission = XMVectorSet(1, 1, 0, -1);
 			else if (m_type == 3)
 				m_material.emission = XMVectorSet(1, 0, 1, -1);
+			else if (m_type == 4)
+				m_material.emission = XMVectorSet(1, 1, 1, -1);
+			else if (m_type == 5)
+				m_material.emission = XMVectorSet(0.2f, 0.2f, 1, -1);
 			else
 				m_material.emission = XMVectorSet(0, 1, 1, -1);
 		}

@@ -15,6 +15,7 @@ public:
 	void addProjectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage);
 	void removeProjectile(int index);
 	void moveProjectiles(float dt);
+	void changeDirection(int index, XMVECTOR relPos);
 	std::vector<Projectile*> getList();
 
 	void release();

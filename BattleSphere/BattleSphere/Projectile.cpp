@@ -19,10 +19,21 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int d
 	}
 	else if (type == RIFLE)
 	{
-		m_velocity = 50.0f;
+		m_velocity = 5.0f;
 		//setScale(0.5f, 0.5f, 0.8f);
 		setScale(0.15f, 0.15f, 0.3f);
 	}
+}
+
+void Projectile::setDirection(XMVECTOR relPos)
+{
+	m_direction = getPosition() - relPos;
+	m_direction = XMVectorSetY(m_direction, 0.0f);
+	m_direction = XMVector3Normalize(m_direction);
+	float angle = XMConvertToDegrees(XMVectorGetX(XMVector3AngleBetweenNormals(m_direction, XMVectorSet(0, 0, 1, 0))));
+	if (XMVectorGetX(getPosition()) < XMVectorGetX(relPos))
+		angle *= -1;
+	setRotation(XMVectorSet(0, 1, 0, angle));
 }
 
 int Projectile::getType()
