@@ -66,6 +66,7 @@ DirectX::XMVECTOR getClosestPointFromPointToTriangle(DirectX::XMVECTOR p, Direct
 CollisionInfo testSphereTriangle(DirectX::XMVECTOR SpherePos, float sphereRad, DirectX::XMVECTOR a, DirectX::XMVECTOR b, DirectX::XMVECTOR c)
 {
 	CollisionInfo collisionInfo;
+
 	DirectX::XMVECTOR closestPoint = getClosestPointFromPointToTriangle(SpherePos, a, b, c);
 	DirectX::XMVECTOR d = SpherePos - closestPoint;
 	float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(d));
@@ -75,12 +76,19 @@ CollisionInfo testSphereTriangle(DirectX::XMVECTOR SpherePos, float sphereRad, D
 		collisionInfo.m_contactPoint = closestPoint;
 		DirectX::XMVECTOR triNormal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(b - a, c - a));
 
-		// Signed distance between triangle and sphere
+		// Signed distance between triangle and sphere to check if sphere is behind or in front of triangle plane
 		float signedDist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(triNormal, d));
+
 		if (signedDist < 0.0f)
+		{
+			// Sphere is behind triangle plane, push out dist radius + dist
 			collisionInfo.m_normal = triNormal * (sphereRad + dist);
+		}
 		else
+		{
+			// Sphere is in front of triangle plane, push out radius - dist
 			collisionInfo.m_normal = triNormal * (sphereRad - dist);
+		}
 	}
 
 	return collisionInfo;
