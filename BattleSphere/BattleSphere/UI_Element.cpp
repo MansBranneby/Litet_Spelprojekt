@@ -178,7 +178,8 @@ void UI_Element::updateVertexBuffer()
 
 void UI_Element::draw()
 {
-	if (m_vertexList[0].normX)
+	//if (m_vertexList[0].normX)
+	if (m_isDrawn)
 	{
 		UINT32 vertexSize = sizeof(vertex);
 		UINT32 offset = 0;

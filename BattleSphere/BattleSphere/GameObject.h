@@ -18,6 +18,8 @@ private:
 	XMVECTOR m_rotation;
 	XMVECTOR m_scale;
 
+	bool m_isDrawn;
+
 public:
 	GameObject();
 	~GameObject();
@@ -47,4 +49,7 @@ public:
 
 	XMVECTOR getPosition();
 	objectData const getData();
+
+	bool isDrawn();
+	void setDrawn(bool isDrawn);
 };

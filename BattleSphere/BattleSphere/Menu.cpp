@@ -8,6 +8,7 @@ Menu::Menu()
 {
 	m_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.01f, 200.0f, false);
 	m_cameraPerspective = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.01f, 200.0f, true);
+	m_cameraPerspective->setCameraPosition(0.0f, 0.0f, -10.0f);
 	//m_depthState = nullptr;
 	m_vertexShader = new VertexShader(L"VertexShaderMenu.hlsl");
 	m_pixelShader = new PixelShader(L"PixelShaderMenu.hlsl");

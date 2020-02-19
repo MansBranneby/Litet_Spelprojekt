@@ -22,6 +22,7 @@ private:
 	float m_fadeOut, m_initialFadeTime;
 	float m_fadeIn;
 	bool m_isAnimated; // Controls if spriteSheet is updated
+	bool m_isFadeOut, m_isFadeIn;
 
 public:
 	UI_Animation(float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames);

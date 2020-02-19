@@ -25,6 +25,7 @@ private:
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	
+	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
 
 public:
@@ -34,6 +35,10 @@ public:
 	void hi_mainMenu(Game* game);
 	void hi_robotSelection(Game* game);
 	void hi_options(Game* game);
+
+	void u_mainMenu(Game* game, float dt);
+	void u_robotSelection(Game* game, float dt);
+	void u_options(Game* game, float dt);
 
 	void pause();
 	void resume();

@@ -21,7 +21,7 @@ private:
 	std::vector<State*> m_states;
 
 	int m_nrOfPlayers;
-	int m_controllerId[XUSER_MAX_COUNT];
+	int m_playerId[XUSER_MAX_COUNT];
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
 
@@ -38,6 +38,8 @@ public:
 	void changeState(stateType state);
 	bool isActive(stateType state);
 	
+	int setPlayerIdIndex(int id);
+	int getPlayerIdIndex(int id);
 	void updatePlayerStatus();
 	Robot** getRobots();
 	Input* getInput();

@@ -59,7 +59,7 @@ void GameState::handleInputs(Game* game, float dt)
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (game->getRobots()[i] != nullptr)
+		if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 		{
 			if (!game->getInput()->refresh(i))
 			{
@@ -159,7 +159,7 @@ void GameState::update(Game* game, float dt)
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (game->getRobots()[i] != nullptr)
+		if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 		{
 			game->getRobots()[i]->update();
 
@@ -200,7 +200,7 @@ void GameState::draw(Game* game, int index)
 	game->getPreLoader()->draw(objectType::e_scene);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (game->getRobots()[i] != nullptr)
+		if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 		{
 			std::vector<Weapon*> weapons = game->getRobots()[i]->getWeapons();
 

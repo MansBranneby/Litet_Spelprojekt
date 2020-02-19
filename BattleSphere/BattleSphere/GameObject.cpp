@@ -5,6 +5,8 @@ GameObject::GameObject()
 	m_position = XMVectorSet(0, 0, 0, 0);
 	m_rotation = XMVectorSet(1, 0, 0, 0);
 	m_scale = XMVectorSet(1, 1, 1, 0);
+
+	m_isDrawn = true;
 }
 
 GameObject::~GameObject()
@@ -93,4 +95,14 @@ objectData const GameObject::getData()
 {
 	objectData temp = { m_position, m_rotation, m_scale };
 	return temp;
+}
+
+bool GameObject::isDrawn()
+{
+	return m_isDrawn;
+}
+
+void GameObject::setDrawn(bool isDrawn)
+{
+	m_isDrawn = isDrawn;
 }

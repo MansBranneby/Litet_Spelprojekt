@@ -3,7 +3,8 @@
 Input::Input()
 {
     m_nrOfGamepads = getControllerState();
-    m_inputBlocked = false;
+    for (int i = 0; i < XUSER_MAX_COUNT; i++)
+        m_inputBlocked[i] = false;
 }
 
 bool Input::refresh(int user)
@@ -22,14 +23,14 @@ int Input::getNrOfGamepads()
     return m_nrOfGamepads;
 }
 
-bool Input::isBlocked()
+bool Input::isBlocked(int id)
 {
-	return m_inputBlocked;
+	return m_inputBlocked[id];
 }
 
-void Input::setBlocked(bool inputBlocked)
+void Input::setBlocked(int id, bool inputBlocked)
 {
-    m_inputBlocked = inputBlocked;
+    m_inputBlocked[id] = inputBlocked;
 }
 
 bool Input::reconnectController(int user)

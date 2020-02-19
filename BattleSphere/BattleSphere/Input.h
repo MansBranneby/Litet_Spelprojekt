@@ -14,7 +14,7 @@ private:
 	Gamepad m_gamepads[XUSER_MAX_COUNT];
 	int m_gamepadIds[XUSER_MAX_COUNT];
 	int m_nrOfGamepads;
-	bool m_inputBlocked;
+	bool m_inputBlocked[XUSER_MAX_COUNT];
 
 	int getControllerState();
 public:
@@ -23,8 +23,8 @@ public:
 	int getId(int user);
 	int getNrOfGamepads();
 
-	bool isBlocked();
-	void setBlocked(bool inputBlocked);
+	bool isBlocked(int id);
+	void setBlocked(int id, bool inputBlocked);
 
 	bool reconnectController(int user);
 	bool refresh(int user);

@@ -1,5 +1,30 @@
 #include "Game.h"
 
+int Game::setPlayerIdIndex(int id)
+{
+	int returnValue = -1;
+	for (int i = 0; i < XUSER_MAX_COUNT && returnValue == -1; i++)
+	{
+		if (m_playerId[i] == -1)
+		{
+			m_playerId[i] = id;
+			returnValue = i;
+		}
+	}
+	return returnValue;
+}
+
+int Game::getPlayerIdIndex(int id)
+{
+	int returnValue = -1;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_playerId[i] == id)
+			returnValue = i;
+	}
+	return returnValue;
+}
+
 void Game::updatePlayerStatus()
 {
 	
@@ -33,7 +58,10 @@ Game::Game()
 {
 	m_nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		m_playerId[i] = -1;
 		m_robots[i] = nullptr;
+	}
 	//updatePlayerStatus();
 
 	objectData sceneData;
