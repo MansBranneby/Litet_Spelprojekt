@@ -7,6 +7,9 @@
 #define FLOAT_HEIGHT 3.0f // Default 3
 #define SPIN_INTENSITY 20.0f // Default 20
 #define SMALL_SCALE 0.7f // Default 0.9
+#define SPAWN_ANIMATION_TIME 3.5f
+#define SPAWN_HEIGHT 170.0f
+#define FINAL_HEIGHT 0.6f
 
 
 class Resource : public GameObject
@@ -22,6 +25,8 @@ private:
 	void setMaterial();
 
 	// Spawning information
+	bool m_spawning;
+	bool m_heightReset;
 	int m_spawnPosIndex;
 
 	// Floating and spin animation
@@ -30,6 +35,7 @@ private:
 
 	void updateFloating(float dT);
 	void updateSpinning(float dT, float modifier = 1.0f);
+	void updateSpawningAnimation(float dT);
 
 public:
 	Resource(int spawnIndex, int type = 0, float scale = 1.0f);

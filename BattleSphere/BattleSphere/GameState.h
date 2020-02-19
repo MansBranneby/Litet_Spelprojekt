@@ -4,8 +4,8 @@
 #include "Transparency.h"
 #include "Lights.h"
 
-#define START_SPAWNED_RESOURCES 20
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
+#define START_SPAWNED_RESOURCES 0
+#define MAX_RESOURCES_OUT_PER_PLAYER 35 // Default 2
 #define SPAWN_INTERVAL 3.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 

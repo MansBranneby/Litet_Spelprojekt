@@ -359,7 +359,7 @@ void GameState::regularSpawn(float dT)
 				// Only make resource special if there are available spots
 				for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
 				{
-					if (m_freeSpawns[(int)(m_normalSpawnAmount + i)])
+					if (m_freeSpawns[(int)(m_normalSpawnAmount) + i])
 						isSpecial = true;
 				}
 			}

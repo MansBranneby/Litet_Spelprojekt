@@ -43,11 +43,40 @@ void Resource::updateSpinning(float dT, float modifier)
 	rotate(0.0f, 1.0f, 0.0f, -relativeSpin);
 }
 
+void Resource::updateSpawningAnimation(float dT)
+{
+	if (!m_heightReset) // Reset y value to spawn height
+	{
+		XMVECTOR firstPos = getPosition();
+		setPosition(firstPos.m128_f32[0], SPAWN_HEIGHT,firstPos.m128_f32[2]);
+		m_heightReset = true;
+	}
+
+	m_time += dT;
+	float velocity = (FINAL_HEIGHT - SPAWN_HEIGHT) / SPAWN_ANIMATION_TIME;
+
+	move(0, velocity*dT, 0);
+	XMVECTOR pos = getPosition();
+	float x = pos.m128_f32[0];
+	float y = pos.m128_f32[1];
+	float z = pos.m128_f32[2];
+
+	if (y <= FINAL_HEIGHT)
+	{
+		setPosition(x, FINAL_HEIGHT, z);
+		m_spawning = false;
+		m_blocked = false;
+		m_time = 0.0f;
+	}
+}
+
 Resource::Resource(int spawnIndex, int type, float scale)
 {
 	m_spawnPosIndex = spawnIndex;
+	m_spawning = true;
+	m_heightReset = false;
 	m_type = type;
-	m_blocked = false;
+	m_blocked = true;
 	m_ready = true;
 	m_time = 0.0f;
 	m_floatRadian = 0;
@@ -79,10 +108,10 @@ Resource::Resource(int spawnIndex, int type, float scale)
 	}
 	m_smallScale = XMVectorMultiply(m_originalScale, XMVectorSet(SMALL_SCALE, SMALL_SCALE, SMALL_SCALE, 1.0f));
 
-	//setScale(0.4f, 0.4f, 0.4f);
+	XMVECTOR pos = getPosition();
+	setPosition(pos.m128_f32[0], SPAWN_HEIGHT, pos.m128_f32[2]);
 	setScale(m_originalScale);
 	setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
-	//m_material.diffuse = XMVectorSet(0, 0, 0, -1);
 	m_material.ambient = XMVectorSet(-1, -1, -1, 2); // Enable illum model 2 for emission
 
 	setMaterial();
@@ -136,15 +165,23 @@ void Resource::updateTime(float dt)
 
 	else
 	{
-		if (!m_blocked) // Move if not held
+		if (m_spawning) // Spawning animation
 		{
-			updateFloating(dt);
-			updateSpinning(dt);
+			updateSpawningAnimation(dt);
 		}
-		else
+		else // Normal animation
 		{
-			updateSpinning(dt, 10.0f); // Spin faster if picked up
+			if (!m_blocked) // Move if not held
+			{
+				updateFloating(dt);
+				updateSpinning(dt);
+			}
+			else
+			{
+				updateSpinning(dt, 10.0f); // Spin faster if picked up
+			}
 		}
+
 	}
 }
 
