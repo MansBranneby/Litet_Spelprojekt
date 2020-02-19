@@ -29,6 +29,7 @@ public:
 	int addPointLight(float x, float y, float z, float radius, float r, float g, float b, float intensity);
 	int addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity);
 	int addSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity);
+	int addAreaLight(float x, float y, float z, float radius, float r, float g, float b, float intensity);
 	int addPointLight();
 	int addDirectionalLight();
 	int addSpotLight();

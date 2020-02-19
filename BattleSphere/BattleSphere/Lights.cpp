@@ -94,6 +94,24 @@ int Lights::addSpotLight(float x, float y, float z, float range, float dx, float
 	return m_nrOfLights - 1;
 }
 
+int Lights::addAreaLight(float x, float y, float z, float radius, float r, float g, float b, float intensity)
+{
+	m_lights[m_nrOfLights].enabled = true;
+	m_lights[m_nrOfLights].x = x;
+	m_lights[m_nrOfLights].y = y;
+	m_lights[m_nrOfLights].z = z;
+	m_lights[m_nrOfLights].w = 1;
+	m_lights[m_nrOfLights].type = 3;
+	m_lights[m_nrOfLights].r = r;
+	m_lights[m_nrOfLights].g = g;
+	m_lights[m_nrOfLights].b = b;
+	m_lights[m_nrOfLights].a = 1;
+	m_lights[m_nrOfLights].intensity = intensity;
+	m_lights[m_nrOfLights].range = radius;
+	m_nrOfLights++;
+	return m_nrOfLights - 1;
+}
+
 int Lights::addPointLight()
 {
 	m_lights[m_nrOfLights].enabled = true;

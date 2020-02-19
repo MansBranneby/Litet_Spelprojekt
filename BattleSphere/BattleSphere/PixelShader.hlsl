@@ -92,27 +92,27 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
 	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
-	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
-		return float4(Ke, 1.0f);
+	
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
 	fragmentCol = Ka * Ia * Kd;
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
-		
+	
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
-
+		//
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
 		float3 L = float3(0, 0, 0);
 		float3 R = float3(0, 0, 0);
+		
 		float4 lightCol = float4(0, 0, 0, 0);
 		switch (light.Type)
 		{
 		case 0:
-			//Point light
+					//Point light
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
 			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
@@ -132,6 +132,16 @@ float4 PS_main(PS_IN input) : SV_Target
 			float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
 			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
 			break;
+		case 3:
+			//Point light
+			
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
+		
+			Ks = float3(0, 0, 0);
+			
+			break;
 		}
 		
 		
@@ -147,7 +157,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
 			break;
 		case 2: // "Phong" (diffuse, ambient, specular)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol);// +Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
 
 			break;
 		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
@@ -158,6 +168,9 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		};
 	}
+
+	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
+		fragmentCol = Ke;
 	float3 ndcSpace = float3(0,0,0);
 	ndcSpace.x = input.pos.x / 1920; // 0 - 1
 	ndcSpace.x = ndcSpace.x * 2 - 1;
@@ -172,7 +185,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 		dist.y *= aspectRatio;
 		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > 0.2f)
-			return float4(fragmentCol, 0.5f);
+			return float4(fragmentCol, 0.3f);
 	}
 	
 	return float4(fragmentCol, KeIn.w);

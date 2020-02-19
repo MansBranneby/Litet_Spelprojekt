@@ -190,17 +190,17 @@ GameState::GameState()
 	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
 	index = m_lights->addDirectionalLight(0.5f, -1, 0.5f, 0.6f, 0.6f, 1.0f, 4.0f);
-	index = m_lights->addSpotLight(-1.5f, 6, -40, 10, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addSpotLight(1.5f, 6, -40, 10, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	m_lights->addPointLight(-31, 6, -43, 10, 1, 1, 0, 5);
-	m_lights->addPointLight(27.5f, 4, -36, 10, 1, 0, 1, 5);
-	m_lights->addPointLight(50, 15.0, 42, 30, 1, 0.5f, 0, 25);
-	m_lights->addPointLight(-3, 10.0, 45, 20, 0, 1, 1, 10);
-	m_lights->addPointLight(20, 5.0, 40, 30, 0, 0, 1, 15);
-	m_lights->addPointLight(107, 5.0, 40, 30, 1, 1, 0, 20);
-	m_lights->addPointLight(90, 5.0, 33, 10, 1, 0, 0, 20);
-	m_lights->addPointLight(-40, 6.0, -1, 30, 1, 1, 0.6f, 15);
-	m_lights->addPointLight(-71.5, 1.0, 59.5, 10, 1, 0.6f, 0, 10);
+	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
+	m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
+	m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
+	m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
+	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
+	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
+	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
+	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
+	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
 	
 
 	//m_lights->setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);

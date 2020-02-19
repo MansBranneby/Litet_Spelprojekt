@@ -140,6 +140,17 @@ void CS_main(ComputeShaderInput IN)
 
 			switch (light.Type)
 			{
+			case 3: //Point light
+			{
+
+				Sphere sphere = { mul(V, light.Position).xyz, light.Range };
+				if (SphereInsideFrustum(sphere, GroupFrustum))
+				{
+					// Add light to light list for opaque geometry.
+					o_AppendLight(i);
+				}
+			}
+			break;
 			case 0: //Point light
 			{
 
@@ -169,6 +180,7 @@ void CS_main(ComputeShaderInput IN)
 				}
 			}
 			break;
+			
 			}
 		}
 		else
