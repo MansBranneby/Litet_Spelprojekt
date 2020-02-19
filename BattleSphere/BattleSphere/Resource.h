@@ -7,10 +7,8 @@
 #define FLOAT_HEIGHT 3.0f // Default 3
 #define SPIN_INTENSITY 20.0f // Default 20
 #define SMALL_SCALE 0.7f // Default 0.9
-#define SPAWN_ANIMATION_TIME 1.2f
-#define SPAWN_X 1.0f
-#define SPAWN_Y 72.0f
-#define SPAWN_Z 70.0f
+#define SPAWN_ANIMATION_TIME 3.5f
+#define SPAWN_HEIGHT 170.0f
 #define FINAL_HEIGHT 0.6f
 
 
@@ -27,8 +25,6 @@ private:
 	void setMaterial();
 
 	// Spawning information
-	XMVECTOR m_finalPos;
-	XMFLOAT3 m_spawnVelocity;
 	bool m_spawning;
 	bool m_heightReset;
 	int m_spawnPosIndex;
