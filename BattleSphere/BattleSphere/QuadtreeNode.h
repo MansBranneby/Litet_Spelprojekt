@@ -13,7 +13,7 @@ private:
 	std::vector <DirectX::XMFLOAT3> m_cMeshes;
 
 	// Bounding volume
-	BoundingVolume* m_boundingVolume;
+	boundingData m_boundingData;
 
 	std::vector<DirectX::XMFLOAT3> calculateNewNodePositions(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD);
 
@@ -23,5 +23,5 @@ public:
 	~QuadtreeNode();
 
 	CollisionInfo testCollision(BoundingVolume* other);
-	CollisionInfo testCollision(BoundingVolume* other, DirectX::XMVECTOR previousPos);
+	CollisionInfo testCollision(BoundingVolume* other, boundingData boundingData, DirectX::XMVECTOR previousPos);
 };

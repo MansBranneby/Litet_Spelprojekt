@@ -22,7 +22,6 @@ CollisionInfo BoundingSphere::intersectsWithTriangle(DirectX::XMVECTOR a, Direct
 	}
 
 	return collisionInfo;
-
 }
 
 DirectX::XMVECTOR BoundingSphere::getClosestPointFromPointToOBB(OBB* other)

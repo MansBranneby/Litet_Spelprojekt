@@ -1,4 +1,5 @@
 #include "QuadtreeNode.h"
+#include "CollisionTests.h"
 
 std::vector<DirectX::XMFLOAT3> QuadtreeNode::calculateNewNodePositions(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD)
 {
@@ -16,13 +17,20 @@ std::vector<DirectX::XMFLOAT3> QuadtreeNode::calculateNewNodePositions(DirectX::
 
 QuadtreeNode::QuadtreeNode()
 {
-	m_boundingVolume = new OBB({ 0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f});
+	// Create this node's bounding volume
+	m_boundingData.pos = { 0.0f, 0.0f, 0.0f };
+	m_boundingData.halfWD = { 0.0f, 0.0f };
+	m_boundingData.xAxis = { 1.0f, 0.0f, 0.0f };
+	m_boundingData.zAxis = { 0.0f, 0.0f, 1.0f };
 }
 
 QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader* preLoader, unsigned int levels, unsigned int currentLevel)
 {
 	// Create this node's bounding volume
-	m_boundingVolume = new OBB(DirectX::XMLoadFloat3(&pos), halfWD, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }); 
+	m_boundingData.pos = DirectX::XMLoadFloat3(&pos);
+	m_boundingData.halfWD = halfWD;
+	m_boundingData.xAxis = { 1.0f, 0.0f, 0.0f };
+	m_boundingData.zAxis = { 0.0f, 0.0f, 1.0f };
 	
 	// Calculate 4 new node positions
 	std::vector<DirectX::XMFLOAT3> nodePositions = calculateNewNodePositions(pos, halfWD); 
@@ -31,10 +39,10 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreL
 	// Test collision of node OBB and other OBB
 	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_static); ++i)
 	{
-		boundingData bd = preLoader->getBoundingData(objectType::e_static, 0, i);
-		OBB tempOBB(bd.pos, bd.halfWD, bd.xAxis, bd.zAxis);
+		boundingData boundingData = preLoader->getBoundingData(objectType::e_static, 0, i);
+
 		// Test collision
-		if (m_boundingVolume->intersects(&tempOBB).m_colliding)
+		if (testOBBOBB(m_boundingData, boundingData).m_colliding)
 		{
 			// Append collisionMesh to to m_cMeshes
 			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, 0, i);
@@ -56,73 +64,72 @@ QuadtreeNode::~QuadtreeNode()
 {
 	for (size_t i = 0; i < m_children.size(); i++)
 		delete m_children[i];
-
-	delete m_boundingVolume;
 }
 
-CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
+//CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
+//{
+//	CollisionInfo collisionInfo;
+//
+//	// Test if other intersects with this node
+//	if (m_boundingVolume->intersects(other).m_colliding)
+//	{
+//		// If this node has no children then start triangle intersection test with other
+//		if (m_children.size() == 0)
+//		{
+//			unsigned int nrOfCollisions = 0;
+//			DirectX::XMVECTOR normal{ 0.0f, 0.0f, 0.0f, 0.0f };
+//
+//			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
+//			{
+//				collisionInfo = other->intersectsWithTriangle(
+//					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
+//					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
+//					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
+//				// Collision detected!
+//				if (collisionInfo.m_colliding)
+//				{
+//					// Average normals in case bounding volume intersects with corner
+//
+//					normal = collisionInfo.m_normal;
+//					nrOfCollisions++;
+//
+//					// Early return in case collision with two triangles detected
+//					if (nrOfCollisions >= 2)
+//					{
+//						collisionInfo.m_normal = normal;
+//						return collisionInfo;
+//					}
+//				}
+//			}
+//
+//			if (nrOfCollisions >= 1)
+//			{
+//				collisionInfo.m_colliding = true;
+//				collisionInfo.m_normal = normal;
+//			}
+//
+//		}
+//		else
+//		{
+//			// Recursive function call testCollision
+//			for (unsigned int i = 0; i < m_children.size(); ++i)
+//			{
+//				collisionInfo = m_children[i]->testCollision(other);
+//				if (collisionInfo.m_colliding) return collisionInfo;
+//			}
+//		}
+//	}
+//
+//	return collisionInfo;
+//}
+
+CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other, boundingData boundingVolume, DirectX::XMVECTOR previousPos)
 {
 	CollisionInfo collisionInfo;
 
 	// Test if other intersects with this node
-	if (m_boundingVolume->intersects(other).m_colliding)
-	{
-		// If this node has no children then start triangle intersection test with other
-		if (m_children.size() == 0)
-		{
-			unsigned int nrOfCollisions = 0;
-			DirectX::XMVECTOR normal{ 0.0f, 0.0f, 0.0f, 0.0f };
-
-			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
-			{
-				collisionInfo = other->intersectsWithTriangle(
-					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
-					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
-					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
-				// Collision detected!
-				if (collisionInfo.m_colliding)
-				{
-					// Average normals in case bounding volume intersects with corner
-
-					normal = collisionInfo.m_normal;
-					nrOfCollisions++;
-
-					// Early return in case collision with two triangles detected
-					if (nrOfCollisions >= 2)
-					{
-						collisionInfo.m_normal = normal;
-						return collisionInfo;
-					}
-				}
-			}
-
-			if (nrOfCollisions >= 1)
-			{
-				collisionInfo.m_colliding = true;
-				collisionInfo.m_normal = normal;
-			}
-
-		}
-		else
-		{
-			// Recursive function call testCollision
-			for (unsigned int i = 0; i < m_children.size(); ++i)
-			{
-				collisionInfo = m_children[i]->testCollision(other);
-				if (collisionInfo.m_colliding) return collisionInfo;
-			}
-		}
-	}
-
-	return collisionInfo;
-}
-
-CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other, DirectX::XMVECTOR previousPos)
-{
-	CollisionInfo collisionInfo;
-
-	// Test if other intersects with this node
-	if (m_boundingVolume->intersects(other).m_colliding)
+	//if (m_boundingVolume->intersects(other).m_colliding)
+	if (testOBBSphere(boundingVolume.pos, boundingVolume.halfWD.x, m_boundingData).m_colliding)
 	{	
 		// If this node has no children then start triangle intersection test with other
 		if (m_children.size() == 0)
@@ -135,10 +142,17 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other, DirectX::XMVECT
 
 			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
 			{
-				collisionInfo = other->intersectsWithTriangle(
+				/*collisionInfo = other->intersectsWithTriangle(
+					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
+					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
+					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });*/
+
+				collisionInfo = testSphereTriangle(boundingVolume.pos, boundingVolume.halfWD.x,
 					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
 					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
 					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
+
+
 				// Collision detected!
 				if (collisionInfo.m_colliding)
 				{
@@ -166,7 +180,7 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other, DirectX::XMVECT
 			// Recursive function call testCollision
 			for (unsigned int i = 0; i < m_children.size(); ++i)
 			{
-				collisionInfo = m_children[i]->testCollision(other, previousPos);
+				collisionInfo = m_children[i]->testCollision(other, boundingVolume, previousPos);
 				if (collisionInfo.m_colliding) return collisionInfo;
 			}
 		}

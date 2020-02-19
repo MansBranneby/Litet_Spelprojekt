@@ -190,6 +190,7 @@
     <ClInclude Include="BackfaceCuller.h" />
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CollisionTests.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />
