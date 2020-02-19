@@ -107,10 +107,11 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
-	loadFromFile(objectType::e_resource, "1mesh1mat", "1mesh1mat");
+	loadFromFile(objectType::e_resource, "Weapon1", "1mesh1mat");
 	loadFromFile(objectType::e_static, "Bar", "BarColl");
 	loadFromFile(objectType::e_static, "Wall", "WallColl");
 	loadFromFile(objectType::e_scene, "SceneBig");
+	loadFromFile(objectType::e_scene, "Ground");
 }
 
 PreLoader::~PreLoader()

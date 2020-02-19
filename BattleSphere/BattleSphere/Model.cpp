@@ -681,6 +681,139 @@ void Model::loadModel(std::ifstream& in)
 
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
+}
+
+void Model::loadModel(std::ifstream& in, objectType type)
+{
+	std::string line;
+	std::istringstream inputStream;
+
+	std::getline(in, line);
+	inputStream.str(line);
+	inputStream >> m_nrOfVertices;
+	inputStream.clear();
+	m_vertices = new vertex[m_nrOfVertices];
+	m_vertexAndId = new vertexAndId[m_nrOfVertices];
+
+	// Read vertices
+	for (int i = 0; i < m_nrOfVertices; i++)
+	{
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >>
+			m_vertices[i].posX >> m_vertices[i].posY >> m_vertices[i].posZ >>
+			m_vertices[i].u >> m_vertices[i].v >>
+			m_vertices[i].normX >> m_vertices[i].normY >> m_vertices[i].normZ;
+		inputStream.clear();
+		m_vertexAndId[i].posX = m_vertices[i].posX;
+		m_vertexAndId[i].posY = m_vertices[i].posY;
+		m_vertexAndId[i].posZ = m_vertices[i].posZ;
+		m_vertexAndId[i].iD = i;
+	}
+	// Creates a vertex buffer
+	createVertexBuffer();
+
+	// Creates the vertex culling buffer, contains position and vertex ID
+	createVertexCullingBuffer();
+
+
+	// Get number of materials to read
+	std::getline(in, line);
+	inputStream.str(line);
+	inputStream >> m_nrOfSubModels;
+	inputStream.clear();
+
+	m_subModels = new SubModel[m_nrOfSubModels];
+	material tempMat;
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		// Ambient
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.ambient.m128_f32[0] >> tempMat.ambient.m128_f32[1] >> tempMat.ambient.m128_f32[2];
+		inputStream.clear();
+
+		// Diffuse
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.diffuse.m128_f32[0] >> tempMat.diffuse.m128_f32[1] >> tempMat.diffuse.m128_f32[2];
+		inputStream.clear();
+
+		// Specular
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.specular.m128_f32[0] >> tempMat.specular.m128_f32[1] >> tempMat.specular.m128_f32[2];
+		inputStream.clear();
+
+		// Emission
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.emission.m128_f32[0] >> tempMat.emission.m128_f32[1] >> tempMat.emission.m128_f32[2];
+		inputStream.clear();
+
+		// Shininess
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.specular.m128_f32[3];
+		inputStream.clear();
+
+		// Diffuse texture
+
+		std::getline(in, line);
+
+		//?
+
+		// Refraction
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.diffuse.m128_f32[3];
+		inputStream.clear();
+
+
+		// Opacity
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.emission.m128_f32[3];
+		inputStream.clear();
+
+		// Illumination model enumeration
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.ambient.m128_f32[3];
+		inputStream.clear();
+
+		// Set submodel material
+		m_subModels[i].setMaterialInfo(tempMat);
+
+		// Get number of indices
+		int nrOfIndices = 0;
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> nrOfIndices;
+		inputStream.clear();
+
+		// Read indices
+		int* indices = new int[nrOfIndices];
+		for (int j = 0; j < nrOfIndices; j += 3)
+		{
+			std::getline(in, line);
+			inputStream.str(line);
+			inputStream >> indices[j] >> indices[j + 1] >> indices[j + 2];
+
+			// Save vertex indices 
+			m_indices.push_back(indices[j]);
+			m_indices.push_back(indices[j + 1]);
+			m_indices.push_back(indices[j + 2]);
+			inputStream.clear();
+		}
+		m_subModels[i].setFaces(indices, nrOfIndices);
+	}
+
+	// Create model matrix
+	createVertexCBuffer();
+
+	// Create bounding volume
+	computeOBB(); // Calculate information for bounding volume data
 	// Hardcoded bounding volume based on object type, e.g. robots will have bounding spheres
 	switch (type)
 	{
@@ -693,5 +826,4 @@ void Model::loadModel(std::ifstream& in)
 	default:
 		m_boundingVolume = new OBB(m_bData.pos, m_bData.halfWD, m_bData.xAxis, m_bData.zAxis);
 	}
-
 }

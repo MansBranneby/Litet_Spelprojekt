@@ -1,5 +1,15 @@
 #include "Resource.h"
 
+void Resource::setMaterial()
+{
+	if (m_type == PISTOL || m_type == RIFLE)
+		m_material.emission = RED_EMISSION;
+	else if (m_type == MOVEMENT || m_type == DASH)
+		m_material.emission = GREEN_EMISSION;
+	else
+		m_material.emission = BLUE_EMISSION;
+}
+
 void Resource::updateFloating(float dT)
 {
 	// Update increment
@@ -33,8 +43,9 @@ void Resource::updateSpinning(float dT, float modifier)
 	rotate(0.0f, 1.0f, 0.0f, -relativeSpin);
 }
 
-Resource::Resource(int type, float scale)
+Resource::Resource(int spawnIndex, int type, float scale)
 {
+	m_spawnPosIndex = spawnIndex;
 	m_type = type;
 	m_blocked = false;
 	m_ready = true;
@@ -42,6 +53,30 @@ Resource::Resource(int type, float scale)
 	m_floatRadian = 0;
 	m_spinDegree = 0;
 	m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
+	if (type == RIFLE) // TODO: Remove
+	{
+		m_originalScale = XMVectorSet(0.8f * scale, 0.8f * scale, 0.8f * scale, 1.0f);
+	}
+	else if (type == MOVEMENT)
+	{
+		m_originalScale = XMVectorSet(0.1f * scale, 0.8f * scale, 0.1f * scale, 1.0f);
+	}
+	else if (type == SHIELD)
+	{
+		m_originalScale = XMVectorSet(0.8f * scale, 0.8f * scale, 0.1f * scale, 1.0f);
+	}
+	else if (type == DASH)
+	{
+		m_originalScale = XMVectorSet(0.2f * scale, 1.6f * scale, 0.2f * scale, 1.0f);
+	}
+	else if (type == REFLECT)
+	{
+		m_originalScale = XMVectorSet(1.8f * scale, 1.8f * scale, 0.2f * scale, 1.0f);
+	}
+	else
+	{
+		m_originalScale = XMVectorSet(0.35f * scale, 0.35f * scale, 0.55f * scale, 1.0f);
+	}
 	m_smallScale = XMVectorMultiply(m_originalScale, XMVectorSet(SMALL_SCALE, SMALL_SCALE, SMALL_SCALE, 1.0f));
 
 	//setScale(0.4f, 0.4f, 0.4f);
@@ -50,12 +85,7 @@ Resource::Resource(int type, float scale)
 	//m_material.diffuse = XMVectorSet(0, 0, 0, -1);
 	m_material.ambient = XMVectorSet(-1, -1, -1, 2); // Enable illum model 2 for emission
 
-	if (type == PISTOL || type == RIFLE)
-		m_material.emission = RED_EMISSION;
-	else if (type == MOVEMENT)
-		m_material.emission = GREEN_EMISSION;
-	else
-		m_material.emission = BLUE_EMISSION;
+	setMaterial();
 }
 
 Resource::~Resource()
@@ -100,12 +130,7 @@ void Resource::updateTime(float dt)
 			m_blocked = false;
 			m_floatRadian = 0;
 
-			if (m_type == 0)
-				m_material.emission = RED_EMISSION;
-			else if (m_type == 1)
-				m_material.emission = GREEN_EMISSION;
-			else
-				m_material.emission = BLUE_EMISSION;
+			setMaterial();
 		}
 	}
 
@@ -121,4 +146,9 @@ void Resource::updateTime(float dt)
 			updateSpinning(dt, 10.0f); // Spin faster if picked up
 		}
 	}
+}
+
+int Resource::getSpawnIndex() const
+{
+	return m_spawnPosIndex;
 }

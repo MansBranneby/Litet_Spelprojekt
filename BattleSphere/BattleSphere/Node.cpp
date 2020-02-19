@@ -78,7 +78,7 @@ bool Node::isType(int type)
 		if (m_colorType == RED)
 			return true;
 	}
-	else if (type == MOVEMENT)
+	else if (type == MOVEMENT || type == DASH)
 	{
 		if (m_colorType == GREEN)
 			return true;
