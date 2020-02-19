@@ -126,51 +126,39 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			//BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
-			boundingData fuckoff = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
-			fuckoff.pos = m_robots[i]->getPosition();
+			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
-			float l = XMVectorGetX(XMVector3Length(v));
-			float d = fuckoff.halfWD.x * 2.0f;
 			XMVECTOR newPos = m_robots[i]->getPosition();
-
-			
+			float l = XMVectorGetX(XMVector3Length(v));
+			float d = robotBD.halfWD.x * 2.0f;
 
 			// if robot moved further than its diameter
 			if (d < l)
 			{
 				float tIncrement = 1.0f - l / (l + d);
-				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
+				for (float t = tIncrement; t < 1.0f; t += tIncrement)
 				{
-					fuckoff.pos = m_robots[i]->getPreviousPosition() + (v * t);
-					collisionInfo = game->getQuadtree()->testCollision(fuckoff, m_robots[i]->getPreviousPosition());
+					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
+					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
 
 					if (collisionInfo.m_colliding)
+					{
+						// Collision found, stop tests
 						newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
-				}
-
-				for (int j = 0; j < 10; ++j)
-				{
-					// Normal collision
-					fuckoff.pos = newPos;
-					collisionInfo = game->getQuadtree()->testCollision(fuckoff, m_robots[i]->getPreviousPosition());
-					if (collisionInfo.m_colliding)
-						newPos += collisionInfo.m_normal;
-					else break;
+						break;
+					}
 				}
 			}
-			else
+			for (int j = 0; j < 10; ++j)
 			{
-				for (int j = 0; j < 10; ++j)
-				{
-					// Normal collision
-					fuckoff.pos = newPos;
-					collisionInfo = game->getQuadtree()->testCollision(fuckoff, m_robots[i]->getPreviousPosition());
-					if (collisionInfo.m_colliding)
-						newPos += collisionInfo.m_normal;
-					else break;
-				}
-			}	
+				// Normal collision
+				robotBD.pos = newPos;
+				collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
+				if (collisionInfo.m_colliding)
+					newPos += collisionInfo.m_normal;
+				else break;
+			}
 
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
@@ -240,38 +228,29 @@ void GameState::update(Game* game, float dt)
 			m_robots[i]->update(dt);
 	}
 
-
-	CollisionInfo collisionInfo;
-	//BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
-	//boundingData fuckoff = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
-	//fuckoff.pos = m_robots[i]->getPosition();
-	//XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
-	//float l = XMVectorGetX(XMVector3Length(v));
-	//float d = fuckoff.halfWD.x * 2.0f;
-	//XMVECTOR newPos = m_robots[i]->getPosition();
-
-
 	// COLLISION PROJECTILES VS STATIC OBJECTS
+	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
+	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
 		// Normal collision
-		boundingData fuckoff1 = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
-		boundingData fuckoff2 = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
-
-		fuckoff1.pos = ProjectileBank::getInstance()->getList()[i]->getData().pos;
-		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(fuckoff1);
-		if (collisionInfo.m_colliding)
+		projectileBD.pos = ProjectileBank::getInstance()->getList()[i]->getData().pos;
+		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
+		/*if (collisionInfo.m_colliding)
 			ProjectileBank::getInstance()->removeProjectile(i);
 		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
-			ProjectileBank::getInstance()->removeProjectile(i);
+			ProjectileBank::getInstance()->removeProjectile(i);*/
 
 		
 		// COLLISION PROJECTILE VS PLAYERS
 		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
 		{
-			collisionInfo = testSphereSphere(fuckoff1.pos, fuckoff2.pos, fuckoff1.halfWD.x, fuckoff2.halfWD.x);
+			/*ProjectileBank::getInstance()->getList()[i]->getVelocity();
+			ProjectileBank::getInstance()->getList()[i]->getDirection();
+			m_robots[i]->getVelocity();*/
 
-			// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
+			collisionInfo = testSphereSphere(projectileBD.pos, robotBD.pos, projectileBD.halfWD.x, robotBD.halfWD.x);
+			// TODO: Find solution to projectile colliding with its "owner" and is immediately removed
 			//if(collisionInfo.m_colliding)
 				//ProjectileBank::getInstance()->removeProjectile(i);	
 		}

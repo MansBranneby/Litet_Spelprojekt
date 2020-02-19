@@ -32,7 +32,8 @@ private:
 	XMVECTOR* m_positionHistory;		// Array of positions
 	unsigned int m_positionHistorySize; // Current size
 	unsigned int m_positionHistoryCap;  // Cap
-	unsigned int m_positionHistoryPtr;	// Point to last inserted position
+	unsigned int m_positionHistoryPtr;	// Pointer to last inserted position
+	DirectX::XMVECTOR testVelocity;
 
 	void addWeapon(int type);
 public:
