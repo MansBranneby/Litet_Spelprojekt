@@ -32,7 +32,7 @@ void Resource::updateSpinning(float dT, float modifier)
 {
 	// Increment
 	float newSpinDegree = m_spinDegree + SPIN_INTENSITY * modifier * dT;
-	
+
 	// Calculate relative spin
 	while (newSpinDegree >= 360.0f)
 		newSpinDegree -= 360.0f;
@@ -47,23 +47,25 @@ void Resource::updateSpawningAnimation(float dT)
 {
 	if (!m_heightReset) // Reset y value to spawn height
 	{
-		XMVECTOR firstPos = getPosition();
-		setPosition(firstPos.m128_f32[0], SPAWN_HEIGHT,firstPos.m128_f32[2]);
+		m_finalPos = getPosition();
+		setPosition(SPAWN_X, SPAWN_Y, SPAWN_Z);
+		m_spawnVelocity = {
+			(m_finalPos.m128_f32[0] - SPAWN_X) / SPAWN_ANIMATION_TIME,
+			(m_finalPos.m128_f32[1] - SPAWN_Y) / SPAWN_ANIMATION_TIME,
+			(m_finalPos.m128_f32[2] - SPAWN_Z) / SPAWN_ANIMATION_TIME
+		};
 		m_heightReset = true;
 	}
 
 	m_time += dT;
-	float velocity = (FINAL_HEIGHT - SPAWN_HEIGHT) / SPAWN_ANIMATION_TIME;
 
-	move(0, velocity*dT, 0);
+	move(m_spawnVelocity.x * dT, m_spawnVelocity.y * dT, m_spawnVelocity.z * dT);
 	XMVECTOR pos = getPosition();
-	float x = pos.m128_f32[0];
 	float y = pos.m128_f32[1];
-	float z = pos.m128_f32[2];
 
 	if (y <= FINAL_HEIGHT)
 	{
-		setPosition(x, FINAL_HEIGHT, z);
+		setPosition(m_finalPos);
 		m_spawning = false;
 		m_blocked = false;
 		m_time = 0.0f;
@@ -72,6 +74,8 @@ void Resource::updateSpawningAnimation(float dT)
 
 Resource::Resource(int spawnIndex, int type, float scale)
 {
+	m_spawnVelocity = { 0, 0, 0 };
+	m_finalPos = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	m_spawnPosIndex = spawnIndex;
 	m_spawning = true;
 	m_heightReset = false;
@@ -108,8 +112,6 @@ Resource::Resource(int spawnIndex, int type, float scale)
 	}
 	m_smallScale = XMVectorMultiply(m_originalScale, XMVectorSet(SMALL_SCALE, SMALL_SCALE, SMALL_SCALE, 1.0f));
 
-	XMVECTOR pos = getPosition();
-	setPosition(pos.m128_f32[0], SPAWN_HEIGHT, pos.m128_f32[2]);
 	setScale(m_originalScale);
 	setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
 	m_material.ambient = XMVectorSet(-1, -1, -1, 2); // Enable illum model 2 for emission
