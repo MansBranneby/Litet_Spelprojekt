@@ -1,7 +1,6 @@
 #pragma once
-
 #include "State.h"
-
+#include "CollisionTests.h"
 class GameState : public State 
 {
 private:

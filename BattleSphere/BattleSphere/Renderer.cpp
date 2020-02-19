@@ -206,7 +206,7 @@ void downsample()
 
 void shadowRender()
 {
-	float clearColour[] = { 1.0f, 0, 0.2f, 1 };
+	float clearColour[] = { 0.0f, 0.0f, 0.0f, 1 };
 
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_shadowMapping->getDepthStencilView());
 	DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
