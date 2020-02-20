@@ -28,6 +28,8 @@ private:
 	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
 
+	void handleInputs(Game* game, float dt);
+
 public:
 	MainMenuState();
 	virtual ~MainMenuState();

@@ -308,11 +308,11 @@ void MainMenuState::resume()
 {
 }
 
-void MainMenuState::handleInput(Game* game)
+void MainMenuState::handleInputs(Game* game, float dt)
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		game->getInput()->refresh(i);
+		game->getInput()->refresh(i, dt);
 	}
 
 	switch (m_menuState)
@@ -331,9 +331,13 @@ void MainMenuState::handleInput(Game* game)
 
 }
 
+void MainMenuState::handleInput(Game* game)
+{
+}
+
 void MainMenuState::update(Game* game, float dt)
 {
-	handleInput(game);
+	handleInputs(game, dt);
 	m_uiElements[1]->updateElement(dt);
 	//if(m_activeMenu == ActiveMainMenu::e_startGame)
 	//	m_uiElements[2]->updateElement(AnimationType::e_sprite, dt);
@@ -357,9 +361,9 @@ void MainMenuState::update(Game* game, float dt)
 	}
 }
 
-void MainMenuState::draw(Game* game, int index)
+void MainMenuState::draw(Game* game, renderPass pass)
 {
-	if (index == 0)
+	if (pass == renderPass::e_menu)
 	{
 		for (int i = 0; i < m_uiElements.size(); i++)
 		{

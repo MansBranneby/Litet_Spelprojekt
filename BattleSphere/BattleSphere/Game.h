@@ -38,7 +38,7 @@ public:
 
 	void update(float dt);
 	//void updateSec();
-	void draw(int index);
+	void draw(renderPass pass = renderPass::e_scene);
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);

@@ -249,7 +249,7 @@ void GameState::update(Game* game, float dt)
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr && m_robots[i].isDrawn()) 
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn()) 
 		{
 			m_robots[i]->update(dt);
 			XMVECTOR pos = m_robots[i]->getPosition();
@@ -303,12 +303,15 @@ void GameState::update(Game* game, float dt)
 
 void GameState::draw(Game* game, renderPass pass)
 {
+	m_input = game->getInput();
+	m_robots = game->getRobots();
+
 	if (pass != renderPass::e_transparent)
 	{
 
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			if (m_robots[i] != nullptr && m_robots[i].isDrawn())
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 

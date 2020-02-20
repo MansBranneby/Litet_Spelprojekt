@@ -56,7 +56,6 @@ Clock* g_Clock;
 Game* g_Game;
 LightCulling g_lightCulling;
 
-MainMenuState g_mainMenuState;
 Transparency g_transparency;
 ShadowMapping* g_shadowMapping;
 GameState* g_gameState;
@@ -275,8 +274,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	g_lightCulling.computeFrustum();
 	createRenderResources(); // Creates instances of graphics classes etc.
 	g_transparency.initialize();
-	
-	GameState g_gameState;
 
 	if (wndHandle)
 	{
@@ -416,7 +413,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
-					g_Game->draw(0);
+					g_Game->draw(renderPass::e_menu);
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 					g_lightCulling.cullLights();
@@ -438,7 +435,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
-					g_Game->draw(1);
+					g_Game->draw(renderPass::e_menuScene);
 
 					//finalRender();
 

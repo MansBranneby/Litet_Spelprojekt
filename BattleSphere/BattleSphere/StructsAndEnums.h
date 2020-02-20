@@ -31,6 +31,8 @@ enum class renderPass
 	e_scene,
 	e_downSample,
 	e_final,
+	e_menu,
+	e_menuScene,
 	e_opaque,
 	e_transparent
 };
