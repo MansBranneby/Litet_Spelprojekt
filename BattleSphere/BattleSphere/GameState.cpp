@@ -52,8 +52,9 @@ void GameState::startSpawn()
 {
 	for (int i = 0; i < START_SPAWNED_RESOURCES; i++)
 	{
-		int spawnIndex = getSpawnIndex();
-		Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f);
+		int spawnIndex = getSpawnIndex(); // TODO:: Change spawn types
+		//Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f, false);
+		Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 0.8f, false);
 		XMFLOAT2 pos = m_spawns[spawnIndex];
 		resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
 		m_resources.push_back(resource);
@@ -104,9 +105,6 @@ void GameState::handleMovement(Game* game, float dt, int id)
 		m_robots[id]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
 	}
 
-	// Projectile movement
-	ProjectileBank::getInstance()->moveProjectiles(dt);
-
 	// Resource movement
 	if (m_robots[id]->getResourceIndex() != -1)
 		m_resources[m_robots[id]->getResourceIndex()]->setPosition(m_robots[id]->getPosition() + XMVectorSet(0.0f, 1.5f, 0.0f, 0.0f));
@@ -116,13 +114,13 @@ void GameState::handleInputs(Game* game, float dt)
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
+		if (game->getRobots()[i] != nullptr)
 		{
 			if (!m_input->refresh(i, dt))
 			{
 				m_input->reconnectController(i);
 			}
-			else
+			else if (game->getRobots()[i]->isDrawn())
 			{
 				// Use weapon
 				if (m_input->getTriggerR(i) > 0.2)
@@ -221,16 +219,18 @@ void GameState::handleInputs(Game* game, float dt)
 						}
 					}
 				}
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
-				{
-					m_robots[i]->setHealth(100);
-					m_input->setVibration(i, 0.0f);
-				}
 
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_X))
 				{
 					m_robots[i]->upgradeWeapon(RIFLE);
 				}
+			}
+
+			// TODO: remove cheats yooo
+			if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
+			{
+				m_robots[i]->setHealth(100);
+				m_input->setVibration(i, 0.0f);
 			}
 
 			// COLLISION PLAYER VS STATIC OBJECTS
@@ -299,7 +299,7 @@ GameState::GameState()
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	
+
 
 	// Initialize resource spawning lists
 	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
@@ -345,7 +345,7 @@ void GameState::regularSpawn(float dT)
 		if (maxResources > m_resources.size()) // If there's room for a resource, spawn one
 		{
 
-			
+
 			// Randomize whether it is a normal or special resource
 			bool isSpecial = false;
 			if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
@@ -353,26 +353,28 @@ void GameState::regularSpawn(float dT)
 				// Only make resource special if there are available spots
 				for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
 				{
-					if (m_freeSpawns[(int)(m_normalSpawnAmount) + (char)i])
+					if (m_freeSpawns[(int)(m_normalSpawnAmount)+(char)i])
 						isSpecial = true;
 				}
 			}
-	
+
 
 			int spawnIndex;
 			Resource* resource;
 			if (isSpecial)
 			{
-				spawnIndex = getSpecialSpawnIndex();
-				resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
+				spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
+				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
+				resource = new Resource(m_spawnLightIndex, spawnIndex, RIFLE, 3.0f);
 			}
 			else
 			{
 				spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
-				resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
+				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
+				resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 1.2f);
 			}
 
-			
+
 			XMFLOAT2 pos = m_spawns[spawnIndex];
 			resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
 			m_resources.push_back(resource);
@@ -400,17 +402,20 @@ void GameState::update(Game* game, float dt)
 	game->updatePlayerStatus();
 	regularSpawn(dt);
 
+	// Projectile movement
+	ProjectileBank::getInstance()->moveProjectiles(dt);
+
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr && m_robots[i]->isDrawn()) 
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
 			m_robots[i]->update(dt);
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
-			
+
 	}
 
 	// TODO remove with collision instead aswell as game field?
@@ -426,22 +431,25 @@ void GameState::update(Game* game, float dt)
 		else
 		{
 			// COLLISION PROJECTILE VS PLAYERS
-			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+			for (int j = 0; j < XUSER_MAX_COUNT; j++)
 			{
-				BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
-				collisionInfo = robotBV->intersects(projBV);
-
-				// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
-				if (collisionInfo.m_colliding)
+				if (m_robots[j] != nullptr && m_robots[j]->isDrawn())
 				{
-					int resourceIndex = m_robots[j]->getResourceIndex();
-					if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
+					BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
+					collisionInfo = robotBV->intersects(projBV);
+
+					// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
+					if (collisionInfo.m_colliding)
 					{
-						m_input->setVibration(j, 0.5f);
-						if (resourceIndex != -1)
+						int resourceIndex = m_robots[j]->getResourceIndex();
+						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 						{
-							m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
-							m_resources[resourceIndex]->setBlocked(false);
+							m_input->setVibration(j, 0.5f);
+							if (resourceIndex != -1)
+							{
+								m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+								m_resources[resourceIndex]->setBlocked(false);
+							}
 						}
 					}
 				}
@@ -502,5 +510,5 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 	}
-	
+
 }

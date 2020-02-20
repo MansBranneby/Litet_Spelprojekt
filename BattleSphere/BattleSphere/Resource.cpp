@@ -74,14 +74,14 @@ void Resource::updateSpawningAnimation(float dT)
 	}
 }
 
-Resource::Resource(int spotLightIndex, int spawnIndex, int type, float scale)
+Resource::Resource(int spotLightIndex, int spawnIndex, int type, float scale, bool spawnAnimation)
 {
 	m_spotLightIndex = spotLightIndex;
 	m_spawnPosIndex = spawnIndex;
-	m_spawning = true;
+	m_spawning = spawnAnimation;
 	m_heightReset = false;
 	m_type = type;
-	m_blocked = true;
+	m_blocked = spawnAnimation;
 	m_ready = true;
 	m_time = 0.0f;
 	m_floatRadian = 0;

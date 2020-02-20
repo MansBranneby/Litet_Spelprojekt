@@ -41,7 +41,7 @@ private:
 	void updateSpawningAnimation(float dT);
 
 public:
-	Resource(int spotLightIndex, int spawnIndex, int type = 0, float scale = 1.0f);
+	Resource(int spotLightIndex, int spawnIndex, int type = 0, float scale = 1.0f, bool spawnAnimation = true);
 	~Resource();
 
 	int getType();
