@@ -259,7 +259,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 				startGame = false;
 		}
 	}
-	if (startGame && nrOfPlayers > 0) // TODO: Change to nrOfPlayers > 0 for debug and testing
+	if (startGame && nrOfPlayers > 1) // TODO: Change to nrOfPlayers > 0 for debug and testing
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
