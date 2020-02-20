@@ -189,7 +189,6 @@ GameState::GameState()
 	m_lights = Lights::getInstance();
 	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-	index = m_lights->addDirectionalLight(0.5f, -1, 0.5f, 0.6f, 0.6f, 1.0f, 4.0f);
 	index = m_lights->addSpotLight(-1.5f, 6, -40, 10, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(1.5f, 6, -40, 10, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	m_lights->addPointLight(-31, 6, -43, 10, 1, 1, 0, 5);

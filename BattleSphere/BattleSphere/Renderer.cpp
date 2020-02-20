@@ -176,6 +176,10 @@ void createRenderResources()
 	g_bloom = new Bloom();
 
 	g_shadowMapping = new ShadowMapping();
+	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
+	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
+											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
+	Lights::getInstance()->addDirectionalLight(0, 1, 0, 0, 0, 0, 5.0f);
 }
 
 void downsample()
@@ -264,8 +268,6 @@ void finalRender()
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#define _ITERATOR_DEBUG_LEVEL 0
-#define _HAS_ITERATOR_DEBUGGING 0
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
@@ -299,10 +301,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	
 		int counterFrames = 0;
 		int fps = 0;
-		float color[4] = { 0 };
-		float range = 1;
-		float intensity = 1;
-
+		float sunColor[4] = { (float)238 / 255, (float)247 / 255, (float)222 / 255, 0 };
+		float moonColor[4] = { 0 };
+		float rotation = 0;
+		float intensity = 5.0f;
+		XMVECTOR sunStartPos = g_shadowMapping->getCamera()->getPosition();
+		XMVECTOR sunPos = g_shadowMapping->getCamera()->getPosition();
+		XMVECTOR moonPos = XMVectorSet(0, -2, 0, 0);
+		float speed = 1.0f;
+		float rotCoeff = 0;
 		
 		///////////////
 		while (WM_QUIT != msg.message)
@@ -441,13 +448,49 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::Begin("Settings");
 
 				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-				ImGui::ColorPicker4("Pick a color", color);
-				ImGui::SliderFloat("Range: ", &range, 0, 100);
+				ImGui::ColorPicker4("Pick a color", moonColor);
+				ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
 				ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
 
-				Lights::getInstance()->setColor(0, color[0], color[1], color[2]);
-				Lights::getInstance()->setRange(0, range);
+				rotation += rotCoeff * speed * 0.1f;
+				if (rotCoeff >= 360)
+					rotCoeff = 0;
+				float rotInRad = XMConvertToRadians(rotation);
+				
+				//sunPos = g_shadowMapping->getCamera()->getPosition();
+				//g_Clock->getDeltaTime()
+				sunPos = XMVector3Rotate(sunStartPos, XMVectorSet((float)sin(rotInRad / 2)*0.5f, 0, (float)sin(rotInRad / 2), (float)cos(rotInRad / 2)));
+				moonPos = XMVector3Rotate(sunPos, XMVectorSet((float)sin(XM_PI / 2) * 0.5f, 0, (float)sin(XM_PI / 2), (float)cos(XM_PI / 2)));
+				XMVECTOR sunDir = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - sunPos);
+				XMVECTOR moonDir = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - moonPos);
+				float sunColorCoeff = (XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
+				float moonColorCoeff = (XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
+				
+				if (sunColorCoeff > 0)
+				{
+					g_shadowMapping->getCamera()->setPosition(sunPos);
+					rotCoeff = 1.4f - sunColorCoeff;
+				}
+				else
+				{
+					g_shadowMapping->getCamera()->setPosition(moonPos);
+					rotCoeff = 1.4f - moonColorCoeff;
+				}
+				g_shadowMapping->getCamera()->updateBuffers();
+
+				sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
+				sunColor[1] = 235 * pow(sunColorCoeff, 0.35f) / 255;
+				sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
+				Lights::getInstance()->setColor(0, sunColor[0], sunColor[1], sunColor[2]);
+				Lights::getInstance()->setDirection(0, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
 				Lights::getInstance()->setIntensity(0, intensity);
+
+				moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
+				moonColor[1] = 50 * pow(moonColorCoeff * 0.6f, 0.2f) / 255;	// 0.5f för lila
+				moonColor[2] = 70 * pow(moonColorCoeff * 0.8f, 0.1f) / 255;
+				Lights::getInstance()->setColor(1, moonColor[0], moonColor[1], moonColor[2]);
+				Lights::getInstance()->setDirection(1, XMVectorGetX(moonDir), XMVectorGetY(moonDir), XMVectorGetZ(moonDir));
+				Lights::getInstance()->setIntensity(1, intensity);
 
 				ImGui::End();
 				ImGui::Render();
@@ -466,6 +509,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					OutputDebugStringA("\n");*/
 
 				}
+
+				//realistic colours
+				//sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
+				//sunColor[1] = 235 * pow(sunColorCoeff, 0.35f) / 255;
+				//sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
+				//moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
+				//moonColor[1] = 50 * pow(moonColorCoeff * 0.6f, 0.2f) / 255;	// 0.5f för lila
+				//moonColor[2] = 70 * pow(moonColorCoeff * 0.8f, 0.1f) / 255;
 
 				g_Clock->resetStartTimer();
 			}

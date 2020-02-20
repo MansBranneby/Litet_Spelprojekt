@@ -33,6 +33,7 @@ public:
 	int addDirectionalLight();
 	int addSpotLight();
 	void setPosition(int index, float x, float y, float z);
+	void setDirection(int index, float dx, float dy, float dz);
 	void setColor(int index, float r, float g, float b);
 	void setRange(int index, float range);
 	void setIntensity(int index, float intensity);

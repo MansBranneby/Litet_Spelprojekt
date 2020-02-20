@@ -3,7 +3,7 @@
 ShadowMapping::ShadowMapping()
 {
 	m_shadowVS = VertexShader(L"VertexShaderShadowMapping.hlsl");
-	m_shadowCam = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 20.0f, 400.0f, XMVectorSet(180.0f, 130.0f, -70.0f, 0.0f));
+	m_shadowCam = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 20.0f, 500.0f, XMVectorSet(180.0f, 130.0f, -70.0f, 0.0f));
 
 	D3D11_TEXTURE2D_DESC descTex;
 	ZeroMemory(&descTex, sizeof(descTex));
