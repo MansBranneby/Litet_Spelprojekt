@@ -206,7 +206,7 @@ CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR b
 	DirectX::XMVECTOR vRel = bVel - aVel; // b's velocity relative to a
 	DirectX::XMVECTOR ab = bPos - aPos; // Vector beteen spheres
 	float rSum = aRad + bRad; // Sum of radii
-	
+
 	// If distance between a and b is shorter than sum their radius there's already a collision
 	// Dot product used to avoid a more expensive square root operation 
 	float length = DirectX::XMVectorGetX(DirectX::XMVector3Dot(ab, ab)) - rSum * rSum;
@@ -215,5 +215,19 @@ CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR b
 		collisioninfo.m_colliding = true;
 		collisioninfo.m_normal = ab;
 	}
+
+	float a = DirectX::XMVectorGetX(DirectX::XMVector3Dot(vRel, vRel));
+	if (a < 0.1f)
+		return collisioninfo;
+
+	float b = DirectX::XMVectorGetX(DirectX::XMVector3Dot(ab, vRel));
+	if (b >= 0.0f)
+		return collisioninfo;
+
+	float c = b * b - a * length;
+	if (c < 0.0f)
+		return collisioninfo;
+
+	collisioninfo.m_colliding = true;
 	return collisioninfo;
 }

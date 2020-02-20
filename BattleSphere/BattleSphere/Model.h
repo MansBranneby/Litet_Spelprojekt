@@ -5,7 +5,6 @@
 #include <sstream>
 #include "StructsAndEnums.h"
 
-
 class Model
 {
 private:

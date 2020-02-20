@@ -1,7 +1,6 @@
 #pragma once
 #include "BackfaceCuller.h"
 #include "Model.h"
-
 #include "Weapon.h"
 #include "Robot.h"
 #include "Node.h"
