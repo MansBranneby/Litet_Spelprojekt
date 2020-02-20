@@ -91,11 +91,12 @@ int GameState::getSpecialSpawnIndex()
 
 void GameState::handleMovement(Game* game, float dt, int id)
 {
+	// Save velocity for collision
+	m_robots[id]->setVel(XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f) *
+		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
+
 	// Robot and weapon movement
-	m_robots[id]->move(
-		XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f) *
-		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f) // TODO remove trigger
-	);
+	m_robots[id]->move(m_robots[id]->getVel());
 
 	// Rotation
 	if (abs(m_input->getThumbRX(id)) > 0.1f || abs(m_input->getThumbRY(id)) > 0.1f)
@@ -235,30 +236,38 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[i]->getData(), 0, 0));
+			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
-			float l = XMVectorGetX(XMVector3Length(v));
-			float r = robotBV->getRadius();
 			XMVECTOR newPos = m_robots[i]->getPosition();
-			// If robot moved farther than its radius
-			if (r < l)
+			float l = XMVectorGetX(XMVector3Length(v));
+			float d = robotBD.halfWD.x * 2.0f;
+
+			// if robot moved further than its diameter
+			if (d < l)
 			{
-				float tIncrement = r / l;
-				for (float t = tIncrement; t < 1.0f && !collisionInfo.m_colliding; t += tIncrement)
+				float tIncrement = 1.0f - l / (l + d);
+				for (float t = tIncrement; t < 1.0f; t += tIncrement)
 				{
-					robotBV->setPos(m_robots[i]->getPreviousPosition() + (v * t));
-					collisionInfo = game->getQuadtree()->testCollision(robotBV);
+					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
+					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
 
 					if (collisionInfo.m_colliding)
+					{
+						// Collision found, stop tests
 						newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
+						break;
+					}
 				}
 			}
-			else
+			for (int j = 0; j < 10; ++j)
 			{
 				// Normal collision
-				collisionInfo = game->getQuadtree()->testCollision(robotBV);
+				robotBD.pos = newPos;
+				collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
 				if (collisionInfo.m_colliding)
-					newPos = m_robots[i]->getPosition() + collisionInfo.m_normal;
+					newPos += collisionInfo.m_normal;
+				else break;
 			}
 
 			m_robots[i]->setPosition(newPos);
@@ -418,38 +427,53 @@ void GameState::update(Game* game, float dt)
 
 	}
 
-	// TODO remove with collision instead aswell as game field?
+	// COLLISION PROJECTILES VS STATIC OBJECTS
+	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
+	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
-		// Normal collision
-		BoundingSphere* projBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0));
-		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projBV);
+		// Save projectile pointer
+		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
+
+		// Update bounding data
+		projectileBD.pos = projectile->getData().pos;
+
+		// Test collision
+		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
+
+		// Remove based on conditions
 		if (collisionInfo.m_colliding)
+		{
+			// Collision against static object found, remove projectile
 			ProjectileBank::getInstance()->removeProjectile(i);
-		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
+		}
+		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)
+		{
+			// Remove after a certain distance from origin
 			ProjectileBank::getInstance()->removeProjectile(i);
+		}
 		else
 		{
+			// Bullet has not yet been removed by previous collision
 			// COLLISION PROJECTILE VS PLAYERS
-			for (int j = 0; j < XUSER_MAX_COUNT; j++)
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
 			{
-				if (m_robots[j] != nullptr && m_robots[j]->isDrawn())
-				{
-					BoundingSphere* robotBV = static_cast <BoundingSphere*> (game->getPreLoader()->getDynamicBoundingVolume(objectType::e_robot, m_robots[j]->getData(), 0, 0));
-					collisionInfo = robotBV->intersects(projBV);
+				// TODO: Test two moving spheres
+				//testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel(), projectile->getDirection * projectile->getVelocity);
 
-					// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
-					if (collisionInfo.m_colliding)
+				// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
+				robotBD.pos = m_robots[j]->getPosition();
+				testSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x);
+				if (collisionInfo.m_colliding)
+				{
+					int resourceIndex = m_robots[j]->getResourceIndex();
+					if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 					{
-						int resourceIndex = m_robots[j]->getResourceIndex();
-						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
+						m_input->setVibration(j, 0.5f);
+						if (resourceIndex != -1)
 						{
-							m_input->setVibration(j, 0.5f);
-							if (resourceIndex != -1)
-							{
-								m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
-								m_resources[resourceIndex]->setBlocked(false);
-							}
+							m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+							m_resources[resourceIndex]->setBlocked(false);
 						}
 					}
 				}
@@ -467,6 +491,7 @@ void GameState::update(Game* game, float dt)
 		m_nodes[i]->updateTime(dt);
 	}
 }
+
 
 void GameState::draw(Game* game, renderPass pass)
 {

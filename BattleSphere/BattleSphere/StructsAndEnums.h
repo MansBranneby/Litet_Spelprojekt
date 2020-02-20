@@ -124,11 +124,13 @@ struct CollisionInfo
 {
 	bool m_colliding;
 	DirectX::XMVECTOR m_normal;
+	DirectX::XMVECTOR m_contactPoint;
 
 	CollisionInfo()
 	{
 		m_colliding = false;
 		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
+		m_contactPoint = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
 	}
 };
 

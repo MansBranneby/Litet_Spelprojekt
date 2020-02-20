@@ -157,16 +157,6 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
-BoundingVolume* PreLoader::getStaticBoundingVolume(objectType type, int modelNr, int variant) const
-{
-	return m_objects[(int)type][variant][modelNr].getStaticBoundingVolume();
-}
-
-BoundingVolume* PreLoader::getDynamicBoundingVolume(objectType type, objectData data, int modelNr, int variant) const
-{
-	return m_objects[(int)type][variant][modelNr].getDynamicBoundingVolume(data);
-}
-
 int PreLoader::getNrOfVariants(objectType type) const
 {
 	return (int)m_objects[(int)type].size();
