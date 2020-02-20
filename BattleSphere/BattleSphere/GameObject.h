@@ -12,6 +12,7 @@ class GameObject
 {
 private:
 	XMVECTOR m_position;
+	XMVECTOR m_staticRotation;
 	XMVECTOR m_rotation;
 	XMVECTOR m_scale;
 

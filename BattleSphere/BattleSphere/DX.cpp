@@ -23,7 +23,18 @@ void DX::createStencilStates()
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
 	// Create depth stencil state
-	dsDesc.StencilEnable = false;
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_ZERO;
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
 	HRESULT hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &m_pDSStateDisabled);
 	if (FAILED(hr))
 		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);

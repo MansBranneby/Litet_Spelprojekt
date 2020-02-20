@@ -4,8 +4,7 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
-#include <stdlib.h>
-#include <time.h>  
+#include <stdlib.h> 
 
 #include "DX.h"
 #include "ProjectileBank.h"

@@ -299,6 +299,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		int counterFrames = 0;
 		int fps = 0;
 		float color[4] = { 0 };
+		float position[2] = { 0 };
 		float range = 1;
 		float intensity = 1;
 
@@ -452,10 +453,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::ColorPicker4("Pick a color", color);
 				ImGui::SliderFloat("Range: ", &range, 0, 100);
 				ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+				ImGui::SliderFloat("Isntensity: ", &position[0], -200, 200);
+				ImGui::SliderFloat("Intsensity: ", &position[1], -200, 200);
+				//ImGui::SliderFloat2("Position: ", position, -200, 200);
 
 				Lights::getInstance()->setColor(0, color[0], color[1], color[2]);
 				Lights::getInstance()->setRange(0, range);
 				Lights::getInstance()->setIntensity(0, intensity);
+				Lights::getInstance()->setPosition(0, position[0], 0.4f, position[1]);
 
 				ImGui::End();
 				ImGui::Render();

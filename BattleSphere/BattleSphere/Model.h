@@ -28,9 +28,10 @@ private:
 	XMMATRIX* m_matrixData;
 	XMMATRIX* m_modelMatrixData;
 	XMMATRIX m_modelMatrix;
+	XMMATRIX m_staticRotationMat;
 	XMMATRIX m_rotationMat;
-	XMMATRIX m_rotationAfterMat;
 	XMMATRIX m_scalingMat;
+	XMMATRIX m_relStaticRotationMat;
 	XMMATRIX m_relRotationMat;
 	XMMATRIX m_relScalingMat;
 	ID3D11Buffer* m_vertexBuffer;
@@ -46,6 +47,8 @@ private:
 
     void setPosition(XMVECTOR pos);
 	void setPosition(XMVECTOR pos, XMVECTOR relPos);
+	void setStaticRotation(XMVECTOR rotation);
+	void setStaticRotation(XMVECTOR rotation, XMVECTOR relRotation);
 	void setRotation(XMVECTOR rotation);
 	void setRotation(XMVECTOR rotation, XMVECTOR relRotation);
 	void setScale(XMVECTOR scale);
@@ -72,6 +75,9 @@ public:
 	BoundingVolume* getDynamicBoundingVolume(objectData data);
 	void setObjectData(objectData data, int modelNr = -1);
 	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
+	void setAllObjectData(objectData data);
+	void setAllObjectData(objectData data, objectData relativeData);
+	void loadModel(std::ifstream& in);
 	void loadModel(std::ifstream& in, objectType type);
 };
 
