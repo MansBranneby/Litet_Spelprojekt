@@ -431,7 +431,7 @@ void GameState::update(Game* game, float dt)
 	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
 	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-	{
+	{ 
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
 
@@ -458,12 +458,9 @@ void GameState::update(Game* game, float dt)
 			// COLLISION PROJECTILE VS PLAYERS
 			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
 			{
-				// TODO: Test two moving spheres
-				//testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel(), projectile->getDirection * projectile->getVelocity);
-
-				// TODO: Find solution to projectiles colliding with its "owner" and is immediately removed
 				robotBD.pos = m_robots[j]->getPosition();
-				testSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x);
+				collisionInfo = testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel(), projectile->getDirection() * projectile->getVelocity());
+
 				if (collisionInfo.m_colliding)
 				{
 					int resourceIndex = m_robots[j]->getResourceIndex();
