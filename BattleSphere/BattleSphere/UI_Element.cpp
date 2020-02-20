@@ -5,7 +5,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 	// Vertex list //
 	float left, right, top, bottom, texU, texV, alpha;
 
-	if (m_isDrawn ? alpha = 1.0f : alpha = 0.0f);
+	(m_isDrawn ? alpha = 1.0f : alpha = 0.0f);
 	
 	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
 	{
