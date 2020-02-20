@@ -1,13 +1,19 @@
 #pragma once
 
 #include "State.h"
+#include "Transparency.h"
+#include "Lights.h"
 
 class GameState : public State 
 {
+	
 private:
-
-	std::vector<GameObject> m_gameObjects;
-	std::vector<Projectile*> m_projectiles;
+	Input* m_input;
+	Robot** m_robots;
+	std::vector<Resource*> m_resources;
+	std::vector<Node*> m_nodes;
+	Lights* m_lights;
+	Transparency m_transparency;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
@@ -21,6 +27,6 @@ public:
 	
 	void handleInput(Game* game);
 	void update(Game* game, float dt);
-	void draw(Game* game, int index);
+	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
 

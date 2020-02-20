@@ -63,6 +63,11 @@ PreLoader* Game::getPreLoader()
 	return &m_preLoader;
 }
 
+QuadtreeNode* Game::getQuadtree()
+{
+	return m_quadtree;
+}
+
 Game::Game()
 {
 	m_nrOfPlayers = 0;
@@ -73,11 +78,14 @@ Game::Game()
 	}
 	//updatePlayerStatus();
 
-	objectData sceneData;
-	sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
-	sceneData.rotation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
-	m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	//m_preLoader.cull(objectType::e_scene);
+	// TODO: this ruins collision tests because we don't recalculate bounding volume data
+	//objectData sceneData;
+	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
+	//sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
+	//m_preLoader.setStaticData(objectType::e_scene, sceneData);
+	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{100.0f, 100.0f}, &m_preLoader, 2, 0);
 }
 
 void Game::update(float dt)
@@ -89,16 +97,7 @@ void Game::update(float dt)
 	}
 }
 
-//void Game::updateSec()
-//{
-//	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-//	{
-//		if (m_input.isPressed(i, XINPUT_GAMEPAD_A))
-//		{
-//			m_robots[i]->upgradeWeapon(RIFLE);
-//		}
-//	}
-//}
+
 
 void Game::draw(int index)
 {
@@ -138,6 +137,9 @@ bool Game::isActive(stateType state)
 
 void Game::release()
 {
+	ProjectileBank::getInstance()->release();
+	delete ProjectileBank::getInstance();
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr)
@@ -146,4 +148,6 @@ void Game::release()
 			delete m_robots[i];
 		}
 	}
+
+	delete m_quadtree;
 }

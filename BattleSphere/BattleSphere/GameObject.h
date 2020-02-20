@@ -8,9 +8,6 @@
 
 using namespace DirectX;
 
-
-
-
 class GameObject
 {
 private:
@@ -19,6 +16,9 @@ private:
 	XMVECTOR m_scale;
 
 	bool m_isDrawn;
+
+protected:
+	material m_material;
 
 public:
 	GameObject();
@@ -32,20 +32,24 @@ public:
 	void setPosition(XMVECTOR pos);
 	void move(float dX, float dY, float dZ); // Relative current value
 	void move(XMVECTOR dPos);
-	// Set relative object
 
 	// Rotation
 	void setRotation(XMVECTOR rotation); // Absolute
 	void setRotation(float vx, float vy, float vz, float rotDeg);
 	void rotate(XMVECTOR dRotation); // Relative current value
 	void rotate(float vx, float vy, float vz, float dRotDeg);
-	// Set relative object
 
 	// Scale
 	void setScale(XMVECTOR scale); // Absolute
 	void setScale(float xScale, float yScale, float zScale);
 	void scale(XMVECTOR scale); // Relative
 	void scale(float xScale, float yScale, float zScale);
+
+	// Material
+	void setAmbiet(float x, float y, float z, float w = -1);
+	void setDiffuse(float x, float y, float z, float w = -1);
+	void setSpecular(float x, float y, float z, float w = -1);
+	void setEmission(float x, float y, float z, float w = -1);
 
 	XMVECTOR getPosition();
 	objectData const getData();

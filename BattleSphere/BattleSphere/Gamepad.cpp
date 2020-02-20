@@ -5,6 +5,10 @@ Gamepad::Gamepad()
 	m_deadZoneX = 0.1f;
 	m_deadZoneY = 0.1f;
 	m_state.Gamepad.wButtons = 0;
+	m_vibration.wLeftMotorSpeed = 0;
+	m_vibration.wRightMotorSpeed = 0;
+	m_time = 0.0f;
+	m_vibActive = false;
 
 	m_controllerId = -1;
 	m_thumbLX = 0;
@@ -31,7 +35,7 @@ XINPUT_GAMEPAD* Gamepad::getState()
 	return &m_state.Gamepad;
 }
 
-bool Gamepad::refresh()
+bool Gamepad::refresh(float dt)
 {
 	if (m_controllerId == -1)
 		return false;
@@ -43,6 +47,13 @@ bool Gamepad::refresh()
 		{
 			m_controllerId = -1;
 			return false;
+		}
+		ZeroMemory(&m_vibration, sizeof(XINPUT_VIBRATION));
+		if (m_vibActive)
+		{
+			m_time += dt;
+			if (m_time > 0.1f)
+				setVibration(0.0f);
 		}
 
 		float normLX = fmaxf(-1, (float)m_state.Gamepad.sThumbLX / 32767);
@@ -74,6 +85,18 @@ bool Gamepad::refresh()
 bool Gamepad::isPressed(WORD button)
 {
 	return (m_state.Gamepad.wButtons & button) != 0;
+}
+
+void Gamepad::setVibration(float speed)
+{
+	if (speed == 0.0f)
+		m_vibActive = false;
+	else
+		m_vibActive = true;
+	m_time = 0.0f;
+	m_vibration.wLeftMotorSpeed = (int)floorf(65535 * speed);
+	m_vibration.wRightMotorSpeed = (int)floorf(65535 * speed);
+	XInputSetState(m_controllerId, &m_vibration);
 }
 
 float Gamepad::getThumbLX()

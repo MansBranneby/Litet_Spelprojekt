@@ -6,6 +6,11 @@ GameObject::GameObject()
 	m_rotation = XMVectorSet(1, 0, 0, 0);
 	m_scale = XMVectorSet(1, 1, 1, 0);
 
+	m_material.ambient = XMVectorSet(-1, -1, -1, -1);
+	m_material.diffuse = XMVectorSet(-1, -1, -1, -1);
+	m_material.specular = XMVectorSet(-1, -1, -1, -1);
+	m_material.emission = XMVectorSet(-1, -1, -1, -1);
+
 	m_isDrawn = true;
 }
 
@@ -86,6 +91,26 @@ void GameObject::scale(float xScale, float yScale, float zScale)
 	m_scale += scale;
 }
 
+void GameObject::setAmbiet(float x, float y, float z, float w)
+{
+	m_material.ambient = XMVectorSet(x, y, z, w);
+}
+
+void GameObject::setDiffuse(float x, float y, float z, float w)
+{
+	m_material.diffuse = XMVectorSet(x, y, z, w);
+}
+
+void GameObject::setSpecular(float x, float y, float z, float w)
+{
+	m_material.specular = XMVectorSet(x, y, z, w);
+}
+
+void GameObject::setEmission(float x, float y, float z, float w)
+{
+	m_material.emission = XMVectorSet(x, y, z, w);
+}
+
 XMVECTOR GameObject::getPosition()
 {
 	return m_position;
@@ -93,7 +118,7 @@ XMVECTOR GameObject::getPosition()
 
 objectData const GameObject::getData()
 {
-	objectData temp = { m_position, m_rotation, m_scale };
+	objectData temp = { m_position, m_rotation, m_scale, m_material };
 	return temp;
 }
 

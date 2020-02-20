@@ -1,24 +1,12 @@
+
 #include "LightCulling.h"
 
-void LightCulling::setLightData()
-{
-	for (int i = 0; i < LIGHT_COUNT; i++)
-	{
-		m_lights[i].enabled = false;
-		m_lights[i].intensity = 1;
-	}
-	m_nrOfLights = 0;
 
-
-
-
-	
-}
 
 void LightCulling::createConstantBuffers()
 {
 	m_viewMatrixData = new XMMATRIX();
-	*m_viewMatrixData = m_camera->getViewMatrix();
+	*m_viewMatrixData = DX::getInstance()->getCam()->getViewMatrix();
 	m_viewMatrixCBuffer = new ConstantBuffer(m_viewMatrixData, sizeof(XMMATRIX));
 
 	/*Data for compute shader, gives increased thread information*/
@@ -36,7 +24,7 @@ void LightCulling::createConstantBuffers()
 	m_screenToViewData = new screenToViewInfo();
 	m_screenToViewData->height = DX::getInstance()->getHeight();
 	m_screenToViewData->width = DX::getInstance()->getWidth();
-	m_screenToViewData->inverseProj = XMMatrixInverse(nullptr, m_camera->getProjectionMatrix());
+	m_screenToViewData->inverseProj = XMMatrixInverse(nullptr, DX::getInstance()->getCam()->getProjectionMatrix());
 	m_screenToViewCBuffer = new ConstantBuffer(m_screenToViewData, sizeof(screenToViewInfo));
 }
 
@@ -115,8 +103,8 @@ void LightCulling::createLightData()
 
 
 	/*Create light data*/
-	bufferDesc.StructureByteStride = sizeof(Light);
-	bufferDesc.ByteWidth = sizeof(Light) * LIGHT_COUNT;
+	bufferDesc.StructureByteStride = sizeof(LightData);
+	bufferDesc.ByteWidth = sizeof(LightData) * LIGHT_COUNT;
 
 
 	D3D11_SUBRESOURCE_DATA initData;
@@ -127,7 +115,7 @@ void LightCulling::createLightData()
 	DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, &initData, &m_lightBuffer);
 
 
-	srvDesc.Buffer.ElementWidth = sizeof(Light);
+	srvDesc.Buffer.ElementWidth = sizeof(LightData);
 	srvDesc.Buffer.NumElements = LIGHT_COUNT;
 	if (m_lightBuffer != nullptr)
 		DX::getInstance()->getDevice()->CreateShaderResourceView(m_lightBuffer, &srvDesc, &m_lightSRV);
@@ -171,14 +159,12 @@ void LightCulling::updateSubresource()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, m_lights, sizeof(Light) * LIGHT_COUNT);
+	memcpy(mappedMemory.pData, m_lights, sizeof(LightData) * LIGHT_COUNT);
 	DX::getInstance()->getDeviceContext()->Unmap(m_lightBuffer, 0);
 }
 
 LightCulling::LightCulling()
 {
-	
-	m_camera = nullptr;
 	m_computeShaderFrustum = nullptr;
 	m_computeShaderLightCulling = nullptr;
 	m_dispatchCBuffer = nullptr;
@@ -205,6 +191,7 @@ LightCulling::LightCulling()
 	m_lightBuffer = nullptr;
 	m_lightSRV = nullptr;
 	m_frustumSRV = nullptr;
+	m_lights = nullptr;
 
 }
 
@@ -253,11 +240,6 @@ LightCulling::~LightCulling()
 	{
 		m_lightIndexCountUAV->Release();
 		m_lightIndexCountUAV = nullptr;
-	}
-	if (m_camera)
-	{
-		delete m_camera;
-		m_camera = nullptr;
 	}
 	if (m_structuredBufferOut)
 	{
@@ -331,180 +313,22 @@ LightCulling::~LightCulling()
 		m_frustumSRV->Release();
 		m_frustumSRV = nullptr;
 	}
-}
-
-int LightCulling::addPointLight(float x, float y, float z, float radius, float r, float g, float b, float intensity)
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 0;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_lights[m_nrOfLights].range = radius;
-	m_nrOfLights++;
-	return m_nrOfLights - 1;
-}
-
-int LightCulling::addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity)
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].dx = dx;
-	m_lights[m_nrOfLights].dy = dy;
-	m_lights[m_nrOfLights].dz = dz;
-	m_lights[m_nrOfLights].type = 1;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_nrOfLights++;
-	return m_nrOfLights - 1;
-}
-
-int LightCulling::addSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity)
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 2;
-	m_lights[m_nrOfLights].spotLightAngle = angleDeg;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = b;
-	m_lights[m_nrOfLights].b = g;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = range;
-	m_lights[m_nrOfLights].dx = dx;
-	m_lights[m_nrOfLights].dy = dy;
-	m_lights[m_nrOfLights].dz = dz;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_nrOfLights++;
-	updateSubresource();
-	return m_nrOfLights - 1;
-}
-
-int LightCulling::addPointLight()
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 0;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_nrOfLights++;
-	updateSubresource();
-
-	return m_nrOfLights - 1;
-}
-
-int LightCulling::addDirectionalLight()
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].dx = 0;
-	m_lights[m_nrOfLights].dy = 0;
-	m_lights[m_nrOfLights].dz = 0;
-	m_lights[m_nrOfLights].type = 1;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-
-	m_lights[m_nrOfLights].intensity = 1;
-	m_nrOfLights++;
-	updateSubresource();
-
-	return m_nrOfLights - 1;
-}
-
-int LightCulling::addSpotLight()
-{
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 2;
-	m_lights[m_nrOfLights].spotLightAngle = 0;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_lights[m_nrOfLights].dx = 0;
-	m_lights[m_nrOfLights].dy = -1;
-	m_lights[m_nrOfLights].dz = 0;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_nrOfLights++;
-	updateSubresource();
-
-	return m_nrOfLights - 1;
-}
-
-void LightCulling::setPosition(int index, float x, float y, float z)
-{
-	m_lights[index].x = x;
-	m_lights[index].y = y;
-	m_lights[index].z = z;
-	updateSubresource();
-
-}
-
-void LightCulling::setColor(int index, float r, float g, float b)
-{
-	m_lights[index].r = r;
-	m_lights[index].g = g;
-	m_lights[index].b = b;
-	updateSubresource();
-
-}
-
-void LightCulling::setRange(int index, float range)
-{
-	m_lights[index].range = range;
-	updateSubresource();
-
-}
-
-void LightCulling::setIntensity(int index, float intensity)
-{
-	m_lights[index].intensity = intensity;
-	updateSubresource();
-
-}
-
-void LightCulling::setAngle(int index, float angleDeg)
-{
-	m_lights[index].spotLightAngle = angleDeg;
-	updateSubresource();
-
+	if (m_lights)
+	{
+		delete m_lights;
+	}
 }
 
 
 void LightCulling::initialize()
 {
-	m_camera = new Camera(DX::getInstance()->getWidth(), DX::getInstance()->getHeight(), 0.1f, 200.0f);
+	m_lights = Lights::getInstance();
 	m_computeShaderFrustum = new ComputeShader(L"ComputeShaderFrustumCalc.hlsl");
 	createConstantBuffers();
 	createFrustumData();
 	createLightData();
+	
 
-
-
-	setLightData();
 }
 
 void LightCulling::computeFrustum()

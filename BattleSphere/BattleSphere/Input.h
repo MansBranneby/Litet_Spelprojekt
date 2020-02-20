@@ -27,9 +27,10 @@ public:
 	void setBlocked(int id, bool inputBlocked);
 
 	bool reconnectController(int user);
-	bool refresh(int user);
+	bool refresh(int user, float dt);
 
 	bool isPressed(int user, WORD button);
+	void setVibration(int user, float speed);
 
 	float getThumbLX(int user);
 	float getThumbLY(int user);
