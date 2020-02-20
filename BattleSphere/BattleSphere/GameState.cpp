@@ -2,11 +2,12 @@
 
 void GameState::handleMovement(Game* game, float dt, int id)
 {
+	// Save velocity for collision
+	m_robots[id]->setVel(XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f) *
+		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
+
 	// Robot and weapon movement
-	m_robots[id]->move(
-		XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f) *
-		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f) // TODO remove trigger
-	);
+	m_robots[id]->move(m_robots[id]->getVel());
 
 	// Rotation
 	if (abs(m_input->getThumbRX(id)) > 0.1f || abs(m_input->getThumbRY(id)) > 0.1f)
@@ -233,26 +234,40 @@ void GameState::update(Game* game, float dt)
 	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
-		// Normal collision
-		projectileBD.pos = ProjectileBank::getInstance()->getList()[i]->getData().pos;
+		// Save projectile pointer
+		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
+
+		// Update bounding data
+		projectileBD.pos = projectile->getData().pos;
+
+		// Test collision
 		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
-		/*if (collisionInfo.m_colliding)
-			ProjectileBank::getInstance()->removeProjectile(i);
-		else if (XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition())) > 200.0f)
-			ProjectileBank::getInstance()->removeProjectile(i);*/
 
-		
-		// COLLISION PROJECTILE VS PLAYERS
-		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+		// Remove based on conditions
+		if (collisionInfo.m_colliding)
 		{
-			/*ProjectileBank::getInstance()->getList()[i]->getVelocity();
-			ProjectileBank::getInstance()->getList()[i]->getDirection();
-			m_robots[i]->getVelocity();*/
+			// Collision against static object found, remove projectile
+			ProjectileBank::getInstance()->removeProjectile(i);
+		}
+		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)
+		{
+			// Remove after a certain distance from origin
+			ProjectileBank::getInstance()->removeProjectile(i);
+		}
+		else
+		{
+			// Bullet has not yet been removed by previous collision
+			// COLLISION PROJECTILE VS PLAYERS
+			for (int j = 0; j < XUSER_MAX_COUNT; j++)
+			{
+				// TODO: Test two moving spheres
+				//testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel(), projectile->getDirection * projectile->getVelocity);
 
-			collisionInfo = testSphereSphere(projectileBD.pos, robotBD.pos, projectileBD.halfWD.x, robotBD.halfWD.x);
-			// TODO: Find solution to projectile colliding with its "owner" and is immediately removed
-			//if(collisionInfo.m_colliding)
-				//ProjectileBank::getInstance()->removeProjectile(i);	
+				// TODO: Find solution to projectile colliding with its "owner" and is immediately removed
+				collisionInfo = testSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x);
+				if(collisionInfo.m_colliding)
+					ProjectileBank::getInstance()->removeProjectile(i);	
+			}
 		}
 	}
 
