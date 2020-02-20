@@ -2,6 +2,7 @@
 #include "DX.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include "Lights.h"
 #include <vector>
 #include <cmath>
 #include <time.h> 

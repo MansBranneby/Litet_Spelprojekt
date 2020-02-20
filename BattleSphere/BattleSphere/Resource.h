@@ -10,6 +10,8 @@
 #define SPAWN_ANIMATION_TIME 3.5f
 #define SPAWN_HEIGHT 170.0f
 #define FINAL_HEIGHT 0.6f
+#define SPOTLIGHT_Y_OFFSET 30.0f
+#define SPOTLIGHT_RANGE 200.0f
 
 
 class Resource : public GameObject
@@ -28,6 +30,7 @@ private:
 	bool m_spawning;
 	bool m_heightReset;
 	int m_spawnPosIndex;
+	int m_spotLightIndex;
 
 	// Floating and spin animation
 	float m_floatRadian;
@@ -38,7 +41,7 @@ private:
 	void updateSpawningAnimation(float dT);
 
 public:
-	Resource(int spawnIndex, int type = 0, float scale = 1.0f);
+	Resource(int spotLightIndex, int spawnIndex, int type = 0, float scale = 1.0f);
 	~Resource();
 
 	int getType();

@@ -53,7 +53,7 @@ void GameState::startSpawn()
 	for (int i = 0; i < START_SPAWNED_RESOURCES; i++)
 	{
 		int spawnIndex = getSpawnIndex();
-		Resource* resource = new Resource(spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f);
+		Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f);
 		XMFLOAT2 pos = m_spawns[spawnIndex];
 		resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
 		m_resources.push_back(resource);
@@ -290,6 +290,7 @@ GameState::GameState()
 	index = m_lights->addDirectionalLight(0.5f, -1, 0.5f, 0.6f, 0.6f, 1.0f, 4.0f);
 	index = m_lights->addSpotLight(-1.5f, 6, -40, 10, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(1.5f, 6, -40, 10, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+
 	m_lights->addPointLight(-31, 6, -43, 10, 1, 1, 0, 5);
 	m_lights->addPointLight(27.5f, 4, -36, 10, 1, 0, 1, 5);
 	m_lights->addPointLight(50, 15.0, 42, 30, 1, 0.5f, 0, 25);
@@ -301,14 +302,8 @@ GameState::GameState()
 	m_lights->addPointLight(-71.5, 1.0, 59.5, 10, 1, 0.6f, 0, 10);
 
 
-	//m_lights->setColor(index, float(19) / 255, float(62) / 255, float(124) / 255);
-	/*
-	index = m_lights->addSpotLight(-35, 30, -5, 50, -0.3f, -1, 0.3f, 1.0f, 0.9f, 0.9f, 25, 1);
-	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);
-	index = m_lights->addSpotLight(0, 5, -45, 50, 0, -0.5f, 1.0f, 1.0f, 0.9f, 0.9f, 25, 1);
-	m_lights->setColor(index, float(234) / 255, float(185) / 255, float(217) / 255);*/
-
 	// Initialize resource spawning lists
+	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
 	loadLists();
 	startSpawn();
 }
@@ -359,7 +354,7 @@ void GameState::regularSpawn(float dT)
 				// Only make resource special if there are available spots
 				for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
 				{
-					if (m_freeSpawns[(int)(m_normalSpawnAmount) + i])
+					if (m_freeSpawns[(int)(m_normalSpawnAmount) + (char)i])
 						isSpecial = true;
 				}
 			}
@@ -370,12 +365,12 @@ void GameState::regularSpawn(float dT)
 			if (isSpecial)
 			{
 				spawnIndex = getSpecialSpawnIndex();
-				resource = new Resource(spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
+				resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
 			}
 			else
 			{
 				spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
-				resource = new Resource(spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
+				resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
 			}
 
 			

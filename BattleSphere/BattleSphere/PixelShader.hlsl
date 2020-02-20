@@ -131,6 +131,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			float attenuation = DoAttenuation(light, d);
 			float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
 			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
+			
 			break;
 		}
 		
