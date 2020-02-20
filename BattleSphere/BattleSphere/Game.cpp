@@ -25,6 +25,15 @@ int Game::getPlayerIdIndex(int id)
 	return returnValue;
 }
 
+void Game::leavePlayerIdIndex(int id)
+{
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_playerId[i] == id)
+			m_playerId[i] = -1;
+	}
+}
+
 void Game::updatePlayerStatus()
 {
 	

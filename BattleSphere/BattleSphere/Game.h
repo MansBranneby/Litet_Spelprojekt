@@ -40,6 +40,7 @@ public:
 	
 	int setPlayerIdIndex(int id);
 	int getPlayerIdIndex(int id);
+	void leavePlayerIdIndex(int id);
 	void updatePlayerStatus();
 	Robot** getRobots();
 	Input* getInput();

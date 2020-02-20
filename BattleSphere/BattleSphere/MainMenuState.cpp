@@ -190,6 +190,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[9 + robotNr]->setDrawn(true);
 				m_uiElements[13 + robotNr]->setDrawn(false); // Press A -> Ready A
 				m_readyState[robotNr]--;
+				game->leavePlayerIdIndex(i);
 				break;
 			case 2:
 				m_uiElements[13 + robotNr]->setDrawn(true);
