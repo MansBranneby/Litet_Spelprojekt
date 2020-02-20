@@ -6,7 +6,7 @@ HRESULT PixelShader::createPixelShader(LPCWSTR fileName)
 	ID3DBlob* pPS = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 
-	HRESULT result = D3DCompileFromFile(fileName, nullptr, nullptr, "PS_main", "ps_5_0", D3DCOMPILE_DEBUG, 0, &pPS, &errorBlob);
+	HRESULT result = D3DCompileFromFile(fileName, nullptr, nullptr, "PS_main", "ps_5_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &pPS, &errorBlob);
 
 	// compilation failed?
 	if (FAILED(result))

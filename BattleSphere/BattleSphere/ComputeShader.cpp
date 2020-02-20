@@ -2,7 +2,7 @@
 
 HRESULT ComputeShader::createComputeShader(LPCWSTR fileName, ID3DBlob** pVS, ID3DBlob** errorBlob)
 {
-	HRESULT result = D3DCompileFromFile(fileName, nullptr, nullptr, "CS_main", "cs_5_0", D3DCOMPILE_DEBUG, 0, pVS, errorBlob);
+	HRESULT result = D3DCompileFromFile(fileName, nullptr, nullptr, "CS_main", "cs_5_0", D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, pVS, errorBlob);
 
 	// compilation failed?
 	if (FAILED(result))

@@ -14,6 +14,7 @@ private:
 	Gamepad m_gamepads[XUSER_MAX_COUNT];
 	int m_gamepadIds[XUSER_MAX_COUNT];
 	int m_nrOfGamepads;
+	bool m_inputBlocked[XUSER_MAX_COUNT];
 
 	int getControllerState();
 public:
@@ -22,10 +23,14 @@ public:
 	int getId(int user);
 	int getNrOfGamepads();
 
+	bool isBlocked(int id);
+	void setBlocked(int id, bool inputBlocked);
+
 	bool reconnectController(int user);
-	bool refresh(int user);
+	bool refresh(int user, float dt);
 
 	bool isPressed(int user, WORD button);
+	void setVibration(int user, float speed);
 
 	float getThumbLX(int user);
 	float getThumbLY(int user);

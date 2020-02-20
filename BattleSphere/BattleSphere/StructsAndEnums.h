@@ -2,15 +2,34 @@
 #include "DX.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include "Lights.h"
 #include <vector>
 #include <cmath>
+#include <time.h> 
+
+#define RED 0
+#define GREEN 1
+#define BLUE 2
+#define RED_DIFFUSE XMVectorSet(1.0f, 0, 0, -1)
+#define GREEN_DIFFUSE XMVectorSet(0, 1.0f, 0, -1)
+#define BLUE_DIFFUSE XMVectorSet(0, 0, 1.0f, -1)
+#define RED_EMISSION XMVectorSet(0.35f, 0, 0, -1)
+#define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
+#define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
 
 using namespace DirectX;
 
+// Normal resources
 #define PISTOL 0
 #define RIFLE 1
 #define MOVEMENT 2
 #define SHIELD 3
+#define DASH 4
+#define REFLECT 5
+
+#define BIGGEST_NORMAL_INDEX 5 // Update if adding resources!
+// Special - bigger than normal number - resources
+
 
 enum class objectType
 {
@@ -28,7 +47,11 @@ enum class renderPass
 {
 	e_scene,
 	e_downSample,
-	e_final
+	e_final,
+	e_menu,
+	e_menuScene,
+	e_opaque,
+	e_transparent
 };
 
 enum class stateType
@@ -53,9 +76,20 @@ struct material
 	XMVECTOR emission = XMVectorSet(0.5f, 0, 0.5f, 0); // emission.xyz, opacity (d)
 };
 
-struct objectData
+
+
+enum class uiType
+{
+	e_mainMenuSelection,
+	e_mainMenuBox,
+	e_mainMenuText,
+	e_static
+};
+
+struct objectData 
 {
 	XMVECTOR pos = XMVectorSet(0, 0, 0, 0);
+	XMVECTOR staticRotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
 	material material;

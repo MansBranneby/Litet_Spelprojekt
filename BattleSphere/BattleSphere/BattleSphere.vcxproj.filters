@@ -81,9 +81,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LightCulling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,6 +136,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BackfaceCuller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transparency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Element.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CollisionTests.cpp">
@@ -207,9 +219,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightCulling.h">
@@ -281,6 +290,21 @@
     <ClInclude Include="CollisionTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Transparency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -324,8 +348,14 @@
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
-    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="PixelShaderMenu.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShaderMenu.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

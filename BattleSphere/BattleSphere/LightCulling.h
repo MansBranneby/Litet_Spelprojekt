@@ -5,9 +5,9 @@
 #include "Camera.h"
 #include <stdlib.h>
 #include <time.h>
+#include "Lights.h"
 
 #define FRUSTUM_COUNT 14000
-#define LIGHT_COUNT 48
 #define INDEX_COUNT FRUSTUM_COUNT * LIGHT_COUNT
 class LightCulling
 {
@@ -34,18 +34,8 @@ private:
 	{
 		plane planes[4] = { 0 };
 	};
-	struct Light 
-	{
-		int enabled;
-		int type;
-		float range, spotLightAngle;
-		float x, y, z, w;
-		float dx, dy, dz;
-		float intensity;
-		float r, g, b, a;
-	};
-	Light m_lights[LIGHT_COUNT] = { 0 };
-	int m_nrOfLights = 0;
+	
+	Lights* m_lights;
 	ID3D11Buffer* m_lightIndexCountBuffer;
 	ID3D11UnorderedAccessView* m_lightIndexCountUAV;
 
@@ -80,26 +70,15 @@ private:
 	void createConstantBuffers();
 	void createLightData();
 	void createFrustumData();
-	void updateSubresource();
+
 	
 public:
+	void updateSubresource();
 	LightCulling();
 	~LightCulling();
-	int addPointLight(float x, float y, float z, float radius, float r, float g, float b, float intensity);
-	int addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity);
-	int addSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity);
-	int addPointLight();
-	int addDirectionalLight();
-	int addSpotLight();
-	void setPosition(int index, float x, float y, float z);
-	void setColor(int index, float r, float g, float b);
-	void setRange(int index, float range);
-	void setIntensity(int index, float intensity);
-	void setAngle(int index, float angleDeg);
 	void initialize();
 	void computeFrustum();
 	void cullLights();
-	void setLightData();
-	
+
 };
 

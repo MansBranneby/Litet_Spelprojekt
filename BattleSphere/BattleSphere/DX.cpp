@@ -7,7 +7,55 @@ DX::DX()
 	m_device = nullptr;
 	m_deviceContext = nullptr;
 	m_swapChain = nullptr;
-	m_camera = nullptr;
+	m_pDSStateEnabled = nullptr;
+	m_pDSStateDisabled = nullptr;
+	//m_camera = nullptr;
+}
+
+void DX::createStencilStates()
+{
+	D3D11_DEPTH_STENCIL_DESC dsDesc = { 0 };
+	ZeroMemory(&dsDesc, sizeof(dsDesc));
+	// Depth test parameters
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	// Create depth stencil state
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_ZERO;
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
+	HRESULT hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &m_pDSStateDisabled);
+	if (FAILED(hr))
+		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
+
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_INCR_SAT;
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
+
+
+	hr = DX::getInstance()->getDevice()->CreateDepthStencilState(&dsDesc, &m_pDSStateEnabled);
+	if (FAILED(hr))
+		MessageBox(NULL, L"pDSState", L"Error", MB_OK | MB_ICONERROR);
 }
 
 DX* DX::getInstance()
@@ -40,6 +88,16 @@ IDXGISwapChain* DX::getSwapChain()
 	return m_swapChain;
 }
 
+ID3D11DepthStencilState* DX::getDSSEnabled()
+{
+	return m_pDSStateEnabled;
+}
+
+ID3D11DepthStencilState* DX::getDSSDisabled()
+{
+	return m_pDSStateDisabled;
+}
+
 float DX::getWidth()
 {
 	return m_width;
@@ -66,7 +124,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
 	scd.OutputWindow = wndHandle;                           // the window to be used
 	scd.SampleDesc.Count = 1;                               // how many multisamples
-	scd.Windowed = TRUE;                                    // windowed/full-screen mode
+	scd.Windowed = true;                                    // windowed/full-screen mode
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 
@@ -89,7 +147,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 		NULL,
 		&m_deviceContext);
 
-
+	createStencilStates();
 	return hr;
 }
 
@@ -105,4 +163,6 @@ void DX::release()
 	getDevice()->Release();
 	getDeviceContext()->Release();
 	getSwapChain()->Release();
+	m_pDSStateDisabled->Release();
+	m_pDSStateEnabled->Release();
 }

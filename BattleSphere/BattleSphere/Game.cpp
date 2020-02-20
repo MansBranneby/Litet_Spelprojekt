@@ -1,5 +1,39 @@
 #include "Game.h"
 
+int Game::setPlayerIdIndex(int id)
+{
+	int returnValue = -1;
+	for (int i = 0; i < XUSER_MAX_COUNT && returnValue == -1; i++)
+	{
+		if (m_playerId[i] == -1)
+		{
+			m_playerId[i] = id;
+			returnValue = i;
+		}
+	}
+	return returnValue;
+}
+
+int Game::getPlayerIdIndex(int id)
+{
+	int returnValue = -1;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_playerId[i] == id)
+			returnValue = i;
+	}
+	return returnValue;
+}
+
+void Game::leavePlayerIdIndex(int id)
+{
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_playerId[i] == id)
+			m_playerId[i] = -1;
+	}
+}
+
 void Game::updatePlayerStatus()
 {
 	
@@ -38,10 +72,13 @@ Game::Game()
 {
 	m_nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		m_playerId[i] = -1;
 		m_robots[i] = nullptr;
-	updatePlayerStatus();
+	}
+	//updatePlayerStatus();
 
-	m_preLoader.cull(objectType::e_scene);
+	//m_preLoader.cull(objectType::e_scene);
 	// TODO: this ruins collision tests because we don't recalculate bounding volume data
 	//objectData sceneData;
 	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
@@ -60,12 +97,14 @@ void Game::update(float dt)
 	}
 }
 
-void Game::draw()
+
+
+void Game::draw(renderPass pass)
 {
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (!m_states[i]->isPaused())
-			m_states[i]->draw(this);
+			m_states[i]->draw(this, pass);
 	}
 }
 

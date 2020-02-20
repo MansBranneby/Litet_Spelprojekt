@@ -12,8 +12,11 @@ class GameObject
 {
 private:
 	XMVECTOR m_position;
+	XMVECTOR m_staticRotation;
 	XMVECTOR m_rotation;
 	XMVECTOR m_scale;
+
+	bool m_isDrawn;
 
 protected:
 	material m_material;
@@ -51,4 +54,7 @@ public:
 
 	XMVECTOR getPosition();
 	objectData const getData();
+
+	bool isDrawn();
+	void setDrawn(bool isDrawn);
 };

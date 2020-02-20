@@ -23,6 +23,8 @@ private:
 public:
 	Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage);
 
+	void setDirection(XMVECTOR relPos);
+
 	int getType();
 	int getDamage();
 	float getVelocity();

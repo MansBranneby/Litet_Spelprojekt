@@ -4,8 +4,7 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
-#include <stdlib.h>
-#include <time.h>  
+#include <stdlib.h> 
 
 #include "DX.h"
 #include "ProjectileBank.h"
@@ -25,10 +24,10 @@ private:
 	std::vector<State*> m_states;
 
 	int m_nrOfPlayers;
-	int m_controllerId[XUSER_MAX_COUNT];
+	int m_playerId[XUSER_MAX_COUNT];
 	Input m_input;
 	Robot* m_robots[XUSER_MAX_COUNT];
-
+	
 	PreLoader m_preLoader;
 	QuadtreeNode* m_quadtree;
 
@@ -38,11 +37,14 @@ public:
 
 	void update(float dt);
 	//void updateSec();
-	void draw();
+	void draw(renderPass pass = renderPass::e_scene);
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);
 	
+	int setPlayerIdIndex(int id);
+	int getPlayerIdIndex(int id);
+	void leavePlayerIdIndex(int id);
 	void updatePlayerStatus();
 	Robot** getRobots();
 	Input* getInput();
