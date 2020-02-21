@@ -29,7 +29,7 @@ private:
 	ConstantBuffer* m_constantBufferVP;
 	ConstantBuffer* m_constantBufferPosition;
 
-	void updateBuffers();
+	//void updateBuffers();
 
 public:
 	Camera();

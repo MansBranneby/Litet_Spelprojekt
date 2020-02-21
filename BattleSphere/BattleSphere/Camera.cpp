@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+/*
 void Camera::updateBuffers()
 {
 	// Setup VP
@@ -12,6 +13,7 @@ void Camera::updateBuffers()
 	m_constantBufferVP = new ConstantBuffer(&m_viewProjection, sizeof(m_viewProjection));
 	m_constantBufferPosition = new ConstantBuffer(&m_position, sizeof(m_position));
 }
+*/
 
 Camera::Camera(float width, float height, float nearPlane, float farPlane, bool isPerspective)
 {
