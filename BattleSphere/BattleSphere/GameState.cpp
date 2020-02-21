@@ -305,8 +305,8 @@ GameState::GameState()
 	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
 	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 
 
 	// Initialize resource spawning lists
