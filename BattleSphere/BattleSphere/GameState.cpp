@@ -445,7 +445,7 @@ bool GameState::update(Game* game, float dt)
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
 	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
-	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{ 
 		// Save projectile pointer
@@ -474,7 +474,7 @@ bool GameState::update(Game* game, float dt)
 			// COLLISION PROJECTILE VS PLAYERS
 			for (int j = 0; j < XUSER_MAX_COUNT; j++)
 			{
-				if (m_robots[j] != nullptr)
+				if (m_robots[j] != nullptr && m_robots[j]->isDrawn())
 				{
 					robotBD.pos = m_robots[j]->getPosition();
 					collisionInfo = testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel() * dt, projectile->getDirection() * projectile->getVelocity() * dt);
@@ -492,6 +492,7 @@ bool GameState::update(Game* game, float dt)
 								m_resources[resourceIndex]->setBlocked(false);
 							}
 						}
+						break;
 					}
 				}
 			}
