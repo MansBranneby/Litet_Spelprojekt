@@ -173,14 +173,14 @@ void createRenderResources()
 	g_bloom = new Bloom();
 	g_menu = new Menu();
 
-	g_gameState = new GameState();
-	g_mainMenuState = new MainMenuState();
-
 	g_shadowMapping = new ShadowMapping();
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 	Lights::getInstance()->addDirectionalLight(0, 1, 0, 0, 0, 0, 5.0f);
+
+	g_gameState = new GameState();
+	g_mainMenuState = new MainMenuState();
 }
 
 void downsample()
