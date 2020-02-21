@@ -313,7 +313,6 @@ GameState::GameState()
 	m_lights = Lights::getInstance();
 	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-	index = m_lights->addDirectionalLight(0.5f, -1, 0.5f, 0.6f, 0.6f, 1.0f, 4.0f);
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
@@ -323,8 +322,8 @@ GameState::GameState()
 	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
 	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 
 
 	// Initialize resource spawning lists
@@ -473,21 +472,25 @@ bool GameState::update(Game* game, float dt)
 		{
 			// Bullet has not yet been removed by previous collision
 			// COLLISION PROJECTILE VS PLAYERS
-			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; j++)
+			for (int j = 0; j < XUSER_MAX_COUNT; j++)
 			{
-				robotBD.pos = m_robots[j]->getPosition();
-				collisionInfo = testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel(), projectile->getDirection() * projectile->getVelocity());
-
-				if (collisionInfo.m_colliding)
+				if (m_robots[j] != nullptr)
 				{
-					int resourceIndex = m_robots[j]->getResourceIndex();
-					if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
+					robotBD.pos = m_robots[j]->getPosition();
+					collisionInfo = testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel() * dt, projectile->getDirection() * projectile->getVelocity() * dt);
+
+
+					if (collisionInfo.m_colliding)
 					{
-						m_input->setVibration(j, 0.5f);
-						if (resourceIndex != -1)
+						int resourceIndex = m_robots[j]->getResourceIndex();
+						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 						{
-							m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
-							m_resources[resourceIndex]->setBlocked(false);
+							m_input->setVibration(j, 0.5f);
+							if (resourceIndex != -1)
+							{
+								m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+								m_resources[resourceIndex]->setBlocked(false);
+							}
 						}
 					}
 				}

@@ -85,7 +85,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
 	float shadowCoeff = sum / 25.0;
 	
-	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
+	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
@@ -96,12 +96,13 @@ float4 PS_main(PS_IN input) : SV_Target
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
-	fragmentCol = Ka * Ia * Kd;
+	fragmentCol = Ia * Kd; // * Ia
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
 	
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
+		float3 LKs = Ks;
 		//
 		// Calculate for every lightsource
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
@@ -134,13 +135,13 @@ float4 PS_main(PS_IN input) : SV_Target
 			
 			break;
 		case 3:
-			//Point light
+			//Area light
 			
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
 			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
 		
-			Ks = float3(0, 0, 0);
+			LKs = float3(0, 0, 0);
 			
 			break;
 		}
@@ -158,11 +159,11 @@ float4 PS_main(PS_IN input) : SV_Target
 			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
 			break;
 		case 2: // "Phong" (diffuse, ambient, specular)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
 
 			break;
 		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + Ks * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
+			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
 			break;
 		default:
 			fragmentCol = float3(1.0f, 1.0f, 1.0f);

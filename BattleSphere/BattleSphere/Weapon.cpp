@@ -18,7 +18,7 @@ Weapon::Weapon(int type)
 
 	if (type == RIFLE)
 	{
-		m_damage = 10;
+		m_damage = 8;
 		m_recoil = 0.4f;
 		m_cooldown = 0.2f;
 
@@ -26,29 +26,29 @@ Weapon::Weapon(int type)
 	}
 	else if (type == MOVEMENT)
 	{
-		m_cooldown = 5.0f;
-		m_duration = 5.0f;
-		m_speed = 2.0f;
+		m_cooldown = 10.0f;
+		m_duration = 4.0f;
+		m_speed = 1.5f;
 		setScale(0.1f, 0.8f, 0.1f);
 	}
 	else if (type == SHIELD)
 	{
-		m_cooldown = 5.0f;
+		m_cooldown = 10.0f;
 		m_duration = 5.0f;
 		m_defense = 0.0f;
 		setScale(0.8f, 0.8f, 0.1f);
 	}
 	else if (type == DASH)
 	{
-		m_cooldown = 1.0f;
+		m_cooldown = 1.5f;
 		m_duration = 0.15f;
 		m_speed = 5.0f;
 		setScale(0.2f, 1.6f, 0.2f);
 	}
 	else if (type == REFLECT)
 	{
-		m_cooldown = 2.0f;
-		m_duration = 10.0f;
+		m_cooldown = 12.0f;
+		m_duration = 3.0f;
 		m_defense = 0.0f;
 		setScale(1.8f, 1.8f, 0.2f);
 	}
@@ -121,22 +121,55 @@ void Weapon::upgrade()
 	{
 		m_damage += 2;
 		m_recoil -= 0.1f;
-		m_cooldown -= 0.05f;
+		m_cooldown -= 0.03f;
+		if (m_damage > 20)
+			m_damage = 20;
+		if (m_cooldown < 0.05f)
+			m_cooldown = 0.05f;
 	}
 	else if (m_type == MOVEMENT)
 	{
 		m_cooldown -= 0.5f;
 		m_duration += 1.0f;
-		m_speed += 0.5f;
+		m_speed += 0.2f;
+		if (m_cooldown < 6.0f)
+			m_cooldown = 6.0f;
+		if (m_duration > 8.0)
+			m_duration = 8.0f;
 	}
 	else if (m_type == SHIELD)
 	{
-		m_cooldown -= 0.1f;
-		m_duration += 1.0f;
+		m_cooldown -= 0.5f;
+		m_duration += 0.5f;
+		if (m_cooldown < 8.0f)
+			m_cooldown = 8.0f;
+		if (m_duration > 8.0)
+			m_duration = 8.0f;
 	}
 	else if (m_type == DASH)
 	{
 		m_cooldown -= 0.1f;
+		if (m_cooldown < 1.0f)
+			m_cooldown = 1.0f;
+	}
+	else if (m_type == REFLECT)
+	{
+		m_cooldown -= 1.0f;
+		m_duration += 0.5f;
+		if (m_cooldown < 8.0f)
+			m_cooldown = 8.0f;
+		if (m_duration > 6.0)
+			m_duration = 6.0f;
+	}
+	else
+	{
+		m_damage += 2;
+		m_recoil -= 0.1f;
+		m_cooldown -= 0.05f;
+		if (m_damage > 15)
+			m_damage = 15;
+		if (m_cooldown < 0.1f)
+			m_cooldown = 0.1f;
 	}
 	
 	/*

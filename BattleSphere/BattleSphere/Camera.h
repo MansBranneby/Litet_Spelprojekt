@@ -29,7 +29,7 @@ private:
 	ConstantBuffer* m_constantBufferVP;
 	ConstantBuffer* m_constantBufferPosition;
 
-	void updateBuffers();
+	//void updateBuffers();
 
 public:
 	Camera();
@@ -45,5 +45,9 @@ public:
 	XMMATRIX getProjectionMatrix();
 	ConstantBuffer* getConstantBufferVP();
 	ConstantBuffer* getConstantBufferPosition();
+	void updateBuffers();
+
+	XMVECTOR getPosition();
+	void setPosition(XMVECTOR pos);
 };
 

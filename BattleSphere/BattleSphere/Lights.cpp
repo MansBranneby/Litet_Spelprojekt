@@ -184,6 +184,13 @@ void Lights::setPosition(int index, float x, float y, float z)
 
 }
 
+void Lights::setDirection(int index, float dx, float dy, float dz)
+{
+	m_lights[index].dx = dx;
+	m_lights[index].dy = dy;
+	m_lights[index].dz = dz;
+}
+
 void Lights::setColor(int index, float r, float g, float b)
 {
 	m_lights[index].r = r;

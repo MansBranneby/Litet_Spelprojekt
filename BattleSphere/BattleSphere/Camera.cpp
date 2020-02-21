@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+/*
 void Camera::updateBuffers()
 {
 	// Setup VP
@@ -12,6 +13,7 @@ void Camera::updateBuffers()
 	m_constantBufferVP = new ConstantBuffer(&m_viewProjection, sizeof(m_viewProjection));
 	m_constantBufferPosition = new ConstantBuffer(&m_position, sizeof(m_position));
 }
+*/
 
 Camera::Camera(float width, float height, float nearPlane, float farPlane, bool isPerspective)
 {
@@ -177,4 +179,30 @@ ConstantBuffer* Camera::getConstantBufferVP()
 ConstantBuffer* Camera::getConstantBufferPosition()
 {
 	return m_constantBufferPosition;
+}
+
+void Camera::updateBuffers()
+{
+	m_view = XMMatrixLookAtLH(m_position, m_lookAt, m_up);
+	m_viewProjection = XMMatrixMultiply(m_view, m_projection);
+
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferVP->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &m_viewProjection, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferVP->getConstantBuffer(), 0);
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferPosition->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &m_position, sizeof(XMMATRIX));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferPosition->getConstantBuffer(), 0);
+}
+
+XMVECTOR Camera::getPosition()
+{
+	return m_position;
+}
+
+void Camera::setPosition(XMVECTOR pos)
+{
+	m_position = pos;
 }
