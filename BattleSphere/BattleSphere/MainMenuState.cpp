@@ -6,6 +6,12 @@ MainMenuState::MainMenuState()
 	m_menuState = MenuState::e_mainMenu;
 	m_activeMenu = ActiveMainMenu::e_startGame;
 
+	m_availableColours[0] = 1;
+	m_availableColours[1] = 1;
+	m_availableColours[2] = 1;
+	m_availableColours[3] = 1;
+	m_availableColours[4] = 1;
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_readyState[i] = 0;
 
@@ -49,92 +55,95 @@ MainMenuState::~MainMenuState()
 
 bool MainMenuState::hi_mainMenu(Game* game)
 {
-	if (game->getInput()->isPressed(0, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_quit)
-		return 1;
-
-	if (game->getInput()->getThumbLY(0) > -0.2f && game->getInput()->getThumbLY(0) < 0.2f) // Set input to ready if no input is detected
+	for (int j = 0; j < XUSER_MAX_COUNT; j++)
 	{
-		m_uiElements[1]->setSelectionTimer(0.0f);
-		m_uiElements[1]->setReady(true);
-		game->getInput()->setBlocked(0, false);
-	}
+		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_quit)
+			return 1;
 
-	if (game->getInput()->isPressed(0, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_startGame)
-	{
-		game->getInput()->setBlocked(0, true);
-		m_menuState = MenuState::e_robotSelection;
-		game->updatePlayerStatus();
-		
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		if (game->getInput()->getThumbLY(j) > -0.2f && game->getInput()->getThumbLY(j) < 0.2f) // Set input to ready if no input is detected
 		{
-			if (game->getRobots()[i] != nullptr)
-				game->getRobots()[i]->setDrawn(false);
+			m_uiElements[1]->setSelectionTimer(0.0f);
+			
+			game->getInput()->setBlocked(j, false);
 		}
 
-
-		//m_uiElements[1]->fadeOut(1.0f);
-		//m_uiElements[2]->fadeOut(1.0f);
-		//m_uiElements[3]->fadeOut(1.0f);
-		//m_uiElements[4]->fadeOut(1.0f);
-		//m_uiElements[5]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.0f, 0.2f);
-		//m_uiElements[6]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.5f, 0.2f);
-		//m_uiElements[7]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 2.0f, 0.2f);
-		/*m_uiElements[5]->fadeOut(1.0f);
-		m_uiElements[6]->fadeOut(1.0f);
-		m_uiElements[7]->fadeOut(1.0f);*/
-
-		for (int i = 1; i < 8; i++) // Hide main menu
+		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_startGame)
 		{
-			//m_uiElements[i]->setDrawn(false);
-			m_uiElements[i]->fadeOut(0.5f, 0.0f);
-		}
-		for (int i = 8; i < 13; i++) // Show robot selection
-		{
-			m_uiElements[i]->setDrawn(true);
-			m_uiElements[i]->fadeIn(1.0f, 1.0f);
-		}
-		//m_uiElements[8]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.0f, 0.2f);
-	}
+			game->getInput()->setBlocked(j, true);
+			m_menuState = MenuState::e_robotSelection;
+			game->updatePlayerStatus();
 
-	if (!game->getInput()->isBlocked(0)) // Check for inputs if not blocked
-	{
-		if (game->getInput()->getThumbLY(0) < -0.2f)
-		{
-			if (m_uiElements[1]->isReady()) // Is element ready
+			for (int i = 0; i < XUSER_MAX_COUNT; i++)
 			{
-				if (m_activeMenu == ActiveMainMenu::e_startGame)
+				if (game->getRobots()[i] != nullptr)
+					game->getRobots()[i]->setDrawn(false);
+			}
+
+
+			//m_uiElements[1]->fadeOut(1.0f);
+			//m_uiElements[2]->fadeOut(1.0f);
+			//m_uiElements[3]->fadeOut(1.0f);
+			//m_uiElements[4]->fadeOut(1.0f);
+			//m_uiElements[5]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.0f, 0.2f);
+			//m_uiElements[6]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.5f, 0.2f);
+			//m_uiElements[7]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 2.0f, 0.2f);
+			/*m_uiElements[5]->fadeOut(1.0f);
+			m_uiElements[6]->fadeOut(1.0f);
+			m_uiElements[7]->fadeOut(1.0f);*/
+
+			for (int i = 1; i < 8; i++) // Hide main menu
+			{
+				//m_uiElements[i]->setDrawn(false);
+				m_uiElements[i]->fadeOut(0.5f, 0.0f);
+			}
+			for (int i = 8; i < 13; i++) // Show robot selection
+			{
+				m_uiElements[i]->setDrawn(true);
+				m_uiElements[i]->fadeIn(1.0f, 1.0f);
+			}
+			//m_uiElements[8]->setDestinationX(2000.0f, 1500.0f, 2000.0f, 1.0f, 0.2f);
+		}
+
+		if (!game->getInput()->isBlocked(j)) // Check for inputs if not blocked
+		{
+			if (game->getInput()->getThumbLY(j) < -0.2f)
+			{
+				if (m_uiElements[1]->isReady()) // Is element ready
 				{
-					m_uiElements[1]->setDestinationY(-168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-					m_activeMenu = ActiveMainMenu::e_options;
-					m_uiElements[2]->setAnimated(false);
-					m_uiElements[3]->setAnimated(true);
-				}
-				else if (m_activeMenu == ActiveMainMenu::e_options)
-				{
-					m_uiElements[1]->setDestinationY(-168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-					m_activeMenu = ActiveMainMenu::e_quit;
-					m_uiElements[3]->setAnimated(false);
-					m_uiElements[4]->setAnimated(true);
+					if (m_activeMenu == ActiveMainMenu::e_startGame)
+					{
+						m_uiElements[1]->setDestinationY(-168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
+						m_activeMenu = ActiveMainMenu::e_options;
+						m_uiElements[2]->setAnimated(false);
+						m_uiElements[3]->setAnimated(true);
+					}
+					else if (m_activeMenu == ActiveMainMenu::e_options)
+					{
+						m_uiElements[1]->setDestinationY(-168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
+						m_activeMenu = ActiveMainMenu::e_quit;
+						m_uiElements[3]->setAnimated(false);
+						m_uiElements[4]->setAnimated(true);
+					}
 				}
 			}
-		}
-		else if (game->getInput()->getThumbLY(0) > 0.2f)
-		{
-			if (m_uiElements[1]->isReady())
+			else if (game->getInput()->getThumbLY(j) > 0.2f)
 			{
-				if (m_activeMenu == ActiveMainMenu::e_options)
+				if (m_uiElements[1]->isReady())
 				{
-					m_uiElements[1]->setDestinationY(168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-					m_activeMenu = ActiveMainMenu::e_startGame;
-					m_uiElements[3]->setAnimated(false);
-					m_uiElements[2]->setAnimated(true);
-				}
-				else if (m_activeMenu == ActiveMainMenu::e_quit)
-				{
-					m_uiElements[1]->setDestinationY(168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-					m_activeMenu = ActiveMainMenu::e_options;
-					m_uiElements[4]->setAnimated(false);
-					m_uiElements[3]->setAnimated(true);
+					if (m_activeMenu == ActiveMainMenu::e_options)
+					{
+						m_uiElements[1]->setDestinationY(168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
+						m_activeMenu = ActiveMainMenu::e_startGame;
+						m_uiElements[3]->setAnimated(false);
+						m_uiElements[2]->setAnimated(true);
+					}
+					else if (m_activeMenu == ActiveMainMenu::e_quit)
+					{
+						m_uiElements[1]->setDestinationY(168.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
+						m_activeMenu = ActiveMainMenu::e_options;
+						m_uiElements[4]->setAnimated(false);
+						m_uiElements[3]->setAnimated(true);
+					}
 				}
 			}
 		}
@@ -149,16 +158,17 @@ void MainMenuState::hi_robotSelection(Game* game)
 	int robotNr = -1;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isPressed(i, XINPUT_GAMEPAD_B))
+		robotNr = game->getPlayerIdIndex(i);
+
+		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && game->getInput()->getThumbLX(i) < 0.4f && game->getInput()->getThumbLX(i) > -0.4f)
 			game->getInput()->setBlocked(i, false);
 
 		//PRESS A//
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(i))
 		{
-			game->getInput()->setBlocked(i, true);
-			robotNr = game->getPlayerIdIndex(i);
 			if (robotNr == -1)
 				robotNr = game->setPlayerIdIndex(i);
+			game->getInput()->setBlocked(i, true);
 			
 			switch (m_readyState[robotNr])
 			{
@@ -168,6 +178,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[13 + robotNr]->setDrawn(true); // Press A -> Ready A
 				m_uiElements[13 + robotNr]->fadeIn(0.1f, 0.0f);
 				game->getRobots()[i]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
+				changeColour(game, i, true);
 				m_readyState[robotNr]++;
 				break;
 			case 1:
@@ -179,12 +190,9 @@ void MainMenuState::hi_robotSelection(Game* game)
 			}
 		}
 		//PRESS B//
-		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i))
+		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
 		{
 			game->getInput()->setBlocked(i, true);
-			robotNr = game->getPlayerIdIndex(i);
-			if (robotNr == -1)
-				robotNr = game->setPlayerIdIndex(i);
 
 			switch (m_readyState[robotNr])
 			{
@@ -204,6 +212,19 @@ void MainMenuState::hi_robotSelection(Game* game)
 				break;
 			}
 		}
+		//Right
+		if (game->getInput()->getThumbLX(i) > 0.4f && m_readyState[robotNr] == 1 && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
+		{
+			game->getInput()->setBlocked(i, true);
+			changeColour(game, i, true);
+		}
+		//Left
+		if (game->getInput()->getThumbLX(i) < -0.4f && m_readyState[robotNr] == 1 && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
+		{
+			game->getInput()->setBlocked(i, true);
+			changeColour(game, i, false);
+		}
+
 	}
 
 	for (int i = 9; i < 13; i++)
@@ -217,20 +238,34 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[i]->fadeIn(0.5f, 0.0f);
 		}
 	}
-	//for (int i = 13; i < 17; i++)
-	//{
-	//	if (m_uiElements[i]->getAlpha() == 1.0f && m_uiElements[i]->isReady())
-	//	{
-	//		m_uiElements[i]->fadeOut(1.0f, 0.5f);
-	//	}
-	//	else if (m_uiElements[i]->getAlpha() == 0.0f && m_uiElements[i]->isReady())
-	//	{
-	//		/*if (!m_uiElements[i + 4]->isDrawn())*/
-	//			m_uiElements[i]->fadeIn(0.5f, 0.0f);
-	//		//else
-	//		//	m_uiElements[i]->setDrawn(false);
-	//	}
-	//}
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) == -1) // To main menu
+		{
+			game->getInput()->setBlocked(i, true);
+			int nrOfPlayers = 0;
+			for (int j = 0; j < XUSER_MAX_COUNT; j++)
+			{
+				if (game->getPlayerIdIndex(j) != -1)
+					nrOfPlayers++;
+			}
+			if (!nrOfPlayers)
+			{
+				m_menuState = MenuState::e_mainMenu;
+
+				for (int i = 1; i < 8; i++) // Hide main menu
+				{
+					//m_uiElements[i]->setDrawn(false);
+					m_uiElements[i]->fadeIn(0.5f, 0.0f);
+				}
+				for (int i = 8; i < 17; i++) // Show robot selection
+				{
+					m_uiElements[i]->fadeOut(0.0f, 0.0f);
+					m_uiElements[i]->setDrawn(false);
+				}
+			}
+		}
+	}
 }
 
 void MainMenuState::hi_options(Game* game)
@@ -276,7 +311,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (game->getRobots()[i] != nullptr)
-			game->getRobots()[i]->rotate(0.0f, 1.0f, 0.0f, dt * 10);
+			game->getRobots()[i]->rotate(0.0f, 1.0f, 0.0f, dt * 20);
 	}
 
 	m_uiElements[2]->updateElement(dt);
@@ -334,6 +369,91 @@ bool MainMenuState::handleInputs(Game* game, float dt)
 	return 0;
 }
 
+void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
+{
+	// Find colour
+	int myColour = m_robotColour[robotNr];
+	if (dir) // RIGHT
+	{
+		if (myColour == -1)
+		{
+			myColour = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				if (m_availableColours[(myColour + i) % 5] == 1)
+				{
+					m_availableColours[(myColour + i) % 5] = 0;
+					m_robotColour[robotNr] = (myColour + i) % 5;
+					break;
+				}
+			}
+		}
+		for (int i = 1; i < 5; i++)
+		{
+			if (m_availableColours[(myColour + i) % 5] == 1)
+			{
+				m_availableColours[myColour] = 1;
+				m_availableColours[(myColour + i) % 5] = 0;
+				m_robotColour[robotNr] = (myColour + i) % 5;
+				break;
+			}
+		}
+	} // LEFT
+	else
+	{
+		if (myColour == -1)
+		{
+			myColour = 0;
+			for (int i = 0; i > -4; i--)
+			{
+				int index = (myColour + i) % 5;
+				if (index < 0)
+					index = 5 + index;
+				if (m_availableColours[index] == 1)
+				{
+					m_availableColours[index] = 0;
+					m_robotColour[robotNr] = index;
+					break;
+				}
+			}
+		}
+		for (int i = -1; i > -5; i--)
+		{
+			int index = (myColour + i) % 5;
+			if (index < 0)
+				index = 5 + index;
+			if (m_availableColours[index] == 1)
+			{
+				m_availableColours[myColour] = 1;
+				m_availableColours[index] = 0;
+				m_robotColour[robotNr] = index;
+				break;
+			}
+		}
+	}
+	// Set colour
+	switch (m_robotColour[robotNr])
+	{
+	case 0:
+		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 0.0f);
+		break;
+	case 1:
+		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 0.0f);
+		break;
+	case 2:
+		game->getRobots()[robotNr]->setEmission(0.0f, 0.0f, 1.0f);
+		break;
+	case 3:
+		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 1.0f);
+		break;
+	case 4:
+		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 1.0f);
+		break;
+	default:
+		break;
+	}
+}
+
 void MainMenuState::handleInput(Game* game)
 {
 }
@@ -381,7 +501,7 @@ void MainMenuState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
-				game->getPreLoader()->draw(objectType::e_robot, game->getRobots()[i]->getData());
+				game->getPreLoader()->draw(objectType::e_robot, game->getRobots()[i]->getData(), 1, 2);
 		}
 	}
 }

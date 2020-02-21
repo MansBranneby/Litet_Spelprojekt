@@ -215,7 +215,19 @@ void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, 
 
 void UI_Element::fadeOut(float fadeTime, float delay)
 {
-	m_animation->setFadeOut(fadeTime, delay);
+	if (fadeTime != 0.0f || delay != 0.0f)
+		m_animation->setFadeOut(fadeTime, delay);
+	else
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			m_vertexList[i].normX = 0.0f;
+			m_alpha = 0.0f;
+			m_animation->setFadeIn(fadeTime, delay);
+			m_animation->setFadeOut(fadeTime, delay);
+
+		}
+	}
 }
 
 void UI_Element::fadeIn(float fadeTime, float delay)

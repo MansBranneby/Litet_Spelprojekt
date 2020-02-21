@@ -244,18 +244,38 @@ bool UI_Animation::isFadeIn()
 
 void UI_Animation::setFadeOut(float fadeOut, float delay)
 {
-	m_isFadeOut = true;
-	m_fadeOut = fadeOut;
-	m_initialFadeTime = fadeOut;
-	m_delay = delay;
+	if (fadeOut != 0.0f || delay != 0.0f)
+	{
+		m_isFadeOut = true;
+		m_fadeOut = fadeOut;
+		m_initialFadeTime = fadeOut;
+		m_delay = delay;
+	}
+	else
+	{
+		m_isFadeOut = false;
+		m_fadeOut = 0.0f;
+		m_initialFadeTime = 0.0f;
+		m_delay = 0.0f;
+	}
 }
 
 void UI_Animation::setFadeIn(float fadeIn, float delay)
 {
-	m_isFadeIn = true;
-	m_fadeIn = fadeIn;
-	m_initialFadeTime = fadeIn;
-	m_delay2 = delay;
+	if (fadeIn != 0.0f || delay != 0.0f)
+	{
+		m_isFadeIn = true;
+		m_fadeIn = fadeIn;
+		m_initialFadeTime = fadeIn;
+		m_delay2 = delay;
+	}
+	else
+	{
+		m_isFadeIn = false;
+		m_fadeIn = 0.0f;
+		m_initialFadeTime = 0.0f;
+		m_delay2 = 0.0f;
+	}
 }
 
 void UI_Animation::setAnimationData(float speed, float acceleration, float delay, float rest)

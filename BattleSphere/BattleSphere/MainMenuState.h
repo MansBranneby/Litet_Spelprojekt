@@ -27,8 +27,11 @@ private:
 	
 	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
+	int m_robotColour[4] = { -1, -1, -1, -1 };
+	int m_availableColours[5];
 
 	bool handleInputs(Game* game, float dt);
+	void changeColour(Game* game, int i, bool dir);
 
 public:
 	MainMenuState();
