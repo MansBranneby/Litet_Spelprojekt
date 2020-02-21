@@ -110,7 +110,7 @@ void UI_Animation::animateElement(vertex* vertexList, float dt)
 			m_timer = 0.0f;
 			float u = m_spriteSizeX / m_sizeX;
 			float v = m_spriteSizeY / m_sizeY;
-			int activeFrame = m_texU / (u) * 6 + m_texV / (v)-6;
+			int activeFrame = (int)(m_texU / (u) * 6 + m_texV / (v)-6);
 			if (activeFrame == m_nrOfFrames) // Reset sprite sheet
 			{
 				m_texU = u;

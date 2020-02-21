@@ -3,6 +3,7 @@
 GameObject::GameObject()
 {
 	m_position = XMVectorSet(0, 0, 0, 0);
+	m_staticRotation = XMVectorSet(1, 0, 0, 0);
 	m_rotation = XMVectorSet(1, 0, 0, 0);
 	m_scale = XMVectorSet(1, 1, 1, 0);
 
@@ -46,27 +47,35 @@ void GameObject::move(XMVECTOR dPos)
 
 void GameObject::setRotation(XMVECTOR rotation)
 {
-	m_rotation = rotation;
+	m_staticRotation = rotation;
+	m_rotation.m128_f32[3] = 0.0f; // Reset rotation
 }
 
 void GameObject::setRotation(float vx, float vy, float vz, float rotDeg)
 {
 	XMVECTOR rotation = { vx, vy, vz, rotDeg };
-	m_rotation = rotation;
+	m_staticRotation = rotation;
+	m_rotation.m128_f32[3] = 0.0f; // Reset rotation
 }
 
 void GameObject::rotate(XMVECTOR dRotation)
 {
-	m_rotation += dRotation;
+	m_rotation.m128_f32[0] = dRotation.m128_f32[0];
+	m_rotation.m128_f32[1] = dRotation.m128_f32[1];
+	m_rotation.m128_f32[2] = dRotation.m128_f32[2];
+	m_rotation.m128_f32[3] += dRotation.m128_f32[3];
+	while (m_rotation.m128_f32[3] >= 360.0f) // Stay within bounds
+		m_rotation.m128_f32[3] -= 360.0f;
 }
 
 void GameObject::rotate(float vx, float vy, float vz, float dRotDeg)
 {
-	XMVECTOR dRotate = { vx, vy, vz, dRotDeg };
 	m_rotation.m128_f32[0] = vx;
 	m_rotation.m128_f32[1] = vy;
 	m_rotation.m128_f32[2] = vz;
 	m_rotation.m128_f32[3] += dRotDeg;
+	while (m_rotation.m128_f32[3] >= 360.0f) // Stay within bounds
+		m_rotation.m128_f32[3] -= 360.0f;
 }
 
 void GameObject::setScale(XMVECTOR scale)
@@ -118,7 +127,7 @@ XMVECTOR GameObject::getPosition()
 
 objectData const GameObject::getData()
 {
-	objectData temp = { m_position, m_rotation, m_scale, m_material };
+	objectData temp = { m_position, m_staticRotation, m_rotation, m_scale, m_material };
 	return temp;
 }
 

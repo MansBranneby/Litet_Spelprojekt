@@ -1,6 +1,5 @@
 #include "Model.h"
 
-
 void Model::computeOBB()
 {
 	const int nrOfPairs = 179;
@@ -168,7 +167,7 @@ void Model::createVertexCBuffer()
 
 void Model::updateSubResource()
 {
-	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
+	*m_matrixData = m_scalingMat * m_staticRotationMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -179,7 +178,7 @@ void Model::updateSubResource()
 void Model::updateRelSubResource()
 {
 	*m_matrixData = m_scalingMat * m_rotationMat * XMMatrixTranslation(m_pos.m128_f32[0], m_pos.m128_f32[1], m_pos.m128_f32[2])
-		* m_relScalingMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
+		* m_relScalingMat * m_relStaticRotationMat * m_relRotationMat * XMMatrixTranslation(m_relPos.m128_f32[0], m_relPos.m128_f32[1], m_relPos.m128_f32[2]);
 
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_matrixCBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -226,12 +225,12 @@ Model::Model()
 	m_matrixData = nullptr;
 	m_modelMatrix = XMMatrixIdentity();
 	m_modelMatrixData = nullptr;
+	m_staticRotationMat = XMMatrixIdentity();
 	m_rotationMat = XMMatrixIdentity();
-	m_rotationAfterMat = XMMatrixIdentity();
 	m_scalingMat = XMMatrixIdentity();
+	m_relStaticRotationMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();
-	m_boundingVolume = nullptr;
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
@@ -247,7 +246,6 @@ Model::~Model()
 	if (m_vertexCullingBuffer) m_vertexCullingBuffer->Release();
 	if (m_vertexAndId) delete[] m_vertexAndId;
 	if (m_modelMatrixData) delete (m_modelMatrixData);
-	if (m_boundingVolume) delete m_boundingVolume;
 }
 
 void Model::setPosition(XMVECTOR pos)
@@ -259,6 +257,41 @@ void Model::setPosition(XMVECTOR pos, XMVECTOR relPos)
 {
 	m_pos = pos;
 	m_relPos = relPos;
+}
+
+void Model::setStaticRotation(XMVECTOR rotation)
+{
+	float vx = rotation.m128_f32[0];
+	float vy = rotation.m128_f32[1];
+	float vz = rotation.m128_f32[2];
+	float rotDeg = rotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_staticRotationMat = dRotation;
+}
+
+void Model::setStaticRotation(XMVECTOR rotation, XMVECTOR relRotation)
+{
+	setStaticRotation(rotation);
+	float vx = relRotation.m128_f32[0];
+	float vy = relRotation.m128_f32[1];
+	float vz = relRotation.m128_f32[2];
+	float rotDeg = relRotation.m128_f32[3];
+
+	float rotInRad = XMConvertToRadians(rotDeg);
+	vx *= sin(rotInRad / 2);
+	vy *= sin(rotInRad / 2);
+	vz *= sin(rotInRad / 2);
+	float rot = cos(rotInRad / 2);
+	XMVECTOR rotVec = { vx, vy, vz,  rot };
+	XMMATRIX dRotation = XMMatrixRotationQuaternion(rotVec);
+	m_relStaticRotationMat = dRotation;
 }
 
 void Model::setRotation(XMVECTOR rotation)
@@ -455,20 +488,10 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	return updatedVertices;
 }
 
-BoundingVolume* Model::getStaticBoundingVolume() const
-{
-	return m_boundingVolume;
-}
-
-BoundingVolume* Model::getDynamicBoundingVolume(objectData data)
-{
-	m_boundingVolume->setPos(data.pos);
-	return m_boundingVolume;	
-}
-
 void Model::setObjectData(objectData data, int modelNr)
 {
 	setPosition(data.pos);
+	setStaticRotation(data.staticRotation);
 	setRotation(data.rotation);
 	setScale(data.scale);
 	if (modelNr != -1)
@@ -479,11 +502,171 @@ void Model::setObjectData(objectData data, int modelNr)
 void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
 {
 	setPosition(data.pos, relativeData.pos);
+	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	if (modelNr != -1)
 		m_subModels[modelNr].updateMaterialInfo(data.material);
 	updateRelSubResource();
+}
+
+void Model::setAllObjectData(objectData data)
+{
+	setPosition(data.pos);
+	setStaticRotation(data.staticRotation);
+	setRotation(data.rotation);
+	setScale(data.scale);
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].updateMaterialInfo(data.material);
+	}
+	updateSubResource();
+}
+
+void Model::setAllObjectData(objectData data, objectData relativeData)
+{
+	setPosition(data.pos, relativeData.pos);
+	setStaticRotation(data.staticRotation, relativeData.staticRotation);
+	setRotation(data.rotation, relativeData.rotation);
+	setScale(data.scale, relativeData.scale);
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].updateMaterialInfo(data.material);
+	}
+	updateRelSubResource();
+}
+
+void Model::loadModel(std::ifstream& in)
+{
+	std::string line;
+	std::istringstream inputStream;
+
+	std::getline(in, line);
+	inputStream.str(line);
+	inputStream >> m_nrOfVertices;
+	inputStream.clear();
+	m_vertices = new vertex[m_nrOfVertices];
+	m_vertexAndId = new vertexAndId[m_nrOfVertices];
+
+	// Read vertices
+	for (int i = 0; i < m_nrOfVertices; i++)
+	{
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >>
+			m_vertices[i].posX >> m_vertices[i].posY >> m_vertices[i].posZ >>
+			m_vertices[i].u >> m_vertices[i].v >>
+			m_vertices[i].normX >> m_vertices[i].normY >> m_vertices[i].normZ;
+		inputStream.clear();
+		m_vertexAndId[i].posX = m_vertices[i].posX;
+		m_vertexAndId[i].posY = m_vertices[i].posY;
+		m_vertexAndId[i].posZ = m_vertices[i].posZ;
+		m_vertexAndId[i].iD = i;
+	}
+	// Creates a vertex buffer
+	createVertexBuffer();
+
+	// Creates the vertex culling buffer, contains position and vertex ID
+	createVertexCullingBuffer();
+
+
+	// Get number of materials to read
+	std::getline(in, line);
+	inputStream.str(line);
+	inputStream >> m_nrOfSubModels;
+	inputStream.clear();
+
+	m_subModels = new SubModel[m_nrOfSubModels];
+	material tempMat;
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		// Ambient
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.ambient.m128_f32[0] >> tempMat.ambient.m128_f32[1] >> tempMat.ambient.m128_f32[2];
+		inputStream.clear();
+
+		// Diffuse
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.diffuse.m128_f32[0] >> tempMat.diffuse.m128_f32[1] >> tempMat.diffuse.m128_f32[2];
+		inputStream.clear();
+
+		// Specular
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.specular.m128_f32[0] >> tempMat.specular.m128_f32[1] >> tempMat.specular.m128_f32[2];
+		inputStream.clear();
+
+		// Emission
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.emission.m128_f32[0] >> tempMat.emission.m128_f32[1] >> tempMat.emission.m128_f32[2];
+		inputStream.clear();
+
+		// Shininess
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.specular.m128_f32[3];
+		inputStream.clear();
+
+		// Diffuse texture
+
+		std::getline(in, line);
+
+		//?
+
+		// Refraction
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.diffuse.m128_f32[3];
+		inputStream.clear();
+
+
+		// Opacity
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.emission.m128_f32[3];
+		inputStream.clear();
+
+		// Illumination model enumeration
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> tempMat.ambient.m128_f32[3];
+		inputStream.clear();
+
+		// Set submodel material
+		m_subModels[i].setMaterialInfo(tempMat);
+
+		// Get number of indices
+		int nrOfIndices = 0;
+		std::getline(in, line);
+		inputStream.str(line);
+		inputStream >> nrOfIndices;
+		inputStream.clear();
+
+		// Read indices
+		int* indices = new int[nrOfIndices];
+		for (int j = 0; j < nrOfIndices; j += 3)
+		{
+			std::getline(in, line);
+			inputStream.str(line);
+			inputStream >> indices[j] >> indices[j + 1] >> indices[j + 2];
+
+			// Save vertex indices 
+			m_indices.push_back(indices[j]);
+			m_indices.push_back(indices[j + 1]);
+			m_indices.push_back(indices[j + 2]);
+			inputStream.clear();
+		}
+		m_subModels[i].setFaces(indices, nrOfIndices);
+	}
+
+	// Create model matrix
+	createVertexCBuffer();
+
+	// Create bounding volume
+	computeOBB(); // Calculate information for bounding volume data
 }
 
 void Model::loadModel(std::ifstream& in, objectType type)
@@ -609,7 +792,6 @@ void Model::loadModel(std::ifstream& in, objectType type)
 			m_indices.push_back(indices[j + 2]);
 			inputStream.clear();
 		}
-
 		m_subModels[i].setFaces(indices, nrOfIndices);
 	}
 
@@ -618,17 +800,5 @@ void Model::loadModel(std::ifstream& in, objectType type)
 
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
-	// Hardcoded bounding volume based on object type, e.g. robots will have bounding spheres
-	switch (type)
-	{
-	case objectType::e_robot:
-		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
-		break;
-	case objectType::e_projectile:
-		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
-		break;
-	default:
-		m_boundingVolume = new OBB(m_bData.pos, m_bData.halfWD, m_bData.xAxis, m_bData.zAxis);
-	}
 
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include "BackfaceCuller.h"
 #include "Model.h"
-
 #include "Weapon.h"
 #include "Robot.h"
 #include "Node.h"
@@ -42,8 +41,6 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, int modelNr, int variant = 0) const;
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, int modelNr, int variant = 0) const;
 	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant = 0) const;
-	BoundingVolume* getStaticBoundingVolume(objectType type, int modelNr, int variant = 0) const;
-	BoundingVolume* getDynamicBoundingVolume(objectType type, objectData data, int modelNr, int variant) const;
 	int getNrOfVariants(objectType type) const;
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
@@ -54,6 +51,8 @@ public:
 	void draw(objectType type, int variant = 0);
 	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
 	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void drawOneMaterial(objectType type, objectData data, int variant = 0);
+	void drawOneMaterial(objectType type, objectData data, objectData relativeData, int variant = 0);
 	void cull(objectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.
 };
 

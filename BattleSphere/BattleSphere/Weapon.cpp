@@ -22,7 +22,7 @@ Weapon::Weapon(int type)
 		m_recoil = 0.4f;
 		m_cooldown = 0.2f;
 
-		setScale(0.2f, 0.2f, 0.8f);
+		setScale(0.8f, 0.8f, 0.8f);
 	}
 	else if (type == MOVEMENT)
 	{
@@ -58,7 +58,7 @@ Weapon::Weapon(int type)
 		m_recoil = 0.1f;
 		m_cooldown = 0.5f;
 
-		setScale(0.15f, 0.15f, 0.6f);
+		setScale(0.35f, 0.35f, 0.55f);
 	}
 
 	m_currentRecoil = m_recoil / 2.0f;

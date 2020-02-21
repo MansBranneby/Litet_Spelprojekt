@@ -10,7 +10,7 @@ Robot::Robot(int playerId)
 	m_currentWeapon[RIGHT] = 0;
 	m_score = 0;
 	m_resource = -1;
-	Weapon* pistol = new Weapon(RIFLE);
+	Weapon* pistol = new Weapon(PISTOL);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -68,7 +68,10 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 	{
 		m_health -= (int)floorf(dmg);
 		if (m_health < 0)
+		{
 			m_health = 0;
+			setDrawn(false);
+		}
 		m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
 		removeResource();
 		return true;
@@ -78,6 +81,7 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 
 void Robot::setHealth(int health)
 {
+	setDrawn(true);
 	m_health = health;
 	if (m_playerId == 0)
 		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
@@ -274,6 +278,16 @@ XMVECTOR Robot::getPreviousPosition() const
 	}
 
 	return m_positionHistory[m_positionHistoryPtr - 1];
+}
+
+void Robot::setVel(DirectX::XMVECTOR vel)
+{
+	m_vel = vel;
+}
+
+DirectX::XMVECTOR Robot::getVel() const
+{
+	return m_vel;
 }
 
 void Robot::release()
