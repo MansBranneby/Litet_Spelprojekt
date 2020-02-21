@@ -33,6 +33,7 @@ private:
 	void startSpawn();
 	int getSpawnIndex();
 	int getSpecialSpawnIndex();
+	void spawnNodes();
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

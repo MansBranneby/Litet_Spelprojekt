@@ -89,6 +89,26 @@ int GameState::getSpecialSpawnIndex()
 	return index;
 }
 
+void GameState::spawnNodes()
+{
+	Node* node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(-118.0f, 0.2f, -10.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
+	m_nodes.push_back(node);
+	node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(150.0f, 0.2f, 122.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
+	m_nodes.push_back(node);
+	node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(105.0f, 0.2f, -18.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	m_nodes.push_back(node);
+	node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(-101.0f, 0.3f, -49.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	m_nodes.push_back(node);
+}
+
 void GameState::handleMovement(Game* game, float dt, int id)
 {
 	// Save velocity for collision
@@ -285,12 +305,9 @@ GameState::GameState()
 	m_robots = nullptr;
 	m_collectedTime = 0.0f;
 
-	for (int i = 0; i < 6; i++)
-	{
-		Node* node = new Node(i % 6);
-		node->setPosition(XMVectorSet((float)(i * 10), 0.2f, (float)(-90.0f), 0.0f));
-		m_nodes.push_back(node);
-	}
+	// Spawn preset nodes
+	spawnNodes();
+
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
