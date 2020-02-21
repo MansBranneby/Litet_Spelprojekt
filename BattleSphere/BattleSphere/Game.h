@@ -35,7 +35,7 @@ public:
 	
 	Game();
 
-	void update(float dt);
+	bool update(float dt);
 	//void updateSec();
 	void draw(renderPass pass = renderPass::e_scene);
 	void pushState(State* state);

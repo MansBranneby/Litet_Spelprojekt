@@ -47,8 +47,10 @@ MainMenuState::~MainMenuState()
 	}
 }
 
-void MainMenuState::hi_mainMenu(Game* game)
+bool MainMenuState::hi_mainMenu(Game* game)
 {
+	if (game->getInput()->isPressed(0, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_quit)
+		return 1;
 
 	if (game->getInput()->getThumbLY(0) > -0.2f && game->getInput()->getThumbLY(0) < 0.2f) // Set input to ready if no input is detected
 	{
@@ -137,6 +139,7 @@ void MainMenuState::hi_mainMenu(Game* game)
 			}
 		}
 	}
+	return 0;
 }
 
 void MainMenuState::hi_robotSelection(Game* game)
@@ -308,7 +311,7 @@ void MainMenuState::resume()
 {
 }
 
-void MainMenuState::handleInputs(Game* game, float dt)
+bool MainMenuState::handleInputs(Game* game, float dt)
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
@@ -318,7 +321,7 @@ void MainMenuState::handleInputs(Game* game, float dt)
 	switch (m_menuState)
 	{
 	case e_mainMenu:
-		hi_mainMenu(game);
+		return hi_mainMenu(game);
 		break;
 	case e_robotSelection:
 		hi_robotSelection(game);
@@ -328,16 +331,17 @@ void MainMenuState::handleInputs(Game* game, float dt)
 	default:
 		break;
 	}
-
+	return 0;
 }
 
 void MainMenuState::handleInput(Game* game)
 {
 }
 
-void MainMenuState::update(Game* game, float dt)
+bool MainMenuState::update(Game* game, float dt)
 {
-	handleInputs(game, dt);
+	if (handleInputs(game, dt))
+		return 1;
 	m_uiElements[1]->updateElement(dt);
 	//if(m_activeMenu == ActiveMainMenu::e_startGame)
 	//	m_uiElements[2]->updateElement(AnimationType::e_sprite, dt);
@@ -359,6 +363,7 @@ void MainMenuState::update(Game* game, float dt)
 	default:
 		break;
 	}
+	return 0;
 }
 
 void MainMenuState::draw(Game* game, renderPass pass)

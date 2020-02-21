@@ -303,7 +303,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		float range = 1;
 		float intensity = 1;
 
-		
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
@@ -320,7 +319,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			{
 				//// UPDATE ////
 
-				g_Game->update(g_Clock->getDeltaTime());
+				if (g_Game->update(g_Clock->getDeltaTime()))
+				{
+					msg.message = WM_QUIT;
+					DispatchMessage(&msg);
+				}
 				
 				//// SET PIPELINE ////
 				float clearColour[] = { 0, 0, 0, 0  };

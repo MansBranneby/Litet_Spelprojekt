@@ -88,13 +88,15 @@ Game::Game()
 	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{100.0f, 100.0f}, &m_preLoader, 2, 0);
 }
 
-void Game::update(float dt)
+bool Game::update(float dt)
 {
+	bool returnValue = true;
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (!m_states[i]->isPaused())
-			m_states[i]->update(this, dt);
+			returnValue = m_states[i]->update(this, dt);
 	}
+	return returnValue;
 }
 
 

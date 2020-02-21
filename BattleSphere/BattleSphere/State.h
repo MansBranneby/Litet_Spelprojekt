@@ -18,7 +18,7 @@ public:
 	virtual void resume() = 0;
 
 	virtual void handleInput(Game* game) = 0;
-	virtual void update(Game* game, float dt) = 0;
+	virtual bool update(Game* game, float dt) = 0;
 	virtual void draw(Game* game, renderPass pass = renderPass::e_scene) = 0;
 
 	void activateState(Game* game, stateType state);
