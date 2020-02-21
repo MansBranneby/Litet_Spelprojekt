@@ -228,6 +228,5 @@ CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR b
 	if (c < 0.0f)
 		return collisioninfo;
 
-	collisioninfo.m_colliding = true;
 	return collisioninfo;
 }
