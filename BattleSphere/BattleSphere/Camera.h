@@ -45,5 +45,9 @@ public:
 	XMMATRIX getProjectionMatrix();
 	ConstantBuffer* getConstantBufferVP();
 	ConstantBuffer* getConstantBufferPosition();
+	void updateBuffers();
+
+	XMVECTOR getPosition();
+	void setPosition(XMVECTOR pos);
 };
 

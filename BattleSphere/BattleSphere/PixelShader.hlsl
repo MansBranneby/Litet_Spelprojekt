@@ -85,7 +85,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
 	float shadowCoeff = sum / 25.0;
 	
-	float3 Ia = { 0.2, 0.2, 0.2 }; // Ambient light
+	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
@@ -96,7 +96,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
-	fragmentCol = Ka * Ia * Kd;
+	fragmentCol = Ia * Kd; // * Ia
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
 	
