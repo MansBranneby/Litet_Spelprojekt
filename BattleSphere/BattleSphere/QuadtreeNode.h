@@ -1,10 +1,8 @@
 #pragma once
 #include <vector>
 #include <DirectXMath.h>
-#include "GameObject.h"
+#include "CollisionTests.h"
 #include "PreLoader.h"
-#include "BoundingVolume.h"
-#include "OBB.h"
 
 class QuadtreeNode
 {
@@ -13,7 +11,7 @@ private:
 	std::vector <DirectX::XMFLOAT3> m_cMeshes;
 
 	// Bounding volume
-	BoundingVolume* m_boundingVolume;
+	boundingData m_boundingData;
 
 	std::vector<DirectX::XMFLOAT3> calculateNewNodePositions(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD);
 
@@ -22,5 +20,6 @@ public:
 	QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader* preLoader, unsigned int levels, unsigned int currentLevel);
 	~QuadtreeNode();
 
-	CollisionInfo testCollision(BoundingVolume* other);
+	CollisionInfo testCollision(boundingData boundingVolume);
+	CollisionInfo testCollision(boundingData boundingVolume, DirectX::XMVECTOR previousPos);
 };

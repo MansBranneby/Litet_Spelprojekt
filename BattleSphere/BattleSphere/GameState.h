@@ -1,5 +1,4 @@
 #pragma once
-
 #include "State.h"
 #include "Transparency.h"
 #include "Lights.h"
@@ -9,6 +8,7 @@
 #define SPAWN_INTERVAL 6.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
+#include "CollisionTests.h"
 class GameState : public State 
 {
 	

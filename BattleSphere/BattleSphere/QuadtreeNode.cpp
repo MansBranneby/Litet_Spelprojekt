@@ -16,13 +16,20 @@ std::vector<DirectX::XMFLOAT3> QuadtreeNode::calculateNewNodePositions(DirectX::
 
 QuadtreeNode::QuadtreeNode()
 {
-	m_boundingVolume = new OBB({ 0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f});
+	// Create this node's bounding volume
+	m_boundingData.pos = { 0.0f, 0.0f, 0.0f };
+	m_boundingData.halfWD = { 0.0f, 0.0f };
+	m_boundingData.xAxis = { 1.0f, 0.0f, 0.0f };
+	m_boundingData.zAxis = { 0.0f, 0.0f, 1.0f };
 }
 
 QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreLoader* preLoader, unsigned int levels, unsigned int currentLevel)
 {
 	// Create this node's bounding volume
-	m_boundingVolume = new OBB(DirectX::XMLoadFloat3(&pos), halfWD, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }); 
+	m_boundingData.pos = DirectX::XMLoadFloat3(&pos);
+	m_boundingData.halfWD = halfWD;
+	m_boundingData.xAxis = { 1.0f, 0.0f, 0.0f };
+	m_boundingData.zAxis = { 0.0f, 0.0f, 1.0f };
 	
 	// Calculate 4 new node positions
 	std::vector<DirectX::XMFLOAT3> nodePositions = calculateNewNodePositions(pos, halfWD); 
@@ -31,10 +38,10 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreL
 	// Test collision of node OBB and other OBB
 	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_static); ++i)
 	{
-		boundingData bd = preLoader->getBoundingData(objectType::e_static, 0, i);
-		OBB tempOBB(bd.pos, bd.halfWD, bd.xAxis, bd.zAxis);
+		boundingData boundingData = preLoader->getBoundingData(objectType::e_static, 0, i);
+
 		// Test collision
-		if (m_boundingVolume->intersects(&tempOBB).m_colliding)
+		if (testOBBOBB(m_boundingData, boundingData).m_colliding)
 		{
 			// Append collisionMesh to to m_cMeshes
 			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, 0, i);
@@ -56,17 +63,15 @@ QuadtreeNode::~QuadtreeNode()
 {
 	for (size_t i = 0; i < m_children.size(); i++)
 		delete m_children[i];
-
-	delete m_boundingVolume;
 }
 
-CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
+CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume)
 {
 	CollisionInfo collisionInfo;
 
 	// Test if other intersects with this node
-	if (m_boundingVolume->intersects(other).m_colliding)
-	{	
+	if (testOBBOBB(m_boundingData, boundingVolume).m_colliding)
+	{
 		// If this node has no children then start triangle intersection test with other
 		if (m_children.size() == 0)
 		{
@@ -75,16 +80,21 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 
 			for (unsigned int i = 0; i < m_cMeshes.size(); i += 3)
 			{
-				collisionInfo = other->intersectsWithTriangle(
+				unsigned int ind1 = i + 1;
+				unsigned int ind2 = i + 2;
+
+				collisionInfo = testSphereTriangle(boundingVolume.pos, boundingVolume.halfWD.x,
 					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
-					XMVECTOR{ m_cMeshes[i + 1].x, m_cMeshes[i + 1].y, m_cMeshes[i + 1].z },
-					XMVECTOR{ m_cMeshes[i + 2].x, m_cMeshes[i + 2].y, m_cMeshes[i + 2].z });
+					XMVECTOR{ m_cMeshes[ind1].x, m_cMeshes[ind1].y, m_cMeshes[ind1].z },
+					XMVECTOR{ m_cMeshes[ind2].x, m_cMeshes[ind2].y, m_cMeshes[ind2].z });
 				// Collision detected!
 				if (collisionInfo.m_colliding)
 				{
 					// Average normals in case bounding volume intersects with corner
-					normal += collisionInfo.m_normal;
+
+					normal = collisionInfo.m_normal;
 					nrOfCollisions++;
+
 					// Early return in case collision with two triangles detected
 					if (nrOfCollisions >= 2)
 					{
@@ -99,14 +109,79 @@ CollisionInfo QuadtreeNode::testCollision(BoundingVolume* other)
 				collisionInfo.m_colliding = true;
 				collisionInfo.m_normal = normal;
 			}
-				
+
 		}
 		else
 		{
 			// Recursive function call testCollision
 			for (unsigned int i = 0; i < m_children.size(); ++i)
 			{
-				collisionInfo = m_children[i]->testCollision(other);
+				collisionInfo = m_children[i]->testCollision(boundingVolume);
+				if (collisionInfo.m_colliding) return collisionInfo;
+			}
+		}
+	}
+
+	return collisionInfo;
+}
+
+CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume, DirectX::XMVECTOR previousPos)
+{
+	CollisionInfo collisionInfo;
+
+	// Test if other intersects with this node
+	if (testOBBSphere(boundingVolume.pos, boundingVolume.halfWD.x, m_boundingData).m_colliding)
+	{	
+		// If this node has no children then start triangle intersection test with other
+		if (m_children.size() == 0)
+		{
+			unsigned int nrOfCollisions = 0;
+			float shortest = INFINITY;
+			float length = 0.0f;
+
+			std::vector<DirectX::XMVECTOR> normals;
+			std::vector<DirectX::XMVECTOR> contactPoints;
+
+			for (int i = 0; i < m_cMeshes.size(); i += 3)
+			{
+				int ind1 = i + 1;
+				int ind2 = i + 2;
+
+				collisionInfo = testSphereTriangle(boundingVolume.pos, boundingVolume.halfWD.x,
+					XMVECTOR{ m_cMeshes[i].x, m_cMeshes[i].y, m_cMeshes[i].z },
+					XMVECTOR{ m_cMeshes[ind1].x, m_cMeshes[ind1].y, m_cMeshes[ind1].z },
+					XMVECTOR{ m_cMeshes[ind2].x, m_cMeshes[ind2].y, m_cMeshes[ind2].z });
+
+
+				// Collision detected!
+				if (collisionInfo.m_colliding)
+				{
+					// Average normals in case bounding volume intersects with corner					
+					normals.push_back(collisionInfo.m_normal);
+					contactPoints.push_back(collisionInfo.m_contactPoint);
+					nrOfCollisions++;
+				}
+			}
+
+			// Find normal closest to current position
+			for (int j = 0; j < normals.size(); ++j)
+			{
+				length = DirectX::XMVectorGetX(DirectX::XMVector3Length(contactPoints[j] - boundingVolume.pos));
+
+				if (length < shortest)
+				{
+					shortest = length;
+					collisionInfo.m_normal = normals[j];
+					collisionInfo.m_colliding = true;
+				}
+			}	
+		}
+		else
+		{
+			// Recursive function call testCollision
+			for (unsigned int i = 0; i < m_children.size(); ++i)
+			{
+				collisionInfo = m_children[i]->testCollision(boundingVolume, previousPos);
 				if (collisionInfo.m_colliding) return collisionInfo;
 			}
 		}

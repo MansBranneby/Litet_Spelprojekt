@@ -280,6 +280,16 @@ XMVECTOR Robot::getPreviousPosition() const
 	return m_positionHistory[m_positionHistoryPtr - 1];
 }
 
+void Robot::setVel(DirectX::XMVECTOR vel)
+{
+	m_vel = vel;
+}
+
+DirectX::XMVECTOR Robot::getVel() const
+{
+	return m_vel;
+}
+
 void Robot::release()
 {
 	// TODO realease resource?

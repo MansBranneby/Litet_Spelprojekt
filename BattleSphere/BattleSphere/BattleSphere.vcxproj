@@ -146,12 +146,11 @@
     <ClCompile Include="BackfaceCuller.cpp" />
     <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CollisionTests.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Drone.cpp" />
-    <ClCompile Include="BoundingSphere.cpp" />
-    <ClCompile Include="BoundingVolume.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -172,7 +171,6 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PreLoader.cpp" />
     <ClCompile Include="Projectile.cpp" />
@@ -194,12 +192,11 @@
     <ClInclude Include="BackfaceCuller.h" />
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CollisionTests.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="Drone.h" />
-    <ClInclude Include="BoundingSphere.h" />
-    <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -222,7 +219,6 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="OBB.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="PreLoader.h" />
     <ClInclude Include="Projectile.h" />

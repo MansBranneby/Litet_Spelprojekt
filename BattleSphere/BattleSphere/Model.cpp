@@ -1,6 +1,5 @@
 #include "Model.h"
 
-
 void Model::computeOBB()
 {
 	const int nrOfPairs = 179;
@@ -232,7 +231,6 @@ Model::Model()
 	m_relStaticRotationMat = XMMatrixIdentity();
 	m_relRotationMat = XMMatrixIdentity();
 	m_relScalingMat = XMMatrixIdentity();
-	m_boundingVolume = nullptr;
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
@@ -248,7 +246,6 @@ Model::~Model()
 	if (m_vertexCullingBuffer) m_vertexCullingBuffer->Release();
 	if (m_vertexAndId) delete[] m_vertexAndId;
 	if (m_modelMatrixData) delete (m_modelMatrixData);
-	if (m_boundingVolume) delete m_boundingVolume;
 }
 
 void Model::setPosition(XMVECTOR pos)
@@ -489,17 +486,6 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	}
 
 	return updatedVertices;
-}
-
-BoundingVolume* Model::getStaticBoundingVolume() const
-{
-	return m_boundingVolume;
-}
-
-BoundingVolume* Model::getDynamicBoundingVolume(objectData data)
-{
-	m_boundingVolume->setPos(data.pos);
-	return m_boundingVolume;	
 }
 
 void Model::setObjectData(objectData data, int modelNr)
@@ -814,16 +800,5 @@ void Model::loadModel(std::ifstream& in, objectType type)
 
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
-	// Hardcoded bounding volume based on object type, e.g. robots will have bounding spheres
-	switch (type)
-	{
-	case objectType::e_robot:
-		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
-		break;
-	case objectType::e_projectile:
-		m_boundingVolume = new BoundingSphere(m_bData.pos, m_bData.halfWD.x);
-		break;
-	default:
-		m_boundingVolume = new OBB(m_bData.pos, m_bData.halfWD, m_bData.xAxis, m_bData.zAxis);
-	}
+
 }
