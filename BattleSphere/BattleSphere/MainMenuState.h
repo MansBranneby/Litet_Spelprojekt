@@ -28,13 +28,13 @@ private:
 	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
 
-	void handleInputs(Game* game, float dt);
+	bool handleInputs(Game* game, float dt);
 
 public:
 	MainMenuState();
 	virtual ~MainMenuState();
 
-	void hi_mainMenu(Game* game);
+	bool hi_mainMenu(Game* game);
 	void hi_robotSelection(Game* game);
 	void hi_options(Game* game);
 
@@ -46,7 +46,7 @@ public:
 	void resume();
 
 	void handleInput(Game* game);
-	void update(Game* game, float dt);
+	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
 

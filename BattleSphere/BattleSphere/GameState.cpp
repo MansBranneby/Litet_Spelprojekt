@@ -239,7 +239,7 @@ void GameState::handleInput(Game* game)
 {
 }
 
-void GameState::update(Game* game, float dt)
+bool GameState::update(Game* game, float dt)
 {
 	m_input = game->getInput();
 	m_robots = game->getRobots();
@@ -299,6 +299,7 @@ void GameState::update(Game* game, float dt)
 	{
 		m_resources[i]->updateTime(dt);
 	}
+	return 0;
 }
 
 void GameState::draw(Game* game, renderPass pass)
