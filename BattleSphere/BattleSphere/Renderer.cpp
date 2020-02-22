@@ -397,7 +397,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader()->getPixelShader(), nullptr, 0);
+					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(0)->getPixelShader(), nullptr, 0);
 
 
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_menu->getVertexShader()->getvertexLayout());
@@ -464,6 +464,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
 					g_Game->draw(renderPass::e_menu);
+
+					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(1)->getPixelShader(), nullptr, 0);
+					g_Game->draw(renderPass::e_menuAni);
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 					g_lightCulling.cullLights();

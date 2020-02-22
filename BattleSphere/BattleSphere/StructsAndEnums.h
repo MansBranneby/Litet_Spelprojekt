@@ -49,6 +49,7 @@ enum class renderPass
 	e_downSample,
 	e_final,
 	e_menu,
+	e_menuAni,
 	e_menuScene,
 	e_opaque,
 	e_transparent
