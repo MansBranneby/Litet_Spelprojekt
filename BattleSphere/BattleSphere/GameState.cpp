@@ -53,8 +53,8 @@ void GameState::startSpawn()
 	for (int i = 0; i < START_SPAWNED_RESOURCES; i++)
 	{
 		int spawnIndex = getSpawnIndex(); // TODO:: Change spawn types
-		//Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f, false);
-		Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 0.8f, false);
+		//Resource* resource = new Resource(false, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f);
+		Resource* resource = new Resource(false, spawnIndex, (rand() % 4) + 2, 0.8f);
 		XMFLOAT2 pos = m_spawns[spawnIndex];
 		resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
 		m_resources.push_back(resource);
@@ -107,6 +107,113 @@ void GameState::spawnNodes()
 	node->setPosition(XMVectorSet(-101.0f, 0.3f, -49.0f, 0.0f));
 	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
+}
+
+void GameState::updateSpawnDrone(float dT)
+{
+	// Update propellers
+	m_spawnDronePropeller[0].rotate(0.0f, 1.0f, 0.0f, -dT * PROPELLER_SPEED * (rand() % 2 + 1.0f));
+	m_spawnDronePropeller[1].rotate(0.0f, 1.0f, 0.0f, -dT * PROPELLER_SPEED * (rand() % 2 + 1.0f));
+	m_spawnDronePropeller[2].rotate(0.0f, 1.0f, 0.0f, -dT * PROPELLER_SPEED * (rand() % 2 + 1.0f));
+	m_spawnDronePropeller[3].rotate(0.0f, 1.0f, 0.0f, -dT * PROPELLER_SPEED * (rand() % 2 + 1.0f));
+
+	// Update time since last mission was assigned
+	m_collectedTime += dT;
+
+	// Update drone states
+	switch (m_spawnDroneState)
+	{
+	case -1: // Wait for mission
+		if (m_collectedTime >= SPAWN_INTERVAL)
+		{
+			if (assignMission()) // If mission assignable, advance state
+				m_spawnDroneState++;
+		}
+		break;
+
+	case 0: // Set target to rising point
+		XMVECTOR target = m_spawnDroneBody.getPosition();
+		target.m128_f32[1] = TRAVEL_HEIGHT;
+		setTravelTarget(target);
+		setRotationTarget(m_transportDestination);
+		m_spawnDroneState++;
+		break;
+	case 1: // Rise 
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 2: // Set target above transport location
+		target = m_transportDestination;
+		target.m128_f32[1] = TRAVEL_HEIGHT;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+
+	case 3: // Travel
+		if (travelAndCheck(dT, true))
+			m_spawnDroneState++;
+		break;
+
+	case 4: // Set target to decline down to spawn point
+		target = m_transportDestination;
+		target.m128_f32[1] -= RESOURCE_OFFSET;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+	
+	case 5: // Decline 
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 6: // Leave resource
+		m_resources[m_heldResourceIndex]->setPosition(m_transportDestination);
+		m_resources[m_heldResourceIndex]->setBlocked(false);
+		m_heldResourceIndex = -1;
+		m_spawnDroneState++;
+		break;
+
+	case 7: // Set target above transport location, rotate to drone start
+		target = m_transportDestination;
+		target.m128_f32[1] = TRAVEL_HEIGHT;
+		setTravelTarget(target);
+		setRotationTarget(DRONE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 8: // Rise 
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 9: // Set target above drone start
+		target = DRONE_START;
+		target.m128_f32[1] = TRAVEL_HEIGHT;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+
+	case 10: // Travel
+		if (travelAndCheck(dT, true))
+			m_spawnDroneState++;
+		break;
+
+	case 11: // Set target to decline down to drone start  
+		setTravelTarget(DRONE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 12: // Decline
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 13: // Reset switch
+		m_spawnDroneState++;
+		m_spawnDroneState = -1;
+		break;
+	}
 }
 
 void GameState::handleMovement(Game* game, float dt, int id)
@@ -327,9 +434,32 @@ GameState::GameState()
 
 
 	// Initialize resource spawning lists
-	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
 	loadLists();
 	startSpawn();
+
+	// Initialize spawning drone
+	m_droneLightIndex = m_lights->addSpotLight(0, 150, 0, 150, 0, -1, 0, 1, 1, 1, 40, 7);
+	//m_droneLightIndex = m_lights->addAreaLight(-119, 3, 99, TRAVEL_HEIGHT, 1, 1, 1, 30);
+	m_spawnDroneState = -1;
+	m_heldResourceIndex = -1;
+	m_spawnDroneRotating = false;
+	m_spawnDroneTravelling = false;
+	m_transportDestination = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_transportDirection = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_travelTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_travelDirection = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_spawnDroneBody.setPosition(DRONE_START);
+	XMVECTOR droneStart = DRONE_START;
+	m_lights->setPosition(
+		m_droneLightIndex,
+		droneStart.m128_f32[0],
+		droneStart.m128_f32[1] + LIGHT_OFFSET,
+		droneStart.m128_f32[2]
+	);
+	m_spawnDronePropeller[0].setPosition(7.0692f, 0.64566f, -4.934334f);
+	m_spawnDronePropeller[1].setPosition(7.0692f, 0.64566f, 4.934334f);
+	m_spawnDronePropeller[2].setPosition(-7.0692f, 0.64566f, -4.934334f);
+	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
 }
 
 GameState::~GameState()
@@ -346,65 +476,163 @@ GameState::~GameState()
 
 }
 
-void GameState::regularSpawn(float dT)
+void GameState::setTravelTarget(XMVECTOR target)
 {
-	m_collectedTime += dT;
+	// Set travel destination
+	m_spawnDroneTravelling = true;
+	m_travelTarget = target;
+}
 
-	// Spawn if spawn interval pasted
-	if (m_collectedTime >= SPAWN_INTERVAL)
+void GameState::setRotationTarget(XMVECTOR target)
+{
+	// Enable rotation to target if wanted
+	m_spawnDroneRotating = true;
+	XMVECTOR direction = target - m_spawnDroneBody.getPosition();
+	direction.m128_f32[1] = 0.0f;
+	direction.m128_f32[3] = 0.0f;
+	m_transportDirection = XMVector3Normalize(direction);
+	m_transportDirection.m128_f32[1] = 0.0f; // Skip y-axis
+}
+
+bool GameState::travelAndCheck(float dT, bool fastTravel)
+{
+	if (m_spawnDroneTravelling)
 	{
-		// Reset spawn time
+		XMVECTOR pos = m_spawnDroneBody.getPosition();
+		pos = XMVector3Length(m_travelTarget - pos);
+		float distance = pos.m128_f32[0];
+		if (distance > TRAVEL_THRESHOLD)
+		{
+			// Update direction
+			m_travelDirection = XMVector3Normalize(m_travelTarget - m_spawnDroneBody.getPosition());
+
+			XMVECTOR movement = m_travelDirection * dT;
+			// Decide movement speed
+			if (fastTravel)
+				movement *= FAST_TRAVEL_SPEED;
+			else
+				movement *= SLOW_TRAVEL_SPEED;
+
+			// Move drone
+			m_spawnDroneBody.move(movement);
+
+			// Move resource
+			if (m_heldResourceIndex != -1)
+				m_resources[m_heldResourceIndex]->move(movement);
+
+			// Move light
+			pos = m_spawnDroneBody.getPosition();
+			m_lights->setPosition(
+				m_droneLightIndex,
+				pos.m128_f32[0],
+				pos.m128_f32[1] + LIGHT_OFFSET,
+				pos.m128_f32[2]
+			);
+		}
+		else
+			m_spawnDroneTravelling = false;
+	}
+
+	if (m_spawnDroneRotating)
+	{
+		// Check what direction to rotate
+		objectData temp = m_spawnDroneBody.getData();
+		float rotation = XM_PI * temp.rotation.m128_f32[3] / 180.0f;
+		XMVECTOR droneOrientation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		droneOrientation.m128_f32[0] = XMScalarSin(rotation); 
+		droneOrientation.m128_f32[2] = XMScalarCos(rotation);
+		XMVECTOR tempVec = XMVector3Dot(m_transportDirection, droneOrientation);
+		float dotProduct = tempVec.m128_f32[0];
+		float deltaRotation = XMScalarACos(dotProduct);
+
+		// Check if rotation is sufficient, if so disable rotation, else rotate
+		if ( deltaRotation < ROTATION_THRESHOLD)
+			m_spawnDroneRotating = false;
+		else
+		{
+			// Rotate
+			XMVECTOR cross = XMVector3Cross(droneOrientation, m_transportDirection);
+			float increment;
+			if (cross.m128_f32[1] > 0)
+				increment = ROTATION_SPEED * dT;
+			
+			else
+				increment = -ROTATION_SPEED * dT;
+			
+			m_spawnDroneBody.rotate(0.0f, 1.0f, 0.0f, increment);
+		}
+	}
+
+	return !m_spawnDroneTravelling && !m_spawnDroneRotating;
+}
+
+bool GameState::assignMission()
+{
+	// Calculate number of players
+	int nrOfPlayers = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_robots[i] != nullptr)
+			nrOfPlayers++;
+	}
+
+	// Spawn resources according to max allowed
+	int maxResources = MAX_RESOURCES_OUT_PER_PLAYER * nrOfPlayers;
+	if (maxResources > m_resources.size()) // If there's room for a resource, spawn one
+	{
+		// Reset time since last spawn
 		while (m_collectedTime >= SPAWN_INTERVAL)
 			m_collectedTime -= SPAWN_INTERVAL;
 
-		// Calculate number of players
-		int nrOfPlayers = 0;
-		for (int i = 0; i < 4; i++)
+		// Randomize whether it is a normal or special resource
+		bool isSpecial = false;
+		if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
 		{
-			if (m_robots[i] != nullptr)
-				nrOfPlayers++;
+			// Only make resource special if there are available spots
+			for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
+			{
+				if (m_freeSpawns[(int)(m_normalSpawnAmount)+(int)i])
+					isSpecial = true;
+			}
 		}
 
-		// Spawn resources according to max allowed
-		int maxResources = MAX_RESOURCES_OUT_PER_PLAYER * nrOfPlayers;
-		if (maxResources > m_resources.size()) // If there's room for a resource, spawn one
+
+		Resource* resource;
+		int spawnIndex;
+		if (isSpecial)
 		{
-
-
-			// Randomize whether it is a normal or special resource
-			bool isSpecial = false;
-			if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
-			{
-				// Only make resource special if there are available spots
-				for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
-				{
-					if (m_freeSpawns[(int)(m_normalSpawnAmount)+(char)i])
-						isSpecial = true;
-				}
-			}
-
-
-			int spawnIndex;
-			Resource* resource;
-			if (isSpecial)
-			{
-				spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
-				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
-				resource = new Resource(m_spawnLightIndex, spawnIndex, RIFLE, 3.0f);
-			}
-			else
-			{
-				spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
-				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
-				resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 1.2f);
-			}
-
-
-			XMFLOAT2 pos = m_spawns[spawnIndex];
-			resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
-			m_resources.push_back(resource);
+			spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
+			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
+			resource = new Resource(true, spawnIndex, RIFLE, 3.0f);
 		}
+
+		else
+		{
+			spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
+			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.2f);
+			resource = new Resource(true, spawnIndex, (rand() % 4) + 2, 1.2f);
+		}
+
+		// Set resource under drone
+		XMVECTOR pos = m_spawnDroneBody.getPosition();
+		resource->setPosition(XMVectorSet
+		(
+			(float)(pos.m128_f32[0]),
+			(float)(pos.m128_f32[1]) + RESOURCE_OFFSET,
+			(float)(pos.m128_f32[2]),
+			0.0f)
+		);
+		m_resources.push_back(resource);
+		m_heldResourceIndex = (int)m_resources.size() - 1;
+
+		// Set transport destination
+		XMFLOAT2 destination = m_spawns[spawnIndex];
+		m_transportDestination = XMVectorSet(destination.x, FINAL_HEIGHT, destination.y, 0.0f);
+
+		return true;
 	}
+
+	return  false;
 }
 
 void GameState::pause()
@@ -425,7 +653,9 @@ bool GameState::update(Game* game, float dt)
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
-	regularSpawn(dt);
+
+	// Update spawning drone
+	updateSpawnDrone(dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -447,7 +677,7 @@ bool GameState::update(Game* game, float dt)
 	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
 	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-	{ 
+	{
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
 
@@ -508,9 +738,11 @@ bool GameState::update(Game* game, float dt)
 	{
 		m_nodes[i]->updateTime(dt);
 	}
+
+
+
 	return 0;
 }
-
 
 void GameState::draw(Game* game, renderPass pass)
 {
@@ -549,6 +781,11 @@ void GameState::draw(Game* game, renderPass pass)
 
 		game->getPreLoader()->draw(objectType::e_scene);
 		game->getPreLoader()->draw(objectType::e_scene, 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDroneBody.getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);

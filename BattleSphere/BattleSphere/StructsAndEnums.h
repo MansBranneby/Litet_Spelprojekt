@@ -7,6 +7,9 @@
 #include <cmath>
 #include <time.h> 
 
+using namespace DirectX;
+
+// Colors
 #define RED 0
 #define GREEN 1
 #define BLUE 2
@@ -17,7 +20,35 @@
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
 #define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
 
-using namespace DirectX;
+// Spawning drone
+#define PROPELLER_SPEED 1700.0f
+#define ROTATION_SPEED 60.0f
+#define FAST_TRAVEL_SPEED 35.0f
+#define SLOW_TRAVEL_SPEED 14.0f
+#define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+#define RESOURCE_OFFSET -8.0f
+#define LIGHT_OFFSET 0.0f
+#define ROTATION_THRESHOLD 0.006f // Radian difference bias
+#define TRAVEL_THRESHOLD 0.1f
+#define TRAVEL_HEIGHT 50.0f
+
+// Spawning
+#define START_SPAWNED_RESOURCES 4
+#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
+#define SPAWN_INTERVAL 30.0f
+#define SPECIAL_RESOURCE_CHANCE 25 // % chance
+
+// Resource
+#define FLOAT_INTENSITY 6.0f // Default 6
+#define FLOAT_HEIGHT 3.0f // Default 3
+#define SPIN_INTENSITY 20.0f // Default 20
+#define SMALL_SCALE 0.7f // Default 0.9
+#define SPAWN_ANIMATION_TIME 3.5f
+#define SPAWN_HEIGHT 170.0f
+#define FINAL_HEIGHT 0.6f
+#define SPOTLIGHT_Y_OFFSET 30.0f
+#define SPOTLIGHT_RANGE 200.0f
+
 
 // Normal resources
 #define PISTOL 0

@@ -1,14 +1,9 @@
 #pragma once
 #include "State.h"
 #include "Transparency.h"
-#include "Lights.h"
-
-#define START_SPAWNED_RESOURCES 4
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
-#define SPAWN_INTERVAL 6.0f
-#define SPECIAL_RESOURCE_CHANCE 25 // % chance
-
 #include "CollisionTests.h"
+#include "StructsAndEnums.h"
+
 class GameState : public State 
 {
 	
@@ -26,14 +21,32 @@ private:
 	void loadLists();
 
 	// Spawning
-	int m_spawnLightIndex;
-	float m_collectedTime;
+
 	int m_normalSpawnAmount;
 	int m_specialSpawnAmount;
 	void startSpawn();
 	int getSpawnIndex();
 	int getSpecialSpawnIndex();
 	void spawnNodes();
+
+	// Drone resource spawning
+	int m_droneLightIndex;
+	int m_spawnDroneState;
+	int m_heldResourceIndex;
+	XMVECTOR m_transportDestination;
+	XMVECTOR m_transportDirection;
+	XMVECTOR m_travelTarget;
+	XMVECTOR m_travelDirection;
+	float m_collectedTime;
+	bool m_spawnDroneTravelling;
+	bool m_spawnDroneRotating;
+	GameObject m_spawnDroneBody;
+	GameObject m_spawnDronePropeller[4];
+	void setTravelTarget(XMVECTOR target);
+	void setRotationTarget(XMVECTOR target);
+	bool travelAndCheck(float dT, bool fastTravel);
+	bool assignMission();
+	void updateSpawnDrone(float dT);
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
@@ -42,7 +55,7 @@ public:
 	GameState();
 	virtual ~GameState();
 
-	void regularSpawn(float dT);
+	
 
 	void pause();
 	void resume();

@@ -102,7 +102,7 @@ PreLoader::PreLoader()
 	m_bFCuller = new BackfaceCuller;
 
 	// Load objects
-	//loadFromFile(objectType::e_drone, "?");
+	loadFromFile(objectType::e_drone, "Drone");
 	loadFromFile(objectType::e_weapon, "Weapon1");
 	loadFromFile(objectType::e_robot, "BattleSphere", "1mesh1mat");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
@@ -258,6 +258,20 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, objectData rel
 	{
 		m_objects[typ][variant][i].draw();
 	}
+}
+
+void PreLoader::drawOneModel(objectType type, objectData data, int modelNr, int variant)
+{
+	int typ = (int)type;
+		m_objects[typ][variant][modelNr].setObjectData(data);
+		m_objects[typ][variant][modelNr].draw();
+}
+
+void PreLoader::drawOneModel(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setObjectData(data, relativeData);
+	m_objects[typ][variant][modelNr].draw();
 }
 
 void PreLoader::cull(objectType type, int variant)

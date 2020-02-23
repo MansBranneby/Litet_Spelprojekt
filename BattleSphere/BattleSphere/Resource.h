@@ -3,17 +3,6 @@
 #include "DX.h"
 #include "GameObject.h"
 
-#define FLOAT_INTENSITY 6.0f // Default 6
-#define FLOAT_HEIGHT 3.0f // Default 3
-#define SPIN_INTENSITY 20.0f // Default 20
-#define SMALL_SCALE 0.7f // Default 0.9
-#define SPAWN_ANIMATION_TIME 3.5f
-#define SPAWN_HEIGHT 170.0f
-#define FINAL_HEIGHT 0.6f
-#define SPOTLIGHT_Y_OFFSET 30.0f
-#define SPOTLIGHT_RANGE 200.0f
-
-
 class Resource : public GameObject
 {
 private:
@@ -30,7 +19,6 @@ private:
 	bool m_spawning;
 	bool m_heightReset;
 	int m_spawnPosIndex;
-	int m_spotLightIndex;
 
 	// Floating and spin animation
 	float m_floatRadian;
@@ -41,7 +29,7 @@ private:
 	void updateSpawningAnimation(float dT);
 
 public:
-	Resource(int spotLightIndex, int spawnIndex, int type = 0, float scale = 1.0f, bool spawnAnimation = true);
+	Resource(bool blocked, int spawnIndex, int type = 0, float scale = 1.0f);
 	~Resource();
 
 	int getType();

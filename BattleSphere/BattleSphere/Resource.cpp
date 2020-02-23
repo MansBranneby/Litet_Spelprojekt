@@ -50,7 +50,6 @@ void Resource::updateSpawningAnimation(float dT)
 		XMVECTOR firstPos = getPosition();
 		setPosition(firstPos.m128_f32[0], SPAWN_HEIGHT,firstPos.m128_f32[2]);
 		m_heightReset = true;
-		Lights::getInstance()->setRange(m_spotLightIndex, SPOTLIGHT_RANGE);
 	}
 
 	m_time += dT;
@@ -61,7 +60,6 @@ void Resource::updateSpawningAnimation(float dT)
 	float x = pos.m128_f32[0];
 	float y = pos.m128_f32[1];
 	float z = pos.m128_f32[2];
-	Lights::getInstance()->setPosition(m_spotLightIndex, x, y + SPOTLIGHT_Y_OFFSET, z);
 
 	if (y <= FINAL_HEIGHT)
 	{
@@ -69,19 +67,15 @@ void Resource::updateSpawningAnimation(float dT)
 		m_spawning = false;
 		m_blocked = false;
 		m_time = 0.0f;
-		Lights::getInstance()->setPosition(m_spotLightIndex, 0, 150, 0);
-		Lights::getInstance()->setRange(m_spotLightIndex, 0);
 	}
 }
 
-Resource::Resource(int spotLightIndex, int spawnIndex, int type, float scale, bool spawnAnimation)
+Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 {
-	m_spotLightIndex = spotLightIndex;
 	m_spawnPosIndex = spawnIndex;
-	m_spawning = spawnAnimation;
 	m_heightReset = false;
 	m_type = type;
-	m_blocked = spawnAnimation;
+	m_blocked = blocked;
 	m_ready = true;
 	m_time = 0.0f;
 	m_floatRadian = 0;
@@ -170,24 +164,16 @@ void Resource::updateTime(float dt)
 
 	else
 	{
-		if (m_spawning) // Spawning animation
-		{
-			updateSpawningAnimation(dt);
-		}
-		else // Normal animation
-		{
-			if (!m_blocked) // Move if not held
+		if (!m_blocked) // Move if not held
 			{
 				updateFloating(dt);
 				updateSpinning(dt);
 			}
-			else
+		else
 			{
 				updateSpinning(dt, 10.0f); // Spin faster if picked up
 			}
 		}
-
-	}
 }
 
 int Resource::getSpawnIndex() const
