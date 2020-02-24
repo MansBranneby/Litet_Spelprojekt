@@ -36,16 +36,15 @@ void Game::leavePlayerIdIndex(int id)
 
 void Game::updatePlayerStatus()
 {
-	
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_input.getId(i) != -1 && m_robots[i] == nullptr)
+		if (m_robots[i] == nullptr && m_input.getId(i) != -1)
 		{
 			Robot* robot = new Robot(i);
 			m_robots[i] = robot;
+			m_nrOfPlayers++;
 		}
 	}
-	m_nrOfPlayers = m_input.getNrOfGamepads();
 }
 
 Robot** Game::getRobots()

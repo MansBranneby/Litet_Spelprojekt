@@ -161,7 +161,7 @@ void GameState::updateSpawnDrone(float dT)
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
-	
+
 	case 5: // Decline 
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
@@ -481,6 +481,7 @@ void GameState::setTravelTarget(XMVECTOR target)
 	// Set travel destination
 	m_spawnDroneTravelling = true;
 	m_travelTarget = target;
+	m_travelDirection = XMVector3Normalize(m_travelTarget - m_spawnDroneBody.getPosition());
 }
 
 void GameState::setRotationTarget(XMVECTOR target)
@@ -500,12 +501,9 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 	{
 		XMVECTOR pos = m_spawnDroneBody.getPosition();
 		pos = XMVector3Length(m_travelTarget - pos);
-		float distance = pos.m128_f32[0];
-		if (distance > TRAVEL_THRESHOLD)
+		float distanceToTarget = pos.m128_f32[0];
+		if (distanceToTarget > TRAVEL_THRESHOLD)
 		{
-			// Update direction
-			m_travelDirection = XMVector3Normalize(m_travelTarget - m_spawnDroneBody.getPosition());
-
 			XMVECTOR movement = m_travelDirection * dT;
 			// Decide movement speed
 			if (fastTravel)
@@ -513,15 +511,31 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 			else
 				movement *= SLOW_TRAVEL_SPEED;
 
-			// Move drone
-			m_spawnDroneBody.move(movement);
 
-			// Move resource
-			if (m_heldResourceIndex != -1)
-				m_resources[m_heldResourceIndex]->move(movement);
 
-			// Move light
+			// If target passed, teleport to target
+			float movedDistance = XMVector3Length(movement).m128_f32[0];
+			if (movedDistance > distanceToTarget)
+				m_spawnDroneBody.setPosition(m_travelTarget); // Set drone
+			else	
+				m_spawnDroneBody.move(movement); // Move drone
+
 			pos = m_spawnDroneBody.getPosition();
+
+			// Set resource position
+			if (m_heldResourceIndex != -1)
+			{
+				
+				m_resources[m_heldResourceIndex]->setPosition(XMVectorSet
+				(
+					(float)(pos.m128_f32[0]),
+					(float)(pos.m128_f32[1]) + RESOURCE_OFFSET,
+					(float)(pos.m128_f32[2]),
+					0.0f)
+				);
+			}
+
+			// Set light position
 			m_lights->setPosition(
 				m_droneLightIndex,
 				pos.m128_f32[0],
@@ -539,14 +553,14 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 		objectData temp = m_spawnDroneBody.getData();
 		float rotation = XM_PI * temp.rotation.m128_f32[3] / 180.0f;
 		XMVECTOR droneOrientation = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		droneOrientation.m128_f32[0] = XMScalarSin(rotation); 
+		droneOrientation.m128_f32[0] = XMScalarSin(rotation);
 		droneOrientation.m128_f32[2] = XMScalarCos(rotation);
 		XMVECTOR tempVec = XMVector3Dot(m_transportDirection, droneOrientation);
 		float dotProduct = tempVec.m128_f32[0];
 		float deltaRotation = XMScalarACos(dotProduct);
 
 		// Check if rotation is sufficient, if so disable rotation, else rotate
-		if ( deltaRotation < ROTATION_THRESHOLD)
+		if (deltaRotation < ROTATION_THRESHOLD)
 			m_spawnDroneRotating = false;
 		else
 		{
@@ -555,10 +569,10 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 			float increment;
 			if (cross.m128_f32[1] > 0)
 				increment = ROTATION_SPEED * dT;
-			
+
 			else
 				increment = -ROTATION_SPEED * dT;
-			
+
 			m_spawnDroneBody.rotate(0.0f, 1.0f, 0.0f, increment);
 		}
 	}

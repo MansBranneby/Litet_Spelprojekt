@@ -274,6 +274,20 @@ void PreLoader::drawOneModel(objectType type, objectData data, objectData relati
 	m_objects[typ][variant][modelNr].draw();
 }
 
+void PreLoader::drawOneModelAndMat(objectType type, objectData data, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setAllObjectData(data);
+	m_objects[typ][variant][modelNr].draw();
+}
+
+void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setAllObjectData(data, relativeData);
+	m_objects[typ][variant][modelNr].draw();
+}
+
 void PreLoader::cull(objectType type, int variant)
 {
 	m_bFCuller->turnOnCullingPipeline();

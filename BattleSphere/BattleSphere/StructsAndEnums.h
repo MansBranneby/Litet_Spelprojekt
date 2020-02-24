@@ -25,17 +25,18 @@ using namespace DirectX;
 #define ROTATION_SPEED 60.0f
 #define FAST_TRAVEL_SPEED 35.0f
 #define SLOW_TRAVEL_SPEED 14.0f
-#define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+//#define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+#define DRONE_START XMVectorSet(66.0f, 5.0f, 46.5f, -1)
 #define RESOURCE_OFFSET -8.0f
 #define LIGHT_OFFSET 0.0f
 #define ROTATION_THRESHOLD 0.006f // Radian difference bias
-#define TRAVEL_THRESHOLD 0.1f
+#define TRAVEL_THRESHOLD 0.3f
 #define TRAVEL_HEIGHT 50.0f
 
 // Spawning
 #define START_SPAWNED_RESOURCES 4
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
-#define SPAWN_INTERVAL 30.0f
+#define MAX_RESOURCES_OUT_PER_PLAYER 20 // Default 2
+#define SPAWN_INTERVAL 1.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
 // Resource
