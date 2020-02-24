@@ -113,7 +113,6 @@ PreLoader::PreLoader()
 	loadFromFile(ObjectType::e_static, "Wall", "WallColl");
 	//loadFromFile(objectType::e_scene, "SceneBig");
 	//loadFromFile(objectType::e_scene, "Ground");
-	loadFromFile(ObjectType::e_scene, "TestTower");
 }
 
 PreLoader::~PreLoader()

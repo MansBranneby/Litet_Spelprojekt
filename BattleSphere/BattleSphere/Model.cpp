@@ -747,9 +747,9 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 		//// Diffuse texture
 		std::getline(in, line);
-		//inputStream.str(line);
-		//createTexture(inputStream.str()); // Create texture
-		//inputStream.clear();
+		inputStream.str(line);
+		createTexture(inputStream.str()); // Create texture
+		inputStream.clear();
 
 		//?
 
@@ -809,7 +809,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 void Model::createTexture(std::string fileName)
 {
-	if (fileName != "")
+	if (fileName != "\r")
 	{
 		std::wstring wFileName(fileName.length(), L' ');
 		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
