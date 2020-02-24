@@ -216,6 +216,64 @@ void GameState::updateSpawnDrone(float dT)
 	}
 }
 
+void GameState::updateDynamicCamera()
+{
+	// Calculate number of players
+	int nrOfPlayers = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_robots[i] != nullptr)
+			nrOfPlayers++;
+	}
+
+	if (nrOfPlayers >= 1)
+	{
+		// Get new look at 
+		XMVECTOR newLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		XMVECTOR robPos;
+		for (int i = 0; i < nrOfPlayers; i++)
+			newLookAt += robPos = m_robots[i]->getPosition();
+		newLookAt /= (float)nrOfPlayers;
+
+		// Get min and max of x and z
+		robPos = m_robots[0]->getPosition();
+		float maxRobotDistance = -1;
+		float minX = robPos.m128_f32[0];
+		float maxX = robPos.m128_f32[0];
+		float minZ = robPos.m128_f32[2];
+		float maxZ = robPos.m128_f32[2];
+		for (int i = 1; i < nrOfPlayers; i++)
+		{
+			robPos = m_robots[i]->getPosition();
+
+			if (minX > robPos.m128_f32[0])
+				minX = robPos.m128_f32[0];
+
+			else if (maxX < robPos.m128_f32[0])
+				maxX = robPos.m128_f32[0];
+
+			if (minZ > robPos.m128_f32[2])
+				minZ = robPos.m128_f32[2];
+
+			else if (maxZ < robPos.m128_f32[2])
+				maxZ = robPos.m128_f32[2];
+		}
+
+		// Calculate biggest distance
+		float xDifference = maxX - minX;
+		float zDifference = maxZ - minZ;
+		float biggestDifference;
+		if (xDifference > zDifference)
+			biggestDifference = xDifference;
+		else
+			biggestDifference = zDifference;
+
+		// Set new camera position and look at
+		XMVECTOR newPos = newLookAt + m_vecToCam * (ADDED_CAM_DISTANCE + biggestDifference);
+		DX::getInstance()->getCam()->setPosAndLook(newPos, newLookAt);
+	}
+}
+
 void GameState::handleMovement(Game* game, float dt, int id)
 {
 	// Save velocity for collision
@@ -363,7 +421,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
@@ -460,6 +518,9 @@ GameState::GameState()
 	m_spawnDronePropeller[1].setPosition(7.0692f, 0.64566f, 4.934334f);
 	m_spawnDronePropeller[2].setPosition(-7.0692f, 0.64566f, -4.934334f);
 	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
+
+	// Initialize dynamic camera
+	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
 }
 
 GameState::~GameState()
@@ -517,7 +578,7 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 			float movedDistance = XMVector3Length(movement).m128_f32[0];
 			if (movedDistance > distanceToTarget)
 				m_spawnDroneBody.setPosition(m_travelTarget); // Set drone
-			else	
+			else
 				m_spawnDroneBody.move(movement); // Move drone
 
 			pos = m_spawnDroneBody.getPosition();
@@ -525,7 +586,7 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 			// Set resource position
 			if (m_heldResourceIndex != -1)
 			{
-				
+
 				m_resources[m_heldResourceIndex]->setPosition(XMVectorSet
 				(
 					(float)(pos.m128_f32[0]),
@@ -667,6 +728,9 @@ bool GameState::update(Game* game, float dt)
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
+
+	// Update dynamic camera
+	updateDynamicCamera();
 
 	// Update spawning drone
 	updateSpawnDrone(dt);

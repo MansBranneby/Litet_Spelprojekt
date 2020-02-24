@@ -20,6 +20,11 @@ using namespace DirectX;
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
 #define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
 
+// Dynamic camera
+#define MINIMUM_CAM_DISTANCE 30.0f
+#define MAXIMUM_CAM_DISTANCE 162.8f
+#define ADDED_CAM_DISTANCE 30.0f
+
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
 #define ROTATION_SPEED 60.0f

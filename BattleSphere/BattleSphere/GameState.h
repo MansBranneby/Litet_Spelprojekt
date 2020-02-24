@@ -48,6 +48,10 @@ private:
 	bool assignMission();
 	void updateSpawnDrone(float dT);
 
+	// Dynamic camera
+	XMVECTOR m_vecToCam;
+	void updateDynamicCamera();
+
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 

@@ -161,6 +161,25 @@ void Camera::setCameraPosition(float x, float y, float z)
 	updateBuffers();
 }
 
+void Camera::setCameraPosition(XMVECTOR newPos)
+{
+	m_position = newPos;
+	updateBuffers();
+}
+
+void Camera::setLookAt(XMVECTOR newLookAt)
+{
+	m_lookAt = newLookAt;
+	updateBuffers();
+}
+
+void Camera::setPosAndLook(XMVECTOR newPos, XMVECTOR newLookAt)
+{
+	m_position = newPos;
+	m_lookAt = newLookAt;
+	updateBuffers();
+}
+
 XMMATRIX Camera::getViewMatrix()
 {
 	return m_view;
@@ -197,9 +216,14 @@ void Camera::updateBuffers()
 	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferPosition->getConstantBuffer(), 0);
 }
 
-XMVECTOR Camera::getPosition()
+XMVECTOR Camera::getPosition() const
 {
 	return m_position;
+}
+
+XMVECTOR Camera::getLookAt() const
+{
+	return m_lookAt;
 }
 
 void Camera::setPosition(XMVECTOR pos)

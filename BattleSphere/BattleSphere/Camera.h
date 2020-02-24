@@ -40,6 +40,9 @@ public:
 	void initialize(float width, float height, float nearPlane, float farPlane);
 
 	void setCameraPosition(float x, float y, float z);
+	void setCameraPosition(XMVECTOR newPos);
+	void setLookAt(XMVECTOR newLookAt);
+	void setPosAndLook(XMVECTOR newPos, XMVECTOR newLookAt);
 
 	XMMATRIX getViewMatrix();
 	XMMATRIX getProjectionMatrix();
@@ -47,7 +50,8 @@ public:
 	ConstantBuffer* getConstantBufferPosition();
 	void updateBuffers();
 
-	XMVECTOR getPosition();
+	XMVECTOR getPosition() const;
+	XMVECTOR getLookAt() const;
 	void setPosition(XMVECTOR pos);
 };
 
