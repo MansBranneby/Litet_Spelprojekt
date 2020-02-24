@@ -16,7 +16,8 @@ private:
 	float m_animationSpeed, m_acceleration ,m_delay, m_delay2, m_rest; // Animation data
 	
 	float m_sizeX, m_sizeY;
-	float m_spriteSizeX, m_spriteSizeY, m_nrOfFrames;
+	float m_spriteSizeX, m_spriteSizeY;
+	u_int m_nrOfFrames;
 	float m_texU, m_texV;
 
 	float m_fadeOut, m_initialFadeTime;

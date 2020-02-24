@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackfaceCuller.h" />
+    <ClInclude Include="Billboard.h" />
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CollisionTests.h" />

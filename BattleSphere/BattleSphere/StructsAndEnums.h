@@ -61,8 +61,8 @@ using namespace DirectX;
 #define BIGGEST_NORMAL_INDEX 5 // Update if adding resources!
 // Special - bigger than normal number - resources
 
-
-enum class objectType
+//#define OBJECT_TYPES 9
+enum class ObjectType
 {
 	e_drone = 0,
 	e_weapon = 1,
@@ -71,7 +71,9 @@ enum class objectType
 	e_projectile = 4,
 	e_resource = 5,
 	e_scene = 6,
-	e_static = 7
+	e_static = 7,
+	e_billboard,
+	e_nrOfEnums
 };
 
 enum class renderPass

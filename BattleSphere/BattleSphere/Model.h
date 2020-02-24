@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include "StructsAndEnums.h"
+#include "WICTextureLoader.h"
 
 class Model
 {
@@ -18,6 +19,9 @@ private:
 	// Bounding volume variables
 	boundingData m_bData;
 	std::vector<int> m_indices;
+
+	// Texture
+	ID3D11ShaderResourceView* m_SRV;
 
 	ID3D11Buffer* m_matrixCBuffer;
 	XMMATRIX* m_matrixData;
@@ -71,6 +75,7 @@ public:
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
-	void loadModel(std::ifstream& in, objectType type);
+	void loadModel(std::ifstream& in, ObjectType type);
+	void createTexture(std::string fileName);
 };
 

@@ -363,7 +363,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+			boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 0, 0);
 			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
@@ -596,7 +596,6 @@ bool GameState::assignMission()
 			}
 		}
 
-
 		Resource* resource;
 		int spawnIndex;
 		if (isSpecial)
@@ -674,8 +673,8 @@ bool GameState::update(Game* game, float dt)
 	}
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
-	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
-	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+	boundingData projectileBD = game->getPreLoader()->getBoundingData(ObjectType::e_projectile, 0, 0);
+	boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 1, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
 		// Save projectile pointer
@@ -752,7 +751,7 @@ void GameState::draw(Game* game, renderPass pass)
 	if (pass != renderPass::e_transparent)
 	{
 
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		/*for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
@@ -774,13 +773,13 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
-		}
+		}*/
 	}
 	if (pass != renderPass::e_opaque)
 	{
 
-		game->getPreLoader()->draw(objectType::e_scene);
-		game->getPreLoader()->draw(objectType::e_scene, 1);
+		game->getPreLoader()->draw(ObjectType::e_scene);
+		/*game->getPreLoader()->draw(objectType::e_scene, 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDroneBody.getData(), 0);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
@@ -789,7 +788,7 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
-		}
+		}*/
 	}
 
 }

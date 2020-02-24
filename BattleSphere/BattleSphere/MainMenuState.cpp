@@ -501,7 +501,7 @@ void MainMenuState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
-				game->getPreLoader()->draw(objectType::e_robot, game->getRobots()[i]->getData(), 1, 2);
+				game->getPreLoader()->draw(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 2);
 		}
 	}
 }

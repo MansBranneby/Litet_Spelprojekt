@@ -234,6 +234,7 @@ Model::Model()
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
+	m_SRV = nullptr;
 }
 
 Model::~Model()
@@ -611,10 +612,11 @@ void Model::loadModel(std::ifstream& in)
 		inputStream.clear();
 
 		// Diffuse texture
-
+		std::string hey;
 		std::getline(in, line);
-
-		//?
+		inputStream.str(line);
+		inputStream >> hey;
+		inputStream.clear();
 
 		// Refraction
 		std::getline(in, line);
@@ -669,7 +671,7 @@ void Model::loadModel(std::ifstream& in)
 	computeOBB(); // Calculate information for bounding volume data
 }
 
-void Model::loadModel(std::ifstream& in, objectType type)
+void Model::loadModel(std::ifstream& in, ObjectType type)
 {
 	std::string line;
 	std::istringstream inputStream;
@@ -743,9 +745,11 @@ void Model::loadModel(std::ifstream& in, objectType type)
 		inputStream >> tempMat.specular.m128_f32[3];
 		inputStream.clear();
 
-		// Diffuse texture
-
+		//// Diffuse texture
 		std::getline(in, line);
+		//inputStream.str(line);
+		//createTexture(inputStream.str()); // Create texture
+		//inputStream.clear();
 
 		//?
 
@@ -801,4 +805,19 @@ void Model::loadModel(std::ifstream& in, objectType type)
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
 
+}
+
+void Model::createTexture(std::string fileName)
+{
+	if (fileName != "")
+	{
+		std::wstring wFileName(fileName.length(), L' ');
+		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
+
+		HRESULT hr = CoInitialize(NULL);
+		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &m_SRV);
+
+		if (FAILED(hr))
+			MessageBox(NULL, L"Error createTexture in Model.cpp", L"Error", MB_OK | MB_ICONERROR);
+	}
 }

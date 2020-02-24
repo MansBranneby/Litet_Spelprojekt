@@ -190,5 +190,6 @@ float4 PS_main(PS_IN input) : SV_Target
 			return float4(fragmentCol, 0.3f);
 	}
 	
-	return float4(fragmentCol, KeIn.w);
+	//return float4(fragmentCol, KeIn.w);
+	return float4(float3(input.tex.x, 0.0f, 0.0f), 1.0f );
 };
