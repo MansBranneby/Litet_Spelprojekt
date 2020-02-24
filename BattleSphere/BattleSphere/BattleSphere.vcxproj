@@ -150,6 +150,7 @@
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Clock.cpp" />
+    <ClCompile Include="DBGObj.cpp" />
     <ClCompile Include="Drone.cpp" />
     <ClCompile Include="DX.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Clock.h" />
+    <ClInclude Include="DBGObj.h" />
     <ClInclude Include="Drone.h" />
     <ClInclude Include="DX.h" />
     <ClInclude Include="Game.h" />

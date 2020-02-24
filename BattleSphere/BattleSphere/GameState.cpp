@@ -330,6 +330,16 @@ GameState::GameState()
 	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
 	loadLists();
 	startSpawn();
+
+	// Dynamic background object
+		//Animation freeway
+	std::vector<XMVECTOR> freeway;
+	freeway.push_back(XMVectorSet(0.0f, 0.0f, -120.0f, 1.0f));
+	freeway.push_back(XMVectorSet(-60.0f, 0.0f, -60.0f, 1.0f));
+	freeway.push_back(XMVectorSet(120.0f, 0.0f, -0.0f, 1.0f));
+	freeway.push_back(XMVectorSet(0.0f, 0.0f, 60.0f, 1.0f));
+
+	m_dBGObjs.push_back(new DBGObj(Animation::e_Freeway, freeway, 0.5f));
 }
 
 GameState::~GameState()
@@ -344,6 +354,9 @@ GameState::~GameState()
 		delete m_nodes[i];
 	}
 
+	//Dynamic background objects
+	for (int i = 0; i < m_dBGObjs.size(); i++)
+		delete m_dBGObjs[i];
 }
 
 void GameState::regularSpawn(float dT)
@@ -508,6 +521,11 @@ bool GameState::update(Game* game, float dt)
 	{
 		m_nodes[i]->updateTime(dt);
 	}
+
+	//Dynamic background objects
+	for (int i = 0; i < m_dBGObjs.size(); i++)
+		m_dBGObjs[i]->animate(dt);
+
 	return 0;
 }
 
@@ -554,5 +572,8 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 	}
+
+	for (int i = 0; i < m_dBGObjs.size(); i++)
+		game->getPreLoader()->draw(objectType::e_extra, m_dBGObjs[i]->getData());
 
 }

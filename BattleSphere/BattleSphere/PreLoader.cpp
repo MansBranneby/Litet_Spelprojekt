@@ -112,6 +112,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Wall", "WallColl");
 	loadFromFile(objectType::e_scene, "SceneBig");
 	loadFromFile(objectType::e_scene, "Ground");
+	loadFromFile(objectType::e_extra, "1mesh1mat");
 }
 
 PreLoader::~PreLoader()
