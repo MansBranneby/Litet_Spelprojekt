@@ -3,11 +3,14 @@
 #include "Transparency.h"
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
+#include "Graph.h"
 
 class GameState : public State 
 {
 	
 private:
+
+
 	Input* m_input;
 	Robot** m_robots;
 	std::vector<Resource*> m_resources;

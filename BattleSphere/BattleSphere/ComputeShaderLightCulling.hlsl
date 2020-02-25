@@ -1,5 +1,5 @@
 #define BLOCK_SIZE 4
-#define NUM_LIGHTS 48
+#define NUM_LIGHTS 96
 
 struct Sphere 
 {

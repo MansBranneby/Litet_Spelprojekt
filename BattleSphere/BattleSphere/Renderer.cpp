@@ -308,7 +308,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		XMVECTOR moonPos = XMVectorSet(0, -2, 0, 0);
 		float speed = 1.0f;
 		float rotCoeff = 0;
-		
+
+		int tempIndex = Lights::getInstance()->addAreaLight(0, 0, 0, 20, 1, 0, 1, 20);
+		float positions[2];
+
+		Graph::getInstance()->createVertexBuffer();
 		///////////////
 		while (WM_QUIT != msg.message)
 		{
@@ -349,6 +353,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					//g_lightCulling.updateSubresource();
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
+					
 					//DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
@@ -361,6 +366,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->GSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, DX::getInstance()->getCam()->getConstantBufferPosition()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(3, 1, g_shadowMapping->getCamera()->getConstantBufferVP()->getConstantBuffer());
@@ -413,8 +419,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 					g_Game->draw(renderPass::e_transparent);
-					
-					
+					//Graph::getInstance()->calculateShortestPath(XMVectorSet(0, 0, 0, 0), 0);
+					if (Graph::getInstance()->getActive())
+					{
+						Graph::getInstance()->updatePulse(g_Clock->getDeltaTime());
+						Graph::getInstance()->draw();
+					}
+
 					downsample();
 
 					g_bloom->run();
@@ -499,9 +510,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::Begin("Settings");
 
 				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-				ImGui::ColorPicker4("Pick a color", moonColor);
-				ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
-				ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+				//ImGui::ColorPicker4("Pick a color", moonColor);
+				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
+				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+
+				ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
+				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
+				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);
 
 				ImGui::End();
 				ImGui::Render();
@@ -548,6 +563,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_pixelShaderDownsample.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
+		Graph::getInstance()->release();
+		delete Graph::getInstance();
 
 		//Remove
 		delete g_bloom;

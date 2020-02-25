@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include "GameState.h"
 
 void GameState::loadLists()
 {
@@ -310,6 +311,9 @@ void GameState::handleInputs(Game* game, float dt)
 								}
 							}
 
+							if (m_heldResourceIndex != -1)
+								m_heldResourceIndex--;
+
 							delete m_resources[m_robots[i]->getResourceIndex()];
 							m_resources.erase(m_resources.begin() + m_robots[i]->getResourceIndex());
 							m_robots[i]->removeResource();
@@ -359,6 +363,11 @@ void GameState::handleInputs(Game* game, float dt)
 			{
 				m_robots[i]->setHealth(100);
 				m_input->setVibration(i, 0.0f);
+			}
+
+			if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_LEFT))
+			{
+				Graph::getInstance()->calculateShortestPath(m_robots[i]->getPosition(), 0);
 			}
 
 			// COLLISION PLAYER VS STATIC OBJECTS
@@ -460,6 +469,8 @@ GameState::GameState()
 	m_spawnDronePropeller[1].setPosition(7.0692f, 0.64566f, 4.934334f);
 	m_spawnDronePropeller[2].setPosition(-7.0692f, 0.64566f, -4.934334f);
 	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
+
+	
 }
 
 GameState::~GameState()
@@ -748,9 +759,9 @@ void GameState::draw(Game* game, renderPass pass)
 {
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-
 	if (pass != renderPass::e_transparent)
 	{
+
 
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -791,5 +802,6 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 	}
+	//
 
 }

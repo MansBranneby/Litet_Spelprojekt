@@ -14,7 +14,7 @@ bool Input::refresh(int user, float dt)
 
 int Input::getId(int user)
 {
-    m_nrOfGamepads = getControllerState();
+    //m_nrOfGamepads = getControllerState();
     return m_gamepadIds[user];
 }
 
