@@ -334,12 +334,12 @@ GameState::GameState()
 	// Dynamic background object
 		//Animation freeway
 	std::vector<XMVECTOR> freeway;
-	freeway.push_back(XMVectorSet(0.0f, 0.0f, -120.0f, 1.0f));
-	freeway.push_back(XMVectorSet(-60.0f, 0.0f, -60.0f, 1.0f));
-	freeway.push_back(XMVectorSet(120.0f, 0.0f, -0.0f, 1.0f));
-	freeway.push_back(XMVectorSet(0.0f, 0.0f, 60.0f, 1.0f));
+	freeway.push_back(XMVectorSet(200.0f, 16.0f, 5.0f, 1.0f));
+	freeway.push_back(XMVectorSet(60.0f, -16.0f, 5.0f, 1.0f));
+	freeway.push_back(XMVectorSet(60.0f, 0.0f, 184.0f, 1.0f));
+	freeway.push_back(XMVectorSet(-233.0f, 0.0f, 164.0f, 1.0f));
 
-	m_dBGObjs.push_back(new DBGObj(Animation::e_Freeway, freeway, 0.5f));
+	m_dBGObjs.push_back(new DBGObj(Animation::e_Freeway, freeway, false, 0.5f));
 }
 
 GameState::~GameState()
@@ -564,15 +564,21 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 	if (pass != renderPass::e_opaque)
 	{
+		// Scene (Background objects without collision)
+		for(int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+			game->getPreLoader()->draw(objectType::e_scene, i);
+		
+		//Static
+		for (int i = 0; i < 2; i++)
+			game->getPreLoader()->draw(objectType::e_static, i);
 
-		game->getPreLoader()->draw(objectType::e_scene);
-		game->getPreLoader()->draw(objectType::e_scene, 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 	}
 
+	// Tokyo drift
 	for (int i = 0; i < m_dBGObjs.size(); i++)
 		game->getPreLoader()->draw(objectType::e_extra, m_dBGObjs[i]->getData());
 
