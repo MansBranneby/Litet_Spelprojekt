@@ -20,6 +20,10 @@ private:
 	XMVECTOR m_right;
 	XMVECTOR m_forward;
 
+	// FOV
+	float m_yFOV;
+	float m_xFOV;
+
 	// Matrices
 	XMMATRIX m_view;
 	XMMATRIX m_projection;
@@ -42,7 +46,7 @@ public:
 	void setCameraPosition(float x, float y, float z);
 	void setCameraPosition(XMVECTOR newPos);
 	void setLookAt(XMVECTOR newLookAt);
-	void setPosAndLook(XMVECTOR newPos, XMVECTOR newLookAt);
+	void movePosAndLook(XMVECTOR movedPos, XMVECTOR newLookAt);
 
 	XMMATRIX getViewMatrix();
 	XMMATRIX getProjectionMatrix();
@@ -52,6 +56,8 @@ public:
 
 	XMVECTOR getPosition() const;
 	XMVECTOR getLookAt() const;
+	float getXFOV() const;
+	float getYFOV() const;
 	void setPosition(XMVECTOR pos);
 };
 

@@ -216,48 +216,52 @@ void GameState::updateSpawnDrone(float dT)
 	}
 }
 
-void GameState::updateDynamicCamera()
+void GameState::updateDynamicCamera(float dT)
 {
 	// Calculate number of players
 	int nrOfPlayers = 0;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr)
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			nrOfPlayers++;
 	}
 
 	if (nrOfPlayers >= 1)
 	{
-		// Get new look at 
+		// Get new look at and get min and max of x and z
+		XMVECTOR oldCamLookAt = DX::getInstance()->getCam()->getLookAt();
+		XMVECTOR oldCamPos = DX::getInstance()->getCam()->getPosition();
 		XMVECTOR newLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		XMVECTOR robPos;
-		for (int i = 0; i < nrOfPlayers; i++)
-			newLookAt += robPos = m_robots[i]->getPosition();
-		newLookAt /= (float)nrOfPlayers;
-
-		// Get min and max of x and z
-		robPos = m_robots[0]->getPosition();
 		float maxRobotDistance = -1;
-		float minX = robPos.m128_f32[0];
-		float maxX = robPos.m128_f32[0];
-		float minZ = robPos.m128_f32[2];
-		float maxZ = robPos.m128_f32[2];
-		for (int i = 1; i < nrOfPlayers; i++)
+		float minX = 2000;
+		float maxX = -2000;
+		float minZ = 2000;
+		float maxZ = -2000;
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			robPos = m_robots[i]->getPosition();
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				robPos = m_robots[i]->getPosition();
+				newLookAt += robPos;
+				robPos = XMVector3Normalize(m_robots[i]->getPosition() - oldCamPos);
 
-			if (minX > robPos.m128_f32[0])
-				minX = robPos.m128_f32[0];
+				if (minX > robPos.m128_f32[0])
+					minX = robPos.m128_f32[0];
 
-			else if (maxX < robPos.m128_f32[0])
-				maxX = robPos.m128_f32[0];
+				if (maxX < robPos.m128_f32[0])
+					maxX = robPos.m128_f32[0];
 
-			if (minZ > robPos.m128_f32[2])
-				minZ = robPos.m128_f32[2];
+				if (minZ > robPos.m128_f32[2])
+					minZ = robPos.m128_f32[2];
 
-			else if (maxZ < robPos.m128_f32[2])
-				maxZ = robPos.m128_f32[2];
+				if (maxZ < robPos.m128_f32[2])
+					maxZ = robPos.m128_f32[2];
+			}
 		}
+		newLookAt /= (float)nrOfPlayers;
+		newLookAt.m128_f32[3] -= 30.0f;
+
 
 		// Calculate biggest distance
 		float xDifference = maxX - minX;
@@ -269,8 +273,78 @@ void GameState::updateDynamicCamera()
 			biggestDifference = zDifference;
 
 		// Set new camera position and look at
-		XMVECTOR newPos = newLookAt + m_vecToCam * (ADDED_CAM_DISTANCE + biggestDifference);
-		DX::getInstance()->getCam()->setPosAndLook(newPos, newLookAt);
+
+		XMVECTOR newPos;
+		bool zoomingToStart = false;
+		if (MINIMUM_CAM_DISTANCE + biggestDifference * 160.0f < MAXIMUM_CAM_DISTANCE)
+			newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+		else
+		{
+			zoomingToStart = true;
+			newPos = m_camStartPos;
+			newLookAt = m_camStartLookAt;
+			m_transition = 0.0f;
+		}
+
+
+
+
+		// Project each robot onto FOV planes and find smallest distances
+		float closest = 200000;
+		bool closestPlane[4]{ false, false, false, false }; // Bottom, left, top, right
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				robPos = m_robots[i]->getPosition();
+				XMVECTOR camToBot = XMVector3Normalize(robPos - oldCamPos);
+				for (int plane = 0; plane < 4; plane++) // Bottom, left, top, right
+				{
+					// Project
+					float distance = XMVector3Dot(camToBot, m_fOVPlanes[plane]).m128_f32[0];
+
+					if (distance < closest)
+					{
+						closest = distance;
+						for (int j = 0; j < 4; j++)
+							closestPlane[j] = false;
+						closestPlane[plane] = true;
+					}
+				}
+			}
+		}
+
+		float changeSpeed = dT * CHANGE_SPEED;
+		if (closest < 0.01f)
+			closest = 0.01f;
+
+		m_transition += dT;
+		if (m_transition < 1.0f)
+		{
+			changeSpeed *= 2.0f;
+			newPos = m_camStartPos;
+			newLookAt = m_camStartLookAt;
+		}
+		else if (closest < 0.6f && (closestPlane[1] || closestPlane[3]) && !zoomingToStart) // X
+		{
+			changeSpeed *= 0.8f / closest;
+			newPos += m_vecToCam * (biggestDifference * 90.0f);
+		}
+		else if (closest < 0.6f && closestPlane[0] && !zoomingToStart) // Bottom
+		{
+			changeSpeed *= 0.8f / closest;
+			newPos += m_vecToCam * (biggestDifference * 90.0f);
+		}
+		else if (closest < 0.6f && closestPlane[2] && !zoomingToStart) // Top
+		{
+			changeSpeed *= 0.8f / closest;
+			newPos += m_vecToCam * (biggestDifference * 90.0f);
+		}
+
+		XMVECTOR vecToNewCamPos = newPos - oldCamPos;
+		XMVECTOR vecToNewCamLookAt = newLookAt - oldCamLookAt;
+
+		DX::getInstance()->getCam()->movePosAndLook(vecToNewCamPos * changeSpeed, vecToNewCamLookAt * changeSpeed);
 	}
 }
 
@@ -367,6 +441,9 @@ void GameState::handleInputs(Game* game, float dt)
 										m_robots[k]->setResourceIndex(m_robots[k]->getResourceIndex() - 1);
 								}
 							}
+
+							if (m_heldResourceIndex != -1)
+								m_heldResourceIndex--;
 
 							delete m_resources[m_robots[i]->getResourceIndex()];
 							m_resources.erase(m_resources.begin() + m_robots[i]->getResourceIndex());
@@ -520,7 +597,26 @@ GameState::GameState()
 	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
 
 	// Initialize dynamic camera
+	m_transition = 1.0f;
 	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
+	m_camStartPos = DX::getInstance()->getCam()->getPosition();
+	m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
+	float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
+	float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
+	m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
+	m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
+	m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
+	m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
+
+	// Rotate plane according to look at
+	float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
+	for (int i = 0; i < 4; i++)
+		m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
+
+	m_fOVPlanes[0].m128_f32[2] *= -1;
+	m_fOVPlanes[1].m128_f32[2] *= -1;
+	m_fOVPlanes[2].m128_f32[2] *= -1;
+	m_fOVPlanes[3].m128_f32[2] *= -1;
 }
 
 GameState::~GameState()
@@ -586,7 +682,6 @@ bool GameState::travelAndCheck(float dT, bool fastTravel)
 			// Set resource position
 			if (m_heldResourceIndex != -1)
 			{
-
 				m_resources[m_heldResourceIndex]->setPosition(XMVectorSet
 				(
 					(float)(pos.m128_f32[0]),
@@ -647,7 +742,7 @@ bool GameState::assignMission()
 	int nrOfPlayers = 0;
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_robots[i] != nullptr)
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			nrOfPlayers++;
 	}
 
@@ -730,7 +825,7 @@ bool GameState::update(Game* game, float dt)
 	game->updatePlayerStatus();
 
 	// Update dynamic camera
-	updateDynamicCamera();
+	updateDynamicCamera(dt);
 
 	// Update spawning drone
 	updateSpawnDrone(dt);

@@ -49,8 +49,12 @@ private:
 	void updateSpawnDrone(float dT);
 
 	// Dynamic camera
+	XMVECTOR m_camStartPos;
+	XMVECTOR m_camStartLookAt;
 	XMVECTOR m_vecToCam;
-	void updateDynamicCamera();
+	float m_transition;
+	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
+	void updateDynamicCamera(float dT);
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

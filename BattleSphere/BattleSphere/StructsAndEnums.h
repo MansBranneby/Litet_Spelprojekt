@@ -21,9 +21,9 @@ using namespace DirectX;
 #define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
 
 // Dynamic camera
-#define MINIMUM_CAM_DISTANCE 30.0f
-#define MAXIMUM_CAM_DISTANCE 162.8f
-#define ADDED_CAM_DISTANCE 30.0f
+#define MINIMUM_CAM_DISTANCE 25.0f
+#define MAXIMUM_CAM_DISTANCE 140.0f
+#define CHANGE_SPEED 0.15f
 
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
