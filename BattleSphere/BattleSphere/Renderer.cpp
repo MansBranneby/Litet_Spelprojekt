@@ -172,7 +172,6 @@ void createRenderResources()
 
 	g_bloom = new Bloom();
 	g_menu = new Menu();
-
 	g_shadowMapping = new ShadowMapping();
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
@@ -558,6 +557,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_gameState;
 		delete g_menu;
 		delete g_shadowMapping;
+	
 
 		DestroyWindow(wndHandle);
 	}

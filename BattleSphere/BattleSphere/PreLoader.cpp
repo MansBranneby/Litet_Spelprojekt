@@ -102,7 +102,7 @@ PreLoader::PreLoader()
 	m_bFCuller = new BackfaceCuller;
 
 	// Load objects
-	loadFromFile(ObjectType::e_scene, "TestTower");
+	loadFromFile(ObjectType::e_billboard, "TestTower");
 	loadFromFile(ObjectType::e_drone, "Drone");
 	loadFromFile(ObjectType::e_weapon, "Weapon1");
 	loadFromFile(ObjectType::e_robot, "BattleSphere", "1mesh1mat");
@@ -111,7 +111,7 @@ PreLoader::PreLoader()
 	loadFromFile(ObjectType::e_resource, "Weapon1", "1mesh1mat");
 	loadFromFile(ObjectType::e_static, "Bar", "BarColl");
 	loadFromFile(ObjectType::e_static, "Wall", "WallColl");
-	//loadFromFile(objectType::e_scene, "SceneBig");
+	loadFromFile(ObjectType::e_scene, "SceneBig");
 	//loadFromFile(objectType::e_scene, "Ground");
 }
 
@@ -205,6 +205,13 @@ void PreLoader::draw(ObjectType type, objectData data, objectData relativeData, 
 		m_objects[typ][variant][i].setObjectData(data, relativeData);
 		m_objects[typ][variant][i].draw();
 	}
+}
+
+void PreLoader::draw(ObjectType type, TextureAnimationData textureAnimationData, int variant)
+{
+	int typ = (int)type;
+	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
+		m_objects[typ][variant][i].draw(textureAnimationData);
 }
 
 void PreLoader::drawCM(ObjectType type, int variant)

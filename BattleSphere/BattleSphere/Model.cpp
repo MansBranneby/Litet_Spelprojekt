@@ -192,9 +192,23 @@ void Model::draw()
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
+
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw();
+	}
+}
+
+void Model::draw(TextureAnimationData textureAnimationData)
+{
+	UINT32 vertexSize = sizeof(vertex);
+	UINT32 offset = 0;
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
+
+	for (int i = 0; i < m_nrOfSubModels; i++)
+	{
+		m_subModels[i].draw(textureAnimationData);
 	}
 }
 
@@ -234,7 +248,6 @@ Model::Model()
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
-	m_SRV = nullptr;
 }
 
 Model::~Model()
@@ -713,6 +726,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 	m_subModels = new SubModel[m_nrOfSubModels];
 	material tempMat;
+	ID3D11ShaderResourceView* tempSRV;
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		// Ambient
@@ -748,7 +762,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 		//// Diffuse texture
 		std::getline(in, line);
 		inputStream.str(line);
-		createTexture(inputStream.str()); // Create texture
+		tempSRV = createTexture(inputStream.str()); // Create texture
 		inputStream.clear();
 
 		//?
@@ -774,6 +788,8 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 		// Set submodel material
 		m_subModels[i].setMaterialInfo(tempMat);
+		// Set submodel texture
+		m_subModels[i].setSRV(tempSRV);
 
 		// Get number of indices
 		int nrOfIndices = 0;
@@ -807,17 +823,21 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 }
 
-void Model::createTexture(std::string fileName)
+ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
 {
-	if (fileName != "\r")
+	ID3D11ShaderResourceView* tempSRV = nullptr;
+
+	if (fileName != "\r" && fileName != "")
 	{
 		std::wstring wFileName(fileName.length(), L' ');
 		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
 
 		HRESULT hr = CoInitialize(NULL);
-		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &m_SRV);
+		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &tempSRV);
 
 		if (FAILED(hr))
 			MessageBox(NULL, L"Error createTexture in Model.cpp", L"Error", MB_OK | MB_ICONERROR);
 	}
+
+	return tempSRV;
 }

@@ -3,6 +3,7 @@
 #include "Transparency.h"
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
+#include "Billboard.h"
 
 class GameState : public State 
 {
@@ -12,6 +13,7 @@ private:
 	Robot** m_robots;
 	std::vector<Resource*> m_resources;
 	std::vector<Node*> m_nodes;
+	std::vector<Billboard*> m_billboards;
 	Lights* m_lights;
 	Transparency m_transparency;
 
@@ -21,7 +23,6 @@ private:
 	void loadLists();
 
 	// Spawning
-
 	int m_normalSpawnAmount;
 	int m_specialSpawnAmount;
 	void startSpawn();
@@ -50,6 +51,9 @@ private:
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
+
+	// Initializing billboards
+	void initBillboards();
 
 public:
 	GameState();

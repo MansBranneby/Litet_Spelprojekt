@@ -403,6 +403,12 @@ void GameState::handleInputs(Game* game, float dt)
 	}
 }
 
+void GameState::initBillboards()
+{
+	Billboard* billboard = new Billboard();
+	m_billboards.push_back(billboard);
+}
+
 GameState::GameState()
 {
 	srand((unsigned int)time(NULL));
@@ -414,6 +420,9 @@ GameState::GameState()
 
 	// Spawn preset nodes
 	spawnNodes();
+
+	// Initialize billboards
+	initBillboards();
 
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
@@ -474,6 +483,8 @@ GameState::~GameState()
 		delete m_nodes[i];
 	}
 
+	for (int i = 0; i < m_billboards.size(); ++i)
+		delete m_billboards[i];
 }
 
 void GameState::setTravelTarget(XMVECTOR target)
@@ -738,7 +749,8 @@ bool GameState::update(Game* game, float dt)
 		m_nodes[i]->updateTime(dt);
 	}
 
-
+	// TODO GLENN
+	m_billboards[0]->setVelocityUV(m_billboards[0]->getVelocityUV() - XMVECTOR{ 1.0f, 0.0f, 0.0f } * dt * 0.2f);
 
 	return 0;
 }
@@ -750,45 +762,42 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass != renderPass::e_transparent)
 	{
-
-		/*for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
-				game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
+				game->getPreLoader()->draw(ObjectType::e_robot, m_robots[i]->getData(), 1, 2);
+				game->getPreLoader()->draw(ObjectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
 
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
 				{
-					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+					game->getPreLoader()->draw(ObjectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
 				}
 			}
 		}
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+			game->getPreLoader()->draw(ObjectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
 		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
-		}*/
+			game->getPreLoader()->draw(ObjectType::e_resource, m_resources[i]->getData(), 0, 0);
+		}
 	}
 	if (pass != renderPass::e_opaque)
 	{
-
+		game->getPreLoader()->draw(ObjectType::e_billboard, m_billboards[0]->getTextureAnimationData(), 0);
 		game->getPreLoader()->draw(ObjectType::e_scene);
-		/*game->getPreLoader()->draw(objectType::e_scene, 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDroneBody.getData(), 0);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
-		}*/
-	}
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDroneBody.getData(), 0);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
 
+		for (int i = 0; i < m_nodes.size(); i++)
+			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
+		
+	}
 }

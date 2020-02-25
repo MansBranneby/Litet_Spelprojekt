@@ -156,6 +156,9 @@
     <ClCompile Include="CollisionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Billboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -319,12 +322,6 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="ComputeShaderVGaussian.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
     <FxCompile Include="VertexShaderFinalRender.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
@@ -332,9 +329,6 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="PixelShaderDownsample.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="VertexShaderShadowMapping.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />

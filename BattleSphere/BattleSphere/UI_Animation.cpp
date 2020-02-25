@@ -207,6 +207,7 @@ UI_Animation::UI_Animation(float sizeX, float sizeY, float spriteSizeX, float sp
 	m_nrOfFrames = nrOfFrames;
 	m_animationSpeed = 0.0f;
 	m_acceleration = 0.0f;
+	m_initialFadeTime = 0.0f;
 
 	m_texU = m_spriteSizeX / m_sizeX;
 	m_texV = m_spriteSizeY / m_sizeY;

@@ -10,6 +10,9 @@ SubModel::SubModel()
 	m_nrOfIndices = 0;
 	m_indexArray = nullptr;
 
+	// Texture
+	m_SRV = nullptr;
+
 	// Backface culling
 	m_culledIndiceBuffer = nullptr;
 	m_clearedIndiceBuffer = nullptr;
@@ -21,10 +24,12 @@ SubModel::~SubModel()
 	if (m_indexBuffer) m_indexBuffer->Release();
 
 	if (m_constantBuffer) delete m_constantBuffer;
+	if (m_constantBuffer) delete m_textureAnimationCB;
 	if (m_mat) _aligned_free(m_mat);
 	if (m_indexArray) delete[] m_indexArray;
 	if (m_culledIndiceBuffer) m_culledIndiceBuffer->Release();
 	if (m_clearedIndiceBuffer) m_clearedIndiceBuffer->Release();
+	if (m_SRV) m_SRV->Release();
 }
 
 void SubModel::createIndexBuffer()
@@ -58,6 +63,14 @@ void SubModel::createCulledIndexBuffer()
 	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
 }
 
+void SubModel::setTextureAnimationInfo(TextureAnimationData textureAnimationData)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(*m_textureAnimationCB->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &textureAnimationData, sizeof(textureAnimationData));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_textureAnimationCB->getConstantBuffer(), 0);
+}
+
 void SubModel::setMaterialInfo(material mat)
 {
 	*m_mat = mat;
@@ -65,6 +78,9 @@ void SubModel::setMaterialInfo(material mat)
 	//TODO: Create constant buffer
 	m_constantBuffer = new ConstantBuffer(m_mat, sizeof(material));
 	m_materialCBuffer = *m_constantBuffer->getConstantBuffer();
+
+	// TODO GLENN
+	m_textureAnimationCB = new ConstantBuffer(m_mat, sizeof(material));
 }
 
 void SubModel::updateMaterialInfo(material mat)
@@ -92,6 +108,11 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 	createCulledIndexBuffer();
 }
 
+void SubModel::setSRV(ID3D11ShaderResourceView* SRV)
+{
+	m_SRV = SRV;
+}
+
 void SubModel::draw()
 {
 	// Bind indexbuffer
@@ -104,10 +125,40 @@ void SubModel::draw()
 	else
 		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
 
+	ID3D11ShaderResourceView* nullSRV = { nullptr };
+
+	// Set texture if model has one other set it to nullptr
+	(m_SRV != nullptr) ? DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV) : DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV);
+		
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 	
+}
+
+void SubModel::draw(TextureAnimationData textureAnimationData)
+{
+	setTextureAnimationInfo(textureAnimationData);
+
+	// Bind indexbuffer
+	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_culledIndiceBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	DX* instance = DX::getInstance();
+	XMVECTOR emission = m_mat->emission;
+	if (emission.m128_f32[0] > 0 || emission.m128_f32[1] > 0 || emission.m128_f32[2] > 0)
+		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSEnabled(), 1);
+	else
+		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
+
+	ID3D11ShaderResourceView* nullSRV = { nullptr };
+
+	// Set texture if model has one other set it to nullptr
+	(m_SRV != nullptr) ? DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV) : DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV);
+
+	// Bind constantbuffer
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(5, 1, m_textureAnimationCB->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 }
 
 void SubModel::cullDraw()

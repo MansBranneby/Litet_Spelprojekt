@@ -40,12 +40,18 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 cbuffer PS_ROBOT_DATA : register (b4) 
 {
 	float4 playerPosition[4];
-
 };
+
+cbuffer PS_CONSTANT_BUFFER : register (b5)
+{
+	float4 velocityUV;
+};
+
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
 }
+
 float DoSpotCone(Light light, float4 L)
 {
 	
@@ -59,6 +65,8 @@ Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
+Texture2D txModel : register(t4);
+
 float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//// (for one light)
@@ -191,5 +199,8 @@ float4 PS_main(PS_IN input) : SV_Target
 	}
 	
 	//return float4(fragmentCol, KeIn.w);
-	return float4(float3(input.tex.x, 0.0f, 0.0f), 1.0f );
+	float3 hey = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+	return float4(hey + fragmentCol, KeIn.w);
+	//return float4(velocityUV.x, 0.0f, 0.0f, KeIn.w);
+	
 };

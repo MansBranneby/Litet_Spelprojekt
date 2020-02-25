@@ -64,14 +64,14 @@ using namespace DirectX;
 //#define OBJECT_TYPES 9
 enum class ObjectType
 {
-	e_drone = 0,
-	e_weapon = 1,
-	e_robot = 2,
-	e_node = 3,
-	e_projectile = 4,
-	e_resource = 5,
-	e_scene = 6,
-	e_static = 7,
+	e_drone,
+	e_weapon,
+	e_robot,
+	e_node,
+	e_projectile,
+	e_resource,
+	e_scene,
+	e_static,
 	e_billboard,
 	e_nrOfEnums
 };
@@ -128,6 +128,11 @@ struct objectData
 	material material;
 };
 
+struct TextureAnimationData
+{
+	XMVECTOR velocityUV;
+};
+
 // Game update return data
 struct returnInfo
 {
@@ -155,16 +160,16 @@ struct vectorPairProjections {
 // Information acquired from collision detection
 struct CollisionInfo
 {
-	bool m_colliding;
-	DirectX::XMVECTOR m_normal;
-	DirectX::XMVECTOR m_contactPoint;
+	bool m_colliding = false;
+	DirectX::XMVECTOR m_normal{ 0.0f, 0.0f, 0.0f };
+	DirectX::XMVECTOR m_contactPoint{ 0.0f, 0.0f, 0.0f };
+};
 
-	CollisionInfo()
-	{
-		m_colliding = false;
-		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
-		m_contactPoint = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
-	}
+
+enum class BillboardState
+{
+	e_blinking,
+	e_moving
 };
 
 struct vertexAndId

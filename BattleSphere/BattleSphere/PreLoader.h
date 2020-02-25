@@ -40,7 +40,8 @@ public:
 	int getNrOfVariants(ObjectType type) const;
 
 	void setStaticData(ObjectType type, objectData data, int variant = 0); // Set position for static objects
-
+	
+	void draw(ObjectType type, TextureAnimationData textureAnimationData, int variant = 0);
 	void drawCM(ObjectType type, int variant = 0);
 	void drawCM(ObjectType type, objectData data, int variant = 0);
 	void drawCM(ObjectType type, objectData data, objectData relativeData, int variant = 0);

@@ -20,9 +20,6 @@ private:
 	boundingData m_bData;
 	std::vector<int> m_indices;
 
-	// Texture
-	ID3D11ShaderResourceView* m_SRV;
-
 	ID3D11Buffer* m_matrixCBuffer;
 	XMMATRIX* m_matrixData;
 	XMMATRIX* m_modelMatrixData;
@@ -60,6 +57,7 @@ private:
 
 public:
 	void draw();
+	void draw(TextureAnimationData textureAnimationData);
 	void cullDraw();
 	Model();
 	~Model();
@@ -76,6 +74,6 @@ public:
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
 	void loadModel(std::ifstream& in, ObjectType type);
-	void createTexture(std::string fileName);
+	ID3D11ShaderResourceView* createTexture(std::string fileName);
 };
 
