@@ -277,7 +277,15 @@ void GameState::updateDynamicCamera(float dT)
 		XMVECTOR newPos;
 		bool zoomingToStart = false;
 		if (MINIMUM_CAM_DISTANCE + biggestDifference * 160.0f < MAXIMUM_CAM_DISTANCE)
+		{
 			newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+			if (newPos.m128_f32[2] < -105.0f)
+			{
+				float difference = -105.0f - newPos.m128_f32[2];
+				newPos.m128_f32[2] += difference;
+				newLookAt.m128_f32[2] += difference;
+			}
+		}
 		else
 		{
 			zoomingToStart = true;
@@ -319,7 +327,7 @@ void GameState::updateDynamicCamera(float dT)
 			closest = 0.01f;
 
 		m_transition += dT;
-		if (m_transition < 1.0f)
+		if (m_transition < 2.0f)
 		{
 			changeSpeed *= 2.0f;
 			newPos = m_camStartPos;
