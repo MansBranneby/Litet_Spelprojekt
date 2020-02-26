@@ -159,6 +159,9 @@
     <ClCompile Include="DBGObj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DBOHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -308,6 +311,9 @@
     <ClInclude Include="DBGObj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DBOHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -363,6 +369,9 @@
     <FxCompile Include="PixelShaderUIAni.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />

@@ -2,7 +2,7 @@
 #include "State.h"
 #include "Transparency.h"
 #include "Lights.h"
-#include "DBGObj.h"
+#include "DBOHandler.h"
 
 #define START_SPAWNED_RESOURCES 4
 #define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
@@ -37,7 +37,7 @@ private:
 	void spawnNodes();
 
 	// Dynamic background objects
-	std::vector<DBGObj*> m_dBGObjs;
+	DBOHandler* m_dboHandler;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

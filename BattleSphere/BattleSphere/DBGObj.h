@@ -11,6 +11,7 @@ enum Animation
 class DBGObj : public GameObject // Dynamic background object
 {
 private:
+	bool m_isDrawn;
 	Animation m_animation;
 	float m_t;
 	int m_activeCurve, m_nrOfCurves;
@@ -19,6 +20,7 @@ private:
 	float m_speed;
 	float m_driftFactor;
 	XMVECTOR m_prevPos;
+	int m_lightIndex;
 
 	void calcCurveLength(int nrOfsegments);
 	XMVECTOR getCoord(int curveIndex, float t);
@@ -29,5 +31,8 @@ public:
 
 	void animate(float dt);
 	void bezier3(float dt);
+
+	void setDrawn(bool isDrawn);
+	bool isDrawn();
 };
 

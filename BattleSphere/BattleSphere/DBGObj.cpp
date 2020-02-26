@@ -40,6 +40,7 @@ XMVECTOR DBGObj::getCoord(int curveIndex, float t)
 DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 	: GameObject()
 {
+	m_isDrawn = false;
 	m_t = 0.0f;
 	m_speed = speed;
 	if (tokyoDriver)
@@ -85,6 +86,8 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 
 	m_curveLenght.resize(m_nrOfCurves);
 	calcCurveLength(10);
+	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 20.0f, 0.0f, 0.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
+
 }
 
 DBGObj::~DBGObj()
@@ -140,4 +143,18 @@ void DBGObj::bezier3(float dt)
 	setRotation(1.0f, 0.0f, 0.0f, (acos(XMVector3Dot(translation, XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) - 90.0f);
 	// rotation in x (around y)
 	rotate(0.0f, 1.0f, 0.0f, -(acos(XMVector3Dot(translation, XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) * m_driftFactor);
+
+	translation = XMVector3Normalize(translation);
+	Lights::getInstance()->setPosition(m_lightIndex, x + translation.m128_f32[0] * 5.0f, y + translation.m128_f32[1] * 5.0f + 2.0f, z + translation.m128_f32[2] * 5.0f);
+	Lights::getInstance()->setDirection(m_lightIndex, translation.m128_f32[0], translation.m128_f32[1] -0.5f, translation.m128_f32[2]);
+}
+
+void DBGObj::setDrawn(bool isDrawn)
+{
+	m_isDrawn = isDrawn;
+}
+
+bool DBGObj::isDrawn()
+{
+	return m_isDrawn;
 }

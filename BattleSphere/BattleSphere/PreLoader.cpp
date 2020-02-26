@@ -116,6 +116,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 
@@ -123,7 +124,6 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_scene, "Background\\Ground");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
-	loadFromFile(objectType::e_scene, "OnMap\\HeadLights");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
 	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
 }

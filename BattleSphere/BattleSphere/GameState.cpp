@@ -315,7 +315,7 @@ GameState::GameState()
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addSpotLight(133.0f, 38.0f, -29.0f, 150.0f, -1.0f, -0.8f, -0.5f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f);
+	index = m_lights->addSpotLight(133.0f, 38.0f, -29.0f, 150.0f, -1.0f, -0.8f, -0.5f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
 	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
 	m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
@@ -324,16 +324,20 @@ GameState::GameState()
 	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
+	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
+	m_lights->addAreaLight(46.0f, 4.0f, -6.5f, 12.0f, 0.0f, 1.0f, 0.35f, 15.0f); // Gas station cyan
+	m_lights->addAreaLight(53.0f, 11.8f, 10.0f, 20.0f, 0.8f, 0.8f, 0.8f, 15.0f); // Gas station white
+	index = m_lights->addSpotLight(47.5f, 14.7f, -0.34f, 20.0f, -0.0f, -0.9f, -0.3f, 0.8f, 0.8f, 0.8f, 30.0f, 5.0f); // Gas station spotlight
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
-
 
 	// Initialize resource spawning lists
 	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
 	loadLists();
 	startSpawn();
-
+	
 	// Dynamic background object
-	m_dBGObjs.push_back(new DBGObj(Animation::e_Freeway, false, 60.0f));
+	m_dboHandler = new DBOHandler();
 }
 
 GameState::~GameState()
@@ -349,8 +353,7 @@ GameState::~GameState()
 	}
 
 	//Dynamic background objects
-	for (int i = 0; i < m_dBGObjs.size(); i++)
-		delete m_dBGObjs[i];
+	delete m_dboHandler;
 }
 
 void GameState::regularSpawn(float dT)
@@ -517,8 +520,7 @@ bool GameState::update(Game* game, float dt)
 	}
 
 	//Dynamic background objects
-	for (int i = 0; i < m_dBGObjs.size(); i++)
-		m_dBGObjs[i]->animate(dt);
+	m_dboHandler->update(dt);
 
 	return 0;
 }
@@ -573,7 +575,7 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 
 	// Tokyo drift
-	for (int i = 0; i < m_dBGObjs.size(); i++)
-		game->getPreLoader()->draw(objectType::e_extra, m_dBGObjs[i]->getData());
-
+	for (int i = 0; i < m_dboHandler->getDBONr(); i++)
+		game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+	
 }
