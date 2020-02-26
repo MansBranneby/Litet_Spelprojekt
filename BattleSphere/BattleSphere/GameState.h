@@ -3,6 +3,7 @@
 #include "Transparency.h"
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
+#include "SpawnDrone.h"
 
 class GameState : public State 
 {
@@ -15,38 +16,9 @@ private:
 	Lights* m_lights;
 	Transparency m_transparency;
 
-	// Resource spawning lists
-	std::vector<XMFLOAT2> m_spawns;
-	std::vector<bool> m_freeSpawns;
-	void loadLists();
-
 	// Spawning
-
-	int m_normalSpawnAmount;
-	int m_specialSpawnAmount;
-	void startSpawn();
-	int getSpawnIndex();
-	int getSpecialSpawnIndex();
+	SpawnDrone* m_spawnDrone;
 	void spawnNodes();
-
-	// Drone resource spawning
-	int m_droneLightIndex;
-	int m_spawnDroneState;
-	int m_heldResourceIndex;
-	XMVECTOR m_transportDestination;
-	XMVECTOR m_transportDirection;
-	XMVECTOR m_travelTarget;
-	XMVECTOR m_travelDirection;
-	float m_collectedTime;
-	bool m_spawnDroneTravelling;
-	bool m_spawnDroneRotating;
-	GameObject m_spawnDroneBody;
-	GameObject m_spawnDronePropeller[4];
-	void setTravelTarget(XMVECTOR target);
-	void setRotationTarget(XMVECTOR target);
-	bool travelAndCheck(float dT, bool fastTravel);
-	bool assignMission();
-	void updateSpawnDrone(float dT);
 
 	// Dynamic camera
 	XMVECTOR m_camStartPos;
@@ -62,8 +34,6 @@ private:
 public:
 	GameState();
 	virtual ~GameState();
-
-	
 
 	void pause();
 	void resume();

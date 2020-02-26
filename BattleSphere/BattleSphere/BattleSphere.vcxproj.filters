@@ -156,6 +156,9 @@
     <ClCompile Include="CollisionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SpawnDrone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -278,9 +281,6 @@
     <ClInclude Include="BackfaceCuller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="QuadtreeNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -303,6 +303,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI_Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnDrone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -354,6 +357,9 @@
     <FxCompile Include="VertexShaderMenu.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
