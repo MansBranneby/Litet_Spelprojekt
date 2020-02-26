@@ -230,3 +230,21 @@ CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR b
 
 	return collisioninfo;
 }
+
+bool testLineLine(XMVECTOR startL1, XMVECTOR endL1, XMVECTOR startL2, XMVECTOR endL2)
+{
+	XMVECTOR l1Dir = endL1 - startL1;
+	XMVECTOR l2Dir = endL2 - startL2; 
+	float someDot = XMVectorGetX(l1Dir) * XMVectorGetY(l2Dir) - XMVectorGetY(l1Dir) * XMVectorGetX(l2Dir);
+	if (someDot == 0)
+		return false;
+	XMVECTOR startDiff = startL2 - startL1;
+	float t = (XMVectorGetX(startDiff) * XMVectorGetY(l2Dir) - XMVectorGetY(startDiff) * XMVectorGetX(l2Dir)) / someDot;
+	if (t < 0 || t > 1)
+		return false;
+	t = (XMVectorGetX(startDiff) * XMVectorGetY(l1Dir) - XMVectorGetY(startDiff) * XMVectorGetX(l1Dir)) / someDot;
+	if (t < 0 || t > 1)
+		return false;
+	return true;
+	
+}

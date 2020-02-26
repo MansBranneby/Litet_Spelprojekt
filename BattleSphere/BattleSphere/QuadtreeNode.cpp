@@ -189,3 +189,52 @@ CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume, DirectX::
 
 	return collisionInfo;
 }
+
+bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
+{
+
+	XMFLOAT2 point[4];
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, m_boundingData.pos - m_boundingData.halfWD.x * m_boundingData.xAxis + m_boundingData.halfWD.y * m_boundingData.zAxis);//Top Left;
+	point[0].x = pos.x;
+	point[0].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos + m_boundingData.halfWD.x * m_boundingData.xAxis + m_boundingData.halfWD.y * m_boundingData.zAxis);//Top Right;
+	point[1].x = pos.x;
+	point[1].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos - m_boundingData.halfWD.x * m_boundingData.xAxis - m_boundingData.halfWD.y * m_boundingData.zAxis);//Bottom Left;
+	point[2].x = pos.x;
+	point[2].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos + m_boundingData.halfWD.x * m_boundingData.xAxis - m_boundingData.halfWD.y * m_boundingData.zAxis);//Bottom Right;
+	point[3].x = pos.x;
+	point[3].y = pos.z;
+	bool collision = false;
+	if (start.x > end.x) // Check right line
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[1]), XMLoadFloat2(&point[3]));
+	if (!collision && start.x < end.x)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[0]), XMLoadFloat2(&point[2]));
+	if (!collision && start.y > end.y)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[0]), XMLoadFloat2(&point[1]));
+	if (!collision && start.y < end.y)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[2]), XMLoadFloat2(&point[3]));
+
+	
+	if (collision)
+	{
+		collision = false;
+		if (m_children.size() == 0)
+		{
+			//Epic triangle collision detection :OO
+			//collision
+		}
+		else
+		{
+			for (int i = 0; i < m_children.size(); i++)
+			{
+				collision = m_children[i]->testCollision(start, end);
+				if (collision)
+					return true;
+			}
+		}
+	}
+	return false;
+}
