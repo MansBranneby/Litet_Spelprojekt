@@ -86,7 +86,10 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 
 	m_curveLenght.resize(m_nrOfCurves);
 	calcCurveLength(10);
-	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 20.0f, 0.0f, 0.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
+	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
+	//m_lightIndex = Lights::getInstance()->addSpotLight(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 45.0f, 0.0f);
+	//m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
+	//m_lightIndex = Lights::getInstance()->addDirectionalLight(0, -1, 0, 1, 1, 1, 1);
 
 }
 
