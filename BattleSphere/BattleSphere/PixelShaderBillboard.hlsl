@@ -197,30 +197,19 @@ case 3:
 	}
 
 	// Sample texture with UV coordinates that have been incremented with velocityUV coordinates to translate the texture
+	float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
 	if (billboardType == 1.0f)
 	{
-		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-
-		if (Ke.x > 0.0f || Ke.y > 0.0f || Ke.y > 0.0f)
+		//modelTexture *= blinkValue;
+		//fragmentCol *= blinkValue;
+		float low = 0.0f;
+		float high = 80.0f;
+		if (input.posWC.y > low&& input.posWC.y < high)
 		{
-			//modelTexture *= blinkValue;
-			//fragmentCol *= blinkValue;
+			float3(0.0f, 0.3f, 0.4f); // lightblue
+			fragmentCol = lerp(float3(0.0f, 0.3f, 0.4f), float3(1.0f, 0.01f, 0.6f), -(low + (blinkValue * 80.0f) - input.posWC.y) / high);
 		}
-
-		if (input.posWC.y > 20.0f && input.posWC.y < 80.0f)
-			fragmentCol = lerp(fragmentCol, float3(0.0f, 0.0f, 1.0f), (80.0f - input.posWC.y) / 60.0f);
-
-		/*if (input.posWC.y > 45.0f && input.posWC.y < 55.0f)
-			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), (55.0f - input.posWC.y)/20);
-		else if (input.posWC.y > 35.0f && input.posWC.y < 45.0f)
-			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), -(33.0f - input.posWC.y) / 20);*/
-
-
-
-		return float4(modelTexture + fragmentCol, KeIn.w);
 	}
 
-
-
-	return float4(fragmentCol , KeIn.w);
+	return float4(modelTexture + fragmentCol , KeIn.w);
 };

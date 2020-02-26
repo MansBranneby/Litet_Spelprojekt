@@ -761,6 +761,8 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 		//// Diffuse texture
 		std::getline(in, line);
+		if (!line.empty() && *line.rbegin() == '\r') 
+			line.erase(line.length() - 1, 1);
 		inputStream.str(line);
 		tempSRV = createTexture(inputStream.str()); // Create texture
 		inputStream.clear();
