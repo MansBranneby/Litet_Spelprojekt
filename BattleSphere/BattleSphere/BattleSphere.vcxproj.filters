@@ -19,9 +19,6 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{7c1a79ee-d042-4446-a02f-bb37ce12e6c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Files\Particles">
-      <UniqueIdentifier>{4f91b86f-217a-4b22-a951-89f6a4420dcc}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Renderer.cpp">
@@ -160,9 +157,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpawnDrone.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Particles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -314,9 +308,6 @@
     <ClInclude Include="SpawnDrone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Particles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -369,21 +360,6 @@
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
-    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
-    <FxCompile Include="ComputeShaderParticles.hlsl">
-      <Filter>Shader Files\Particles</Filter>
-    </FxCompile>
-    <FxCompile Include="VertexShaderParticles.hlsl">
-      <Filter>Shader Files\Particles</Filter>
-    </FxCompile>
-    <FxCompile Include="GeometryShaderParticles.hlsl">
-      <Filter>Shader Files\Particles</Filter>
-    </FxCompile>
-    <FxCompile Include="PixelShaderParticles.hlsl">
-      <Filter>Shader Files\Particles</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
