@@ -86,7 +86,7 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 
 	m_curveLenght.resize(m_nrOfCurves);
 	calcCurveLength(10);
-	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
+	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 20.0f, 0.0f, 1.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
 	//m_lightIndex = Lights::getInstance()->addSpotLight(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 45.0f, 0.0f);
 	//m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
 	//m_lightIndex = Lights::getInstance()->addDirectionalLight(0, -1, 0, 1, 1, 1, 1);
@@ -97,20 +97,23 @@ DBGObj::~DBGObj()
 {
 }
 
-void DBGObj::animate(float dt)
+bool DBGObj::animate(float dt)
 {
+	bool hideCar = false;
 	switch (m_animation)
 	{
 	case 0:
-		bezier3(dt);
+		hideCar = bezier3(dt);
 		break;
 	default:
 		break;
 	}
+	return hideCar;
 }
 
-void DBGObj::bezier3(float dt)
+bool DBGObj::bezier3(float dt)
 {
+	bool hideCar = false;
 	m_prevPos = getPosition(); // Previous position for rotation calculation
 	if (m_t == 0.0f)
 	{
@@ -118,12 +121,17 @@ void DBGObj::bezier3(float dt)
 	}
 
 	m_t += dt * m_speed / m_curveLenght[m_activeCurve];
-	if (m_t > 1.0f) // Start on new curve or restart animation
+	if (m_t >= 1.0f) // Start on new curve or restart animation
 	{
 		if (m_nrOfCurves - 1 > m_activeCurve)
 			m_activeCurve++;
 		else
+		{
 			m_activeCurve = 0;
+			hideCar = true;
+			m_t = 0.0f;
+			return hideCar;
+		}
 		m_t = 0.0f;
 	}
 	float mt = (1 - m_t);
@@ -150,6 +158,8 @@ void DBGObj::bezier3(float dt)
 	translation = XMVector3Normalize(translation);
 	Lights::getInstance()->setPosition(m_lightIndex, x + translation.m128_f32[0] * 5.0f, y + translation.m128_f32[1] * 5.0f + 2.0f, z + translation.m128_f32[2] * 5.0f);
 	Lights::getInstance()->setDirection(m_lightIndex, translation.m128_f32[0], translation.m128_f32[1] -0.5f, translation.m128_f32[2]);
+
+	return hideCar;
 }
 
 void DBGObj::setDrawn(bool isDrawn)

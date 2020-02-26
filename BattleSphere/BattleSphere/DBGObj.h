@@ -29,8 +29,8 @@ public:
 	DBGObj(Animation animation, bool tokyoDirver = false, float speed = 0.0f);
 	~DBGObj();
 
-	void animate(float dt);
-	void bezier3(float dt);
+	bool animate(float dt);
+	bool bezier3(float dt);
 
 	void setDrawn(bool isDrawn);
 	bool isDrawn();

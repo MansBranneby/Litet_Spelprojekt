@@ -10,6 +10,7 @@ private:
 	std::vector<DBGObj*> m_cars1;
 	float m_bigTimer;
 	float m_lastSpawn;
+	int m_drawnCars;
 public:
 	DBOHandler();
 	~DBOHandler();

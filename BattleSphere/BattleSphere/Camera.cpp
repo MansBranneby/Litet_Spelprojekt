@@ -193,7 +193,7 @@ void Camera::updateBuffers()
 	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferVP->getConstantBuffer(), 0);
 
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferPosition->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &m_position, sizeof(XMMATRIX));
+	memcpy(mappedMemory.pData, &m_position, sizeof(XMVECTOR));
 	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferPosition->getConstantBuffer(), 0);
 }
 
