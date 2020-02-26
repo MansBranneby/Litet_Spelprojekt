@@ -203,12 +203,12 @@ case 3:
 
 		if (Ke.x > 0.0f || Ke.y > 0.0f || Ke.y > 0.0f)
 		{
-			modelTexture *= blinkValue;
-			fragmentCol *= blinkValue;
+			//modelTexture *= blinkValue;
+			//fragmentCol *= blinkValue;
 		}
 
-		if (input.posWC.y > 20.0f && input.posWC.y < 55.0f)
-			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), -(20.0f - input.posWC.y) / 35.0f);
+		if (input.posWC.y > 20.0f && input.posWC.y < 80.0f)
+			fragmentCol = lerp(fragmentCol, float3(0.0f, 0.0f, 1.0f), (80.0f - input.posWC.y) / 60.0f);
 
 		/*if (input.posWC.y > 45.0f && input.posWC.y < 55.0f)
 			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), (55.0f - input.posWC.y)/20);
