@@ -367,7 +367,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 			if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_LEFT))
 			{
-				Graph::getInstance()->calculateShortestPath(m_robots[i]->getPosition(), 3);
+				Graph::getInstance()->calculateShortestPath(i, m_robots[i]->getPosition(), 3);
 			}
 
 			// COLLISION PLAYER VS STATIC OBJECTS

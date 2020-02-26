@@ -6,8 +6,9 @@
 #include "VertexShader.h"
 #include "QuadtreeNode.h"
 
-#define POINT_DISTANCE 9
+#define POINT_DISTANCE 1
 #define PULSE_SPEED 90
+#define MAX_USER 4
 
 struct graphNode
 {
@@ -23,31 +24,30 @@ private:
 	static Graph* m_instance;
 
 	std::vector<graphNode> m_nodes;
-	std::vector<XMVECTOR> m_path;
+	std::vector<XMVECTOR> m_path[MAX_USER];
+	XMVECTOR m_pulsePos[MAX_USER];
+	float m_pulseLength[MAX_USER];
+	bool m_active[MAX_USER];
 	VertexShader m_vs;
 	GeometryShader m_gs;
 	PixelShader m_ps;
 	ConstantBuffer* m_pulseCBuffer;
 	ID3D11Buffer* m_vsBuffer = nullptr;
-	XMVECTOR m_pulsePos;
-	float m_pulseLength;
-	bool m_active;
 	QuadtreeNode* m_quadtree;
 
-	//Remove
-	int index;
+	
 
-	std::vector<XMVECTOR> pointFiller(std::vector<XMVECTOR> path);
+	std::vector<XMVECTOR> pointFiller(int index, std::vector<XMVECTOR> path);
 public:
 	Graph();
 	
 	static Graph* getInstance();
-	void updatePulse(float dt);
+	void updatePulse(int index, float dt);
 	void createVertexBuffer();
-	bool getActive();
+	bool getActive(int index);
 	void setQuadtree(QuadtreeNode* qtn);
-	std::vector<XMVECTOR> calculateShortestPath(XMVECTOR startPos, int goal);
-	void draw();
+	std::vector<XMVECTOR> calculateShortestPath(int index, XMVECTOR startPos, int goal);
+	void draw(int index);
 
 	void release();
 };

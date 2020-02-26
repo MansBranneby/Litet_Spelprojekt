@@ -2,13 +2,13 @@
 
 Graph* Graph::m_instance = nullptr;
 
-std::vector<XMVECTOR> Graph::pointFiller(std::vector<XMVECTOR> path)
+std::vector<XMVECTOR> Graph::pointFiller(int index, std::vector<XMVECTOR> path)
 {
 	std::vector<XMVECTOR> points;
 	float rest = 0;
-	for (int i = 0; i < path.size() - 1; i++)
+	for (int i = 0; i < path.size(); i++)
 	{
-		float length = XMVectorGetX(XMVector3Length(path[i] - path[i + (int)1]));
+		/*float length = XMVectorGetX(XMVector3Length(path[i] - path[i + (int)1]));
 		float currDist = POINT_DISTANCE - rest;
 		rest = std::fmodf(length - currDist, POINT_DISTANCE);
 		//int nrOfPoints = floorf(length / POINT_DISTANCE);
@@ -19,17 +19,13 @@ std::vector<XMVECTOR> Graph::pointFiller(std::vector<XMVECTOR> path)
 				currDist / length
 			));
 			currDist += POINT_DISTANCE;
-		}
+		}*/
+		path[i].m128_f32[1] = 1.2f + 0.05f * index;
+		points.push_back(path[i]);
+		
 	}
-	m_path = points;
+	m_path[index] = points;
 
-	if (m_path.size() > 0)
-	{
-		D3D11_MAPPED_SUBRESOURCE mappedMemory;
-		DX::getInstance()->getDeviceContext()->Map(m_vsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &m_path[0], sizeof(XMVECTOR) * m_path.size());
-		DX::getInstance()->getDeviceContext()->Unmap(m_vsBuffer, 0);
-	}
 
 
 	return points;
@@ -41,7 +37,7 @@ void Graph::createVertexBuffer()
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	bufferDesc.ByteWidth = sizeof(XMVECTOR) * 200;
+	bufferDesc.ByteWidth = sizeof(XMVECTOR) * 25;
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	/*D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = &m_path[0];*/
@@ -52,9 +48,9 @@ void Graph::createVertexBuffer()
 		MessageBox(NULL, L"Path VB", L"Error", MB_OK | MB_ICONERROR);
 }
 
-bool Graph::getActive()
+bool Graph::getActive(int index)
 {
-	return m_active;
+	return m_active[index];
 }
 
 void Graph::setQuadtree(QuadtreeNode* qtn)
@@ -167,15 +163,18 @@ Graph::Graph()
 			));
 		}
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		m_path[i].push_back(XMVectorSet(0, 0, 0, 0));
+		m_active[i] = false;
+		m_pulseLength[i] = 0.0f;
 
-	m_path.push_back(XMVectorSet(0, 0, 0, 0));
-	m_active = false;
-	m_pulseLength = 0.0f;
+	}
+	m_pulseCBuffer = new ConstantBuffer(&m_pulsePos[0], sizeof(XMVECTOR));
 
 	m_vs = VertexShader(L"VertexShaderPath.hlsl", 2);
 	m_gs = GeometryShader(L"GeometryShaderPath.hlsl");
 	m_ps = PixelShader(L"PixelShaderPath.hlsl");
-	m_pulseCBuffer = new ConstantBuffer(&m_pulsePos, sizeof(XMVECTOR));
 }
 
 Graph* Graph::getInstance()
@@ -188,17 +187,17 @@ Graph* Graph::getInstance()
 	return m_instance;
 }
 
-void Graph::updatePulse(float dt)
+void Graph::updatePulse(int index, float dt)
 {
 	bool newPulse = true;
-	m_pulseLength += PULSE_SPEED * dt;
-	float distance = m_pulseLength;
-	for (int i = m_path.size() - 2; i >= 0; i--)
+	m_pulseLength[index] += PULSE_SPEED * dt;
+	float distance = m_pulseLength[index];
+	for (int i = m_path[index].size() - 2; i >= 0; i--)
 	{
-		float length = XMVectorGetX(XMVector3Length(m_path[i] - m_path[i + (int)1]));
+		float length = XMVectorGetX(XMVector3Length(m_path[index][i] - m_path[index][i + (int)1]));
 		if (distance < length)
 		{
-			m_pulsePos = XMVectorLerp(m_path[i + 1], m_path[i], distance / length);
+			m_pulsePos[index] = XMVectorLerp(m_path[index][i + 1], m_path[index][i], distance / length);
 			newPulse = false;
 			break;
 		}
@@ -207,22 +206,19 @@ void Graph::updatePulse(float dt)
 	}
 	if (newPulse)
 	{
-		m_pulseLength = 0;
-		m_active = false;
+		m_pulseLength[index] = 0;
+		m_active[index] = false;
 		//calculateShortestPath(XMVectorSet(120, 0, 0, 0), 0);
 	}
-	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	DX::getInstance()->getDeviceContext()->Map(*m_pulseCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &m_pulsePos, sizeof(XMVECTOR));
-	DX::getInstance()->getDeviceContext()->Unmap(*m_pulseCBuffer->getConstantBuffer(), 0);
+	
 	//		Lights::getInstance()->setPosition(index, m_pulsePos.m128_f32[0], 5, m_pulsePos.m128_f32[2]);
 }
 
-std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
+std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos, int goal)
 {
-	if (!m_active)
+	if (!m_active[index])
 	{
-		m_active = true;
+		m_active[index] = true;
 		struct node
 		{
 			int index;
@@ -257,7 +253,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
 		}
 		if (startNode == -1)
 		{
-			m_active = false;
+			m_active[index] = false;
 			return std::vector<XMVECTOR>();
 		}
 		
@@ -304,7 +300,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
 					}
 				}
 				path.push_back(startPos);
-				return pointFiller(path);
+				return pointFiller(index, path);
 			}
 
 
@@ -347,22 +343,39 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
 	return std::vector<XMVECTOR>();
 }
 
-void Graph::draw()
+void Graph::draw(int index)
 {
-	DX::getInstance()->getDeviceContext()->VSSetShader(&m_vs.getVertexShader(), nullptr, 0);
-	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-	DX::getInstance()->getDeviceContext()->GSSetShader(&m_gs.getGeometryShader(), nullptr, 0);
-	DX::getInstance()->getDeviceContext()->PSSetShader(&m_ps.getPixelShader(), nullptr, 0);
-	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_pulseCBuffer->getConstantBuffer());
-	UINT32 vertexSize = sizeof(XMVECTOR);
-	UINT32 offset = 0;
+	if (m_active[index])
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedMemory;
+		if (m_path[index].size() > 0)
+		{
+			DX::getInstance()->getDeviceContext()->Map(m_vsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+			memcpy(mappedMemory.pData, &m_path[index][0], sizeof(XMVECTOR) * m_path[index].size());
+			DX::getInstance()->getDeviceContext()->Unmap(m_vsBuffer, 0);
 
-	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vsBuffer, &vertexSize, &offset);
-	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	DX::getInstance()->getDeviceContext()->IASetInputLayout(&m_vs.getvertexLayout());
-	DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSDisabled(), 1);
-	DX::getInstance()->getDeviceContext()->Draw(m_path.size(), 0);
+
+		}
+		DX::getInstance()->getDeviceContext()->Map(*m_pulseCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &m_pulsePos[index], sizeof(XMVECTOR));
+		DX::getInstance()->getDeviceContext()->Unmap(*m_pulseCBuffer->getConstantBuffer(), 0);
+
+		DX::getInstance()->getDeviceContext()->VSSetShader(&m_vs.getVertexShader(), nullptr, 0);
+		DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+		DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+		DX::getInstance()->getDeviceContext()->GSSetShader(&m_gs.getGeometryShader(), nullptr, 0);
+		DX::getInstance()->getDeviceContext()->PSSetShader(&m_ps.getPixelShader(), nullptr, 0);
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_pulseCBuffer->getConstantBuffer());
+		UINT32 vertexSize = sizeof(XMVECTOR);
+		UINT32 offset = 0;
+
+		DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vsBuffer, &vertexSize, &offset);
+		DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		DX::getInstance()->getDeviceContext()->IASetInputLayout(&m_vs.getvertexLayout());
+		DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSDisabled(), 1);
+		DX::getInstance()->getDeviceContext()->Draw(m_path[index].size(), 0);
+	}
+	
 
 }
 

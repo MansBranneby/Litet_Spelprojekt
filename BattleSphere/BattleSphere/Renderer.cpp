@@ -174,9 +174,9 @@ void createRenderResources()
 	g_menu = new Menu();
 
 	g_shadowMapping = new ShadowMapping();
-	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
+	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
-											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
+		(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 
 	g_gameState = new GameState();
 	g_mainMenuState = new MainMenuState();
@@ -210,7 +210,7 @@ void downsample()
 
 	ID3D11ShaderResourceView* nullSRV = { nullptr };
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullSRV);
-	
+
 }
 
 void shadowRender()
@@ -257,7 +257,7 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
 	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 	g_bloom->setShaderResource(renderPass::e_final);
-	
+
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
 
 	ID3D11ShaderResourceView* nullRTV = { NULL };
@@ -290,7 +290,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		
+
 		g_Clock = new Clock();
 		g_Game = new Game();
 		g_Game->pushState(g_gameState);
@@ -334,9 +334,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);
 				}
-				
+
 				//// SET PIPELINE ////
-				float clearColour[] = { 0, 0, 0, 0  };
+				float clearColour[] = { 0, 0, 0, 0 };
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
@@ -353,7 +353,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					//g_lightCulling.updateSubresource();
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
-					
+
 					//DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
@@ -414,16 +414,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
-					
+
 					g_Game->draw(renderPass::e_opaque);
 
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 					g_Game->draw(renderPass::e_transparent);
-					//Graph::getInstance()->calculateShortestPath(XMVectorSet(0, 0, 0, 0), 0);
-					if (Graph::getInstance()->getActive())
+
+					for (int i = 0; i < XUSER_MAX_COUNT; i++)
 					{
-						Graph::getInstance()->updatePulse(g_Clock->getDeltaTime());
-						Graph::getInstance()->draw();
+						if (Graph::getInstance()->getActive(i))
+						{
+							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());
+							Graph::getInstance()->draw(i);
+						}
 					}
 
 					downsample();
