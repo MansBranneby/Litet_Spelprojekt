@@ -9,7 +9,6 @@ struct PS_IN
 	float2 tex : TEXCOORDS;
 	float3 nor : NORMAL;
 };
-
 struct Light {
 	int Enabled;
 	int Type;
@@ -38,9 +37,16 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 	matrix lightVP;
 };
 
-cbuffer PS_ROBOT_DATA : register (b4) 
+cbuffer PS_ROBOT_DATA : register (b4)
 {
 	float4 playerPosition[4];
+};
+
+cbuffer PS_CONSTANT_BUFFER : register (b5)
+{
+	float4 velocityUV;
+	float blinkValue;
+	float billboardType;
 };
 
 float DoAttenuation(Light light, float d)
@@ -60,6 +66,7 @@ Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
+Texture2D txModel : register(t4); // Model texture
 
 float4 PS_main(PS_IN input) : SV_Target
 {
@@ -72,36 +79,36 @@ float4 PS_main(PS_IN input) : SV_Target
 	float4 PosRelLight = mul(lightVP, float4(input.posWC.xyz, 1.0f));
 
 	PosRelLight.xy /= PosRelLight.w;
-	
+
 	float2 shadowMapTex = float2(0.5f * PosRelLight.x + 0.5f, -0.5f * PosRelLight.y + 0.5f);
 	float depth = PosRelLight.z / PosRelLight.w;
 
-	float ep = 0.0005f;	
+	float ep = 0.0005f;
 	float dx = 1.0f / 1920;
 	float dy = 1.0f / 1080;
 
 	float sum = 0;
 	float x, y;
 	for (y = -1.0; y <= 1.0; y += 0.5)
-		for (x = -1.0; x <= 1.0; x += 0.5) 
-			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
+		for (x = -1.0; x <= 1.0; x += 0.5)
+			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx * x, dy * y)).r + ep < depth) ? 0.0f : 1.0f;
 	float shadowCoeff = sum / 25.0;
-	
+
 	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
-	
+
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
 	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
 	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
-	
+
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
 	fragmentCol = Ia * Kd; // * Ia
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
-	
+
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
 		float3 LKs = Ks;
@@ -110,44 +117,44 @@ float4 PS_main(PS_IN input) : SV_Target
 		float d = pow(length(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC), 1); // Attenuation (decay of light, increase the power to to increase effect)
 		float3 L = float3(0, 0, 0);
 		float3 R = float3(0, 0, 0);
-		
+
 		float4 lightCol = float4(0, 0, 0, 0);
 		switch (light.Type)
 		{
 		case 0:
-					//Point light
-			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
-			break;
-		case 1:
-			//Directional light
+			//Point light
+	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+	lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
+	break;
+case 1:
+	//Directional light
 
-			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
-			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
-			break;
-		case 2:
-			//return float4(1, 1, 1, 1);
-			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			float attenuation = DoAttenuation(light, d);
-			float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
-			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
-			
-			break;
-		case 3:
-			//Area light
-			
-			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
-		
-			LKs = float3(0, 0, 0);
-			
-			break;
-		}
-		
+	L = normalize(-Lights[LightIndex[i]].Direction.xyz);
+	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+	lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
+	break;
+case 2:
+	//return float4(1, 1, 1, 1);
+	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+	float attenuation = DoAttenuation(light, d);
+	float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
+	lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
+
+	break;
+case 3:
+	//Area light
+
+	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+	lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
+
+	LKs = float3(0, 0, 0);
+
+	break;
+}
+
 		// Illumination models //
 		switch (KaIn.w)
 		{
@@ -188,6 +195,32 @@ float4 PS_main(PS_IN input) : SV_Target
 		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > 0.2f)
 			return float4(fragmentCol, 0.3f);
 	}
+
+	// Sample texture with UV coordinates that have been incremented with velocityUV coordinates to translate the texture
+	if (billboardType == 1.0f)
+	{
+		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+
+		if (Ke.x > 0.0f || Ke.y > 0.0f || Ke.y > 0.0f)
+		{
+			modelTexture *= blinkValue;
+			fragmentCol *= blinkValue;
+		}
+
+		if (input.posWC.y > 20.0f && input.posWC.y < 55.0f)
+			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), -(20.0f - input.posWC.y) / 35.0f);
+
+		/*if (input.posWC.y > 45.0f && input.posWC.y < 55.0f)
+			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), (55.0f - input.posWC.y)/20);
+		else if (input.posWC.y > 35.0f && input.posWC.y < 45.0f)
+			fragmentCol = lerp(fragmentCol, float3(1.0f, 1.0f, 1.0f), -(33.0f - input.posWC.y) / 20);*/
+
+
+
+		return float4(modelTexture + fragmentCol, KeIn.w);
+	}
+
+
 
 	return float4(fragmentCol , KeIn.w);
 };

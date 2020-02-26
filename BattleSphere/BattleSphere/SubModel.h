@@ -32,7 +32,7 @@ public:
 	SubModel();
 	~SubModel();
 
-	void setTextureAnimationInfo(TextureAnimationData textureAnimationData);
+	void updateTextureAnimationCB(TextureAnimationData textureAnimationData);
 	void setMaterialInfo(material mat);
 	void updateMaterialInfo(material mat);
 	void setFaces(int* indexBuffer, int nrOfIndices);

@@ -13,7 +13,7 @@ private:
 	Robot** m_robots;
 	std::vector<Resource*> m_resources;
 	std::vector<Node*> m_nodes;
-	std::vector<Billboard*> m_billboards;
+	std::vector<Billboard> m_billboards;
 	Lights* m_lights;
 	Transparency m_transparency;
 
@@ -48,12 +48,13 @@ private:
 	bool travelAndCheck(float dT, bool fastTravel);
 	bool assignMission();
 	void updateSpawnDrone(float dT);
+	void updateBillboards(float dt);
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 
-	// Initializing billboards
-	void initBillboards();
+	// create billboards
+	void createBillboards();
 
 public:
 	GameState();

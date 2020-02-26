@@ -78,6 +78,7 @@ enum class ObjectType
 
 enum class renderPass
 {
+	e_billboard,
 	e_scene,
 	e_downSample,
 	e_final,
@@ -128,9 +129,13 @@ struct objectData
 	material material;
 };
 
+// Data used to animate texture
 struct TextureAnimationData
 {
-	XMVECTOR velocityUV;
+	XMVECTOR velocityUV{0.0f, 0.0f, 0.0f};
+	float blinkValue = 0.0f;
+	float type = 0.0f;
+	float padding[2];
 };
 
 // Game update return data

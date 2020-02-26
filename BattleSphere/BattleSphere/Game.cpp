@@ -77,13 +77,6 @@ Game::Game()
 	}
 	//updatePlayerStatus();
 
-	//m_preLoader.cull(objectType::e_scene);
-	// TODO: this ruins collision tests because we don't recalculate bounding volume data
-	//objectData sceneData;
-	//sceneData.pos = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
-	//sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	//sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
-	//m_preLoader.setStaticData(objectType::e_scene, sceneData);
 	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{100.0f, 100.0f}, &m_preLoader, 2, 0);
 }
 
@@ -97,8 +90,6 @@ bool Game::update(float dt)
 	}
 	return returnValue;
 }
-
-
 
 void Game::draw(renderPass pass)
 {

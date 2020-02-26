@@ -51,6 +51,7 @@ PixelShader gPS;
 VertexShader g_vertexShaderFinalRender;
 PixelShader g_pixelShaderFinalRender;
 PixelShader g_pixelShaderDownsample;
+PixelShader g_pixelShaderBillboard;
 
 Clock* g_Clock;
 Game* g_Game;
@@ -136,6 +137,7 @@ void createFullscreenQuad()
 	g_vertexShaderFinalRender = VertexShader(L"VertexShaderFinalRender.hlsl");
 	g_pixelShaderFinalRender = PixelShader(L"PixelShaderFinalRender.hlsl");
 	g_pixelShaderDownsample = PixelShader(L"PixelShaderDownSample.hlsl");
+	g_pixelShaderBillboard = PixelShader(L"PixelShaderBillboard.hlsl");
 }
 
 void setupTestTriangle()
@@ -236,6 +238,25 @@ void shadowRender()
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_shadowMapping->getVertexShader().getvertexLayout());
 
 	g_Game->draw();
+}
+
+void billboardRender()
+{
+	DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderBillboard.getPixelShader(), nullptr, 0);
+}
+
+void transparencyRender()
+{
+	DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 }
 
 void finalRender()
@@ -374,8 +395,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					ID3D11ShaderResourceView* shadowSRV = g_shadowMapping->getShaderResourceView();
 					DX::getInstance()->getDeviceContext()->PSSetShaderResources(3, 1, &shadowSRV);
 
-					ID3D11SamplerState* shadowSampler = g_shadowMapping->getSamplerState();
-					DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, &shadowSampler);
+					DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 
 					DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
 					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -409,9 +429,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
 					
+
 					g_Game->draw(renderPass::e_opaque);
 
-					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
+					billboardRender();
+					g_Game->draw(renderPass::e_billboard);
+
+					transparencyRender();
 					g_Game->draw(renderPass::e_transparent);
 					
 					
@@ -546,6 +570,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
 		g_pixelShaderDownsample.release();
+		g_pixelShaderBillboard.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
 

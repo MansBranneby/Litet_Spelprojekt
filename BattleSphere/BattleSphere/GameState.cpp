@@ -216,6 +216,13 @@ void GameState::updateSpawnDrone(float dT)
 	}
 }
 
+void GameState::updateBillboards(float dt)
+{
+	// Update billboards
+	for (int i = 0; i < m_billboards.size(); ++i)
+		m_billboards[i].moveUV(dt * 0.1f);
+}
+
 void GameState::handleMovement(Game* game, float dt, int id)
 {
 	// Save velocity for collision
@@ -403,10 +410,10 @@ void GameState::handleInputs(Game* game, float dt)
 	}
 }
 
-void GameState::initBillboards()
+void GameState::createBillboards()
 {
-	Billboard* billboard = new Billboard();
-	m_billboards.push_back(billboard);
+	m_billboards.push_back(Billboard({ -0.5f, 0.0f, 0.0f }, 2.0f, 1.0f));
+
 }
 
 GameState::GameState()
@@ -421,8 +428,9 @@ GameState::GameState()
 	// Spawn preset nodes
 	spawnNodes();
 
-	// Initialize billboards
-	initBillboards();
+	// Create billboards
+	// Billboards are used to animate buildings, eg. translating textures
+	createBillboards();
 
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
@@ -482,9 +490,6 @@ GameState::~GameState()
 	{
 		delete m_nodes[i];
 	}
-
-	for (int i = 0; i < m_billboards.size(); ++i)
-		delete m_billboards[i];
 }
 
 void GameState::setTravelTarget(XMVECTOR target)
@@ -602,7 +607,7 @@ bool GameState::assignMission()
 			// Only make resource special if there are available spots
 			for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
 			{
-				if (m_freeSpawns[(int)(m_normalSpawnAmount)+(int)i])
+				if (m_freeSpawns[(int)(m_normalSpawnAmount)+(int)(i)])
 					isSpecial = true;
 			}
 		}
@@ -666,6 +671,8 @@ bool GameState::update(Game* game, float dt)
 
 	// Update spawning drone
 	updateSpawnDrone(dt);
+	// Update billboards
+	updateBillboards(dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -749,9 +756,6 @@ bool GameState::update(Game* game, float dt)
 		m_nodes[i]->updateTime(dt);
 	}
 
-	// TODO GLENN
-	m_billboards[0]->setVelocityUV(m_billboards[0]->getVelocityUV() - XMVECTOR{ 1.0f, 0.0f, 0.0f } * dt * 0.2f);
-
 	return 0;
 }
 
@@ -760,7 +764,7 @@ void GameState::draw(Game* game, renderPass pass)
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 
-	if (pass != renderPass::e_transparent)
+	if (pass == renderPass::e_opaque)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -786,9 +790,8 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(ObjectType::e_resource, m_resources[i]->getData(), 0, 0);
 		}
 	}
-	if (pass != renderPass::e_opaque)
+	else if (pass == renderPass::e_transparent)
 	{
-		game->getPreLoader()->draw(ObjectType::e_billboard, m_billboards[0]->getTextureAnimationData(), 0);
 		game->getPreLoader()->draw(ObjectType::e_scene);
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDroneBody.getData(), 0);
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
@@ -800,4 +803,10 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
 		
 	}
+	else if (pass == renderPass::e_billboard)
+	{
+		for(int i = 0; i < m_billboards.size(); ++i)
+			game->getPreLoader()->draw(ObjectType::e_billboard, m_billboards[i].getTextureAnimationData(), 0);
+	}
+
 }

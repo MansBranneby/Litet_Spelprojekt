@@ -331,8 +331,6 @@
     <FxCompile Include="PixelShaderDownsample.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="GeometryShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
@@ -341,7 +339,6 @@
     </FxCompile>
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
-    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="PixelShaderMenu.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
@@ -351,6 +348,9 @@
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="PixelShaderBillboard.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
