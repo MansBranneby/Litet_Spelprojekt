@@ -4,6 +4,7 @@
 #include "GeometryShader.h"
 #include "PixelShader.h"
 #include "VertexShader.h"
+#include "QuadtreeNode.h"
 
 #define POINT_DISTANCE 9
 #define PULSE_SPEED 90
@@ -31,6 +32,7 @@ private:
 	XMVECTOR m_pulsePos;
 	float m_pulseLength;
 	bool m_active;
+	QuadtreeNode* m_quadtree;
 
 	//Remove
 	int index;
@@ -43,6 +45,7 @@ public:
 	void updatePulse(float dt);
 	void createVertexBuffer();
 	bool getActive();
+	void setQuadtree(QuadtreeNode* qtn);
 	std::vector<XMVECTOR> calculateShortestPath(XMVECTOR startPos, int goal);
 	void draw();
 

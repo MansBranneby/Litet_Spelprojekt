@@ -208,13 +208,16 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 	point[3].x = pos.x;
 	point[3].y = pos.z;
 	bool collision = false;
-	if (start.x > end.x) // Check right line
+	if (start.x < point[1].x && start.x > point[0].x && start.y > point[2].y && start.y < point[0].y)
+		collision = true;
+
+	if(!collision)
 		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[1]), XMLoadFloat2(&point[3]));
-	if (!collision && start.x < end.x)
+	if (!collision)
 		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[0]), XMLoadFloat2(&point[2]));
-	if (!collision && start.y > end.y)
+	if (!collision)
 		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[0]), XMLoadFloat2(&point[1]));
-	if (!collision && start.y < end.y)
+	if (!collision)
 		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&end), XMLoadFloat2(&point[2]), XMLoadFloat2(&point[3]));
 
 	
@@ -225,6 +228,23 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 		{
 			//Epic triangle collision detection :OO
 			//collision
+			for (int i = 0; i < m_cMeshes.size(); i+=3)
+			{
+				int ind1 = i + 1;
+				int ind2 = i + 2;
+
+				XMVECTOR triangles[3];
+				triangles[0] = XMLoadFloat3(&m_cMeshes[i]);
+				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
+				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
+
+				XMVECTOR startReal = { start.x, 1.0f, start.y };
+				XMVECTOR endReal = { end.x, 1.0f, end.y };
+
+				collision = testLineTriangle(startReal, endReal, triangles);
+				if (collision)
+					return true;
+			}
 		}
 		else
 		{

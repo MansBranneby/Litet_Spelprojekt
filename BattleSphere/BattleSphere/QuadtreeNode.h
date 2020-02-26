@@ -4,6 +4,8 @@
 #include "CollisionTests.h"
 #include "PreLoader.h"
 
+using namespace DirectX;
+
 class QuadtreeNode
 {
 private:

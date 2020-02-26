@@ -12,22 +12,26 @@ std::vector<XMVECTOR> Graph::pointFiller(std::vector<XMVECTOR> path)
 		float currDist = POINT_DISTANCE - rest;
 		rest = std::fmodf(length - currDist, POINT_DISTANCE);
 		//int nrOfPoints = floorf(length / POINT_DISTANCE);
-		
+
 		while (currDist < length)
 		{
 			points.push_back(XMVectorLerp(path[i], path[i + (int)1],
-				currDist  / length
-				));
+				currDist / length
+			));
 			currDist += POINT_DISTANCE;
 		}
 	}
 	m_path = points;
-	
-	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	DX::getInstance()->getDeviceContext()->Map(m_vsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &m_path[0], sizeof(XMVECTOR) * m_path.size());
-	DX::getInstance()->getDeviceContext()->Unmap(m_vsBuffer, 0);
-	
+
+	if (m_path.size() > 0)
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedMemory;
+		DX::getInstance()->getDeviceContext()->Map(m_vsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &m_path[0], sizeof(XMVECTOR) * m_path.size());
+		DX::getInstance()->getDeviceContext()->Unmap(m_vsBuffer, 0);
+	}
+
+
 	return points;
 }
 
@@ -43,7 +47,7 @@ void Graph::createVertexBuffer()
 	data.pSysMem = &m_path[0];*/
 
 	// create a Vertex Buffer
-	HRESULT result = DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, nullptr,  &m_vsBuffer);
+	HRESULT result = DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, nullptr, &m_vsBuffer);
 	if (FAILED(result))
 		MessageBox(NULL, L"Path VB", L"Error", MB_OK | MB_ICONERROR);
 }
@@ -51,6 +55,11 @@ void Graph::createVertexBuffer()
 bool Graph::getActive()
 {
 	return m_active;
+}
+
+void Graph::setQuadtree(QuadtreeNode* qtn)
+{
+	m_quadtree = qtn;
 }
 
 Graph::Graph()
@@ -75,7 +84,7 @@ Graph::Graph()
 	m_nodes[12].pos = XMVectorSet(27.0f, 0.0f, -38.0f, 0.0f);
 	m_nodes[13].pos = XMVectorSet(16.0f, 0.0f, -7.0f, 0.0f);
 	m_nodes[14].pos = XMVectorSet(27.0f, 0.0f, -66.0f, 0.0f);
-	m_nodes[15].pos = XMVectorSet(44.0f, 0.0f, -93.0f, 0.0f);
+	m_nodes[15].pos = XMVectorSet(44.0f, 0.0f, -70.0f, 0.0f);
 	m_nodes[16].pos = XMVectorSet(14.0f, 0.0f, -75.0f, 0.0f);
 	m_nodes[17].pos = XMVectorSet(0.0f, 0.0f, -110.0f, 0.0f);
 	m_nodes[18].pos = XMVectorSet(-14.0f, 0.0f, -75.0f, 0.0f);
@@ -159,8 +168,9 @@ Graph::Graph()
 		}
 	}
 
-	m_path.push_back(XMVectorSet(0,0,0,0));
+	m_path.push_back(XMVectorSet(0, 0, 0, 0));
 	m_active = false;
+	m_pulseLength = 0.0f;
 
 	m_vs = VertexShader(L"VertexShaderPath.hlsl", 2);
 	m_gs = GeometryShader(L"GeometryShaderPath.hlsl");
@@ -183,17 +193,17 @@ void Graph::updatePulse(float dt)
 	bool newPulse = true;
 	m_pulseLength += PULSE_SPEED * dt;
 	float distance = m_pulseLength;
-	for (int i = 0; i < m_path.size() - 1; i++)
+	for (int i = m_path.size() - 2; i >= 0; i--)
 	{
 		float length = XMVectorGetX(XMVector3Length(m_path[i] - m_path[i + (int)1]));
 		if (distance < length)
 		{
-			m_pulsePos = XMVectorLerp(m_path[i], m_path[i + 1], distance / length);
+			m_pulsePos = XMVectorLerp(m_path[i + 1], m_path[i], distance / length);
 			newPulse = false;
 			break;
 		}
 		distance -= length;
-		
+
 	}
 	if (newPulse)
 	{
@@ -201,11 +211,11 @@ void Graph::updatePulse(float dt)
 		m_active = false;
 		//calculateShortestPath(XMVectorSet(120, 0, 0, 0), 0);
 	}
-		D3D11_MAPPED_SUBRESOURCE mappedMemory;
-		DX::getInstance()->getDeviceContext()->Map(*m_pulseCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &m_pulsePos, sizeof(XMVECTOR));
-		DX::getInstance()->getDeviceContext()->Unmap(*m_pulseCBuffer->getConstantBuffer(), 0);
-//		Lights::getInstance()->setPosition(index, m_pulsePos.m128_f32[0], 5, m_pulsePos.m128_f32[2]);
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(*m_pulseCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &m_pulsePos, sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_pulseCBuffer->getConstantBuffer(), 0);
+	//		Lights::getInstance()->setPosition(index, m_pulsePos.m128_f32[0], 5, m_pulsePos.m128_f32[2]);
 }
 
 std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
@@ -223,18 +233,35 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
 		std::vector<node> open;
 		std::vector<node> closed;
 		float shortestDistance = 10000.0f;
-		int startNode = 0;
+		int startNode = -1;
 		float heuristic = XMVectorGetX(XMVector3Length(m_nodes[goal].pos - startPos));
+		XMFLOAT2 playerPos;
+		playerPos.x = startPos.m128_f32[0];
+		playerPos.y = startPos.m128_f32[2];
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
 
 			float currDist = XMVectorGetX(XMVector3Length(m_nodes[i].pos - startPos));
 			if (currDist < shortestDistance)
 			{
-				shortestDistance = currDist;
-				startNode = i;
+				XMFLOAT2 nodePos;
+				nodePos.x = m_nodes[i].pos.m128_f32[0];
+				nodePos.y = m_nodes[i].pos.m128_f32[2];
+				if (!m_quadtree->testCollision(playerPos, nodePos))
+				{
+					shortestDistance = currDist;
+					startNode = i;
+				}
+
 			}
 		}
+		if (startNode == -1)
+		{
+			m_active = false;
+			return std::vector<XMVECTOR>();
+		}
+		
+
 		//nodes.push_back({ startNode, -1, 0});
 		open.push_back({ startNode, -1, 0, 0 });
 
@@ -261,11 +288,22 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(XMVECTOR startPos, int goal)
 				node currentNode = open[q];
 				while (currentNode.source != -1)
 				{
-					path.insert(path.begin(), m_nodes[currentNode.index].pos);
+					path.push_back(m_nodes[currentNode.index].pos);
 					currentNode = closed[currentNode.source];
 				}
-				path.insert(path.begin(), m_nodes[startNode].pos);
-				path.insert(path.begin(), startPos);
+				path.push_back(m_nodes[startNode].pos);
+				for (int i = 0; i < path.size(); i++)
+				{
+					XMFLOAT2 nodePos;
+					nodePos.x = path[i].m128_f32[0];
+					nodePos.y = path[i].m128_f32[2];
+					if (!m_quadtree->testCollision(playerPos, nodePos))
+					{
+						path.erase(path.begin() + (i + 1), path.end());
+						break;
+					}
+				}
+				path.push_back(startPos);
 				return pointFiller(path);
 			}
 
