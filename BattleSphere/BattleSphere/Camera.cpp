@@ -76,8 +76,8 @@ Camera::Camera()
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-	m_yFOV = 0.45f * DirectX::XM_PI;
-	m_xFOV = 0.45f * DirectX::XM_PI;
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(0.45f * DirectX::XM_PI);
 
 	// Setup VP
 	m_view = XMMatrixIdentity();
@@ -102,8 +102,8 @@ void Camera::initialize(float width, float height, float nearPlane, float farPla
 
 	// Setup VP
 	m_view = XMMatrixLookAtLH(m_position, m_lookAt, m_up);
-	m_yFOV = 0.45f * DirectX::XM_PI;
-	m_xFOV = 2.0f*atan(width / height) * tan(m_yFOV/2.0f);
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(2.0f*atan(width / height) * tan(m_yFOV/2.0f));
 	m_projection = XMMatrixPerspectiveFovLH(0.45f * DirectX::XM_PI, width / height, nearPlane, farPlane);
 	m_viewProjection = XMMatrixMultiply(m_view, m_projection);
 
@@ -126,8 +126,8 @@ Camera::Camera(float width, float height, float nearPlane, float farPlane)
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-	m_yFOV = 0.45f * DirectX::XM_PI;
-	m_xFOV = 2.0f * atan(width / height) * tan(m_yFOV / 2.0f);
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(2.0f * atan(width / height) * tan(m_yFOV / 2.0f));
 
 	// Setup VP
 	m_view = XMMatrixLookAtLH(m_position, m_lookAt, m_up);
