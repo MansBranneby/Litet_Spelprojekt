@@ -52,7 +52,7 @@ private:
 	XMVECTOR m_camStartPos;
 	XMVECTOR m_camStartLookAt;
 	XMVECTOR m_vecToCam;
-	float m_transition;
+	bool m_zoomingOutToStart;
 	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
 	void updateDynamicCamera(float dT);
 

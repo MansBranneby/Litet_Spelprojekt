@@ -34,14 +34,14 @@ void GameState::loadLists()
 	m_spawns.push_back({ -39, -70 });
 	m_spawns.push_back({ -50, -81 });
 	m_spawns.push_back({ -50, -59 });
-	m_normalSpawnAmount = (int)m_spawns.size();
+	m_normalSpawnAmount = (int)(m_spawns.size());
 
 	// Special spawns
 	m_spawns.push_back({ -163, 120 });
 	m_spawns.push_back({ -60, 85 });
 	m_spawns.push_back({ 56, 50 });
 	m_spawns.push_back({ 155, 28 });
-	m_specialSpawnAmount = (int)m_spawns.size() - m_normalSpawnAmount;
+	m_specialSpawnAmount = (int)(m_spawns.size() - m_normalSpawnAmount);
 
 	// Free spawn bool list
 	for (int i = 0; i < m_spawns.size(); i++)
@@ -233,7 +233,6 @@ void GameState::updateDynamicCamera(float dT)
 		XMVECTOR oldCamPos = DX::getInstance()->getCam()->getPosition();
 		XMVECTOR newLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		XMVECTOR robPos;
-		float maxRobotDistance = -1;
 		float minX = 2000;
 		float maxX = -2000;
 		float minZ = 2000;
@@ -259,8 +258,10 @@ void GameState::updateDynamicCamera(float dT)
 					maxZ = robPos.m128_f32[2];
 			}
 		}
+
+		// Set look at between players and move it upp the z-axis slightly
 		newLookAt /= (float)nrOfPlayers;
-		newLookAt.m128_f32[3] -= 30.0f;
+		newLookAt.m128_f32[3] -= 100.0f;
 
 
 		// Calculate biggest distance
@@ -275,31 +276,45 @@ void GameState::updateDynamicCamera(float dT)
 		// Set new camera position and look at
 
 		XMVECTOR newPos;
-		bool zoomingToStart = false;
-		if (MINIMUM_CAM_DISTANCE + biggestDifference * 160.0f < MAXIMUM_CAM_DISTANCE)
+		if (m_zoomingOutToStart) // If zooming out, have harder criteria to zoom in again
 		{
-			newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
-			if (newPos.m128_f32[2] < -105.0f)
+			if (MINIMUM_CAM_DISTANCE + biggestDifference * 250.0f < MAXIMUM_CAM_DISTANCE)
 			{
-				float difference = -105.0f - newPos.m128_f32[2];
-				newPos.m128_f32[2] += difference;
-				newLookAt.m128_f32[2] += difference;
+				newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+				if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
+				{
+					float difference = -105.0f - newPos.m128_f32[2];
+					newPos.m128_f32[2] += difference;
+					newLookAt.m128_f32[2] += difference;
+				}
+				m_zoomingOutToStart = false;
 			}
 		}
-		else
+		else // If not zooming out
 		{
-			zoomingToStart = true;
-			newPos = m_camStartPos;
-			newLookAt = m_camStartLookAt;
-			m_transition = 0.0f;
+			if (MINIMUM_CAM_DISTANCE + biggestDifference * 120.0f < MAXIMUM_CAM_DISTANCE)
+			{
+				newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+				if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
+				{
+					float difference = -105.0f - newPos.m128_f32[2];
+					newPos.m128_f32[2] += difference;
+					newLookAt.m128_f32[2] += difference;
+				}
+			}
+			else
+			{
+				m_zoomingOutToStart = true;
+				newPos = m_camStartPos;
+				newLookAt = m_camStartLookAt;
+			}
 		}
 
 
 
 
 		// Project each robot onto FOV planes and find smallest distances
-		float closest = 200000;
-		bool closestPlane[4]{ false, false, false, false }; // Bottom, left, top, right
+		float closest = INFINITY;
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -312,38 +327,22 @@ void GameState::updateDynamicCamera(float dT)
 					float distance = XMVector3Dot(camToBot, m_fOVPlanes[plane]).m128_f32[0];
 
 					if (distance < closest)
-					{
 						closest = distance;
-						for (int j = 0; j < 4; j++)
-							closestPlane[j] = false;
-						closestPlane[plane] = true;
-					}
 				}
 			}
 		}
 
 		float changeSpeed = dT * CHANGE_SPEED;
-		if (closest < 0.01f)
+		if (closest < 0.01f) // Limit closest to avoid zero and negative speeds
 			closest = 0.01f;
 
-		m_transition += dT;
-		if (m_transition < 2.0f)
+		if (m_zoomingOutToStart) // If zooming out to start pos is true, set the position and look at, also increase speeds
 		{
 			changeSpeed *= 2.0f;
 			newPos = m_camStartPos;
 			newLookAt = m_camStartLookAt;
 		}
-		else if (closest < 0.6f && (closestPlane[1] || closestPlane[3]) && !zoomingToStart) // X
-		{
-			changeSpeed *= 0.8f / closest;
-			newPos += m_vecToCam * (biggestDifference * 90.0f);
-		}
-		else if (closest < 0.6f && closestPlane[0] && !zoomingToStart) // Bottom
-		{
-			changeSpeed *= 0.8f / closest;
-			newPos += m_vecToCam * (biggestDifference * 90.0f);
-		}
-		else if (closest < 0.6f && closestPlane[2] && !zoomingToStart) // Top
+		else if (closest < 0.6f) // Change "changeSpeed" according to how close a player is to a camera plane
 		{
 			changeSpeed *= 0.8f / closest;
 			newPos += m_vecToCam * (biggestDifference * 90.0f);
@@ -605,7 +604,7 @@ GameState::GameState()
 	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
 
 	// Initialize dynamic camera
-	m_transition = 1.0f;
+	m_zoomingOutToStart = false;
 	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
 	m_camStartPos = DX::getInstance()->getCam()->getPosition();
 	m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
@@ -769,7 +768,7 @@ bool GameState::assignMission()
 			// Only make resource special if there are available spots
 			for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
 			{
-				if (m_freeSpawns[(int)(m_normalSpawnAmount)+(int)i])
+				if (m_freeSpawns[(int)((m_normalSpawnAmount)+ i)])
 					isSpecial = true;
 			}
 		}
