@@ -13,7 +13,6 @@ void Graph::setShortestPath(int index, std::vector<XMVECTOR>* path)
 		for (int j = 0; j < 4; j++)
 		{
 			float currDist = 0;
-			int a = path[j].size();
 
 			for (int i = 0; i < (int)path[j].size() - 1; i++)
 			{
@@ -321,7 +320,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 			for (int i = 0; i < m_nodes[open[q].index].neighbours.size(); i++)
 			{
 				node nod;
-				nod.source = closed.size();
+				nod.source = (int)closed.size();
 				nod.index = m_nodes[open[q].index].neighbours[i];
 				nod.g = open[q].g + m_nodes[open[q].index].neighbourDistance[i];
 				nod.f = nod.g + m_nodes[nod.index].heuristic[goal];
@@ -391,7 +390,7 @@ void Graph::draw(int index)
 		DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 		DX::getInstance()->getDeviceContext()->IASetInputLayout(&m_vs.getvertexLayout());
 		DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSDisabled(), 1);
-		DX::getInstance()->getDeviceContext()->Draw(m_path[index].size(), 0);
+		DX::getInstance()->getDeviceContext()->Draw((UINT)m_path[index].size(), 0);
 	}
 	
 
