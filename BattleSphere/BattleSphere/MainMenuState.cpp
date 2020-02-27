@@ -452,6 +452,7 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 	default:
 		break;
 	}
+	Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
 }
 
 void MainMenuState::handleInput(Game* game)

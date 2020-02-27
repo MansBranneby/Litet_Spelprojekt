@@ -2,33 +2,34 @@
 
 Graph* Graph::m_instance = nullptr;
 
-std::vector<XMVECTOR> Graph::pointFiller(int index, std::vector<XMVECTOR> path)
+void Graph::setShortestPath(int index, std::vector<XMVECTOR>* path)
 {
-	std::vector<XMVECTOR> points;
-	float rest = 0;
-	for (int i = 0; i < path.size(); i++)
+	if (!m_active[index])
 	{
-		/*float length = XMVectorGetX(XMVector3Length(path[i] - path[i + (int)1]));
-		float currDist = POINT_DISTANCE - rest;
-		rest = std::fmodf(length - currDist, POINT_DISTANCE);
-		//int nrOfPoints = floorf(length / POINT_DISTANCE);
+		m_active[index] = true;
+		int shortestPath = -1;
+		float shortestDist = 10000;
 
-		while (currDist < length)
+		for (int j = 0; j < 4; j++)
 		{
-			points.push_back(XMVectorLerp(path[i], path[i + (int)1],
-				currDist / length
-			));
-			currDist += POINT_DISTANCE;
-		}*/
-		path[i].m128_f32[1] = 1.2f + 0.05f * index;
-		points.push_back(path[i]);
-		
+			float currDist = 0;
+			int a = path[j].size();
+
+			for (int i = 0; i < (int)path[j].size() - 1; i++)
+			{
+				currDist += XMVectorGetX(XMVector3Length(path[j][i] - path[j][i + 1]));
+			}
+			if ((int)path[j].size() > 0 && currDist < shortestDist)
+			{
+				shortestDist = currDist;
+				shortestPath = j;
+			}
+		}
+		m_path[index] = path[shortestPath];
+		for (int i = 0; i < (int)m_path[index].size(); i++)
+			m_path[index][i].m128_f32[1] = 1.2f + 0.05f * index;
 	}
-	m_path[index] = points;
-
-
-
-	return points;
+	
 }
 
 void Graph::createVertexBuffer()
@@ -56,6 +57,11 @@ bool Graph::getActive(int index)
 void Graph::setQuadtree(QuadtreeNode* qtn)
 {
 	m_quadtree = qtn;
+}
+
+void Graph::setColour(int index, XMVECTOR colour)
+{
+	m_colour[index] = colour;
 }
 
 Graph::Graph()
@@ -168,9 +174,12 @@ Graph::Graph()
 		m_path[i].push_back(XMVectorSet(0, 0, 0, 0));
 		m_active[i] = false;
 		m_pulseLength[i] = 0.0f;
-
+		m_pulseCounter[i] = 0.0f;
+		m_colour[i] = XMVectorSet(1,1,1,0);
 	}
+
 	m_pulseCBuffer = new ConstantBuffer(&m_pulsePos[0], sizeof(XMVECTOR));
+	m_colourCBuffer = new ConstantBuffer(&m_pulsePos[0], sizeof(XMVECTOR));
 
 	m_vs = VertexShader(L"VertexShaderPath.hlsl", 2);
 	m_gs = GeometryShader(L"GeometryShaderPath.hlsl");
@@ -191,8 +200,9 @@ void Graph::updatePulse(int index, float dt)
 {
 	bool newPulse = true;
 	m_pulseLength[index] += PULSE_SPEED * dt;
+	m_pulseCounter[index] += dt;
 	float distance = m_pulseLength[index];
-	for (int i = m_path[index].size() - 2; i >= 0; i--)
+	for (int i = (int)m_path[index].size() - 2; i >= 0; i--)
 	{
 		float length = XMVectorGetX(XMVector3Length(m_path[index][i] - m_path[index][i + (int)1]));
 		if (distance < length)
@@ -204,21 +214,24 @@ void Graph::updatePulse(int index, float dt)
 		distance -= length;
 
 	}
+	if (newPulse && (distance < 30 || m_pulseCounter[index] < 1.5f) && (int)m_path[index].size() > 1)
+	{
+		m_pulsePos[index] = m_path[index][0] + XMVector3Normalize(m_path[index][0] - m_path[index][1]) * distance;
+		newPulse = false;
+	}
 	if (newPulse)
 	{
-		m_pulseLength[index] = 0;
+		m_pulseLength[index] = 0.0f;
 		m_active[index] = false;
-		//calculateShortestPath(XMVectorSet(120, 0, 0, 0), 0);
+		m_pulseCounter[index] = 0.0f;
 	}
-	
-	//		Lights::getInstance()->setPosition(index, m_pulsePos.m128_f32[0], 5, m_pulsePos.m128_f32[2]);
 }
 
 std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos, int goal)
 {
 	if (!m_active[index])
 	{
-		m_active[index] = true;
+		
 		struct node
 		{
 			int index;
@@ -300,7 +313,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 					}
 				}
 				path.push_back(startPos);
-				return pointFiller(index, path);
+				return path;
 			}
 
 
@@ -348,10 +361,10 @@ void Graph::draw(int index)
 	if (m_active[index])
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedMemory;
-		if (m_path[index].size() > 0)
+		if ((int)m_path[index].size() > 0)
 		{
 			DX::getInstance()->getDeviceContext()->Map(m_vsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-			memcpy(mappedMemory.pData, &m_path[index][0], sizeof(XMVECTOR) * m_path[index].size());
+			memcpy(mappedMemory.pData, &m_path[index][0], sizeof(XMVECTOR) * (int)m_path[index].size());
 			DX::getInstance()->getDeviceContext()->Unmap(m_vsBuffer, 0);
 
 
@@ -360,12 +373,17 @@ void Graph::draw(int index)
 		memcpy(mappedMemory.pData, &m_pulsePos[index], sizeof(XMVECTOR));
 		DX::getInstance()->getDeviceContext()->Unmap(*m_pulseCBuffer->getConstantBuffer(), 0);
 
+		DX::getInstance()->getDeviceContext()->Map(*m_colourCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &m_colour[index], sizeof(XMVECTOR));
+		DX::getInstance()->getDeviceContext()->Unmap(*m_colourCBuffer->getConstantBuffer(), 0);
+
 		DX::getInstance()->getDeviceContext()->VSSetShader(&m_vs.getVertexShader(), nullptr, 0);
 		DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
 		DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 		DX::getInstance()->getDeviceContext()->GSSetShader(&m_gs.getGeometryShader(), nullptr, 0);
 		DX::getInstance()->getDeviceContext()->PSSetShader(&m_ps.getPixelShader(), nullptr, 0);
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_pulseCBuffer->getConstantBuffer());
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, m_colourCBuffer->getConstantBuffer());
 		UINT32 vertexSize = sizeof(XMVECTOR);
 		UINT32 offset = 0;
 
@@ -386,4 +404,5 @@ void Graph::release()
 	m_ps.release();
 	m_vsBuffer->Release();
 	delete m_pulseCBuffer;
+	delete m_colourCBuffer;
 }

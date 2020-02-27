@@ -93,20 +93,20 @@ int GameState::getSpecialSpawnIndex()
 void GameState::spawnNodes()
 {
 	Node* node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(-118.0f, 0.2f, -10.0f, 0.0f));
+	node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
 	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(150.0f, 0.2f, 122.0f, 0.0f));
+	node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	m_nodes.push_back(node);
+	node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
+	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	m_nodes.push_back(node);
+	node = new Node(rand() % 3);
+	node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
 	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
-	m_nodes.push_back(node);
-	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(105.0f, 0.2f, -18.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
-	m_nodes.push_back(node);
-	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(-101.0f, 0.3f, -49.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
 }
 
@@ -365,9 +365,20 @@ void GameState::handleInputs(Game* game, float dt)
 				m_input->setVibration(i, 0.0f);
 			}
 
-			if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_LEFT))
+			if (m_robots[i]->getResourceIndex() != -1) //m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_LEFT)
 			{
-				Graph::getInstance()->calculateShortestPath(i, m_robots[i]->getPosition(), 3);
+				bool goal = false;
+				std::vector<XMVECTOR> paths[4];
+				for (int j = 0; j < (int)m_nodes.size(); j++)
+				{
+					if (m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+					{
+						paths[j] = Graph::getInstance()->calculateShortestPath(i, m_robots[i]->getPosition(), j);
+						goal = true;
+					}
+				}
+				if (goal)
+					Graph::getInstance()->setShortestPath(i, paths);
 			}
 
 			// COLLISION PLAYER VS STATIC OBJECTS

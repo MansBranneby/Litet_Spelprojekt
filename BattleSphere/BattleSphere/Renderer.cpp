@@ -309,8 +309,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		float speed = 1.0f;
 		float rotCoeff = 0;
 
-		int tempIndex = Lights::getInstance()->addAreaLight(0, 0, 0, 20, 1, 0, 1, 20);
-		float positions[2];
+		/*int tempIndex = Lights::getInstance()->addAreaLight(0, 0, 0, 20, 1, 0, 1, 20);
+		float positions[2];*/
 
 		Graph::getInstance()->createVertexBuffer();
 		///////////////
@@ -517,9 +517,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
 				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
 
-				ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
+				/*ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
 				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
-				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);
+				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/
 
 				ImGui::End();
 				ImGui::Render();
