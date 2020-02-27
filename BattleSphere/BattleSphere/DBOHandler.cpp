@@ -30,8 +30,8 @@ void DBOHandler::update(float dt)
 	if (m_lastSpawn >= 1.0f && m_bigTimer >= 0.5f)
 	{
 		m_bigTimer = 0.0f;
-		float random = rand() % 10;
-		float random2 = rand() % 2;
+		int random = rand() % 10;
+		int random2 = rand() % 2;
 		int index = 0;
 		if (random2 > 0.5f)
 			index = 5;

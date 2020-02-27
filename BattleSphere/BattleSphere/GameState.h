@@ -3,12 +3,6 @@
 #include "Transparency.h"
 #include "Lights.h"
 #include "DBOHandler.h"
-
-#define START_SPAWNED_RESOURCES 4
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
-#define SPAWN_INTERVAL 6.0f
-#define SPECIAL_RESOURCE_CHANCE 25 // % chance
-
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
 #include "Graph.h"
