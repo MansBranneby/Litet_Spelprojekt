@@ -214,7 +214,7 @@ void Graph::updatePulse(int index, float dt)
 		distance -= length;
 
 	}
-	if (newPulse && (distance < 30 || m_pulseCounter[index] < 1.5f) && (int)m_path[index].size() > 1)
+	if (newPulse && (distance < 30 || m_pulseCounter[index] < 3.0f) && (int)m_path[index].size() > 1)
 	{
 		m_pulsePos[index] = m_path[index][0] + XMVector3Normalize(m_path[index][0] - m_path[index][1]) * distance;
 		newPulse = false;
