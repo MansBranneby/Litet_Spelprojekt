@@ -5,7 +5,8 @@
 
 enum Animation
 {
-	e_Freeway
+	e_FreewayL,
+	e_FreewayR
 };
 
 class DBGObj : public GameObject // Dynamic background object

@@ -575,7 +575,10 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 
 	// Tokyo drift
-	for (int i = 0; i < m_dboHandler->getDBONr(); i++)
-		game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+	for (int i = 0; i < OBJECT_NR_1; i++)
+	{
+		if (m_dboHandler->isDrawn(i))
+			game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+	}
 	
 }

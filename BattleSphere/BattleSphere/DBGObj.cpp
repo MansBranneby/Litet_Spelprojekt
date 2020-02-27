@@ -43,6 +43,7 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 	m_isDrawn = false;
 	m_t = 0.0f;
 	m_speed = speed;
+	m_animation = animation;
 	if (tokyoDriver)
 		m_driftFactor = 1.2f;
 	else
@@ -51,7 +52,7 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 
 	switch (animation)
 	{
-	case e_Freeway:
+	case e_FreewayL:
 		m_nrOfCurves = 5;
 		// Curve 1
 		m_weights.push_back(XMVectorSet(200.0f, 18.0f, 5.0f, 1.0f));
@@ -80,13 +81,41 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 		m_weights.push_back(XMVectorSet(-233.0f, 2.0f, 164.0f, 1.0f));
 		break;
 	default:
+	case e_FreewayR:
+		m_nrOfCurves = 5;
+		// Curve 5
+		m_weights.push_back(XMVectorSet(-233.0f, 2.0f, 174.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(-165.0f, 2.0f, 174.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(-98.0f, 2.0f, 170.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(-31.0f, 2.0f, 175.0f, 1.0f));
+		// Curve 4
+		m_weights.push_back(XMVectorSet(-31.0f, 2.0f, 175.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(40.0f, 2.0f, 170.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(65.0f, 2.0f, 100.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(65.0f, -8.0f, 49.0f, 1.0f));
+		// Curve 3
+		m_weights.push_back(XMVectorSet(65.0f, -8.0f, 49.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(53.0f, -5.0f, 30.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(65.0f, 1.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(93.0f, 1.0f, 16.0f, 1.0f));
+		// Curve 2
+		m_weights.push_back(XMVectorSet(93.0f, 1.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(116.0f, 1.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(139.0f, 16.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 16.0f, 1.0f));
+		// Curve 1
+		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(174.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(187.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(200.0f, 18.0f, 16.0f, 1.0f));
+		break;
 		m_nrOfCurves = 0;
 		break;
 	}
 
 	m_curveLenght.resize(m_nrOfCurves);
 	calcCurveLength(10);
-	m_lightIndex = Lights::getInstance()->addSpotLight(200.0f, 18.0f, 5.0f, 20.0f, 0.0f, 1.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
+	m_lightIndex = Lights::getInstance()->addSpotLight(m_weights[0].m128_f32[0], m_weights[0].m128_f32[1], m_weights[0].m128_f32[2], 20.0f, 0.0f, 1.0f, 0.0f, 0.15f, 0.97f, 1.0f, 45.0f, 50.0f);
 	//m_lightIndex = Lights::getInstance()->addSpotLight(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 45.0f, 0.0f);
 	//m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
 	//m_lightIndex = Lights::getInstance()->addDirectionalLight(0, -1, 0, 1, 1, 1, 1);
@@ -102,7 +131,10 @@ bool DBGObj::animate(float dt)
 	bool hideCar = false;
 	switch (m_animation)
 	{
-	case 0:
+	case e_FreewayL:
+		hideCar = bezier3(dt);
+		break;
+	case e_FreewayR:
 		hideCar = bezier3(dt);
 		break;
 	default:
@@ -150,10 +182,24 @@ bool DBGObj::bezier3(float dt)
 
 	// Rotatation
 	XMVECTOR translation = getPosition() - m_prevPos;
-	// rotation in y (around x)
-	setRotation(1.0f, 0.0f, 0.0f, (acos(XMVector3Dot(translation, XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) - 90.0f);
-	// rotation in x (around y)
-	rotate(0.0f, 1.0f, 0.0f, -(acos(XMVector3Dot(translation, XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) * m_driftFactor);
+
+	switch (m_animation)
+	{
+	case e_FreewayL:
+		// rotation in y (around x)
+		setRotation(1.0f, 0.0f, 0.0f, (acos(XMVector3Dot(translation, XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) - 90.0f);
+		// rotation in x (around y)
+		rotate(0.0f, 1.0f, 0.0f, -(acos(XMVector3Dot(translation, XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) * m_driftFactor);
+		break;
+	case e_FreewayR:
+		// rotation in y (around x)
+		setRotation(1.0f, 0.0f, 0.0f, (acos(XMVector3Dot(translation, XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) - 90.0f);
+		// rotation in x (around y)
+		rotate(0.0f, 1.0f, 0.0f, (acos(XMVector3Dot(translation, XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f)).m128_f32[0] / XMVector3Length(translation).m128_f32[0])) * (180.0f / XM_PI) * m_driftFactor);
+		break;
+	default:
+		break;
+	}
 
 	translation = XMVector3Normalize(translation);
 	Lights::getInstance()->setPosition(m_lightIndex, x + translation.m128_f32[0] * 5.0f, y + translation.m128_f32[1] * 5.0f + 2.0f, z + translation.m128_f32[2] * 5.0f);

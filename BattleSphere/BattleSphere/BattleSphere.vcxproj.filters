@@ -375,6 +375,9 @@
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

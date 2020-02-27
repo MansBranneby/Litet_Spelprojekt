@@ -18,6 +18,7 @@ public:
 	void update(float dt);
 	int getDBONr();
 	objectData getData(int index);
+	bool isDrawn(int index);
 	//void draw();
 };
 
