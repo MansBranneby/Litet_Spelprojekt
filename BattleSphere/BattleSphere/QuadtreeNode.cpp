@@ -38,14 +38,14 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreL
 	// Test collision of node OBB and other OBB
 	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_static); ++i)
 	{
-		boundingData boundingData = preLoader->getBoundingData(objectType::e_static, 0, i);
-
-		// Test collision
-		if (testOBBOBB(m_boundingData, boundingData).m_colliding)
+		for (int j = 0; j < preLoader->getNrOfModels(objectType::e_static, i); j++)
 		{
-			// Append collisionMesh to to m_cMeshes
-			for (int j = 0; j < preLoader->getNrOfModels(objectType::e_static, i); j++)
+			boundingData boundingData = preLoader->getBoundingData(objectType::e_static, j, i);
+
+			// Test collision
+			if (testOBBOBB(m_boundingData, boundingData).m_colliding)
 			{
+				// Append collisionMesh to to m_cMeshes
 				std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, j, i);
 				m_cMeshes.insert(std::end(m_cMeshes), std::begin(tempCMesh), std::end(tempCMesh));
 			}
