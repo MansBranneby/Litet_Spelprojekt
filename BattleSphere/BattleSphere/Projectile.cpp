@@ -1,6 +1,6 @@
 #include "Projectile.h"
 
-Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage)
+Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner)
 {
 	setPosition(pos);
 	setRotation(rot);
@@ -8,8 +8,9 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int d
 	m_type = type;
 	m_damage = damage;
 	m_velocity = 0.0f;
+	m_owner = owner;
 
-	m_material.emission = XMVectorSet(0.0f, 1.0f, 0.0f, -1);
+	m_material.emission = colour;
 
 	if (type == PISTOL)
 	{
@@ -19,14 +20,17 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int d
 	}
 	else if (type == RIFLE)
 	{
-		m_velocity = 50.0f;
+		m_velocity = 5.0f;
 		//setScale(0.5f, 0.5f, 0.8f);
 		setScale(0.15f, 0.15f, 0.3f);
 	}
 }
 
-void Projectile::setDirection(XMVECTOR relPos)
+void Projectile::setDirection(XMVECTOR relPos, XMVECTOR colour, int owner)
 {
+	m_material.emission = colour;
+	m_owner = owner;
+
 	m_direction = getPosition() - relPos;
 	m_direction = XMVectorSetY(m_direction, 0.0f);
 	m_direction = XMVector3Normalize(m_direction);
@@ -34,6 +38,11 @@ void Projectile::setDirection(XMVECTOR relPos)
 	if (XMVectorGetX(getPosition()) < XMVectorGetX(relPos))
 		angle *= -1;
 	setRotation(XMVectorSet(0, 1, 0, angle));
+}
+
+int Projectile::getOwner()
+{
+	return m_owner;
 }
 
 int Projectile::getType()

@@ -522,7 +522,7 @@ bool GameState::update(Game* game, float dt)
 					collisionInfo = testMovingSphereSphere(robotBD.pos, projectileBD.pos, robotBD.halfWD.x, projectileBD.halfWD.x, m_robots[j]->getVel() * dt, projectile->getDirection() * projectile->getVelocity() * dt);
 
 
-					if (collisionInfo.m_colliding)
+					if (collisionInfo.m_colliding && ProjectileBank::getInstance()->getList()[i]->getOwner() != j)
 					{
 						int resourceIndex = m_robots[j]->getResourceIndex();
 						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
