@@ -101,14 +101,10 @@ PreLoader::PreLoader()
 	// Initialize backface culler
 	m_bFCuller = new BackfaceCuller;
 
-	//// Load objects ////
-	
-	// Gameplay
-	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1", "1mesh1mat");
-	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "1mesh1mat");
-
-	// Delete
+	// Load objects
+	loadFromFile(objectType::e_drone, "Drone");
+	loadFromFile(objectType::e_weapon, "Weapon1");
+	loadFromFile(objectType::e_robot, "BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
@@ -272,6 +268,34 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, objectData rel
 	{
 		m_objects[typ][variant][i].draw();
 	}
+}
+
+void PreLoader::drawOneModel(objectType type, objectData data, int modelNr, int variant)
+{
+	int typ = (int)type;
+		m_objects[typ][variant][modelNr].setObjectData(data);
+		m_objects[typ][variant][modelNr].draw();
+}
+
+void PreLoader::drawOneModel(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setObjectData(data, relativeData);
+	m_objects[typ][variant][modelNr].draw();
+}
+
+void PreLoader::drawOneModelAndMat(objectType type, objectData data, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setAllObjectData(data);
+	m_objects[typ][variant][modelNr].draw();
+}
+
+void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+{
+	int typ = (int)type;
+	m_objects[typ][variant][modelNr].setAllObjectData(data, relativeData);
+	m_objects[typ][variant][modelNr].draw();
 }
 
 void PreLoader::cull(objectType type, int variant)

@@ -159,8 +159,18 @@ void LightCulling::updateSubresource()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, m_lights, sizeof(LightData) * LIGHT_COUNT);
+	memcpy(mappedMemory.pData, m_lights->getLights(), sizeof(LightData) * LIGHT_COUNT);
 	DX::getInstance()->getDeviceContext()->Unmap(m_lightBuffer, 0);
+
+	*m_viewMatrixData = DX::getInstance()->getCam()->getViewMatrix();
+	DX::getInstance()->getDeviceContext()->Map(*m_viewMatrixCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_viewMatrixData, sizeof(*m_viewMatrixData));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_viewMatrixCBuffer->getConstantBuffer(), 0);
+
+	m_screenToViewData->inverseProj = m_screenToViewData->inverseProj = XMMatrixInverse(nullptr, DX::getInstance()->getCam()->getProjectionMatrix());
+	DX::getInstance()->getDeviceContext()->Map(*m_screenToViewCBuffer->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, m_screenToViewData, sizeof(*m_screenToViewData));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_screenToViewCBuffer->getConstantBuffer(), 0);
 }
 
 LightCulling::LightCulling()

@@ -1,94 +1,5 @@
 #include "GameState.h"
 
-void GameState::loadLists()
-{
-	// Normal spawns
-	m_spawns.push_back({ -62, 120 });
-	m_spawns.push_back({ -120, 100 });
-	m_spawns.push_back({ -74, 85 });
-	m_spawns.push_back({ -46, 85 });
-	m_spawns.push_back({ -15, 85 });
-	m_spawns.push_back({ 120, 39 });
-	m_spawns.push_back({ -15, 29 });
-	m_spawns.push_back({ 15, 29 });
-	m_spawns.push_back({ -15, -3 });
-	m_spawns.push_back({ 15, -3 });
-	m_spawns.push_back({ -15, -34 });
-	m_spawns.push_back({ 15, -34 });
-	m_spawns.push_back({ -15, -63 });
-	m_spawns.push_back({ 15, -63 });
-	m_spawns.push_back({ -67, 0 });
-	m_spawns.push_back({ -80, 0 });
-	m_spawns.push_back({ -54, 0 });
-	m_spawns.push_back({ 40, -16 });
-	m_spawns.push_back({ 56, -5 });
-	m_spawns.push_back({ 113, -56 });
-	m_spawns.push_back({ 109, -98 });
-	m_spawns.push_back({ 75, -98 });
-	m_spawns.push_back({ 40, -98 });
-	m_spawns.push_back({ 5, -98 });
-	m_spawns.push_back({ -30, -98 });
-	m_spawns.push_back({ -65, -98 });
-	m_spawns.push_back({ 44, -65 });
-	m_spawns.push_back({ -61, -70 });
-	m_spawns.push_back({ -39, -70 });
-	m_spawns.push_back({ -50, -81 });
-	m_spawns.push_back({ -50, -59 });
-	m_normalSpawnAmount = (int)m_spawns.size();
-
-	// Special spawns
-	m_spawns.push_back({ -163, 120 });
-	m_spawns.push_back({ -60, 85 });
-	m_spawns.push_back({ 56, 50 });
-	m_spawns.push_back({ 155, 28 });
-	m_specialSpawnAmount = (int)m_spawns.size() - m_normalSpawnAmount;
-
-	// Free spawn bool list
-	for (int i = 0; i < m_spawns.size(); i++)
-		m_freeSpawns.push_back(true);
-}
-
-void GameState::startSpawn()
-{
-	for (int i = 0; i < START_SPAWNED_RESOURCES; i++)
-	{
-		int spawnIndex = getSpawnIndex(); // TODO:: Change spawn types
-		//Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f, false);
-		Resource* resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 0.8f, false);
-		XMFLOAT2 pos = m_spawns[spawnIndex];
-		resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
-		m_resources.push_back(resource);
-	}
-}
-
-int GameState::getSpawnIndex()
-{
-	// Find free index
-	int index;
-	do
-		index = rand() % m_normalSpawnAmount;
-	while (!m_freeSpawns[index]);
-
-	// Taken spawn is set to not free
-	m_freeSpawns[index] = false;
-
-	return index;
-}
-
-int GameState::getSpecialSpawnIndex()
-{
-	// Find free index
-	int index;
-	do
-		index = (rand() % m_specialSpawnAmount) + m_normalSpawnAmount;
-	while (!m_freeSpawns[index]);
-
-	// Taken spawn is set to not free
-	m_freeSpawns[index] = false;
-
-	return index;
-}
-
 void GameState::spawnNodes()
 {
 	Node* node = new Node(rand() % 3);
@@ -107,6 +18,145 @@ void GameState::spawnNodes()
 	node->setPosition(XMVectorSet(-101.0f, 0.3f, -49.0f, 0.0f));
 	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
+}
+
+void GameState::updateDynamicCamera(float dT)
+{
+	// Calculate number of players
+	int nrOfPlayers = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			nrOfPlayers++;
+	}
+
+	if (nrOfPlayers >= 1)
+	{
+		// Get new look at and get min and max of x and z
+		XMVECTOR oldCamLookAt = DX::getInstance()->getCam()->getLookAt();
+		XMVECTOR oldCamPos = DX::getInstance()->getCam()->getPosition();
+		XMVECTOR newLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		XMVECTOR robPos;
+		float minX = 2000;
+		float maxX = -2000;
+		float minZ = 2000;
+		float maxZ = -2000;
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				robPos = m_robots[i]->getPosition();
+				newLookAt += robPos;
+				robPos = XMVector3Normalize(m_robots[i]->getPosition() - oldCamPos);
+
+				if (minX > robPos.m128_f32[0])
+					minX = robPos.m128_f32[0];
+
+				if (maxX < robPos.m128_f32[0])
+					maxX = robPos.m128_f32[0];
+
+				if (minZ > robPos.m128_f32[2])
+					minZ = robPos.m128_f32[2];
+
+				if (maxZ < robPos.m128_f32[2])
+					maxZ = robPos.m128_f32[2];
+			}
+		}
+
+		// Set look at between players and move it upp the z-axis slightly
+		newLookAt /= (float)nrOfPlayers;
+		newLookAt.m128_f32[3] -= 100.0f;
+
+
+		// Calculate biggest distance
+		float xDifference = maxX - minX;
+		float zDifference = maxZ - minZ;
+		float biggestDifference;
+		if (xDifference > zDifference)
+			biggestDifference = xDifference;
+		else
+			biggestDifference = zDifference;
+
+		// Set new camera position and look at
+
+		XMVECTOR newPos;
+		if (m_zoomingOutToStart) // If zooming out, have harder criteria to zoom in again
+		{
+			if (MINIMUM_CAM_DISTANCE + biggestDifference * 250.0f < MAXIMUM_CAM_DISTANCE)
+			{
+				newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+				if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
+				{
+					float difference = -105.0f - newPos.m128_f32[2];
+					newPos.m128_f32[2] += difference;
+					newLookAt.m128_f32[2] += difference;
+				}
+				m_zoomingOutToStart = false;
+			}
+		}
+		else // If not zooming out
+		{
+			if (MINIMUM_CAM_DISTANCE + biggestDifference * 120.0f < MAXIMUM_CAM_DISTANCE)
+			{
+				newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
+				if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
+				{
+					float difference = -105.0f - newPos.m128_f32[2];
+					newPos.m128_f32[2] += difference;
+					newLookAt.m128_f32[2] += difference;
+				}
+			}
+			else
+			{
+				m_zoomingOutToStart = true;
+				newPos = m_camStartPos;
+				newLookAt = m_camStartLookAt;
+			}
+		}
+
+
+
+
+		// Project each robot onto FOV planes and find smallest distances
+		float closest = INFINITY;
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				robPos = m_robots[i]->getPosition();
+				XMVECTOR camToBot = XMVector3Normalize(robPos - oldCamPos);
+				for (int plane = 0; plane < 4; plane++) // Bottom, left, top, right
+				{
+					// Project
+					float distance = XMVector3Dot(camToBot, m_fOVPlanes[plane]).m128_f32[0];
+
+					if (distance < closest)
+						closest = distance;
+				}
+			}
+		}
+
+		float changeSpeed = dT * CHANGE_SPEED;
+		if (closest < 0.01f) // Limit closest to avoid zero and negative speeds
+			closest = 0.01f;
+
+		if (m_zoomingOutToStart) // If zooming out to start pos is true, set the position and look at, also increase speeds
+		{
+			changeSpeed *= 2.0f;
+			newPos = m_camStartPos;
+			newLookAt = m_camStartLookAt;
+		}
+		else if (closest < 0.6f) // Change "changeSpeed" according to how close a player is to a camera plane
+		{
+			changeSpeed *= 0.8f / closest;
+			newPos += m_vecToCam * (biggestDifference * 90.0f);
+		}
+
+		XMVECTOR vecToNewCamPos = newPos - oldCamPos;
+		XMVECTOR vecToNewCamLookAt = newLookAt - oldCamLookAt;
+
+		DX::getInstance()->getCam()->movePosAndLook(vecToNewCamPos * changeSpeed, vecToNewCamLookAt * changeSpeed);
+	}
 }
 
 void GameState::handleMovement(Game* game, float dt, int id)
@@ -166,7 +216,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (XMVectorGetX(XMVector3Length(rob - resource)) < 1.5f &&
 						!m_resources[j]->isBlocked())
 					{
-						m_freeSpawns[m_resources[j]->getSpawnIndex()] = true;
+						m_spawnDrone->freeSpawn(m_resources[j]->getSpawnIndex());
 						m_robots[i]->setResourceIndex(j);
 						m_resources[j]->setBlocked(true);
 					}
@@ -202,6 +252,8 @@ void GameState::handleInputs(Game* game, float dt)
 										m_robots[k]->setResourceIndex(m_robots[k]->getResourceIndex() - 1);
 								}
 							}
+
+							m_spawnDrone->ifHeldDecreaseResourceIndex();
 
 							delete m_resources[m_robots[i]->getResourceIndex()];
 							m_resources.erase(m_resources.begin() + m_robots[i]->getResourceIndex());
@@ -256,7 +308,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0);
+			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
@@ -303,9 +355,9 @@ GameState::GameState()
 	m_type = stateType::e_gameState;
 	m_input = nullptr;
 	m_robots = nullptr;
-	m_collectedTime = 0.0f;
 
-	// Spawn preset nodes
+	// Spawn preset nodes and initialize spawning drone
+	m_spawnDrone = new SpawnDrone(&m_resources);
 	spawnNodes();
 
 	m_transparency.initialize();
@@ -331,10 +383,27 @@ GameState::GameState()
 	index = m_lights->addSpotLight(47.5f, 14.7f, -0.34f, 20.0f, -0.0f, -0.9f, -0.3f, 0.8f, 0.8f, 0.8f, 30.0f, 5.0f); // Gas station spotlight
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 
-	// Initialize resource spawning lists
-	m_spawnLightIndex = m_lights->addSpotLight(0, 150, 0, 0, 0, -1, 0, 1, 1, 1, 13, 15);
-	loadLists();
-	startSpawn();
+	// Initialize dynamic camera
+	m_zoomingOutToStart = false;
+	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
+	m_camStartPos = DX::getInstance()->getCam()->getPosition();
+	m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
+	float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
+	float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
+	m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
+	m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
+	m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
+	m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
+
+	// Rotate plane according to look at
+	float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
+	for (int i = 0; i < 4; i++)
+		m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
+
+	m_fOVPlanes[0].m128_f32[2] *= -1;
+	m_fOVPlanes[1].m128_f32[2] *= -1;
+	m_fOVPlanes[2].m128_f32[2] *= -1;
+	m_fOVPlanes[3].m128_f32[2] *= -1;
 	
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
@@ -351,70 +420,11 @@ GameState::~GameState()
 	{
 		delete m_nodes[i];
 	}
+	if (m_spawnDrone)
+		delete m_spawnDrone;
 
 	//Dynamic background objects
 	delete m_dboHandler;
-}
-
-void GameState::regularSpawn(float dT)
-{
-	m_collectedTime += dT;
-
-	// Spawn if spawn interval pasted
-	if (m_collectedTime >= SPAWN_INTERVAL)
-	{
-		// Reset spawn time
-		while (m_collectedTime >= SPAWN_INTERVAL)
-			m_collectedTime -= SPAWN_INTERVAL;
-
-		// Calculate number of players
-		int nrOfPlayers = 0;
-		for (int i = 0; i < 4; i++)
-		{
-			if (m_robots[i] != nullptr)
-				nrOfPlayers++;
-		}
-
-		// Spawn resources according to max allowed
-		int maxResources = MAX_RESOURCES_OUT_PER_PLAYER * nrOfPlayers;
-		if (maxResources > m_resources.size()) // If there's room for a resource, spawn one
-		{
-
-
-			// Randomize whether it is a normal or special resource
-			bool isSpecial = false;
-			if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
-			{
-				// Only make resource special if there are available spots
-				for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
-				{
-					if (m_freeSpawns[(int)(m_normalSpawnAmount)+(char)i])
-						isSpecial = true;
-				}
-			}
-
-
-			int spawnIndex;
-			Resource* resource;
-			if (isSpecial)
-			{
-				spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
-				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
-				resource = new Resource(m_spawnLightIndex, spawnIndex, RIFLE, 3.0f);
-			}
-			else
-			{
-				spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
-				//resource = new Resource(m_spawnLightIndex, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.1f);
-				resource = new Resource(m_spawnLightIndex, spawnIndex, (rand() % 4) + 2, 1.2f);
-			}
-
-
-			XMFLOAT2 pos = m_spawns[spawnIndex];
-			resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
-			m_resources.push_back(resource);
-		}
-	}
 }
 
 void GameState::pause()
@@ -435,7 +445,12 @@ bool GameState::update(Game* game, float dt)
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
-	regularSpawn(dt);
+
+	// Update dynamic camera
+	updateDynamicCamera(dt);
+
+	// Update spawning drone
+	m_spawnDrone->update(m_robots, dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -457,7 +472,7 @@ bool GameState::update(Game* game, float dt)
 	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
 	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-	{ 
+	{
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
 
@@ -525,7 +540,6 @@ bool GameState::update(Game* game, float dt)
 	return 0;
 }
 
-
 void GameState::draw(Game* game, renderPass pass)
 {
 	m_input = game->getInput();
@@ -568,6 +582,13 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
 			game->getPreLoader()->draw(objectType::e_static, i);
 
+		game->getPreLoader()->draw(objectType::e_scene);
+		game->getPreLoader()->draw(objectType::e_scene, 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);

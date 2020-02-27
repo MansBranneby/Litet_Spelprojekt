@@ -10,6 +10,9 @@
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
 #include "CollisionTests.h"
+#include "StructsAndEnums.h"
+#include "SpawnDrone.h"
+
 class GameState : public State 
 {
 	
@@ -21,20 +24,17 @@ private:
 	Lights* m_lights;
 	Transparency m_transparency;
 
-	// Resource spawning lists
-	std::vector<XMFLOAT2> m_spawns;
-	std::vector<bool> m_freeSpawns;
-	void loadLists();
-
 	// Spawning
-	int m_spawnLightIndex;
-	float m_collectedTime;
-	int m_normalSpawnAmount;
-	int m_specialSpawnAmount;
-	void startSpawn();
-	int getSpawnIndex();
-	int getSpecialSpawnIndex();
+	SpawnDrone* m_spawnDrone;
 	void spawnNodes();
+
+	// Dynamic camera
+	XMVECTOR m_camStartPos;
+	XMVECTOR m_camStartLookAt;
+	XMVECTOR m_vecToCam;
+	bool m_zoomingOutToStart;
+	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
+	void updateDynamicCamera(float dT);
 
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
@@ -45,8 +45,6 @@ private:
 public:
 	GameState();
 	virtual ~GameState();
-
-	void regularSpawn(float dT);
 
 	void pause();
 	void resume();
