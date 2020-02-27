@@ -230,3 +230,53 @@ CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR b
 
 	return collisioninfo;
 }
+
+bool testLineLine(XMVECTOR startL1, XMVECTOR endL1, XMVECTOR startL2, XMVECTOR endL2)
+{
+	XMVECTOR l1Dir = endL1 - startL1;
+	XMVECTOR l2Dir = endL2 - startL2; 
+	float someDot = XMVectorGetX(l1Dir) * XMVectorGetY(l2Dir) - XMVectorGetY(l1Dir) * XMVectorGetX(l2Dir);
+	if (someDot == 0)
+		return false;
+	XMVECTOR startDiff = startL2 - startL1;
+	float t = (XMVectorGetX(startDiff) * XMVectorGetY(l2Dir) - XMVectorGetY(startDiff) * XMVectorGetX(l2Dir)) / someDot;
+	if (t < 0 || t > 1)
+		return false;
+	t = (XMVectorGetX(startDiff) * XMVectorGetY(l1Dir) - XMVectorGetY(startDiff) * XMVectorGetX(l1Dir)) / someDot;
+	if (t < 0 || t > 1)
+		return false;
+	return true;
+	
+}
+
+bool testLineTriangle(XMVECTOR start, XMVECTOR end, XMVECTOR triPos[3])
+{
+	const float EPSILON = 0.000001f;
+	XMVECTOR edge1, edge2, h, s, q;
+	XMVECTOR dir = end - start;
+	float a, f, u, v;
+	float maxT = XMVectorGetX(XMVector3Length(dir));
+
+	edge1 = triPos[1] - triPos[0];
+	edge2 = triPos[2] - triPos[0];
+	h = XMVector3Cross(dir, edge2);// Triangle pointing tward us
+	a = XMVectorGetX(XMVector3Dot(edge1, h));
+	if (a > -EPSILON && a < EPSILON)
+		return false;
+
+	f = 1.0f / a;
+	s = start - triPos[0];
+	u = f * XMVectorGetX(XMVector3Dot(s, h));
+	if (u < 0.0f || u > 1.0f)
+		return false;
+
+	q = XMVector3Cross(s, edge1);// Triangle pointing away from us
+	v = f * XMVectorGetX(XMVector3Dot(dir, q));
+	if (v < 0.0f || u + v > 1.0f)
+		return false;
+
+	float t = f * XMVectorGetX(XMVector3Dot(edge2, q));
+	if (t < maxT && t > EPSILON)
+		return true;
+	return false;
+}

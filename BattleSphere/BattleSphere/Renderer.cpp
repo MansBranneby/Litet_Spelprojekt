@@ -174,9 +174,9 @@ void createRenderResources()
 	g_menu = new Menu();
 
 	g_shadowMapping = new ShadowMapping();
-	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
+	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
-											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
+		(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 
 	g_gameState = new GameState();
 	g_mainMenuState = new MainMenuState();
@@ -210,7 +210,7 @@ void downsample()
 
 	ID3D11ShaderResourceView* nullSRV = { nullptr };
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullSRV);
-	
+
 }
 
 void shadowRender()
@@ -257,7 +257,7 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
 	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
 	g_bloom->setShaderResource(renderPass::e_final);
-	
+
 	DX::getInstance()->getDeviceContext()->Draw(6, 0);
 
 	ID3D11ShaderResourceView* nullRTV = { NULL };
@@ -290,7 +290,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		
+
 		g_Clock = new Clock();
 		g_Game = new Game();
 		g_Game->pushState(g_gameState);
@@ -308,8 +308,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		XMVECTOR moonPos = XMVectorSet(0, -2, 0, 0);
 		float speed = 1.0f;
 		float rotCoeff = 0;
-		
-		///////////////
+
+		/*int tempIndex = Lights::getInstance()->addAreaLight(0, 0, 0, 20, 1, 0, 1, 20);
+		float positions[2];*/
+
+		Graph::getInstance()->createVertexBuffer();
+
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
@@ -330,9 +334,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);
 				}
-				
+
 				//// SET PIPELINE ////
-				float clearColour[] = { 0, 0, 0, 0  };
+				float clearColour[] = { 0, 0, 0, 0 };
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
@@ -346,21 +350,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					shadowRender();
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-					//g_lightCulling.updateSubresource();
+
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
-					//DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
+
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
 					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-					//DX::getInstance()->getDeviceContext()->ClearState();
-
 					g_bloom->clearRenderTarget();
 
 					// BLOOM
 					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
 					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
+					DX::getInstance()->getDeviceContext()->GSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, DX::getInstance()->getCam()->getConstantBufferPosition()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(3, 1, g_shadowMapping->getCamera()->getConstantBufferVP()->getConstantBuffer());
@@ -408,13 +411,21 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
-					
+
 					g_Game->draw(renderPass::e_opaque);
 
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 					g_Game->draw(renderPass::e_transparent);
-					
-					
+
+					for (int i = 0; i < XUSER_MAX_COUNT; i++)
+					{
+						if (Graph::getInstance()->getActive(i))
+						{
+							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());
+							Graph::getInstance()->draw(i);
+						}
+					}
+
 					downsample();
 
 					g_bloom->run();
@@ -499,25 +510,25 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::Begin("Settings");
 
 				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-				ImGui::ColorPicker4("Pick a color", moonColor);
-				ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
-				ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+				//ImGui::ColorPicker4("Pick a color", moonColor);
+				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
+				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
+
+				/*ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
+				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
+				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/
 
 				ImGui::End();
 				ImGui::Render();
 				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 				DX::getInstance()->getSwapChain()->Present(0, 0);
-				//
+
 				counterFrames++;
 				if (g_Clock->getTimeInSec() > 1.0)
 				{
 					fps = counterFrames;
 					counterFrames = 0;
 					g_Clock->resetSecTimer();
-					//g_Game->updateSec();
-					// TODO: delet dis (visa fps)
-					/*OutputDebugStringA(std::to_string(fps).c_str());
-					OutputDebugStringA("\n");*/
 
 				}
 
@@ -548,6 +559,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_pixelShaderDownsample.release();
 		DX::getInstance()->release();
 		delete DX::getInstance();
+		Graph::getInstance()->release();
+		delete Graph::getInstance();
 
 		//Remove
 		delete g_bloom;

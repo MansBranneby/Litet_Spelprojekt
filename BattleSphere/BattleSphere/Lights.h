@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#define LIGHT_COUNT 48
+#define LIGHT_COUNT 96
 
 using namespace DirectX;
 

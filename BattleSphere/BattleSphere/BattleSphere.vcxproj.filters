@@ -156,6 +156,9 @@
     <ClCompile Include="CollisionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SpawnDrone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -305,6 +308,9 @@
     <ClInclude Include="UI_Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Graph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="SpawnDrone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -355,6 +361,18 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="VertexShaderMenu.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="GeometryShaderPath.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShaderPath.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShaderPath.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
