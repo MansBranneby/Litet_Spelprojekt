@@ -275,7 +275,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_LEFT_SHOULDER))
 					{
 						m_robots[i]->changeWeapon(LEFT);
-					}
+					}	
 				}
 
 				// TODO: add collision and remove projectile

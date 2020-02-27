@@ -103,8 +103,9 @@ PreLoader::PreLoader()
 
 	// Load objects
 	loadFromFile(objectType::e_drone, "Drone");
-	loadFromFile(objectType::e_weapon, "Weapon1");
-	loadFromFile(objectType::e_robot, "BattleSphere", "BattleSphere");
+	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
