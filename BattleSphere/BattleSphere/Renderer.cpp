@@ -313,7 +313,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		float positions[2];*/
 
 		Graph::getInstance()->createVertexBuffer();
-		///////////////
+
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
@@ -350,16 +350,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					shadowRender();
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-					//g_lightCulling.updateSubresource();
+
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
 
-					//DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
 					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-					//DX::getInstance()->getDeviceContext()->ClearState();
-
 					g_bloom->clearRenderTarget();
 
 					// BLOOM
@@ -525,17 +522,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::Render();
 				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 				DX::getInstance()->getSwapChain()->Present(0, 0);
-				//
+
 				counterFrames++;
 				if (g_Clock->getTimeInSec() > 1.0)
 				{
 					fps = counterFrames;
 					counterFrames = 0;
 					g_Clock->resetSecTimer();
-					//g_Game->updateSec();
-					// TODO: delet dis (visa fps)
-					/*OutputDebugStringA(std::to_string(fps).c_str());
-					OutputDebugStringA("\n");*/
 
 				}
 

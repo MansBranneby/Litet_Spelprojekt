@@ -365,7 +365,7 @@ void GameState::handleInputs(Game* game, float dt)
 				m_input->setVibration(i, 0.0f);
 			}
 
-			if (m_robots[i]->getResourceIndex() != -1) //m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_LEFT)
+			if (m_robots[i]->getResourceIndex() != -1)
 			{
 				bool goal = false;
 				std::vector<XMVECTOR> paths[4];

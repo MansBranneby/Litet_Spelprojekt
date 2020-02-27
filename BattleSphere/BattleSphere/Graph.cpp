@@ -39,8 +39,7 @@ void Graph::createVertexBuffer()
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	bufferDesc.ByteWidth = sizeof(XMVECTOR) * 25;
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	/*D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = &m_path[0];*/
+
 
 	// create a Vertex Buffer
 	HRESULT result = DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, nullptr, &m_vsBuffer);
@@ -149,7 +148,6 @@ Graph::Graph()
 	m_nodes[36].neighbours = std::vector<int>{ 36, 38 };
 	m_nodes[37].neighbours = std::vector<int>{ 24, 35, 37, 39 };
 	m_nodes[38].neighbours = std::vector<int>{ 14, 31, 38 };
-	//index = Lights::getInstance()->addPointLight(0, 0, 0, 20, 1, 1, 1, 20);
 
 	for (int i = 0; i < m_nodes.size(); i++)
 	{
@@ -268,12 +266,8 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 			m_active[index] = false;
 			return std::vector<XMVECTOR>();
 		}
-		
 
-		//nodes.push_back({ startNode, -1, 0});
 		open.push_back({ startNode, -1, 0, 0 });
-
-
 
 		while (open.size() > 0)
 		{
