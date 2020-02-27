@@ -103,15 +103,26 @@ PreLoader::PreLoader()
 
 	// Load objects
 	loadFromFile(objectType::e_drone, "Drone");
-	loadFromFile(objectType::e_weapon, "Weapon1");
-	loadFromFile(objectType::e_robot, "BattleSphere", "BattleSphere");
+	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
-	loadFromFile(objectType::e_resource, "Weapon1", "1mesh1mat");
-	loadFromFile(objectType::e_static, "Bar", "BarColl");
-	loadFromFile(objectType::e_static, "Wall", "WallColl");
-	loadFromFile(objectType::e_scene, "SceneBig");
-	loadFromFile(objectType::e_scene, "Ground");
+
+	// On map (with collision)
+	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
+	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
+	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+		// Nodes
+	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
+
+	// Background
+	loadFromFile(objectType::e_scene, "Background\\Ground");
+	loadFromFile(objectType::e_scene, "Background\\Freeway");
+	loadFromFile(objectType::e_scene, "Other\\Car");
+	loadFromFile(objectType::e_extra, "Other\\CarDBO");
+	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
 }
 
 PreLoader::~PreLoader()

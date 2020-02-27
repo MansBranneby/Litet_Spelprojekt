@@ -101,53 +101,62 @@ bool UI_Animation::translateElement(vertex* vertexList, float* posX, float* posY
 
 void UI_Animation::animateElement(vertex* vertexList, float dt)
 {
-	// Sprite
-	if ((m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f) && m_isAnimated)
-	{
-		m_timer += dt;
-		if (m_timer >= 0.1f)
-		{
-			m_timer = 0.0f;
-			float u = m_spriteSizeX / m_sizeX;
-			float v = m_spriteSizeY / m_sizeY;
-			int activeFrame = (int)(m_texU / (u) * 6 + m_texV / (v)-6);
-			if (activeFrame == m_nrOfFrames) // Reset sprite sheet
-			{
-				m_texU = u;
-				m_texV = v;
-			}
-			else
-			{
-				if (m_texV + v > 1)
-				{
-					m_texU += u;
-					m_texV = v;
-				}
-				else
-				{
-					m_texV += v;
-				}
-			}
+	//// Sprite
+	//if ((m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f) && m_isAnimated)
+	//{
+	//	m_timer += dt;
+	//	if (m_timer >= 0.1f)
+	//	{
+	//		m_timer = 0.0f;
+	//		float u = m_spriteSizeX / m_sizeX;
+	//		float v = m_spriteSizeY / m_sizeY;
+	//		int activeFrame = (int)(m_texU / (u) * 6 + m_texV / (v)-6);
+	//		if (activeFrame == m_nrOfFrames) // Reset sprite sheet
+	//		{
+	//			m_texU = u;
+	//			m_texV = v;
+	//		}
+	//		else
+	//		{
+	//			if (m_texV + v > 1)
+	//			{
+	//				m_texU += u;
+	//				m_texV = v;
+	//			}
+	//			else
+	//			{
+	//				m_texV += v;
+	//			}
+	//		}
 
-			vertexList[0].u = m_texU - u;
-			vertexList[0].v = m_texV - v;
+	//		vertexList[0].u = m_texU - u;
+	//		vertexList[0].v = m_texV - v;
 
-			vertexList[1].u = m_texU;
-			vertexList[1].v = m_texV;
+	//		vertexList[1].u = m_texU;
+	//		vertexList[1].v = m_texV;
 
-			vertexList[2].u = m_texU - u;
-			vertexList[2].v = m_texV;
+	//		vertexList[2].u = m_texU - u;
+	//		vertexList[2].v = m_texV;
 
-			vertexList[3].u = m_texU - u;
-			vertexList[3].v = m_texV - v;
+	//		vertexList[3].u = m_texU - u;
+	//		vertexList[3].v = m_texV - v;
 
-			vertexList[4].u = m_texU;
-			vertexList[4].v = m_texV - v;
+	//		vertexList[4].u = m_texU;
+	//		vertexList[4].v = m_texV - v;
 
-			vertexList[5].u = m_texU;
-			vertexList[5].v = m_texV;
-		}
-	}
+	//		vertexList[5].u = m_texU;
+	//		vertexList[5].v = m_texV;
+	//	}
+	//}
+	m_animationData.m128_f32[0] += dt;
+	if (m_animationData.m128_f32[0] >= XM_PI * 2)
+		m_animationData.m128_f32[0] = 0.0f;
+	//m_constantBufferAniData->updateBuffer(&m_animationData, sizeof(XMVECTOR));
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferAniData->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &m_animationData, sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferAniData->getConstantBuffer(), 0);
 }
 
 bool UI_Animation::fadeElement(vertex* vertexList, float dt)
@@ -194,6 +203,11 @@ bool UI_Animation::fadeElement(vertex* vertexList, float dt)
 	return !(m_isFadeOut || m_isFadeIn);
 }
 
+ConstantBuffer* UI_Animation::getConstantBuffer()
+{
+	return m_constantBufferAniData;
+}
+
 UI_Animation::UI_Animation(float sizeX, float sizeY, float spriteSizeX, float spriteSizeY, u_int nrOfFrames)
 {
 	m_timer = 0.0f;
@@ -207,6 +221,7 @@ UI_Animation::UI_Animation(float sizeX, float sizeY, float spriteSizeX, float sp
 	m_nrOfFrames = nrOfFrames;
 	m_animationSpeed = 0.0f;
 	m_acceleration = 0.0f;
+	m_animationData = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_texU = m_spriteSizeX / m_sizeX;
 	m_texV = m_spriteSizeY / m_sizeY;
@@ -216,10 +231,13 @@ UI_Animation::UI_Animation(float sizeX, float sizeY, float spriteSizeX, float sp
 	m_fadeOut = false;
 	m_isFadeOut = false;
 	m_isFadeIn = false;
+
+	m_constantBufferAniData = new ConstantBuffer(&m_animationData, sizeof(XMVECTOR));
 }
 
 UI_Animation::~UI_Animation()
 {
+	delete m_constantBufferAniData;
 }
 
 bool UI_Animation::isAnimated()

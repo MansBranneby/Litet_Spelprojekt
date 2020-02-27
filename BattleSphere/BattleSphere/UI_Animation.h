@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StructsAndEnums.h"
+#include "ConstantBuffer.h";
 #include "imgui/imgui.h"
 
 enum AnimationType
@@ -12,6 +13,8 @@ enum AnimationType
 class UI_Animation
 {
 private:
+	ConstantBuffer* m_constantBufferAniData;
+
 	float m_timer; // Keep track of delay and rest
 	float m_animationSpeed, m_acceleration ,m_delay, m_delay2, m_rest; // Animation data
 	
@@ -22,6 +25,7 @@ private:
 	float m_fadeOut, m_initialFadeTime;
 	float m_fadeIn;
 	bool m_isAnimated; // Controls if spriteSheet is updated
+	XMVECTOR m_animationData;
 	bool m_isFadeOut, m_isFadeIn;
 
 public:
@@ -39,5 +43,7 @@ public:
 	bool translateElement(vertex* vertexList, float* posX, float* posY, float sizeX, float sizeY, float destX, float destY, float dt);
 	void animateElement(vertex* vertexList, float dt);
 	bool fadeElement(vertex* vertexList, float dt);
+
+	ConstantBuffer* getConstantBuffer();
 };
 

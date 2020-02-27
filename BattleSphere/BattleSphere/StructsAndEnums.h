@@ -68,6 +68,7 @@ using namespace DirectX;
 // Special - bigger than normal number - resources
 
 
+#define OBJECT_TYPES 9 // Nr of object types
 enum class objectType
 {
 	e_drone = 0,
@@ -77,7 +78,8 @@ enum class objectType
 	e_projectile = 4,
 	e_resource = 5,
 	e_scene = 6,
-	e_static = 7
+	e_static = 7,
+	e_extra
 };
 
 enum class renderPass
@@ -86,6 +88,7 @@ enum class renderPass
 	e_downSample,
 	e_final,
 	e_menu,
+	e_menuAni,
 	e_menuScene,
 	e_opaque,
 	e_transparent

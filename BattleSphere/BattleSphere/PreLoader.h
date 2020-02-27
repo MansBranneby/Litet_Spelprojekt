@@ -7,7 +7,6 @@
 #include "Projectile.h"
 #include "Resource.h"
 
-#define OBJECT_TYPES 8
 // objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource, e_scene, e_static
 
 

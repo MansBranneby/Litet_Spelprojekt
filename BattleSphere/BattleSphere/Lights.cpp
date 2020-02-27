@@ -180,8 +180,6 @@ void Lights::setPosition(int index, float x, float y, float z)
 	m_lights[index].x = x;
 	m_lights[index].y = y;
 	m_lights[index].z = z;
-	
-
 }
 
 void Lights::setDirection(int index, float dx, float dy, float dz)

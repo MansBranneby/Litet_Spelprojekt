@@ -13,6 +13,7 @@ private:
 //	ID3D11DepthStencilState* m_depthState;
 	VertexShader* m_vertexShader;
 	PixelShader* m_pixelShader;
+	PixelShader* m_pixelShaderAni;
 
 	void initializeResources();
 
@@ -23,6 +24,6 @@ public:
 	//ID3D11DepthStencilState* getDepthStencilState();
 	Camera* getCamera(bool perspective);
 	VertexShader* getVertexShader();
-	PixelShader* getPixelShader();
+	PixelShader* getPixelShader(int index);
 };
 
