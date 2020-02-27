@@ -10,6 +10,14 @@ private:
 		XMVECTOR velocity;
 	};
 
+	struct computeShaderData
+	{
+		float xSize;
+		float ySize;
+		float dT;
+		float padding;
+	};
+
 	// List of lists of particles, each with separate dispatch, 
 	// along with color and size constant buffers
 	std::vector<std::vector<XMVECTOR>> particleGroups;
@@ -18,8 +26,8 @@ private:
 
 	// Compute shader
 	ComputeShader m_computeShaderParticles;
-	ConstantBuffer m_computeSizeConstantBuffer;
-	ID3D11Buffer* m_structuredBufferOut;
+	ConstantBuffer m_computeShaderConstantBuffer;
+	ID3D11Buffer* m_structuredBufferCS;
 
 	// Vertex shader
 	VertexShader m_vertexShaderParticles;
@@ -34,7 +42,7 @@ public:
 	Particles();
 	~Particles();
 
-	void addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount = 200, float velocity = 3.0f);
+	void addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount = 200, float velocity = 3.0f, XMVECTOR direction = {0.0f, 0.0f, 0.0f, 0.0f});
 	void update(float dT);
 	void draw();
 };

@@ -16,7 +16,7 @@ Particles::~Particles()
 	m_pixelShaderParticles.release();
 }
 
-void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity)
+void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, XMVECTOR direction)
 {
 }
 
