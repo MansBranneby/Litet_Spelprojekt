@@ -45,8 +45,12 @@ cbuffer PS_ROBOT_DATA : register (b4)
 cbuffer PS_CONSTANT_BUFFER : register (b5)
 {
 	float4 velocityUV;
-	float blinkValue;
+	float blinkFactor;
 	float billboardType;
+	float colourChangeFactor;
+	float colourDecider;
+	float minY;
+	float maxY;
 };
 
 float DoAttenuation(Light light, float d)
@@ -67,6 +71,58 @@ StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
 Texture2D txModel : register(t4); // Model texture
+
+float3 changeColour(float3 worldPos, float3 colourA, float3 cololourB)
+{
+	float3 fragmentCol = float3(0.0f, 0.0f, 0.0f);
+	float bar = minY + ((maxY - minY) * colourChangeFactor); // Divides model into two halves, one under the bar and one above
+	float barIncrement = maxY * 0.4f; // Decides how much above the bar that should be interpolated
+	
+	//		 MODEL
+	//  ________________
+	// | ColourB		|
+	// | Interpolated AB|
+	// | ColourA		|
+	
+	// colourDecider switches which colour to interpolate between
+	if (colourDecider > 0.0f)
+	{
+		// Every fragment under the bar will be colour A
+		if (worldPos.y < bar)
+		{
+			// Under bar
+			fragmentCol = colourA;
+		}
+		else
+		{
+			// Every fragment above the bar and under bar with some arbitrary increment will be interpolated between colour A and B
+			// Above bar
+			if (worldPos.y < bar + barIncrement)
+				fragmentCol = lerp(colourA, cololourB, (worldPos.y - bar) / barIncrement);
+			else
+				fragmentCol = cololourB; // Rest of the building will be colour B
+		}
+	}
+	else
+	{
+		if (worldPos.y < bar)
+		{
+			// Under bar
+			fragmentCol = cololourB;
+		}
+		else
+		{
+			// Above bar
+			if (worldPos.y < bar + barIncrement)
+				fragmentCol = lerp(cololourB, colourA, (worldPos.y - bar) / barIncrement);
+			else
+				fragmentCol = colourA;
+		}
+	}
+
+	return fragmentCol;
+}
+
 
 float4 PS_main(PS_IN input) : SV_Target
 {
@@ -197,19 +253,23 @@ case 3:
 	}
 
 	// Sample texture with UV coordinates that have been incremented with velocityUV coordinates to translate the texture
-	float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
 	if (billboardType == 1.0f)
 	{
-		//modelTexture *= blinkValue;
-		//fragmentCol *= blinkValue;
-		float low = 0.0f;
-		float high = 80.0f;
-		if (input.posWC.y > low&& input.posWC.y < high)
-		{
-			float3(0.0f, 0.3f, 0.4f); // lightblue
-			fragmentCol = lerp(float3(0.0f, 0.3f, 0.4f), float3(1.0f, 0.01f, 0.6f), -(low + (blinkValue * 80.0f) - input.posWC.y) / high);
-		}
+		// predefined colours
+		float3 cyan = float3(0.0f, 0.4f, 0.3f);
+		float3 lightblue = float3(0.0f, 0.3f, 0.4f);
+		float3 pink = float3(1.0f, 0.01f, 0.6f);
+
+		// Change colour, interpolate between two colours
+		fragmentCol = changeColour(input.posWC, cyan, pink);
+
+		// Sample texture
+		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+		modelTexture *= blinkFactor;
+
+		// Add texture onto fragmentCol
+		fragmentCol += (modelTexture * 0.5f);
 	}
 
-	return float4(modelTexture + fragmentCol , KeIn.w);
+	return float4(fragmentCol , KeIn.w);
 };

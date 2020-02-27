@@ -133,8 +133,12 @@ struct objectData
 struct TextureAnimationData
 {
 	XMVECTOR velocityUV{0.0f, 0.0f, 0.0f};
-	float blinkValue = 0.0f;
+	float blinkFactor = 0.0f;
 	float type = 0.0f;
+	float colourChangeFactor = 0.0f;
+	float colourDecider = 1.0f;
+	float minY = 0.0f;
+	float maxY = 0.0f;
 	float padding[2];
 };
 

@@ -35,6 +35,11 @@ private:
 	// To calculate bounding volumes
 	void computeOBB();
 
+	// Calculate min and max y coordinates
+	float m_minY;
+	float m_maxY;
+	void computeMinMaxY();
+
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCullingBuffer(); // For vertex culling buffer
 	void createVertexCBuffer(); // For model matrix

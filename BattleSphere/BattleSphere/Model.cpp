@@ -4,7 +4,7 @@ void Model::computeOBB()
 {
 	const int nrOfPairs = 179;
 
-	// Get 1 degree rotation matrix
+	// Get 1 degree rotation matrix wa 
 	float vx = 0.0f;
 	float vy = 1.0f; // Rotate around the Y-axis
 	float vz = 0.0f;
@@ -114,6 +114,15 @@ void Model::computeOBB()
 	m_bData.zAxis = pair[bestPairIndex].vec2;
 }
 
+void Model::computeMinMaxY()
+{
+	for (int i = 0; i < m_nrOfVertices; ++i)
+	{	
+		m_minY = min(m_minY, m_vertices[i].posY);
+		m_maxY = max(m_maxY, m_vertices[i].posY);
+	}
+}
+
 void Model::createVertexBuffer()
 {
 	m_modelMatrixData = new XMMATRIX();
@@ -205,7 +214,8 @@ void Model::draw(TextureAnimationData textureAnimationData)
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
-
+	textureAnimationData.minY = m_minY;
+	textureAnimationData.maxY = m_maxY;
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw(textureAnimationData);
@@ -248,6 +258,9 @@ Model::Model()
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
+
+	m_minY = INFINITY;
+	m_maxY = -INFINITY;
 }
 
 Model::~Model()
@@ -804,14 +817,18 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 		int* indices = new int[nrOfIndices];
 		for (int j = 0; j < nrOfIndices; j += 3)
 		{
+			int index0 = j;
+			int index1 = j + 1;
+			int index2 = j + 2;
+
 			std::getline(in, line);
 			inputStream.str(line);
-			inputStream >> indices[j] >> indices[j + 1] >> indices[j + 2];
+			inputStream >> indices[index0] >> indices[index1] >> indices[index2];
 
 			// Save vertex indices 
-			m_indices.push_back(indices[j]);
-			m_indices.push_back(indices[j + 1]);
-			m_indices.push_back(indices[j + 2]);
+			m_indices.push_back(indices[index0]);
+			m_indices.push_back(indices[index1]);
+			m_indices.push_back(indices[index2]);
 			inputStream.clear();
 		}
 		m_subModels[i].setFaces(indices, nrOfIndices);
@@ -822,7 +839,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
-
+	computeMinMaxY();
 }
 
 ID3D11ShaderResourceView* Model::createTexture(std::string fileName)

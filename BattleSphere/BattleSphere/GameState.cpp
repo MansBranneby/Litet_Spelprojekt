@@ -220,7 +220,10 @@ void GameState::updateBillboards(float dt)
 {
 	// Update billboards
 	for (int i = 0; i < m_billboards.size(); ++i)
-		m_billboards[i].moveUV(dt * 0.1f);
+	{
+		m_billboards[i].moveUV(dt);
+		m_billboards[i].changeColour(dt);
+	}
 }
 
 void GameState::handleMovement(Game* game, float dt, int id)
@@ -412,7 +415,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 void GameState::createBillboards()
 {
-	m_billboards.push_back(Billboard({ -0.5f, 0.0f, 0.0f }, 2.0f, 1.0f));
+	m_billboards.push_back(Billboard({ -0.05f, 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f));
 
 }
 
