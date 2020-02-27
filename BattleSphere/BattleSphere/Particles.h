@@ -1,5 +1,6 @@
 #pragma once
 #include "StructsAndEnums.h"
+#define MAX_PARTICLES 10000
 
 class Particles
 {
@@ -26,17 +27,22 @@ private:
 
 	// Compute shader
 	ComputeShader m_computeShaderParticles;
-	ConstantBuffer m_computeShaderConstantBuffer;
-	ID3D11Buffer* m_structuredBufferCS;
+	ConstantBuffer* m_computeShaderConstantBuffer;
+	ID3D11Buffer* m_structuredBufferCSWrite;
+	ID3D11Buffer* m_structuredBufferCSRead;
+	ID3D11UnorderedAccessView* m_structuredBufferUAVCS; // [0] = in(written), [1] = out(to be read)
 
 	// Vertex shader
+	ID3D11ShaderResourceView* m_structuredBufferSRV;
 	VertexShader m_vertexShaderParticles;
+	ConstantBuffer* m_vertexShaderConstantBuffer;
 
 	// Geometry shader
 	GeometryShader m_geometryShaderParticles;
 
 	// Pixel shader
 	PixelShader m_pixelShaderParticles;
+	ConstantBuffer* m_pixelShaderConstantBuffer;
 
 public:
 	Particles();
