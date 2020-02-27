@@ -84,7 +84,7 @@ Game::Game()
 	//sceneData.rotation = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	//sceneData.scale = XMVectorSet(0.6f, 0.6f, 0.6f, 0.6f);
 	//m_preLoader.setStaticData(objectType::e_scene, sceneData);
-	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{200.0f, 200.0f}, &m_preLoader, 2, 0);
+	m_quadtree = new QuadtreeNode(XMFLOAT3{ 0.0f, 0.0f, 0.0f }, XMFLOAT2{300.0f, 300.0f}, &m_preLoader, 2, 0);
 	Graph::getInstance()->setQuadtree(m_quadtree);
 }
 

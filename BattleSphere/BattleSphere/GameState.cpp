@@ -393,6 +393,11 @@ GameState::GameState()
 	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+
+	m_lights->addAreaLight(172, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10); // Under map
+	m_lights->addAreaLight(32, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
+	m_lights->addAreaLight(32, -30, 69, 50, 0.2f, 0.7f, 1.0f, 10);
+
 	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
 	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
 	m_lights->addAreaLight(46.0f, 4.0f, -6.5f, 12.0f, 0.0f, 1.0f, 0.35f, 15.0f); // Gas station cyan
