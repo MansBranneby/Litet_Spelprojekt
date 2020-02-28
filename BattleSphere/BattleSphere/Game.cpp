@@ -117,6 +117,9 @@ void Game::pushState(State* state)
 
 void Game::changeState(stateType state)
 {
+	if (state == stateType::e_gameState)
+		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (m_states[i]->getType() == state)
@@ -141,6 +144,9 @@ void Game::release()
 {
 	ProjectileBank::getInstance()->release();
 	delete ProjectileBank::getInstance();
+
+	Sound::getInstance()->release();
+	delete Sound::getInstance();
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{

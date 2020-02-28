@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "ProjectileBank.h"
 #include "StructsAndEnums.h"
+#include "Sound.h"
 
 using namespace DirectX;
 

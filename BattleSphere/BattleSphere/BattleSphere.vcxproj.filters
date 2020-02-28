@@ -168,6 +168,9 @@
     <ClCompile Include="DBOHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -326,6 +329,9 @@
     <ClInclude Include="DBOHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -393,6 +399,9 @@
     <FxCompile Include="VertexShaderPath.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />

@@ -7,6 +7,7 @@
 #include "StructsAndEnums.h"
 #include "Graph.h"
 #include "SpawnDrone.h"
+#include "Sound.h"
 
 class GameState : public State 
 {

@@ -182,6 +182,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpawnDrone.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="SubModel.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="ShadowMapping.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="SpawnDrone.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StructsAndEnums.h" />

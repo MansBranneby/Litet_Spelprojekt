@@ -68,7 +68,6 @@ void GameState::updateDynamicCamera(float dT)
 		newLookAt /= (float)nrOfPlayers;
 		newLookAt.m128_f32[3] -= 100.0f;
 
-
 		// Calculate biggest distance
 		float xDifference = maxX - minX;
 		float zDifference = maxZ - minZ;
@@ -462,6 +461,9 @@ bool GameState::update(Game* game, float dt)
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
+
+	// Update sounds
+	Sound::getInstance()->update(dt);
 
 	// Update dynamic camera
 	updateDynamicCamera(dt);

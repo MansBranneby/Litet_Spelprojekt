@@ -219,6 +219,10 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
 		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		if (m_type == PISTOL)
+			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
+		if (m_type == RIFLE)
+			Sound::getInstance()->play(soundEffect::e_rifle, projPos, 0.3f, -0.5f, 0.0f);
 
 		return true;
 	}

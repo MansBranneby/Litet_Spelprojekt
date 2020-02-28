@@ -180,6 +180,7 @@ void createRenderResources()
 
 	g_gameState = new GameState();
 	g_mainMenuState = new MainMenuState();
+
 }
 
 void downsample()
@@ -275,7 +276,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	g_lightCulling.computeFrustum();
 	createRenderResources(); // Creates instances of graphics classes etc.
 	g_transparency.initialize();
-
+	
 	if (wndHandle)
 	{
 		IMGUI_CHECKVERSION();

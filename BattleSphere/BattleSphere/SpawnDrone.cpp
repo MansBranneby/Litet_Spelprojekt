@@ -110,6 +110,7 @@ void SpawnDrone::setRotationTarget(XMVECTOR target)
 
 bool SpawnDrone::travelAndCheck(float dT, bool fastTravel)
 {
+	Sound::getInstance()->play(soundAmbient::e_drone, 0.6f, 0.0f, 0.0f, m_spawnDroneBody.getPosition());
 	if (m_spawnDroneTravelling)
 	{
 		XMVECTOR pos = m_spawnDroneBody.getPosition();
@@ -402,6 +403,7 @@ void SpawnDrone::update(Robot** robots, float dT)
 	case 13: // Reset switch
 		m_spawnDroneState++;
 		m_spawnDroneState = -1;
+		Sound::getInstance()->stop(soundAmbient::e_drone);
 		break;
 	}
 }
