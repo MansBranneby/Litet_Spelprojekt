@@ -253,9 +253,9 @@ bool testLineTriangle(XMVECTOR start, XMVECTOR end, XMVECTOR triPos[3])
 {
 	const float EPSILON = 0.000001f;
 	XMVECTOR edge1, edge2, h, s, q;
-	XMVECTOR dir = end - start;
+	XMVECTOR dir = XMVector3Normalize( end - start);
 	float a, f, u, v;
-	float maxT = XMVectorGetX(XMVector3Length(dir));
+	float maxT = XMVectorGetX(XMVector3Length(end - start));
 
 	edge1 = triPos[1] - triPos[0];
 	edge2 = triPos[2] - triPos[0];
