@@ -1,19 +1,23 @@
 #define MOVEMENT_SPEED 20.0f
 
-cbuffer deltaTime {
+cbuffer deltaTime : register(b1)
+{
 	float dt;
 };
 
-struct particle {
+struct particle 
+{
 	float3 pos;
-	float2 tex;
-	float3 normal;
+	float3 vel;
+	float2 size;
+	float3 color;
 };
 
-StructuredBuffer<particle> inputBuffer : register(t0);
-RWStructuredBuffer<particle> outputBuffer : register(u0);
+static const uint particlesPerThread = 8
+RWStructuredBuffer<particle> input : register(u0); // Read from 0
+RWStructuredBuffer<particle> output : register(u1); // Write to 1
 
-[numthreads(1000, 1, 1)]
+[numthreads(16, 1, 1)]
 void CS_main(uint3 DTid : SV_DispatchThreadID)
 {
 	particle temp = inputBuffer.Load(DTid.x);

@@ -111,6 +111,24 @@ void VertexShader::createParticleInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlo
 		12,							// offset of FIRST element (after POSITION)
 		D3D11_INPUT_PER_VERTEX_DATA,
 		0
+	},
+			{
+		"SIZE",
+		0,				// same slot as previous (same vertexBuffer)
+		DXGI_FORMAT_R32G32_FLOAT,
+		0,
+		24,							// offset of FIRST element (after POSITION)
+		D3D11_INPUT_PER_VERTEX_DATA,
+		0
+	},
+			{
+		"COLOR",
+		0,				// same slot as previous (same vertexBuffer)
+		DXGI_FORMAT_R32G32B32_FLOAT,
+		0,
+		32,							// offset of FIRST element (after POSITION)
+		D3D11_INPUT_PER_VERTEX_DATA,
+		0
 	}
 	};
 
