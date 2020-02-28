@@ -159,6 +159,9 @@
     <ClCompile Include="Billboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BillboardHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -308,6 +311,9 @@
     <ClInclude Include="Billboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BillboardHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -337,8 +343,6 @@
     <FxCompile Include="VertexShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="PixelShaderMenu.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
@@ -347,7 +351,6 @@
     </FxCompile>
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
-    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="PixelShaderBillboard.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>

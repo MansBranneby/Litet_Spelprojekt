@@ -62,7 +62,7 @@ private:
 
 public:
 	void draw();
-	void draw(TextureAnimationData textureAnimationData);
+	void draw(BillboardData BillboardData, int subModelNr);
 	void cullDraw();
 	Model();
 	~Model();
@@ -73,8 +73,9 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
+	int getNrOfSubModels() const;
 	void setObjectData(objectData data, int modelNr = -1);
-	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int subModelNr = -1);
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);

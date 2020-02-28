@@ -76,7 +76,7 @@ float3 changeColour(float3 worldPos, float3 colourA, float3 cololourB)
 {
 	float3 fragmentCol = float3(0.0f, 0.0f, 0.0f);
 	float bar = minY + ((maxY - minY) * colourChangeFactor); // Divides model into two halves, one under the bar and one above
-	float barIncrement = maxY * 0.4f; // Decides how much above the bar that should be interpolated
+	float barIncrement = maxY * 0.5 * colourChangeFactor; // Decides how much above the bar that should be interpolated
 	
 	//		 MODEL
 	//  ________________
@@ -265,8 +265,15 @@ case 3:
 
 		// Sample texture
 		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-		modelTexture *= blinkFactor;
+		
 
+		// Add texture onto fragmentCol
+		fragmentCol += (modelTexture * 0.5f);
+	}
+	else if (billboardType == 2.0f)
+	{
+		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+		modelTexture *= blinkFactor;
 		// Add texture onto fragmentCol
 		fragmentCol += (modelTexture * 0.5f);
 	}

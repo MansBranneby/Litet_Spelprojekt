@@ -66,11 +66,11 @@ void SubModel::createCulledIndexBuffer()
 	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
 }
 
-void SubModel::updateTextureAnimationCB(TextureAnimationData textureAnimationData)
+void SubModel::updateTextureAnimationCB(BillboardData BillboardData)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(*m_textureAnimationCB->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &textureAnimationData, sizeof(textureAnimationData));
+	memcpy(mappedMemory.pData, &BillboardData, sizeof(BillboardData));
 	DX::getInstance()->getDeviceContext()->Unmap(*m_textureAnimationCB->getConstantBuffer(), 0);
 }
 
@@ -83,7 +83,7 @@ void SubModel::setMaterialInfo(material mat)
 	m_materialCBuffer = *m_constantBuffer->getConstantBuffer();
 
 	// TODO GLENN
-	m_textureAnimationCB = new ConstantBuffer(m_mat, sizeof(TextureAnimationData));
+	m_textureAnimationCB = new ConstantBuffer(m_mat, sizeof(BillboardData));
 }
 
 void SubModel::updateMaterialInfo(material mat)
@@ -136,23 +136,22 @@ void SubModel::draw()
 	
 }
 
-void SubModel::draw(TextureAnimationData textureAnimationData)
+void SubModel::draw(BillboardData textureAnimationData)
 {
 
 	// Bind indexbuffer
 	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_culledIndiceBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	DX* instance = DX::getInstance();
+    DX* instance = DX::getInstance();
 	XMVECTOR emission = m_mat->emission;
 	if (emission.m128_f32[0] > 0 || emission.m128_f32[1] > 0 || emission.m128_f32[2] > 0)
 		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSEnabled(), 1);
 	else
 		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
 
-
 	// Set texture if model has one other set it to nullptr
-	ID3D11ShaderResourceView* nullSRV = { nullptr };
-	(m_SRV != nullptr) ? (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV), textureAnimationData.type = 1.0f) : (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV), textureAnimationData.type = 0.0f);
+	ID3D11ShaderResourceView* nullSRV = { nullptr };	
+	(m_SRV != nullptr) ? (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV)) : (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV));
 
 	updateTextureAnimationCB(textureAnimationData);
 

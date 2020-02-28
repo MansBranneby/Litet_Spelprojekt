@@ -32,14 +32,14 @@ public:
 	SubModel();
 	~SubModel();
 
-	void updateTextureAnimationCB(TextureAnimationData textureAnimationData);
+	void updateTextureAnimationCB(BillboardData billboardData);
 	void setMaterialInfo(material mat);
 	void updateMaterialInfo(material mat);
 	void setFaces(int* indexBuffer, int nrOfIndices);
 	void setSRV(ID3D11ShaderResourceView* SRV);
 
 	void draw();
-	void draw(TextureAnimationData textureAnimationData);
+	void draw(BillboardData billboardData);
 	void cullDraw();
 };
 

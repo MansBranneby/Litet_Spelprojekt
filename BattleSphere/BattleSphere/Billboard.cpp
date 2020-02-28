@@ -2,6 +2,10 @@
 
 Billboard::Billboard()
 {
+	m_variant = 0;
+	m_modelNr = 0;
+	m_subModelNr = 0;
+
 	m_UVincrement = { 0.0f, 0.0f, 0.0f };
 	m_velocityUV = { 0.0f, 0.0f, 0.0f };
 	m_blinkSpeed = 0.0f;
@@ -9,10 +13,32 @@ Billboard::Billboard()
 	m_type = 0.0f;
 	m_colourChangeSpeed = 0.0f;
 	m_colourChangeFactor = 0.0f;
+	m_colourDecider = 1.0f;
 }
 
-Billboard::Billboard(DirectX::XMVECTOR velocityUV, float blinkSpeed, float colourChangeSpeed, float type)
+Billboard::Billboard(int variant, int modelNr, int subModelNr)
 {
+	m_variant = variant;
+	m_modelNr = modelNr;
+	m_subModelNr = subModelNr;
+
+	m_UVincrement = { 0.0f, 0.0f, 0.0f };
+	m_velocityUV = { 0.0f, 0.0f, 0.0f };
+	m_blinkSpeed = 0.0f;
+	m_blinkFactor = 0.0f;
+	m_type = 0.0f;
+	m_colourChangeSpeed = 0.0f;
+	m_colourChangeFactor = 0.0f;
+	m_colourDecider = 1.0f;
+}
+
+Billboard::Billboard(DirectX::XMVECTOR velocityUV, float blinkSpeed, float colourChangeSpeed, float type, int variant, int modelNr, int subModelNr)
+{
+
+	m_variant = variant;
+	m_modelNr = modelNr;
+	m_subModelNr = subModelNr;
+
 	m_UVincrement = { 0.0f, 0.0f, 0.0f };
 	m_velocityUV = velocityUV;
 	m_blinkSpeed = blinkSpeed;
@@ -54,14 +80,29 @@ void Billboard::changeColour(float dt)
 	}
 }
 
+int Billboard::getVariant() const
+{
+	return m_variant;
+}
+
+int Billboard::getModelNr() const
+{
+	return m_modelNr;
+}
+
+int Billboard::getSubModelNumber() const
+{
+	return m_subModelNr;
+}
+
 DirectX::XMVECTOR Billboard::getVelocityUV() const
 {
 	return m_velocityUV;
 }
 
-TextureAnimationData Billboard::getTextureAnimationData() const
+BillboardData Billboard::getBillboardData() const
 {
-	TextureAnimationData data;
+	BillboardData data;
 	data.velocityUV = m_UVincrement;
 	data.blinkFactor= m_blinkFactor;
 	data.colourChangeFactor = m_colourChangeFactor;
@@ -69,4 +110,13 @@ TextureAnimationData Billboard::getTextureAnimationData() const
 	data.type = m_type;
 
 	return data;
+}
+
+void Billboard::update(float dt)
+{
+	if (m_type == 1)
+	{
+		moveUV(dt);
+		changeColour(dt);
+	}
 }

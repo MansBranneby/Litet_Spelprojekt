@@ -3,7 +3,7 @@
 #include "Transparency.h"
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
-#include "Billboard.h"
+#include "BillboardHandler.h"
 
 class GameState : public State 
 {
@@ -13,7 +13,7 @@ private:
 	Robot** m_robots;
 	std::vector<Resource*> m_resources;
 	std::vector<Node*> m_nodes;
-	std::vector<Billboard> m_billboards;
+	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
 	Transparency m_transparency;
 
@@ -48,19 +48,13 @@ private:
 	bool travelAndCheck(float dT, bool fastTravel);
 	bool assignMission();
 	void updateSpawnDrone(float dT);
-	void updateBillboards(float dt);
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 
-	// create billboards
-	void createBillboards();
-
 public:
-	GameState();
+	GameState(Game* game);
 	virtual ~GameState();
-
-	
 
 	void pause();
 	void resume();

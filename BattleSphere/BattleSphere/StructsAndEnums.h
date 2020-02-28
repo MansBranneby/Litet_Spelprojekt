@@ -130,7 +130,7 @@ struct objectData
 };
 
 // Data used to animate texture
-struct TextureAnimationData
+struct BillboardData
 {
 	XMVECTOR velocityUV{0.0f, 0.0f, 0.0f};
 	float blinkFactor = 0.0f;

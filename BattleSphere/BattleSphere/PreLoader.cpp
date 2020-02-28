@@ -163,6 +163,16 @@ int PreLoader::getNrOfVariants(ObjectType type) const
 	return (int)m_objects[(int)type].size();
 }
 
+int PreLoader::getNrOfModels(ObjectType type, int variant) const
+{
+	return m_nrOfmodels[(int)type][variant];
+}
+
+int PreLoader::getNrOfSubModels(ObjectType type, int modelNr, int variant) const
+{
+	return m_objects[(int)type][modelNr][variant].getNrOfSubModels();
+}
+
 void PreLoader::setStaticData(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
@@ -207,11 +217,12 @@ void PreLoader::draw(ObjectType type, objectData data, objectData relativeData, 
 	}
 }
 
-void PreLoader::draw(ObjectType type, TextureAnimationData textureAnimationData, int variant)
+void PreLoader::draw(ObjectType type, BillboardData billboardData, int modelNr, int subModelNr, int variant)
 {
 	int typ = (int)type;
+
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
-		m_objects[typ][variant][i].draw(textureAnimationData);
+		m_objects[typ][variant][i].draw(billboardData, subModelNr);
 }
 
 void PreLoader::drawCM(ObjectType type, int variant)

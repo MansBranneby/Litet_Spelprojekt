@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="BackfaceCuller.cpp" />
     <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="BillboardHandler.cpp" />
     <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CollisionTests.cpp" />
@@ -192,6 +193,7 @@
   <ItemGroup>
     <ClInclude Include="BackfaceCuller.h" />
     <ClInclude Include="Billboard.h" />
+    <ClInclude Include="BillboardHandler.h" />
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CollisionTests.h" />

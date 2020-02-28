@@ -208,18 +208,20 @@ void Model::draw()
 	}
 }
 
-void Model::draw(TextureAnimationData textureAnimationData)
+void Model::draw(BillboardData BillboardData, int subModelNr)
 {
 	UINT32 vertexSize = sizeof(vertex);
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
-	textureAnimationData.minY = m_minY;
-	textureAnimationData.maxY = m_maxY;
-	for (int i = 0; i < m_nrOfSubModels; i++)
+	BillboardData.minY = m_minY;
+	BillboardData.maxY = m_maxY;
+
+	m_subModels[subModelNr].draw(BillboardData);
+	/*for (int i = 0; i < m_nrOfSubModels; i++)
 	{
-		m_subModels[i].draw(textureAnimationData);
-	}
+		m_subModels[i].draw(BillboardData);
+	}*/
 }
 
 void Model::cullDraw()
@@ -513,6 +515,11 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	}
 
 	return updatedVertices;
+}
+
+int Model::getNrOfSubModels() const
+{
+	return m_nrOfSubModels;
 }
 
 void Model::setObjectData(objectData data, int modelNr)

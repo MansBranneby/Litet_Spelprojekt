@@ -216,16 +216,6 @@ void GameState::updateSpawnDrone(float dT)
 	}
 }
 
-void GameState::updateBillboards(float dt)
-{
-	// Update billboards
-	for (int i = 0; i < m_billboards.size(); ++i)
-	{
-		m_billboards[i].moveUV(dt);
-		m_billboards[i].changeColour(dt);
-	}
-}
-
 void GameState::handleMovement(Game* game, float dt, int id)
 {
 	// Save velocity for collision
@@ -413,13 +403,7 @@ void GameState::handleInputs(Game* game, float dt)
 	}
 }
 
-void GameState::createBillboards()
-{
-	m_billboards.push_back(Billboard({ -0.05f, 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f));
-
-}
-
-GameState::GameState()
+GameState::GameState(Game* game)
 {
 	srand((unsigned int)time(NULL));
 
@@ -432,9 +416,8 @@ GameState::GameState()
 	spawnNodes();
 
 	// Create billboards
-	// Billboards are used to animate buildings, eg. translating textures
-	createBillboards();
-
+	m_billboardHandler = BillboardHandler(game->getPreLoader());
+	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
@@ -675,7 +658,7 @@ bool GameState::update(Game* game, float dt)
 	// Update spawning drone
 	updateSpawnDrone(dt);
 	// Update billboards
-	updateBillboards(dt);
+	m_billboardHandler.updateBillboards(dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -694,10 +677,12 @@ bool GameState::update(Game* game, float dt)
 	}
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
-	boundingData projectileBD = game->getPreLoader()->getBoundingData(ObjectType::e_projectile, 0, 0);
-	boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 1, 0);
+
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
+		boundingData projectileBD = game->getPreLoader()->getBoundingData(ObjectType::e_projectile, 0, 0);
+		boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 1, 0);
+
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
 
@@ -804,12 +789,12 @@ void GameState::draw(Game* game, renderPass pass)
 
 		for (int i = 0; i < m_nodes.size(); i++)
 			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
-		
 	}
 	else if (pass == renderPass::e_billboard)
 	{
-		for(int i = 0; i < m_billboards.size(); ++i)
-			game->getPreLoader()->draw(ObjectType::e_billboard, m_billboards[i].getTextureAnimationData(), 0);
-	}
+		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 
+		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+	}
 }

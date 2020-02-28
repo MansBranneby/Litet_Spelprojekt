@@ -178,9 +178,6 @@ void createRenderResources()
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0,0,0,0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
-
-	g_gameState = new GameState();
-	g_mainMenuState = new MainMenuState();
 }
 
 void downsample()
@@ -310,9 +307,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		
 		g_Clock = new Clock();
 		g_Game = new Game();
+		g_gameState = new GameState(g_Game);
+		g_mainMenuState = new MainMenuState();
 		g_Game->pushState(g_gameState);
 		g_Game->pushState(g_mainMenuState);
 		//g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
