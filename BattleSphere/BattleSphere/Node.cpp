@@ -62,8 +62,8 @@ Node::Node(int colorType)
 	m_colorType = m_oldColor = colorType;
 	m_loopTime = 0.0f;
 	m_newColorPicked = false;
-	setScale(0.3f, 0.3f, 0.3f);
-	setRotation(0, 1, 0, 90);
+	//setScale(0.3f, 0.3f, 0.3f);
+	//setRotation(0, 1, 0, 90);
 	setMaterial();
 }
 

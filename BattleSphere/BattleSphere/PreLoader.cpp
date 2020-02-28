@@ -106,7 +106,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
-	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
+	loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
 	// On map (with collision)
@@ -128,8 +128,11 @@ PreLoader::PreLoader()
 
 	// Background
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
+	loadFromFile(objectType::e_scene, "OnMap\\BigWall");
+	loadFromFile(objectType::e_scene, "OnMap\\NodeGoldenDuck");
 
 	loadFromFile(objectType::e_scene, "Background\\Ground");
+	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
