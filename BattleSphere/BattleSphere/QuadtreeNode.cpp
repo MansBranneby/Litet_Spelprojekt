@@ -38,14 +38,17 @@ QuadtreeNode::QuadtreeNode(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 halfWD, PreL
 	// Test collision of node OBB and other OBB
 	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_static); ++i)
 	{
-		boundingData boundingData = preLoader->getBoundingData(objectType::e_static, 0, i);
-
-		// Test collision
-		if (testOBBOBB(m_boundingData, boundingData).m_colliding)
+		for (int j = 0; j < preLoader->getNrOfModels(objectType::e_static, i); j++)
 		{
-			// Append collisionMesh to to m_cMeshes
-			std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, 0, i);
-			m_cMeshes.insert(std::end(m_cMeshes), std::begin(tempCMesh), std::end(tempCMesh));
+			boundingData boundingData = preLoader->getBoundingData(objectType::e_static, j, i);
+
+			// Test collision
+			if (testOBBOBB(m_boundingData, boundingData).m_colliding)
+			{
+				// Append collisionMesh to to m_cMeshes
+				std::vector<DirectX::XMFLOAT3> tempCMesh = preLoader->getCollisionMesh(objectType::e_static, j, i);
+				m_cMeshes.insert(std::end(m_cMeshes), std::begin(tempCMesh), std::end(tempCMesh));
+			}
 		}
 	}
 
@@ -192,7 +195,7 @@ CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume, DirectX::
 
 bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 {
-
+	
 	XMFLOAT2 point[4];
 	XMFLOAT3 pos;
 	XMStoreFloat3(&pos, m_boundingData.pos - m_boundingData.halfWD.x * m_boundingData.xAxis + m_boundingData.halfWD.y * m_boundingData.zAxis);//Top Left;
@@ -238,8 +241,8 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
 				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
 
-				XMVECTOR startReal = { start.x, 1.0f, start.y };
-				XMVECTOR endReal = { end.x, 1.0f, end.y };
+				XMVECTOR startReal = { start.x, 0.5f, start.y };
+				XMVECTOR endReal = { end.x, 0.5f, end.y };
 
 				collision = testLineTriangle(startReal, endReal, triangles);
 				if (collision)
