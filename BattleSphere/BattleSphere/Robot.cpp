@@ -23,9 +23,9 @@ Robot::Robot(int playerId)
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
 
 	// Position history
-	m_positionHistorySize = 0; 
+	m_positionHistorySize = 0;
 	m_positionHistoryCap = 100;
-	m_positionHistoryPtr = 0;	
+	m_positionHistoryPtr = 0;
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
 }
@@ -132,21 +132,25 @@ void Robot::useWeapon(int side, float dt)
 		m_weapons[m_currentWeapon[side]]->speedUp();
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();
+		m_weapons[m_currentWeapon[side]]->spin(dt);
 	}
 }
 
 void Robot::changeWeapon(int side)
 {
-	if (m_weapons.size() > 2) 
+	if (m_weapons.size() > 2)
 	{
 		m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
 			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
-		
-		if (side == RIGHT)
-			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.4f, 0.4f, 0.2f, 0.0f));
-		else
-			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
+
+		if (m_weapons[m_currentWeapon[side]]->getType() != BEYBLADE)
+		{
+			if (side == RIGHT)
+				m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.4f, 0.4f, 0.2f, 0.0f));
+			else
+				m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
+		}
 		m_ready = false;
 	}
 }
@@ -177,6 +181,7 @@ void Robot::addWeapon(int type)
 	if (m_currentWeapon[LEFT] == -1)
 	{
 		m_currentWeapon[LEFT] = 1;
+		if (type != BEYBLADE)
 		weapon->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
 	}
 	m_weapons.push_back(weapon);
@@ -224,7 +229,7 @@ void Robot::update(float dt)
 void Robot::move(XMVECTOR dPos)
 {
 	GameObject::move(dPos);
-	
+
 	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
 	);

@@ -24,6 +24,12 @@ private:
 	float m_defense;
 	float m_currentDefense;
 
+	bool m_spinning;
+	float m_scale;
+	float m_range;
+	float m_spinPerSec;
+	float m_maxSpinPerSec;
+
 	bool m_ready;
 	float m_cooldown;
 	float m_duration;
@@ -38,6 +44,7 @@ public:
 	bool speedUp();
 	bool shield();
 	bool reflect();
+	bool spin(float dt);
 
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();

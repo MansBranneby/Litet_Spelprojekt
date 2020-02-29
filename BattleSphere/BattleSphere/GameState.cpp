@@ -276,7 +276,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_LEFT_SHOULDER))
 					{
 						m_robots[i]->changeWeapon(LEFT);
-					}	
+					}
 				}
 
 				// TODO: add collision and remove projectile
@@ -421,7 +421,7 @@ GameState::GameState()
 	m_fOVPlanes[1].m128_f32[2] *= -1;
 	m_fOVPlanes[2].m128_f32[2] *= -1;
 	m_fOVPlanes[3].m128_f32[2] *= -1;
-	
+
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
 }
@@ -571,11 +571,31 @@ void GameState::draw(Game* game, renderPass pass)
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
 				game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
+				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
+				switch (wepType)
+				{
+				case 6: // Beyblade
+					game->getPreLoader()->drawOneMaterial(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1);
+					break;
+
+				default:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
+					break;
+				}
 
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
 				{
-					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+					int wepType = weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getType();
+					switch (wepType)
+					{
+					case 6: // Beyblade
+						game->getPreLoader()->drawOneMaterial(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1);
+						break;
+
+					default:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+						break;
+					}
 				}
 			}
 		}
@@ -585,15 +605,25 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+			int resType = m_resources[i]->getType();
+			switch (resType)
+			{
+			case 6: // Beyblade
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 1);
+				break;
+
+			default:
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+				break;
+			}
 		}
 	}
 	if (pass != renderPass::e_opaque)
 	{
 		// Scene (Background objects without collision)
-		for(int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
 			game->getPreLoader()->draw(objectType::e_scene, i);
-		
+
 		//Static
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
 			game->getPreLoader()->draw(objectType::e_static, i);
@@ -617,5 +647,5 @@ void GameState::draw(Game* game, renderPass pass)
 		if (m_dboHandler->isDrawn(i))
 			game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 	}
-	
+
 }
