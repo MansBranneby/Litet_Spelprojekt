@@ -21,6 +21,7 @@ Robot::Robot(int playerId)
 	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
+	m_vel = XMVectorSet(0, 0, 0, 0);
 
 	// Position history
 	m_positionHistorySize = 0;
