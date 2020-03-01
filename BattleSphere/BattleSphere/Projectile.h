@@ -17,7 +17,7 @@ class Projectile : public GameObject
 private:
 	int m_owner;
 	int m_type;
-	int m_damage;
+	float m_damage;
 	float m_velocity;
 	XMVECTOR m_direction;
 
@@ -28,7 +28,7 @@ public:
 
 	int getOwner();
 	int getType();
-	int getDamage();
+	float getDamage();
 	float getVelocity();
 	XMVECTOR getDirection();
 

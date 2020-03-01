@@ -104,9 +104,9 @@ PreLoader::PreLoader()
 	// Load objects
 	loadFromFile(objectType::e_drone, "Drone");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_weapon, "GamePlay\\Beyblade");
+	loadFromFile(objectType::e_weapon, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade");
+	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
@@ -207,11 +207,11 @@ void PreLoader::draw(objectType type, objectData data, int modelNr, int subModel
 	}
 }
 
-void PreLoader::draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant)
+void PreLoader::draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant, bool leftMaterial)
 {
 	int typ = (int)type;
 	if (modelNr != -1)
-		m_objects[typ][variant][modelNr].setObjectData(data, relativeData, subModelNr);
+		m_objects[typ][variant][modelNr].setObjectData(data, relativeData, subModelNr, leftMaterial);
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data, relativeData);

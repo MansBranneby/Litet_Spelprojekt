@@ -67,7 +67,7 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
 	void setObjectData(objectData data, int modelNr = -1);
-	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int modelNr = -1, bool leftMaterial = true);
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);

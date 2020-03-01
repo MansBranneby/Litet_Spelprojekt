@@ -473,16 +473,58 @@ bool GameState::update(Game* game, float dt)
 	ProjectileBank::getInstance()->moveProjectiles(dt);
 
 	Robot** robots = game->getRobots();
+	int nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
+			nrOfPlayers++;
 			m_robots[i]->update(dt);
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
+	}
 
+	// Collision melee weapon
+	for (int i = 0; i < nrOfPlayers; i++)
+	{
+		std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+		int bladeIdx = -1;
+		int leftSide = m_robots[i]->getCurrentWeapon(LEFT);
+		if (weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE)
+			bladeIdx = m_robots[i]->getCurrentWeapon(RIGHT);
+		else if (leftSide != -1 && weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
+			bladeIdx = m_robots[i]->getCurrentWeapon(LEFT);
+		
+		// If player is using Beyblade
+		if (bladeIdx != -1)
+		{
+			XMVECTOR beybladeRobPos = m_robots[i]->getPosition();
+			float beyBladeRange = weapons[bladeIdx]->getRange();
+			// Loop through and possibly damage other players
+			for (int j = 1; j < nrOfPlayers; j++)
+			{
+				int otherIdx = (i + j) % nrOfPlayers;
+				XMVECTOR otherRobPos = m_robots[otherIdx]->getPosition();
+				XMVECTOR dirToVictim = beybladeRobPos - otherRobPos;
+				float beyBladeDamage = weapons[bladeIdx]->getSpinDPS() * dt;
+
+				// Beyblade is within range, damage player.
+				if (beyBladeDamage != 0.0f && XMVector3Length(dirToVictim).m128_f32[0] <= beyBladeRange)
+				{
+					// Set vibration and drop resource
+					int resourceIndex = m_robots[otherIdx]->getResourceIndex();
+					m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1);
+					m_input->setVibration(otherIdx, 0.5f);
+					if (resourceIndex != -1)
+					{
+						m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
+						m_resources[resourceIndex]->setBlocked(false);
+					}
+				}
+			}
+		}
 	}
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
@@ -575,7 +617,7 @@ void GameState::draw(Game* game, renderPass pass)
 				switch (wepType)
 				{
 				case 6: // Beyblade
-					game->getPreLoader()->drawOneMaterial(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1);
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
 					break;
 
 				default:
@@ -589,7 +631,7 @@ void GameState::draw(Game* game, renderPass pass)
 					switch (wepType)
 					{
 					case 6: // Beyblade
-						game->getPreLoader()->drawOneMaterial(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1);
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
 						break;
 
 					default:

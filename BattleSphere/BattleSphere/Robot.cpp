@@ -41,40 +41,39 @@ int Robot::getPlayerId()
 }
 
 
-bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
+bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex)
 {
-	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
-		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 	if (m_currentWeapon[LEFT] != -1)
-		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 
 	if (projIndex != -1)
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 
-	if (dmg != 0.0f)
+	if (damage != 0.0f)
 	{
-		m_health -= (int)floorf(dmg);
+		m_health -= damage;
 		if (m_health < 0)
 		{
 			m_health = 0;
 			setDrawn(false);
 		}
-		m_material.emission = m_colour * (float)m_health / 100.0f;
+		m_material.emission = m_colour * m_health / 100.0f;
 		removeResource();
 		return true;
 	}
 	return false;
 }
 
-void Robot::setHealth(int health)
+void Robot::setHealth(float health)
 {
 	setDrawn(true);
 	m_health = health;
 	m_material.emission = m_colour;
 }
 
-int Robot::getHealth()
+float Robot::getHealth()
 {
 	return m_health;
 }

@@ -62,7 +62,7 @@ Weapon::Weapon(int type)
 		m_cooldown = 0.0f;
 		m_speed = 1000;
 		m_damage = 8;
-		m_range = 5;
+		m_range = 4.123295f; // Blade range
 		m_scale = 1.0f;
 		m_spinPerSec = 0.0f;
 		m_maxSpinPerSec = 5.0f;
@@ -86,9 +86,19 @@ int Weapon::getType()
 	return m_type;
 }
 
-int Weapon::getDamage()
+float Weapon::getDamage()
 {
 	return m_damage;
+}
+
+float Weapon::getSpinDPS()
+{
+	return m_spinPerSec * m_damage;
+}
+
+float Weapon::getRange()
+{
+	return m_range * m_scale + +1.54710078f; // Blade range + robot range
 }
 
 float Weapon::getRecoil()
@@ -181,9 +191,8 @@ void Weapon::upgrade()
 	else if (m_type == BEYBLADE)
 	{
 		m_cooldown = 0.0f;
-		m_damage = 8;
-		m_range += 5;
-		m_scale += 0.7f;
+		m_damage += 6;
+		m_scale *= 2.0f;
 		m_maxSpinPerSec += 1;
 		setScale(m_scale, 1.0f, m_scale);
 	}
@@ -244,7 +253,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		else
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
-		ProjectileBank::getInstance()->addProjectile(projPos + projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		ProjectileBank::getInstance()->addProjectile(projPos + projDir, robotColour, projRot, projDir, m_type, (int)m_damage, robotId);
 
 		return true;
 	}
@@ -337,6 +346,7 @@ bool Weapon::updateTime(float dt)
 			rotate(0, 1, 0, -m_spinPerSec);
 		}
 		m_spinning = false;
+		return false;
 	}
 }
 

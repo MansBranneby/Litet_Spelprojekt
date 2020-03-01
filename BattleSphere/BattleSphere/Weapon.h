@@ -15,7 +15,7 @@ class Weapon : public GameObject
 {
 private:
 	XMVECTOR m_relativePos;
-	int m_damage;
+	float m_damage;
 	int m_type;
 	float m_recoil;
 	float m_currentRecoil;
@@ -49,7 +49,9 @@ public:
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
 	int getType();
-	int getDamage();
+	float getDamage();
+	float getSpinDPS();
+	float getRange();
 	float getRecoil();
 	float getSpeed();
 	bool getActive();

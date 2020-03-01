@@ -50,7 +50,7 @@ int Projectile::getType()
 	return m_type;
 }
 
-int Projectile::getDamage()
+float Projectile::getDamage()
 {
 	return m_damage;
 }

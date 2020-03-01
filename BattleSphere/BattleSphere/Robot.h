@@ -19,7 +19,7 @@ class Robot : public GameObject
 private:
 	int m_playerId;
 	XMVECTOR m_colour;
-	int m_health;
+	float m_health;
 	float m_velocity;
 	float m_currentRotation;
 	std::vector<Weapon*> m_weapons;
@@ -43,9 +43,9 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
-	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex);
-	void setHealth(int health);
-	int getHealth();
+	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex);
+	void setHealth(float health);
+	float getHealth();
 	void setVelocity(float velocity);
 	float getVelocity();
 	void setCurrentRot(float deg);
