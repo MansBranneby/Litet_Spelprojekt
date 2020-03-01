@@ -2,7 +2,6 @@
 
 BillboardHandler::BillboardHandler()
 {
-	m_billboards.push_back(Billboard({ -0.05f, 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, 0, 0, 0));
 }
 
 BillboardHandler::BillboardHandler(PreLoader* preLoader)
@@ -13,15 +12,12 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 		for (int j = 0; j < preLoader->getNrOfModels(ObjectType::e_billboard, i); ++j)
 		{
 			for (int k = 0; k < preLoader->getNrOfSubModels(ObjectType::e_billboard, j, i); ++k)
-				m_billboards.push_back(Billboard(i, j, k));
+				m_billboards.push_back(Billboard(i, j, k)); // Each billboard knows its variantNr, modelNr and submodelNr
 		}
 	}
 
-	//if (k == 2)
-	//	m_billboards.push_back(Billboard({ -0.05f, 0.0f }, 0.0f, 0.1f, 1, i, j, k));
-	//else if (k == 3)
-	//	m_billboards.push_back(Billboard({ 0.0f, 0.0f }, 0.0f, 0.1f, 1, i, j, k));
-	//else
+	m_billboards[2].setType(BillboardState::e_all);
+	m_billboards[5].setType(BillboardState::e_all);
 }
 
 BillboardHandler::~BillboardHandler()

@@ -846,7 +846,8 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
-	computeMinMaxY();
+
+	computeMinMaxY(); // Calculate min and max y for billboard colour interpolation 
 }
 
 ID3D11ShaderResourceView* Model::createTexture(std::string fileName)

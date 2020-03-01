@@ -6,11 +6,11 @@ Billboard::Billboard()
 	m_modelNr = 0;
 	m_subModelNr = 0;
 
+	m_state = BillboardState::e_none;
 	m_UVincrement = { 0.0f, 0.0f, 0.0f };
 	m_velocityUV = { 0.0f, 0.0f, 0.0f };
-	m_blinkSpeed = 0.0f;
-	m_blinkFactor = 0.0f;
-	m_type = 0.0f;
+	m_flashSpeed = 0.0f;
+	m_flashFactor = 0.0f;
 	m_colourChangeSpeed = 0.0f;
 	m_colourChangeFactor = 0.0f;
 	m_colourDecider = 1.0f;
@@ -22,62 +22,69 @@ Billboard::Billboard(int variant, int modelNr, int subModelNr)
 	m_modelNr = modelNr;
 	m_subModelNr = subModelNr;
 
+	m_state = BillboardState::e_none;
 	m_UVincrement = { 0.0f, 0.0f, 0.0f };
-	m_velocityUV = { 0.0f, 0.0f, 0.0f };
-	m_blinkSpeed = 0.0f;
-	m_blinkFactor = 0.0f;
-	m_type = 0.0f;
-	m_colourChangeSpeed = 0.0f;
+	m_velocityUV = { -0.05f, 0.0f, 0.0f };
+	m_flashSpeed = 0.1f;
+	m_flashFactor = 0.0f;
+	m_colourChangeSpeed = 0.01f;
 	m_colourChangeFactor = 0.0f;
 	m_colourDecider = 1.0f;
 }
 
-Billboard::Billboard(DirectX::XMVECTOR velocityUV, float blinkSpeed, float colourChangeSpeed, float type, int variant, int modelNr, int subModelNr)
+void Billboard::setType(BillboardState state)
 {
-
-	m_variant = variant;
-	m_modelNr = modelNr;
-	m_subModelNr = subModelNr;
-
-	m_UVincrement = { 0.0f, 0.0f, 0.0f };
-	m_velocityUV = velocityUV;
-	m_blinkSpeed = blinkSpeed;
-	m_blinkFactor = 0.0f;
-	m_type = type;
-	m_colourChangeSpeed = colourChangeSpeed;
-	m_colourChangeFactor = 0.0f;
-	m_colourDecider = 1.0f;
+	m_state = state;
 }
 
-void Billboard::moveUV(float dt)
+void Billboard::setFlashSpeed(float flashSpeed)
+{
+	m_flashSpeed = flashSpeed;
+}
+
+void Billboard::setColourChangeSpeed(float colourChangeSpeed)
+{
+	m_colourChangeSpeed = colourChangeSpeed;
+}
+
+void Billboard::setVelocityUV(DirectX::XMVECTOR velocityUV)
+{
+	m_velocityUV = velocityUV;
+}
+
+void Billboard::flashColour(float dt)
+{
+	if (m_flashFactor < 0.0f)
+	{
+		m_flashSpeed *= -1.0f; // Make flashSpeed positive
+		m_flashFactor = 0.0f;  // Clamp to 0
+	}
+	else if (m_flashFactor > 1.0f)
+	{
+		m_flashSpeed *= -1.0f; // Make flashSpeed negative
+		m_flashFactor = 1.0f;  // Clamp to 1
+	}
+
+	// increase or decrease flashFactor depending on the sign (+ or -) of flashSpeed
+	m_flashFactor += dt * m_flashSpeed;
+}
+
+void Billboard::interpolateColours(float dt)
+{
+	// Once colour change factor reaches 1.0f we reset it
+	if (m_colourChangeFactor > 1.0f)
+	{
+		m_colourDecider *= -1.0f; // Flip the sign of m_coulourDecider to switch colour in pixelshader
+		m_colourChangeFactor = 0.0f; // Clamp to 0
+	}
+
+	// Increase m_colourChangeFactor
+	m_colourChangeFactor += dt * m_colourChangeSpeed;
+}
+
+void Billboard::translateUV(float dt)
 {
 	m_UVincrement += dt * m_velocityUV;
-	
-	if (m_blinkFactor < 0.0f)
-	{
-		m_blinkSpeed *= -1.0f;
-		m_blinkFactor = 0.0f;
-	}
-	else if (m_blinkFactor > 1.0f)
-	{
-		m_blinkSpeed *= -1.0f;
-		m_blinkFactor = 1.0f;
-	}
-		
-	m_blinkFactor += dt * m_blinkSpeed;
-}
-
-void Billboard::changeColour(float dt)
-{
-	// add onto m_colourChangeFactor
-	m_colourChangeFactor += dt * m_colourChangeSpeed;
-
-	// Once colour change factor reaches 1.0f we reset it
-	if (m_colourChangeFactor >= 1.0f)
-	{
-		m_colourChangeFactor = 0.0f;
-		m_colourDecider *= -1.0f;
-	}
 }
 
 int Billboard::getVariant() const
@@ -95,28 +102,38 @@ int Billboard::getSubModelNumber() const
 	return m_subModelNr;
 }
 
-DirectX::XMVECTOR Billboard::getVelocityUV() const
-{
-	return m_velocityUV;
-}
-
 BillboardData Billboard::getBillboardData() const
 {
 	BillboardData data;
 	data.velocityUV = m_UVincrement;
-	data.blinkFactor= m_blinkFactor;
+	data.flashFactor= m_flashFactor;
 	data.colourChangeFactor = m_colourChangeFactor;
 	data.colourDecider = m_colourDecider;
-	data.type = m_type;
+	data.state = m_state;
 
 	return data;
 }
 
 void Billboard::update(float dt)
 {
-	if (m_type == 1)
+	switch (m_state)
 	{
-		moveUV(dt);
-		changeColour(dt);
+	case BillboardState::e_flashing:
+		flashColour(dt);
+		break;
+
+	case BillboardState::e_interpolating:
+		interpolateColours(dt);
+		break;
+
+	case BillboardState::e_translating:
+		translateUV(dt);
+		break;
+
+	case BillboardState::e_all:
+		flashColour(dt);
+		interpolateColours(dt);
+		translateUV(dt);
+		break;
 	}
 }

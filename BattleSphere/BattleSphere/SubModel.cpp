@@ -136,7 +136,7 @@ void SubModel::draw()
 	
 }
 
-void SubModel::draw(BillboardData textureAnimationData)
+void SubModel::draw(BillboardData billboardData)
 {
 
 	// Bind indexbuffer
@@ -153,8 +153,7 @@ void SubModel::draw(BillboardData textureAnimationData)
 	ID3D11ShaderResourceView* nullSRV = { nullptr };	
 	(m_SRV != nullptr) ? (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV)) : (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV));
 
-	updateTextureAnimationCB(textureAnimationData);
-
+	updateTextureAnimationCB(billboardData);
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(5, 1, m_textureAnimationCB->getConstantBuffer());

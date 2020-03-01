@@ -44,13 +44,18 @@ cbuffer PS_ROBOT_DATA : register (b4)
 
 cbuffer PS_CONSTANT_BUFFER : register (b5)
 {
+	// Type
+	int billboardState;
+	float3 pad;
+	// Translate
 	float4 velocityUV;
-	float blinkFactor;
-	float billboardType;
-	float colourChangeFactor;
+	// Interpolate
 	float colourDecider;
+	float colourChangeFactor;
 	float minY;
 	float maxY;
+	// Flash
+	float flashFactor;
 };
 
 float DoAttenuation(Light light, float d)
@@ -123,7 +128,6 @@ float3 changeColour(float3 worldPos, float3 colourA, float3 cololourB)
 	return fragmentCol;
 }
 
-
 float4 PS_main(PS_IN input) : SV_Target
 {
 	////LIGHTING//// (for one light)
@@ -179,37 +183,35 @@ float4 PS_main(PS_IN input) : SV_Target
 		{
 		case 0:
 			//Point light
-	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-	lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
-	break;
-case 1:
-	//Directional light
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
+			break;
 
-	L = normalize(-Lights[LightIndex[i]].Direction.xyz);
-	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-	lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
-	break;
-case 2:
-	//return float4(1, 1, 1, 1);
-	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-	float attenuation = DoAttenuation(light, d);
-	float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
-	lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
+		case 1:
+			//Directional light
+			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
+			break;
 
-	break;
-case 3:
-	//Area light
+		case 2:
+			//return float4(1, 1, 1, 1);
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+			float attenuation = DoAttenuation(light, d);
+			float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
+			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
+			break;
 
-	L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-	R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-	lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
-
-	LKs = float3(0, 0, 0);
-
-	break;
-}
+		case 3:
+			//Area light
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+			lightCol = Lights[LightIndex[i]].color * DoAttenuation(light, d) * light.Intensity;
+			LKs = float3(0, 0, 0);
+			break;
+		}
 
 		// Illumination models //
 		switch (KaIn.w)
@@ -252,31 +254,47 @@ case 3:
 			return float4(fragmentCol, 0.3f);
 	}
 
-	// Sample texture with UV coordinates that have been incremented with velocityUV coordinates to translate the texture
-	if (billboardType == 1.0f)
+	if (billboardState == 0)
+	{
+		// Flash
+		fragmentCol *= flashFactor;
+	}
+	else if (billboardState == 1)
+	{
+		// Interpolate
+		// predefined colours
+		float3 cyan = float3(0.0f, 0.4f, 0.3f);
+		float3 lightblue = float3(0.0f, 0.3f, 0.4f);
+		float3 pink = float3(1.0f, 0.01f, 0.6f);
+
+		fragmentCol = changeColour(input.posWC, cyan, pink);
+	}
+	else if (billboardState == 2)
+	{
+		// Translate
+		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+		fragmentCol += (modelTexture * 0.5f);
+	}
+	else if (billboardState == 3)
 	{
 		// predefined colours
 		float3 cyan = float3(0.0f, 0.4f, 0.3f);
 		float3 lightblue = float3(0.0f, 0.3f, 0.4f);
 		float3 pink = float3(1.0f, 0.01f, 0.6f);
 
-		// Change colour, interpolate between two colours
+		// Interpolate
 		fragmentCol = changeColour(input.posWC, cyan, pink);
 
-		// Sample texture
+		// Translate
 		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-		
+
+		// Flash
+		modelTexture *= flashFactor;
 
 		// Add texture onto fragmentCol
 		fragmentCol += (modelTexture * 0.5f);
 	}
-	else if (billboardType == 2.0f)
-	{
-		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-		modelTexture *= blinkFactor;
-		// Add texture onto fragmentCol
-		fragmentCol += (modelTexture * 0.5f);
-	}
+
 
 	return float4(fragmentCol , KeIn.w);
 };

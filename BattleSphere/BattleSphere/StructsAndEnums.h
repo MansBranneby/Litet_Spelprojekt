@@ -110,8 +110,6 @@ struct material
 	XMVECTOR emission = XMVectorSet(0.5f, 0, 0.5f, 0); // emission.xyz, opacity (d)
 };
 
-
-
 enum class uiType
 {
 	e_mainMenuSelection,
@@ -129,17 +127,31 @@ struct objectData
 	material material;
 };
 
+
+// Billboard effects
+enum class BillboardState
+{
+	e_flashing,
+	e_interpolating,
+	e_translating,
+	e_all,
+	e_none
+};
 // Data used to animate texture
 struct BillboardData
 {
-	XMVECTOR velocityUV{0.0f, 0.0f, 0.0f};
-	float blinkFactor = 0.0f;
-	float type = 0.0f;
-	float colourChangeFactor = 0.0f;
+	BillboardState state = BillboardState::e_none;
+	int padding0[3];
+	// Translate
+	XMVECTOR velocityUV = { 0.0f, 0.0f };
+	// Interpolate
 	float colourDecider = 1.0f;
-	float minY = 0.0f;
-	float maxY = 0.0f;
-	float padding[2];
+	float colourChangeFactor = 0.0f;
+	float minY = 0.0f; // Max y coordinate of billboard
+	float maxY = 0.0f; // Min y coordinate of billboard
+	// Flash
+	float flashFactor = 0.0f;
+	float padding1[3];
 };
 
 // Game update return data
@@ -172,13 +184,6 @@ struct CollisionInfo
 	bool m_colliding = false;
 	DirectX::XMVECTOR m_normal{ 0.0f, 0.0f, 0.0f };
 	DirectX::XMVECTOR m_contactPoint{ 0.0f, 0.0f, 0.0f };
-};
-
-
-enum class BillboardState
-{
-	e_blinking,
-	e_moving
 };
 
 struct vertexAndId
