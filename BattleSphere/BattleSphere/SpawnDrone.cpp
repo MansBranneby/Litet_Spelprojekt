@@ -110,7 +110,7 @@ void SpawnDrone::setRotationTarget(XMVECTOR target)
 
 bool SpawnDrone::travelAndCheck(float dT, bool fastTravel)
 {
-	Sound::getInstance()->play(soundAmbient::e_drone, 0.6f, 0.0f, 0.0f, m_spawnDroneBody.getPosition());
+	Sound::getInstance()->play(soundAmbient::e_drone, 0.3f, 0.0f, 0.0f, m_spawnDroneBody.getPosition());
 	if (m_spawnDroneTravelling)
 	{
 		XMVECTOR pos = m_spawnDroneBody.getPosition();

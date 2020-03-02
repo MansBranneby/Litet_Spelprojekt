@@ -47,17 +47,17 @@ void Sound::play(soundAmbient sound, float volume, float pitch, float pan, XMVEC
 	m_ambientInstances[(int)sound]->Play(true);
 	if (XMVectorGetX(XMVector3Length(pos - XMVectorSet(0, -100, 0, 0))) > 1.0f)
 	{
-		m_emitter.SetPosition(pos);
-		m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
-		/*
+		//m_emitter.SetPosition(pos);
+		//m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
+		
 		XMVECTOR dir = pos - m_listenerPos;
 		float length = XMVectorGetX(XMVector3Length(dir));
 		if (length < 2.0f)
 			m_emitter.SetPosition(m_listenerPos);
 		else
-			m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.3f));
+			m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.6f));
 		m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
-		*/
+		
 	}
 }
 
@@ -69,7 +69,7 @@ void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, flo
 	if (length < 2.0f)
 		m_emitter.SetPosition(m_listenerPos);
 	else
-		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.3f));
+		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.4f));
 
 	m_effectInstances[m_index]->SetVolume(volume);
 	m_effectInstances[m_index]->SetPitch(pitch);

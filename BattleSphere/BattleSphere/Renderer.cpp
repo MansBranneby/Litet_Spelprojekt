@@ -433,7 +433,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					finalRender();
 
-					rotation += rotCoeff * speed * 0.05f;
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
