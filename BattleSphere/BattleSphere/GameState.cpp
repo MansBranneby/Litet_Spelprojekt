@@ -216,6 +216,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (XMVectorGetX(XMVector3Length(rob - resource)) < 1.5f &&
 						!m_resources[j]->isBlocked())
 					{
+						Sound::getInstance()->play(soundEffect::e_pickup, rob, 0.4f);
 						m_spawnDrone->freeSpawn(m_resources[j]->getSpawnIndex());
 						m_robots[i]->setResourceIndex(j);
 						m_resources[j]->setBlocked(true);
@@ -243,6 +244,7 @@ void GameState::handleInputs(Game* game, float dt)
 							m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
 							m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType());
+							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
 							for (int k = 0; k < XUSER_MAX_COUNT; k++)
 							{

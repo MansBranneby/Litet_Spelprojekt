@@ -129,7 +129,7 @@ void Robot::useWeapon(int side, float dt)
 	if (m_currentWeapon[side] != -1)
 	{
 		m_weapons[m_currentWeapon[side]]->shoot(m_playerId, getPosition(), m_colour, m_currentRotation, side, dt);
-		m_weapons[m_currentWeapon[side]]->speedUp();
+		m_weapons[m_currentWeapon[side]]->speedUp(getPosition());
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();
 	}
@@ -217,7 +217,7 @@ void Robot::update(float dt)
 
 	for (int i = 0; i < m_weapons.size(); i++)
 	{
-		m_weapons[i]->updateTime(dt);
+		m_weapons[i]->updateTime(dt, getPosition());
 	}
 }
 

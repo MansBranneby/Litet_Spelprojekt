@@ -34,7 +34,7 @@ enum class soundEffect
 	e_impactS = 11,
 	e_impactM = 12,
 	e_impactL = 13,
-	e_explotion = 14,
+	e_explosion = 14,
 	e_blast = 15,
 	e_traverse = 16
 };
@@ -43,9 +43,10 @@ enum class soundAmbient
 {
 	e_background = 0,
 	e_drone = 1,
-	e_car = 2,
-	e_melee = 3,
-	e_path = 4
+	e_shield = 2,
+	e_car = 3,
+	e_melee = 4,
+	e_path = 5
 };
 
 enum class soundMusic
@@ -54,8 +55,8 @@ enum class soundMusic
 	e_game = 1
 };
 
-#define NR_EFFECT_SOUNDS 2
-#define NR_AMBIENT_SOUNDS 2
+#define NR_EFFECT_SOUNDS 8
+#define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
 #define NR_EFFECT_INSTANCES 50
 
@@ -86,7 +87,7 @@ public:
 
 	void play(soundMusic sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundAmbient sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
-	void play(soundAmbient sound, XMVECTOR pos, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
+	void play(soundAmbient sound, XMVECTOR pos, float volume = 1.0f, float falloff = 0.4f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundEffect sound, XMVECTOR pos, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 
 	void stop(soundAmbient sound);

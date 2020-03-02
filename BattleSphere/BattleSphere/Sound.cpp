@@ -4,6 +4,7 @@ Sound* Sound::m_instance = nullptr;
 
 Sound::Sound()
 {
+	// TODO: ADD SUSPEND AND RESUME
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 	#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
@@ -12,14 +13,19 @@ Sound::Sound()
 
 	m_listener.SetPosition(XMVectorSet(0, 0, 0, 0));
 
-	m_effect[0] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/fire.wav");
-	m_effect[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/fire2.wav");
+	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
+	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
+	m_effect[(int)soundEffect::e_dash] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/woosh.wav");
+	m_effect[(int)soundEffect::e_pickup] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/pickup.wav");
+	m_effect[(int)soundEffect::e_turnin] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/turnin.wav");
 	
-	m_ambient[0] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
-	m_ambientInstances[0] = m_ambient[0]->CreateInstance();
-	m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/fire2.wav");
+	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
+	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
+	m_ambient[(int)soundAmbient::e_shield] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/shield.wav");
+	m_ambientInstances[(int)soundAmbient::e_background] = m_ambient[0]->CreateInstance();
 	//m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
-	m_ambientInstances[1] = m_ambient[1]->CreateInstance(SoundEffectInstance_Use3D);
+	m_ambientInstances[(int)soundAmbient::e_drone] = m_ambient[(int)soundAmbient::e_drone]->CreateInstance(SoundEffectInstance_Use3D);
+	m_ambientInstances[(int)soundAmbient::e_shield] = m_ambient[(int)soundAmbient::e_shield]->CreateInstance(SoundEffectInstance_Use3D);
 
 	m_index = 0;
 }
@@ -48,16 +54,16 @@ void Sound::play(soundAmbient sound, float volume, float pitch, float pan)
 	m_ambientInstances[(int)sound]->Play(true);
 }
 
-void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float pitch, float pan)
+void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float falloff, float pitch, float pan)
 {
 	pos = XMVectorSetY(pos, XMVectorGetY(pos) * 0.0f);
 	AudioEmitter emitter;
 	XMVECTOR dir = pos - m_listenerPos;
 	float length = XMVectorGetX(XMVector3Length(dir));
-	if (length < 2.0f)
+	if (length < 1.0f)
 		emitter.SetPosition(m_listenerPos);
 	else
-		emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.6f));
+		emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, falloff));
 		//emitter.SetPosition(pos);
 
 	m_ambientInstances[(int)sound]->SetVolume(volume);
@@ -73,10 +79,11 @@ void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, flo
 	m_effectInstances[m_index] = m_effect[(int)sound]->CreateInstance(SoundEffectInstance_Use3D);
 	XMVECTOR dir = pos - m_listenerPos;
 	float length = XMVectorGetX(XMVector3Length(dir));
-	if (length < 2.0f)
+	if (length < 1.0f)
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.4f));
+		//m_emitter.SetPosition(pos);
 
 	m_effectInstances[m_index]->SetVolume(volume);
 	m_effectInstances[m_index]->SetPitch(pitch);
@@ -97,7 +104,7 @@ void Sound::update3D(soundAmbient sound, XMVECTOR pos)
 {
 	XMVECTOR dir = pos - m_listenerPos;
 	float length = XMVectorGetX(XMVector3Length(dir));
-	if (length < 2.0f)
+	if (length < 1.0f)
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.3f));
@@ -118,6 +125,7 @@ void Sound::update(float dt)
 	}
 
 	/*
+	TODO for music later I think
 	if (m_retryAudio)
 	{
 		m_retryAudio = false;

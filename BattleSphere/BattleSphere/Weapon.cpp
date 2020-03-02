@@ -229,10 +229,12 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 	return false;
 }
 
-bool Weapon::speedUp()
+bool Weapon::speedUp(XMVECTOR robotPos)
 {
 	if ((m_type == MOVEMENT || m_type == DASH) && m_ready)
 	{
+		if (m_type == DASH)
+			Sound::getInstance()->play(soundEffect::e_dash, robotPos, 0.4f);
 		m_ready = false;
 		return true;
 	}
@@ -259,7 +261,7 @@ bool Weapon::reflect()
 	return false;
 }
 
-bool Weapon::updateTime(float dt)
+bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 {
 	if (!m_ready)
 	{
@@ -268,12 +270,19 @@ bool Weapon::updateTime(float dt)
 		{
 			m_currentSpeed = m_speed;
 			m_currentDefense = m_defense;
+			if (m_type == SHIELD)
+				Sound::getInstance()->play(soundAmbient::e_shield, robotPos, 0.9f);
 			return true;
 		}
-		if (m_cdTime > m_duration + m_cooldown) // Ability ready again
+		else if (m_cdTime > m_duration + m_cooldown) // Ability ready again
 		{
 			m_cdTime = 0.0f;
 			m_ready = true;
+		}
+		else
+		{
+			if (m_type == SHIELD)
+				Sound::getInstance()->stop(soundAmbient::e_shield);
 		}
 	}
 	m_currentSpeed = 1.0f;
