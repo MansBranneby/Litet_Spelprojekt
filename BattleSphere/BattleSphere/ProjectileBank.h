@@ -12,10 +12,10 @@ private:
 public:
 	static ProjectileBank* getInstance();
 
-	void addProjectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage);
+	void addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner);
 	void removeProjectile(int index);
 	void moveProjectiles(float dt);
-	void changeDirection(int index, XMVECTOR relPos);
+	void changeDirection(int index, XMVECTOR relPos, XMVECTOR colour, int owner);
 	std::vector<Projectile*> getList();
 
 	void release();

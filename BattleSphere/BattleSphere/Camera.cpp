@@ -17,6 +17,9 @@ void Camera::updateBuffers()
 
 Camera::Camera(float width, float height, float nearPlane, float farPlane, bool isPerspective)
 {
+	m_yFOV = 0.45f * DirectX::XM_PI;
+	m_xFOV = 0.45f * DirectX::XM_PI;
+
 	if (isPerspective)
 	{
 		// Base vectors
@@ -73,6 +76,9 @@ Camera::Camera()
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(0.45f * DirectX::XM_PI);
+
 	// Setup VP
 	m_view = XMMatrixIdentity();
 	m_projection = XMMatrixIdentity();
@@ -96,6 +102,8 @@ void Camera::initialize(float width, float height, float nearPlane, float farPla
 
 	// Setup VP
 	m_view = XMMatrixLookAtLH(m_position, m_lookAt, m_up);
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(2.0f*atan(width / height) * tan(m_yFOV/2.0f));
 	m_projection = XMMatrixPerspectiveFovLH(0.45f * DirectX::XM_PI, width / height, nearPlane, farPlane);
 	m_viewProjection = XMMatrixMultiply(m_view, m_projection);
 
@@ -117,6 +125,9 @@ Camera::Camera(float width, float height, float nearPlane, float farPlane)
 	m_up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_right = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	m_forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+	m_yFOV = (float)(0.45f * DirectX::XM_PI);
+	m_xFOV = (float)(2.0f * atan(width / height) * tan(m_yFOV / 2.0f));
 
 	// Setup VP
 	m_view = XMMatrixLookAtLH(m_position, m_lookAt, m_up);
@@ -161,6 +172,25 @@ void Camera::setCameraPosition(float x, float y, float z)
 	updateBuffers();
 }
 
+void Camera::setCameraPosition(XMVECTOR newPos)
+{
+	m_position = newPos;
+	updateBuffers();
+}
+
+void Camera::setLookAt(XMVECTOR newLookAt)
+{
+	m_lookAt = newLookAt;
+	updateBuffers();
+}
+
+void Camera::movePosAndLook(XMVECTOR movedPos, XMVECTOR newLookAt)
+{
+	m_position += movedPos;
+	m_lookAt += newLookAt;
+	updateBuffers();
+}
+
 XMMATRIX Camera::getViewMatrix()
 {
 	return m_view;
@@ -197,9 +227,24 @@ void Camera::updateBuffers()
 	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferPosition->getConstantBuffer(), 0);
 }
 
-XMVECTOR Camera::getPosition()
+XMVECTOR Camera::getPosition() const
 {
 	return m_position;
+}
+
+XMVECTOR Camera::getLookAt() const
+{
+	return m_lookAt;
+}
+
+float Camera::getXFOV() const
+{
+	return m_xFOV;
+}
+
+float Camera::getYFOV() const
+{
+	return m_yFOV;
 }
 
 void Camera::setPosition(XMVECTOR pos)

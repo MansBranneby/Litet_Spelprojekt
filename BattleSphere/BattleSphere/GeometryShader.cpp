@@ -84,7 +84,7 @@ GeometryShader::GeometryShader(LPCWSTR fileName, int type)
 		break;
 
 	default:
-	createGeometryShader(fileName, &pGS, &errorBlob);
+		createGeometryShader(fileName, &pGS, &errorBlob);
 		break;
 	}
 

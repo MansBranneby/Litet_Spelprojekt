@@ -34,7 +34,7 @@ public:
 
 	void upgrade();
 
-	bool shoot(XMVECTOR robotPos, float rot, int side, float dt);
+	bool shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt);
 	bool speedUp();
 	bool shield();
 	bool reflect();
@@ -46,7 +46,7 @@ public:
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
-	float getDefense(XMVECTOR projDir, XMVECTOR robotPos, float robotRot, int& projIndex);
+	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
 
 	bool updateTime(float dt);
 

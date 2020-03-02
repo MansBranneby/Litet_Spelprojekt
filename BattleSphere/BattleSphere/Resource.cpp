@@ -112,7 +112,7 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	setScale(m_originalScale);
 	setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
 	m_material.ambient = XMVectorSet(-1, -1, -1, 2); // Enable illum model 2 for emission
-
+	
 	setMaterial();
 }
 

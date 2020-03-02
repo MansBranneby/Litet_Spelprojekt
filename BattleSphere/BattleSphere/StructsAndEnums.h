@@ -20,16 +20,22 @@ using namespace DirectX;
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
 #define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
 
+// Dynamic camera
+#define MINIMUM_CAM_DISTANCE 25.0f
+#define MAXIMUM_CAM_DISTANCE 140.0f
+#define CHANGE_SPEED 0.15f
+
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
 #define ROTATION_SPEED 60.0f
 #define FAST_TRAVEL_SPEED 35.0f
 #define SLOW_TRAVEL_SPEED 14.0f
 #define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+//#define DRONE_START XMVectorSet(66.0f, 5.0f, 46.5f, -1)
 #define RESOURCE_OFFSET -8.0f
 #define LIGHT_OFFSET 0.0f
 #define ROTATION_THRESHOLD 0.006f // Radian difference bias
-#define TRAVEL_THRESHOLD 0.1f
+#define TRAVEL_THRESHOLD 0.3f
 #define TRAVEL_HEIGHT 50.0f
 
 // Spawning
@@ -83,6 +89,7 @@ enum class renderPass
 	e_downSample,
 	e_final,
 	e_menu,
+	e_menuAni,
 	e_menuScene,
 	e_opaque,
 	e_transparent
