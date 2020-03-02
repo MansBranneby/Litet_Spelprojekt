@@ -13,6 +13,7 @@
 #include "PreLoader.h"
 #include "State.h"
 #include "QuadtreeNode.h"
+#include "Graph.h"
 
 using namespace DirectX;
 

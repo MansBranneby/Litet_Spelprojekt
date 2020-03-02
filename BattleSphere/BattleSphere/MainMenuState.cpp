@@ -21,7 +21,7 @@ MainMenuState::MainMenuState()
 	//MAIN MENU
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_selection.png", true, 0.0f, 30.0f, 844.0f, 67.0f));
 	
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\MainMenuAnimation\\box_ani_sprite3.png", true, 0.0f, 33.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_box.png", true, 0.0f, 33.0f, 738.0f, 169.0f));
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\MainMenuAnimation\\box_ani_sprite3.png", true, 0.0f, -140.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\MainMenuAnimation\\box_ani_sprite3.png", true, 0.0f, -309.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
 	
@@ -435,23 +435,24 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 	switch (m_robotColour[robotNr])
 	{
 	case 0:
-		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 0.0f);
 		break;
 	case 1:
-		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 0.0f);
 		break;
 	case 2:
-		game->getRobots()[robotNr]->setEmission(0.0f, 0.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 0.0f, 1.0f);
 		break;
 	case 3:
-		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 1.0f);
 		break;
 	case 4:
-		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 1.0f);
 		break;
 	default:
 		break;
 	}
+	Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
 }
 
 void MainMenuState::handleInput(Game* game)
@@ -492,9 +493,14 @@ void MainMenuState::draw(Game* game, renderPass pass)
 	{
 		for (int i = 0; i < m_uiElements.size(); i++)
 		{
-			if (m_uiElements[i]->isDrawn())
+			if (m_uiElements[i]->isDrawn() && i != 2)
 				m_uiElements[i]->draw();
 		}
+	}
+	else if (pass == renderPass::e_menuAni)
+	{
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[2]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[2]->draw();
 	}
 	else
 	{

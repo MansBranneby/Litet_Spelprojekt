@@ -270,3 +270,8 @@ void UI_Element::setSelectionTimer(float time)
 {
 	m_selectionTimer = time;
 }
+
+ConstantBuffer* UI_Element::getConstantBuffer()
+{
+	return m_animation->getConstantBuffer();
+}

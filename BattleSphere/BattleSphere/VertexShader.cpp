@@ -91,6 +91,25 @@ void VertexShader::createBCInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
 	(*pVS)->Release();
 }
 
+void VertexShader::createPathInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
+{
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
+	{
+		"POSITION",		// "semantic" name in shader
+		0,				// "semantic" index (not used)
+		DXGI_FORMAT_R32G32B32A32_FLOAT, // size of ONE element (3 floats)
+		0,							 // input slot
+		0,							 // offset of first element
+		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
+		0							 // used for INSTANCING (ignore)
+	}
+	};
+
+	DX::getInstance()->getDevice()->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), (*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), &m_vertexLayout);
+
+	(*pVS)->Release();
+}
+
 VertexShader::VertexShader()
 {
 	m_vertexLayout = nullptr;
@@ -109,7 +128,9 @@ VertexShader::VertexShader(LPCWSTR fileName, int type)
 	case 1:
 		createBCInputLayout(&pVS, &errorBlob);
 		break;
-
+	case 2:
+		createPathInputLayout(&pVS, &errorBlob);
+		break;
 	default:
 		createInputLayout(&pVS, &errorBlob);
 		break;

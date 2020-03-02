@@ -71,5 +71,7 @@ public:
 	bool isDrawn();
 	bool isReady();
 	void setSelectionTimer(float time);
+
+	ConstantBuffer* getConstantBuffer();
 };
 

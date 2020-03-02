@@ -14,9 +14,9 @@ ProjectileBank* ProjectileBank::getInstance()
 	return m_instance;
 }
 
-void ProjectileBank::addProjectile(XMVECTOR pos, XMVECTOR rot, XMVECTOR dir, int type, int damage)
+void ProjectileBank::addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner)
 {
-	Projectile* proj = new Projectile(pos, rot, dir, type, damage);
+	Projectile* proj = new Projectile(pos, colour, rot, dir, type, damage, owner);
 	m_projectiles.push_back(proj);
 }
 
@@ -34,9 +34,9 @@ void ProjectileBank::moveProjectiles(float dt)
 	}
 }
 
-void ProjectileBank::changeDirection(int index, XMVECTOR relPos)
+void ProjectileBank::changeDirection(int index, XMVECTOR relPos, XMVECTOR colour, int owner)
 {
-	m_projectiles[index]->setDirection(relPos);
+	m_projectiles[index]->setDirection(relPos, colour, owner);
 }
 
 std::vector<Projectile*> ProjectileBank::getList()

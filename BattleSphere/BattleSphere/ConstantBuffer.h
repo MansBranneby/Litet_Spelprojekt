@@ -15,5 +15,6 @@ public:
 	ConstantBuffer(const void* data, UINT dataSize);
 	~ConstantBuffer();
 
+	void updateBuffer(const void* data, UINT dataSize);
 	ID3D11Buffer** getConstantBuffer();
 };

@@ -4,6 +4,8 @@
 #include "CollisionTests.h"
 #include "PreLoader.h"
 
+using namespace DirectX;
+
 class QuadtreeNode
 {
 private:
@@ -22,4 +24,5 @@ public:
 
 	CollisionInfo testCollision(boundingData boundingVolume);
 	CollisionInfo testCollision(boundingData boundingVolume, DirectX::XMVECTOR previousPos);
+	bool testCollision(XMFLOAT2 start, XMFLOAT2 end);
 };

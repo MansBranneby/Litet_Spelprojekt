@@ -34,6 +34,15 @@ ConstantBuffer::~ConstantBuffer()
 		m_constantBuffer->Release();
 }
 
+void ConstantBuffer::updateBuffer(const void* data, UINT dataSize)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+
+	DX::getInstance()->getDeviceContext()->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &data, dataSize);
+	DX::getInstance()->getDeviceContext()->Unmap(m_constantBuffer, 0);
+}
+
 ID3D11Buffer** ConstantBuffer::getConstantBuffer()
 {
 	return &m_constantBuffer;
