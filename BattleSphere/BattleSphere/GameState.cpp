@@ -445,9 +445,25 @@ GameState::~GameState()
 	{
 		delete m_nodes[i];
 	}
-	if (m_spawnDrone)
-		delete m_spawnDrone;
 
+}
+
+void GameState::setTravelTarget(XMVECTOR target)
+{
+	// Set travel destination
+	m_spawnDroneTravelling = true;
+	m_travelTarget = target;
+}
+
+void GameState::setRotationTarget(XMVECTOR target)
+{
+	// Enable rotation to target if wanted
+	m_spawnDroneRotating = true;
+	XMVECTOR direction = target - m_spawnDroneBody.getPosition();
+	direction.m128_f32[1] = 0.0f;
+	direction.m128_f32[3] = 0.0f;
+	m_transportDirection = XMVector3Normalize(direction);
+	m_transportDirection.m128_f32[1] = 0.0f; // Skip y-axis
 	//Dynamic background objects
 	delete m_dboHandler;
 }
@@ -544,7 +560,9 @@ bool GameState::update(Game* game, float dt)
 	updateDynamicCamera(dt);
 
 	// Update spawning drone
-	m_spawnDrone->update(m_robots, dt);
+	updateSpawnDrone(dt);
+	// Update billboards
+	m_billboardHandler.updateBillboards(dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -676,6 +694,13 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
 
+		game->getPreLoader()->draw(objectType::e_scene);
+		game->getPreLoader()->draw(objectType::e_scene, 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDroneBody.getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
 	}
@@ -686,4 +711,5 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
 			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
+
 }

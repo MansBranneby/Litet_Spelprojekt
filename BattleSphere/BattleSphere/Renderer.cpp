@@ -307,6 +307,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
+		
 		g_Clock = new Clock();
 		g_Game = new Game();
 		g_gameState = new GameState(g_Game);
@@ -430,7 +431,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
 					
-
 					g_Game->draw(renderPass::e_opaque);
 
 					billboardRender();
