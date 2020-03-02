@@ -435,19 +435,19 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 	switch (m_robotColour[robotNr])
 	{
 	case 0:
-		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 0.0f);
 		break;
 	case 1:
-		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 0.0f);
 		break;
 	case 2:
-		game->getRobots()[robotNr]->setEmission(0.0f, 0.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 0.0f, 1.0f);
 		break;
 	case 3:
-		game->getRobots()[robotNr]->setEmission(0.0f, 1.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 1.0f);
 		break;
 	case 4:
-		game->getRobots()[robotNr]->setEmission(1.0f, 0.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 1.0f);
 		break;
 	default:
 		break;

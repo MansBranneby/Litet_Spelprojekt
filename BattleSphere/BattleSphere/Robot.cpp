@@ -16,6 +16,8 @@ Robot::Robot(int playerId)
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
 	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
+	m_material.emission = XMVectorSet(0.0, 0.0, 0.0, -1);
+	m_colour = XMVectorSet(1.0, 1.0, 1.0, -1);
 	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
@@ -26,20 +28,6 @@ Robot::Robot(int playerId)
 	m_positionHistoryPtr = 0;	
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
-
-	if (playerId == 0)
-		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
-		//m_material.diffuse = XMVector3Normalize(XMVectorSet(80, 10, 180, 0));
-	else if (playerId == 1)
-		m_material.emission = XMVector3Normalize(XMVectorSet(0, 1, 0, -1));
-		//m_material.diffuse = XMVector3Normalize(XMVectorSet(10, 189, 198, 0));
-	else if (playerId == 2)
-		m_material.emission = XMVector3Normalize(XMVectorSet(0, 0, 1, -1));
-		//m_material.diffuse = XMVector3Normalize(XMVectorSet(255, 0, 255, 0));
-	else if (playerId == 3)
-		m_material.emission = XMVector3Normalize(XMVectorSet(1, 1, 0, -1));
-		//m_material.diffuse = XMVector3Normalize(XMVectorSet(19, 62, 255, 0));
-	// TODO add init
 }
 
 void Robot::setPlayerId(int playerId)
@@ -57,9 +45,9 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 {
 	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
-		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
+		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 	if (m_currentWeapon[LEFT] != -1)
-		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(projDir, getPosition(), m_currentRotation, projIndex);
+		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 
 	if (projIndex != -1)
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
@@ -72,7 +60,7 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 			m_health = 0;
 			setDrawn(false);
 		}
-		m_material.emission = XMVector3Normalize(m_material.emission) * (float)m_health / 100.0f;
+		m_material.emission = m_colour * (float)m_health / 100.0f;
 		removeResource();
 		return true;
 	}
@@ -83,14 +71,7 @@ void Robot::setHealth(int health)
 {
 	setDrawn(true);
 	m_health = health;
-	if (m_playerId == 0)
-		m_material.emission = XMVector3Normalize(XMVectorSet(1, 0, 0, -1));
-	else if (m_playerId == 1)
-		m_material.emission = XMVector3Normalize(XMVectorSet(0, 1, 0, -1));
-	else if (m_playerId == 2)
-		m_material.emission = XMVector3Normalize(XMVectorSet(0, 0, 1, -1));
-	else if (m_playerId == 3)
-		m_material.emission = XMVector3Normalize(XMVectorSet(1, 1, 0, -1));
+	m_material.emission = m_colour;
 }
 
 int Robot::getHealth()
@@ -138,11 +119,16 @@ bool Robot::isReady(float dt)
 	return true;
 }
 
+void Robot::setColour(float x, float y, float z)
+{
+	m_material.emission = m_colour = XMVectorSet(x, y, z, -1);
+}
+
 void Robot::useWeapon(int side, float dt)
 {
 	if (m_currentWeapon[side] != -1)
 	{
-		m_weapons[m_currentWeapon[side]]->shoot(getPosition(), m_currentRotation, side, dt);
+		m_weapons[m_currentWeapon[side]]->shoot(m_playerId, getPosition(), m_colour, m_currentRotation, side, dt);
 		m_weapons[m_currentWeapon[side]]->speedUp();
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();

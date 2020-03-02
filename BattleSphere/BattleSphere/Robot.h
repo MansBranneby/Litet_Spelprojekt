@@ -18,6 +18,7 @@ class Robot : public GameObject
 {
 private:
 	int m_playerId;
+	XMVECTOR m_colour;
 	int m_health;
 	float m_velocity;
 	float m_currentRotation;
@@ -50,6 +51,7 @@ public:
 	void setCurrentRot(float deg);
 	float getCurrentRot();
 	bool isReady(float dt);
+	void setColour(float x, float y, float z);
 
 	void useWeapon(int side, float dt);
 	void changeWeapon(int side);
