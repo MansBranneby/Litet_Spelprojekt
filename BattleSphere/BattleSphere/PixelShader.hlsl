@@ -197,6 +197,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			
 			break;
 		case 4: //Volumetric spotlight
+			//return float4(1, 1, 1, 1);
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 
 			float3 cameraDir = normalize(input.posWC - cameraPos.xyz);

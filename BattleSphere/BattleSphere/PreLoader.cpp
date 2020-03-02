@@ -134,6 +134,8 @@ PreLoader::PreLoader()
 
 	loadFromFile(objectType::e_scene, "Background\\Ground");
 	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
+	loadFromFile(objectType::e_scene, "Background\\Apartment2");
+	loadFromFile(objectType::e_scene, "Background\\Background");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
