@@ -4,16 +4,16 @@
 void GameState::spawnNodes()
 {
 	Node* node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
+	//node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	//node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	//node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
@@ -240,13 +240,13 @@ void GameState::handleInputs(Game* game, float dt)
 					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
 						// TODO: Robot position y is 1.9f so collsion mesh must be at y = 2, after that delete the radius * 2
-						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, 0, 0);
+						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
 						bool collision = false;
 						for (int k = 0; k < cm.size(); k+=3)
 						{
 							unsigned int ind1 = k + 1;
 							unsigned int ind2 = k + 2;
-							if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x * 2,
+							if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x,
 								XMVECTOR{ cm[k].x, cm[k].y, cm[k].z },
 								XMVECTOR{ cm[ind1].x, cm[ind1].y, cm[ind1].z },
 								XMVECTOR{ cm[ind2].x, cm[ind2].y, cm[ind2].z }).m_colliding)
@@ -639,7 +639,7 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
 	}
 

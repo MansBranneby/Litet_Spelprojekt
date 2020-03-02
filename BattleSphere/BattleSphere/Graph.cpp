@@ -69,10 +69,10 @@ Graph::Graph()
 		m_nodes.push_back(graphNode());
 
 	}
-	m_nodes[0].pos = XMVectorSet(150.0f, 0.0f, 120.0f, 0.0f);
-	m_nodes[1].pos = XMVectorSet(106.0f, 0.0f, -18.0f, 0.0f);
-	m_nodes[2].pos = XMVectorSet(-100.0f, 0.0f, -50.0f, 0.0f);
-	m_nodes[3].pos = XMVectorSet(-120.0f, 0.0f, -12.0f, 0.0f);
+	m_nodes[0].pos = XMVectorSet(174.0f, 0.0f, 123.5f, 0.0f);
+	m_nodes[1].pos = XMVectorSet(100.6f, 0.0f, -20.0f, 0.0f);
+	m_nodes[2].pos = XMVectorSet(-82.7f, 0.0f, -96.5f, 0.0f);
+	m_nodes[3].pos = XMVectorSet(-116.4f, 0.0f, -9.4f, 0.0f);
 	m_nodes[4].pos = XMVectorSet(156.0f, 0.0f, 13.0f, 0.0f);
 	m_nodes[5].pos = XMVectorSet(156.0f, 0.0f, 50.0f, 0.0f);
 	m_nodes[6].pos = XMVectorSet(106.0f, 0.0f, -58.0f, 0.0f);
@@ -148,6 +148,11 @@ Graph::Graph()
 	m_nodes[36].neighbours = std::vector<int>{ 36, 38 };
 	m_nodes[37].neighbours = std::vector<int>{ 24, 35, 37, 39 };
 	m_nodes[38].neighbours = std::vector<int>{ 14, 31, 38 };
+
+	m_goal[0] = 3;
+	m_goal[1] = 1;
+	m_goal[2] = 0;
+	m_goal[3] = 2;
 
 	for (int i = 0; i < m_nodes.size(); i++)
 	{
@@ -240,7 +245,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 		std::vector<node> closed;
 		float shortestDistance = 10000.0f;
 		int startNode = -1;
-		float heuristic = XMVectorGetX(XMVector3Length(m_nodes[goal].pos - startPos));
+		float heuristic = XMVectorGetX(XMVector3Length(m_nodes[m_goal[goal]].pos - startPos));
 		XMFLOAT2 playerPos;
 		playerPos.x = startPos.m128_f32[0];
 		playerPos.y = startPos.m128_f32[2];
@@ -284,7 +289,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 				}
 			}
 			//Are we the goal????
-			if (m_nodes[open[q].index].heuristic[goal] < 1.0f)
+			if (m_nodes[open[q].index].heuristic[m_goal[goal]] < 1.0f)
 			{
 				std::vector<XMVECTOR> path;
 				node currentNode = open[q];
@@ -317,7 +322,7 @@ std::vector<XMVECTOR> Graph::calculateShortestPath(int index, XMVECTOR startPos,
 				nod.source = (int)closed.size();
 				nod.index = m_nodes[open[q].index].neighbours[i];
 				nod.g = open[q].g + m_nodes[open[q].index].neighbourDistance[i];
-				nod.f = nod.g + m_nodes[nod.index].heuristic[goal];
+				nod.f = nod.g + m_nodes[nod.index].heuristic[m_goal[goal]];
 
 				bool add = true;
 				for (int j = 0; j < closed.size(); j++)
