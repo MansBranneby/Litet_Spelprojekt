@@ -46,7 +46,7 @@ cbuffer PS_CONSTANT_BUFFER : register (b5)
 {
 	// Type
 	int billboardState;
-	float3 pad;
+	float3 padding0;
 	// Translate
 	float4 velocityUV;
 	// Interpolate
@@ -56,6 +56,9 @@ cbuffer PS_CONSTANT_BUFFER : register (b5)
 	float maxY;
 	// Flash
 	float flashFactor;
+	float3 padding1;
+	float4 colourA;
+	float4 colourB;
 };
 
 float DoAttenuation(Light light, float d)
@@ -254,47 +257,56 @@ float4 PS_main(PS_IN input) : SV_Target
 			return float4(fragmentCol, 0.3f);
 	}
 
-	if (billboardState == 0)
+	// BILLBOARD EFFECTS
+	switch (billboardState)
 	{
-		// Flash
+	case 0: // Flash
 		fragmentCol *= flashFactor;
+		break;
+	case 1: // Interpolate
+		// w value decides if default colour or colourA and colourB should be used
+		(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+		break;
+	case 2: // Translate
+		{
+			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+			fragmentCol += (modelTexture * 0.5f);
+		}
+		break;
+	case 3: // Flash and interpolate
+		// w value decides if default colour or colourA and colourB should be used
+		(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+		fragmentCol *= flashFactor;
+		break;
+	case 4: // Flash and translate
+		{
+			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+			modelTexture *= flashFactor;
+		}
+		break; 
+	case 5: // Interpolate and translate
+		{
+			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+			(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+			fragmentCol += (modelTexture * 0.5f);
+		}
+		break;
+	case 6: // Flash, interpolate and translate
+		{
+			// Translate
+			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+
+			// Flash
+			modelTexture *= flashFactor;
+		
+			// w value decides if default colour or colourA and colourB should be used
+			(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+			
+			// Add texture onto fragmentCol
+			fragmentCol += (modelTexture * 0.5f);
+		}
+		break;
 	}
-	else if (billboardState == 1)
-	{
-		// Interpolate
-		// predefined colours
-		float3 cyan = float3(0.0f, 0.4f, 0.3f);
-		float3 lightblue = float3(0.0f, 0.3f, 0.4f);
-		float3 pink = float3(1.0f, 0.01f, 0.6f);
-
-		fragmentCol = changeColour(input.posWC, cyan, pink);
-	}
-	else if (billboardState == 2)
-	{
-		// Translate
-		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-		fragmentCol += (modelTexture * 0.5f);
-	}
-	else if (billboardState == 3)
-	{
-		// predefined colours
-		float3 cyan = float3(0.0f, 0.4f, 0.3f);
-		float3 lightblue = float3(0.0f, 0.3f, 0.4f);
-		float3 pink = float3(1.0f, 0.01f, 0.6f);
-
-		// Interpolate
-		fragmentCol = changeColour(input.posWC, cyan, pink);
-
-		// Translate
-		float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-
-		// Flash
-		modelTexture *= flashFactor;
-
-		// Add texture onto fragmentCol
-		fragmentCol += (modelTexture * 0.5f);
-	}
-
 
 	return float4(fragmentCol , KeIn.w);
 };

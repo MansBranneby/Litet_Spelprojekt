@@ -15,9 +15,16 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 				m_billboards.push_back(Billboard(i, j, k)); // Each billboard knows its variantNr, modelNr and submodelNr
 		}
 	}
+	// predefined colours
+	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
+	DirectX::XMVECTOR lightblue = {0.0f, 0.3f, 0.4f, 1.0f };
+	DirectX::XMVECTOR pink = { 1.0f, 0.01f, 0.6f , 1.0f};
+	DirectX::XMVECTOR lightPink = { 0.6f, 0.2f, 0.5f , 1.0f };
+	DirectX::XMVECTOR purple = { 0.6f, 0.0f, 0.8f , 1.0f };
+	DirectX::XMVECTOR darkPurple = { 0.4f, 0.0f, 0.4f , 1.0f };
 
-	m_billboards[2].setType(BillboardState::e_all);
-	m_billboards[5].setType(BillboardState::e_all);
+	m_billboards[5].setFlashState(0.05f);
+	m_billboards[2].setAllStates(0.01f, 0.02f, darkPurple, cyan, {-0.03f});
 }
 
 BillboardHandler::~BillboardHandler()

@@ -23,6 +23,8 @@ private:
 	float m_colourChangeSpeed; // Determines how fast colour changes
 	float m_colourChangeFactor; // Value 0-1, ticks up to 1 and resets to 0
 	float m_colourDecider; // Flips the interpolated colours inside function ChangeColour in PixelShaderBillboard.hlsl
+	DirectX::XMVECTOR m_colourA; // interpolate between colourA and B
+	DirectX::XMVECTOR m_colourB; // interpolate between colourA and B
 
 	// TRANSLATE TEXTURE
 	DirectX::XMVECTOR m_velocityUV; // Velocity of UV coordinates
@@ -37,8 +39,15 @@ public:
 	Billboard();
 	Billboard(int variant, int modelNr, int subModelNr);
 
-	void setType(BillboardState state);
-	void setFlashSpeed(float flashSpeed);
+	void setState(BillboardState state); 
+	void setFlashState(float flashSpeed); // Initialize flash state
+	void setInterpolateState(float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB); // Initialize interpolate state
+	void setTranslateState(DirectX::XMVECTOR velocityUV); // Initialize translate state
+	void setFlashInterpolateState(float flashSpeed, float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB); // Initialize flash and interpolate state
+	void setFlashTranslateState(float flashSpeed, DirectX::XMVECTOR velocityUV); // Initialize flash and translate state
+	void setInterpolateTranslateState(float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB, DirectX::XMVECTOR velocityUV); // Initialize interpolate and translate state
+	void setAllStates(float flashSpeed, float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB, DirectX::XMVECTOR velocityUV); // initialize flash, interpolate and translate state
+	void setFlashSpeed(float flashSpeed); 
 	void setColourChangeSpeed(float colourChangeSpeed);
 	void setVelocityUV(DirectX::XMVECTOR velocityUV);
 

@@ -134,6 +134,9 @@ enum class BillboardState
 	e_flashing,
 	e_interpolating,
 	e_translating,
+	e_flashing_interpolating,
+	e_flashing_translating,
+	e_interpolating_translating,
 	e_all,
 	e_none
 };
@@ -141,9 +144,9 @@ enum class BillboardState
 struct BillboardData
 {
 	BillboardState state = BillboardState::e_none;
-	int padding0[3];
+	float padding0[3];
 	// Translate
-	XMVECTOR velocityUV = { 0.0f, 0.0f };
+	XMVECTOR velocityUV = DirectX::XMVectorZero();
 	// Interpolate
 	float colourDecider = 1.0f;
 	float colourChangeFactor = 0.0f;
@@ -152,6 +155,8 @@ struct BillboardData
 	// Flash
 	float flashFactor = 0.0f;
 	float padding1[3];
+	DirectX::XMVECTOR colourA;
+	DirectX::XMVECTOR colourB;
 };
 
 // Game update return data
