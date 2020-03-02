@@ -85,7 +85,8 @@ public:
 	static Sound* getInstance();
 
 	void play(soundMusic sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
-	void play(soundAmbient sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f, XMVECTOR pos = XMVectorSet(0, -100, 0, 0));
+	void play(soundAmbient sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
+	void play(soundAmbient sound, XMVECTOR pos, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundEffect sound, XMVECTOR pos, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 
 	void stop(soundAmbient sound);

@@ -17,7 +17,8 @@ Sound::Sound()
 	
 	m_ambient[0] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambientInstances[0] = m_ambient[0]->CreateInstance();
-	m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
+	m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/fire2.wav");
+	//m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
 	m_ambientInstances[1] = m_ambient[1]->CreateInstance(SoundEffectInstance_Use3D);
 
 	m_index = 0;
@@ -38,27 +39,33 @@ void Sound::play(soundMusic sound, float volume, float pitch, float pan)
 	m_musicInstances[(int)sound]->Play(true);
 }
 
-void Sound::play(soundAmbient sound, float volume, float pitch, float pan, XMVECTOR pos)
+void Sound::play(soundAmbient sound, float volume, float pitch, float pan)
 {
 	m_ambientInstances[(int)sound]->SetVolume(volume);
 	m_ambientInstances[(int)sound]->SetPitch(pitch);
 	m_ambientInstances[(int)sound]->SetPan(pan);
 
 	m_ambientInstances[(int)sound]->Play(true);
-	if (XMVectorGetX(XMVector3Length(pos - XMVectorSet(0, -100, 0, 0))) > 1.0f)
-	{
-		//m_emitter.SetPosition(pos);
-		//m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
-		
-		XMVECTOR dir = pos - m_listenerPos;
-		float length = XMVectorGetX(XMVector3Length(dir));
-		if (length < 2.0f)
-			m_emitter.SetPosition(m_listenerPos);
-		else
-			m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.6f));
-		m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
-		
-	}
+}
+
+void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float pitch, float pan)
+{
+	pos = XMVectorSetY(pos, XMVectorGetY(pos) * 0.0f);
+	AudioEmitter emitter;
+	XMVECTOR dir = pos - m_listenerPos;
+	float length = XMVectorGetX(XMVector3Length(dir));
+	if (length < 2.0f)
+		emitter.SetPosition(m_listenerPos);
+	else
+		emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.6f));
+		//emitter.SetPosition(pos);
+
+	m_ambientInstances[(int)sound]->SetVolume(volume);
+	m_ambientInstances[(int)sound]->SetPitch(pitch);
+	m_ambientInstances[(int)sound]->SetPan(pan);
+
+	m_ambientInstances[(int)sound]->Play(true);
+	m_ambientInstances[(int)sound]->Apply3D(m_listener, emitter);
 }
 
 void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, float pan)
