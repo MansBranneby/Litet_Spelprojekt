@@ -11,13 +11,6 @@
 
 using namespace DirectX;
 
-enum class soundType
-{
-	e_music = 0,
-	e_effect = 1,
-	e_ambient = 2
-};
-
 enum class soundEffect
 {
 	e_pistol = 0,
@@ -55,9 +48,17 @@ enum class soundMusic
 	e_game = 1
 };
 
+enum class soundUI
+{
+	e_traverse = 0,
+	e_front = 1,
+	e_back = 2,
+};
+
 #define NR_EFFECT_SOUNDS 8
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
+#define NR_UI_SOUNDS 3
 #define NR_EFFECT_INSTANCES 50
 
 class Sound
@@ -75,6 +76,7 @@ private:
 	std::unique_ptr<SoundEffect> m_effect[NR_EFFECT_SOUNDS];
 	std::unique_ptr<SoundEffect> m_ambient[NR_AMBIENT_SOUNDS];
 	std::unique_ptr<SoundEffect> m_music[NR_MUSIC_SOUNDS];
+	std::unique_ptr<SoundEffect> m_ui[NR_UI_SOUNDS];
 
 	std::unique_ptr<SoundEffectInstance> m_effectInstances[NR_EFFECT_INSTANCES];
 	std::unique_ptr<SoundEffectInstance> m_ambientInstances[NR_AMBIENT_SOUNDS];
@@ -85,6 +87,7 @@ private:
 public:
 	static Sound* getInstance();
 
+	void play(soundUI sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundMusic sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundAmbient sound, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 	void play(soundAmbient sound, XMVECTOR pos, float volume = 1.0f, float falloff = 0.4f, float pitch = 0.0f, float pan = 0.0f);

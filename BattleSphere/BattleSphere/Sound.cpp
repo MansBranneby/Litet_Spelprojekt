@@ -4,7 +4,7 @@ Sound* Sound::m_instance = nullptr;
 
 Sound::Sound()
 {
-	// TODO: ADD SUSPEND AND RESUME
+	// TODO: ADD SUSPEND AND RESUME AND MENU STUFF
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 	#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
@@ -12,6 +12,10 @@ Sound::Sound()
 	m_audEngine = std::make_unique<AudioEngine>(eflags);
 
 	m_listener.SetPosition(XMVectorSet(0, 0, 0, 0));
+
+	m_ui[(int)soundUI::e_traverse] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/traverse.wav");
+	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/front.wav");
+	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
 
 	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
@@ -22,8 +26,7 @@ Sound::Sound()
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
 	m_ambient[(int)soundAmbient::e_shield] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/shield.wav");
-	m_ambientInstances[(int)soundAmbient::e_background] = m_ambient[0]->CreateInstance();
-	//m_ambient[1] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
+	m_ambientInstances[(int)soundAmbient::e_background] = m_ambient[(int)soundAmbient::e_background]->CreateInstance();
 	m_ambientInstances[(int)soundAmbient::e_drone] = m_ambient[(int)soundAmbient::e_drone]->CreateInstance(SoundEffectInstance_Use3D);
 	m_ambientInstances[(int)soundAmbient::e_shield] = m_ambient[(int)soundAmbient::e_shield]->CreateInstance(SoundEffectInstance_Use3D);
 
@@ -40,8 +43,17 @@ Sound* Sound::getInstance()
 	return m_instance;
 }
 
+void Sound::play(soundUI sound, float volume, float pitch, float pan)
+{
+	m_ui[(int)sound]->Play(volume, pitch, pan);
+}
+
 void Sound::play(soundMusic sound, float volume, float pitch, float pan)
 {
+	m_musicInstances[(int)sound]->SetVolume(volume);
+	m_musicInstances[(int)sound]->SetPitch(pitch);
+	m_musicInstances[(int)sound]->SetPan(pan);
+
 	m_musicInstances[(int)sound]->Play(true);
 }
 
