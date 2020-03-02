@@ -218,10 +218,6 @@ void Model::draw(BillboardData BillboardData, int subModelNr)
 	BillboardData.maxY = m_maxY;
 
 	m_subModels[subModelNr].draw(BillboardData);
-	/*for (int i = 0; i < m_nrOfSubModels; i++)
-	{
-		m_subModels[i].draw(BillboardData);
-	}*/
 }
 
 void Model::cullDraw()

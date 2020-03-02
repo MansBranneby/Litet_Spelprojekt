@@ -70,6 +70,7 @@ using namespace DirectX;
 //#define OBJECT_TYPES 9
 enum class ObjectType
 {
+	e_extra,
 	e_drone,
 	e_weapon,
 	e_robot,

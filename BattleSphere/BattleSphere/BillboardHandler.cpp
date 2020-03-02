@@ -11,6 +11,9 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 	{
 		for (int j = 0; j < preLoader->getNrOfModels(ObjectType::e_billboard, i); ++j)
 		{
+			if (j == 1)
+				float b = 10.0f;
+
 			for (int k = 0; k < preLoader->getNrOfSubModels(ObjectType::e_billboard, j, i); ++k)
 				m_billboards.push_back(Billboard(i, j, k)); // Each billboard knows its variantNr, modelNr and submodelNr
 		}
@@ -23,7 +26,7 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 	DirectX::XMVECTOR purple = { 0.6f, 0.0f, 0.8f , 1.0f };
 	DirectX::XMVECTOR darkPurple = { 0.4f, 0.0f, 0.4f , 1.0f };
 
-	m_billboards[3].setAllStates(0.1f, 0.02f, darkPurple, cyan, { -0.03f });
+	m_billboards[3].setAllStates(0.1f, 0.02f, lightPink, cyan, { -0.03f });
 	m_billboards[2].setAllStates(0.01f, 0.02f, darkPurple, cyan, {-0.03f});
 	m_billboards[5].setFlashState(0.05f);
 }

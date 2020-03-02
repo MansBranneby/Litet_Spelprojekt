@@ -102,37 +102,39 @@ PreLoader::PreLoader()
 	m_bFCuller = new BackfaceCuller;
 
 	// Load objects
-	loadFromFile(objectType::e_drone, "Drone");
-	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
-	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
-	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
+	loadFromFile(ObjectType::e_drone, "Drone");
+	loadFromFile(ObjectType::e_weapon, "GamePlay\\Weapon1");
+	loadFromFile(ObjectType::e_resource, "GamePlay\\Weapon1");
+	loadFromFile(ObjectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
+	loadFromFile(ObjectType::e_node, "Building", "1mesh1mat");
+	loadFromFile(ObjectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
 	// On map (with collision)
-	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
-	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
-	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
-	loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
-	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\Bar", "BarColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\Wall", "WallColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+	loadFromFile(ObjectType::e_static, "Background\\Edge", "EdgeColl");
 		// Nodes
-	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 
 		// Static Background (Skyscrapers with collision) // Later billboards?
-	loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
-	loadFromFile(objectType::e_static, "Background\\SS1", "SS1Coll");
-	loadFromFile(objectType::e_static, "Background\\SS2", "SS2Coll");
-	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
-	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");
+	loadFromFile(ObjectType::e_static, "Background\\BSTower", "BSTowerColl");
+	loadFromFile(ObjectType::e_static, "Background\\SS1", "SS1Coll");
+	loadFromFile(ObjectType::e_static, "Background\\SS2", "SS2Coll");
+	loadFromFile(ObjectType::e_static, "Background\\SS3", "SS3Coll");
+	loadFromFile(ObjectType::e_static, "Background\\SS4", "SS4Coll");
 
+	// Billboards
+	loadFromFile(ObjectType::e_billboard, "TestTower");
+	loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
-	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
 
-	loadFromFile(objectType::e_scene, "Background\\Ground");
-	loadFromFile(objectType::e_scene, "Background\\Freeway");
-	loadFromFile(objectType::e_scene, "Other\\Car");
-	loadFromFile(objectType::e_extra, "Other\\CarDBO");
+	loadFromFile(ObjectType::e_scene, "Background\\Ground");
+	loadFromFile(ObjectType::e_scene, "Background\\Freeway");
+	loadFromFile(ObjectType::e_scene, "Other\\Car");
+	loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
 	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
 }
 
@@ -191,7 +193,7 @@ int PreLoader::getNrOfModels(ObjectType type, int variant) const
 
 int PreLoader::getNrOfSubModels(ObjectType type, int modelNr, int variant) const
 {
-	return m_objects[(int)type][modelNr][variant].getNrOfSubModels();
+	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
 }
 
 void PreLoader::setStaticData(ObjectType type, objectData data, int variant)
@@ -240,10 +242,7 @@ void PreLoader::draw(ObjectType type, objectData data, objectData relativeData, 
 
 void PreLoader::draw(ObjectType type, BillboardData billboardData, int modelNr, int subModelNr, int variant)
 {
-	int typ = (int)type;
-
-	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
-		m_objects[typ][variant][i].draw(billboardData, subModelNr);
+	m_objects[(int)type][variant][modelNr].draw(billboardData, subModelNr);
 }
 
 void PreLoader::drawCM(ObjectType type, int variant)
@@ -314,21 +313,22 @@ void PreLoader::drawOneModel(ObjectType type, objectData data, objectData relati
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::drawOneModelAndMat(objectType type, objectData data, int modelNr, int variant)
+void PreLoader::drawOneModelAndMat(ObjectType type, objectData data, int modelNr, int variant)
 {
 	int typ = (int)type;
 	m_objects[typ][variant][modelNr].setAllObjectData(data);
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+
+void PreLoader::drawOneModelAndMat(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant)
 {
 	int typ = (int)type;
 	m_objects[typ][variant][modelNr].setAllObjectData(data, relativeData);
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::cull(objectType type, int variant)
+void PreLoader::cull(ObjectType type, int variant)
 {
 	m_bFCuller->turnOnCullingPipeline();
 	int typ = (int)type;

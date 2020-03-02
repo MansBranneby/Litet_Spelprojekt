@@ -1,5 +1,4 @@
 #include "GameState.h"
-#include "GameState.h"
 
 void GameState::spawnNodes()
 {
@@ -325,7 +324,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+			boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 1, 0);
 			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
@@ -437,104 +436,15 @@ GameState::GameState(Game* game)
 GameState::~GameState()
 {
 	for (int i = 0; i < m_resources.size(); i++)
-	{
 		delete m_resources[i];
-	}
-
 	for (int i = 0; i < m_nodes.size(); i++)
-	{
 		delete m_nodes[i];
-	}
-
-}
-
-void GameState::setTravelTarget(XMVECTOR target)
-{
-	// Set travel destination
-	m_spawnDroneTravelling = true;
-	m_travelTarget = target;
-}
-
-void GameState::setRotationTarget(XMVECTOR target)
-{
-	// Enable rotation to target if wanted
-	m_spawnDroneRotating = true;
-	XMVECTOR direction = target - m_spawnDroneBody.getPosition();
-	direction.m128_f32[1] = 0.0f;
-	direction.m128_f32[3] = 0.0f;
-	m_transportDirection = XMVector3Normalize(direction);
-	m_transportDirection.m128_f32[1] = 0.0f; // Skip y-axis
-	//Dynamic background objects
-	delete m_dboHandler;
-}
-
-bool GameState::assignMission()
-{
-	// Calculate number of players
-	int nrOfPlayers = 0;
-	for (int i = 0; i < 4; i++)
-	{
-		if (m_robots[i] != nullptr)
-			nrOfPlayers++;
-	}
-
-	// Spawn resources according to max allowed
-	int maxResources = MAX_RESOURCES_OUT_PER_PLAYER * nrOfPlayers;
-	if (maxResources > m_resources.size()) // If there's room for a resource, spawn one
-	{
-		// Reset time since last spawn
-		while (m_collectedTime >= SPAWN_INTERVAL)
-			m_collectedTime -= SPAWN_INTERVAL;
-
-		// Randomize whether it is a normal or special resource
-		bool isSpecial = false;
-		if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
-		{
-			// Only make resource special if there are available spots
-			for (int i = 0; i < m_specialSpawnAmount && !isSpecial; i++)
-			{
-				if (m_freeSpawns[(int)(m_normalSpawnAmount)+(int)i])
-					isSpecial = true;
-			}
-		}
+	if (m_dboHandler) 
+		delete m_dboHandler;
+	if (m_spawnDrone)
+		delete m_spawnDrone;
 
 
-		Resource* resource;
-		int spawnIndex;
-		if (isSpecial)
-		{
-			spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
-			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
-			resource = new Resource(true, spawnIndex, RIFLE, 3.0f);
-		}
-
-		else
-		{
-			spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
-			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.2f);
-			resource = new Resource(true, spawnIndex, (rand() % 4) + 2, 1.2f);
-		}
-
-		// Set resource under drone
-		XMVECTOR pos = m_spawnDroneBody.getPosition();
-		resource->setPosition(XMVectorSet
-		(
-			(float)(pos.m128_f32[0]),
-			(float)(pos.m128_f32[1]) + RESOURCE_OFFSET,
-			(float)(pos.m128_f32[2]),
-			0.0f)
-		);
-		m_resources.push_back(resource);
-		m_heldResourceIndex = (int)m_resources.size() - 1;
-
-		// Set transport destination
-		XMFLOAT2 destination = m_spawns[spawnIndex];
-		m_transportDestination = XMVectorSet(destination.x, FINAL_HEIGHT, destination.y, 0.0f);
-
-		return true;
-	}
-
-	return  false;
 }
 
 void GameState::pause()
@@ -560,7 +470,8 @@ bool GameState::update(Game* game, float dt)
 	updateDynamicCamera(dt);
 
 	// Update spawning drone
-	updateSpawnDrone(dt);
+	m_spawnDrone->update(m_robots, dt);
+
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
 
@@ -687,22 +598,31 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 	else if (pass == renderPass::e_transparent)
 	{
-		game->getPreLoader()->draw(ObjectType::e_scene);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDroneBody.getData(), 0);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
+		// Scene (Background objects without collision)
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
+			game->getPreLoader()->draw(ObjectType::e_scene, i);
 
-		game->getPreLoader()->draw(objectType::e_scene);
-		game->getPreLoader()->draw(objectType::e_scene, 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDroneBody.getData(), 0);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[0].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[1].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[2].getData(), m_spawnDroneBody.getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDronePropeller[3].getData(), m_spawnDroneBody.getData(), 1);
+		//Static
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_static); i++)
+			game->getPreLoader()->draw(ObjectType::e_static, i);
+
+		game->getPreLoader()->draw(ObjectType::e_scene);
+		game->getPreLoader()->draw(ObjectType::e_scene, 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
+		{
 			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
+		}
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(ObjectType::e_extra, m_dboHandler->getData(i));
+		}
 	}
 	else if (pass == renderPass::e_billboard)
 	{

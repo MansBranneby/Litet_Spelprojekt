@@ -55,6 +55,8 @@ public:
 	void drawOneMaterial(ObjectType type, objectData data, objectData relativeData, int variant = 0);
 	void drawOneModel(ObjectType type, objectData data, int modelNr, int variant = 0);
 	void drawOneModel(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant = 0);
+	void drawOneModelAndMat(ObjectType type, objectData data, int modelNr, int variant = 0);
+	void drawOneModelAndMat(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant = 0);
 	void cull(ObjectType type, int variant = 0); // Draw static object and update index buffers so only front facing triangles are used.
 };
 
