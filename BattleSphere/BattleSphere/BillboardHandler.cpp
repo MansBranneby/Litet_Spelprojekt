@@ -23,8 +23,9 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 	DirectX::XMVECTOR purple = { 0.6f, 0.0f, 0.8f , 1.0f };
 	DirectX::XMVECTOR darkPurple = { 0.4f, 0.0f, 0.4f , 1.0f };
 
-	m_billboards[5].setFlashState(0.05f);
+	m_billboards[3].setAllStates(0.1f, 0.02f, darkPurple, cyan, { -0.03f });
 	m_billboards[2].setAllStates(0.01f, 0.02f, darkPurple, cyan, {-0.03f});
+	m_billboards[5].setFlashState(0.05f);
 }
 
 BillboardHandler::~BillboardHandler()
