@@ -19,9 +19,13 @@ Sound::Sound()
 
 	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
+	m_effect[(int)soundEffect::e_movement] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/movement.wav");
 	m_effect[(int)soundEffect::e_dash] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/woosh.wav");
+	m_effect[(int)soundEffect::e_reflect] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/reflect.wav");
 	m_effect[(int)soundEffect::e_pickup] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/pickup.wav");
 	m_effect[(int)soundEffect::e_turnin] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/turnin.wav");
+	m_effect[(int)soundEffect::e_damage] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/damage.wav");
+	m_effect[(int)soundEffect::e_impact] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/impact.wav");
 	
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
@@ -69,13 +73,12 @@ void Sound::play(soundAmbient sound, float volume, float pitch, float pan)
 void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float falloff, float pitch, float pan)
 {
 	pos = XMVectorSetY(pos, XMVectorGetY(pos) * 0.0f);
-	AudioEmitter emitter;
 	XMVECTOR dir = pos - m_listenerPos;
 	float length = XMVectorGetX(XMVector3Length(dir));
 	if (length < 1.0f)
-		emitter.SetPosition(m_listenerPos);
+		m_emitter.SetPosition(m_listenerPos);
 	else
-		emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, falloff));
+		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, falloff));
 		//emitter.SetPosition(pos);
 
 	m_ambientInstances[(int)sound]->SetVolume(volume);
@@ -83,7 +86,7 @@ void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float falloff, 
 	m_ambientInstances[(int)sound]->SetPan(pan);
 
 	m_ambientInstances[(int)sound]->Play(true);
-	m_ambientInstances[(int)sound]->Apply3D(m_listener, emitter);
+	m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
 }
 
 void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, float pan)
@@ -110,17 +113,6 @@ void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, flo
 void Sound::stop(soundAmbient sound)
 {
 	m_ambientInstances[(int)sound]->Stop(true);
-}
-
-void Sound::update3D(soundAmbient sound, XMVECTOR pos)
-{
-	XMVECTOR dir = pos - m_listenerPos;
-	float length = XMVectorGetX(XMVector3Length(dir));
-	if (length < 1.0f)
-		m_emitter.SetPosition(m_listenerPos);
-	else
-		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.3f));
-	m_ambientInstances[(int)sound]->Apply3D(m_listener, m_emitter);
 }
 
 void Sound::update(float dt)

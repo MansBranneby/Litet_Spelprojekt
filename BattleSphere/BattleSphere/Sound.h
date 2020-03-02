@@ -16,20 +16,15 @@ enum class soundEffect
 	e_pistol = 0,
 	e_rifle = 1,
 	e_movement = 2,
-	e_shield = 3,
-	e_dash = 4,
-	e_reflect = 5,
-	e_pickup = 6,
-	e_turnin = 7,
-	e_damageS = 8,
-	e_damageM = 9,
-	e_damageL = 10,
-	e_impactS = 11,
-	e_impactM = 12,
-	e_impactL = 13,
-	e_explosion = 14,
-	e_blast = 15,
-	e_traverse = 16
+	e_dash = 3,
+	e_reflect = 4,
+	e_pickup = 5,
+	e_turnin = 6,
+	e_damage = 7,
+	e_impact = 8,
+	e_explosion = 9,
+	e_blast = 10,
+	e_traverse = 11
 };
 
 enum class soundAmbient
@@ -55,7 +50,7 @@ enum class soundUI
 	e_back = 2,
 };
 
-#define NR_EFFECT_SOUNDS 8
+#define NR_EFFECT_SOUNDS 9
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
 #define NR_UI_SOUNDS 3
@@ -95,7 +90,6 @@ public:
 
 	void stop(soundAmbient sound);
 
-	void update3D(soundAmbient sound, XMVECTOR pos = XMVectorSet(0, -100, 0, 0));
 	void update(float dt);
 
 	void release();

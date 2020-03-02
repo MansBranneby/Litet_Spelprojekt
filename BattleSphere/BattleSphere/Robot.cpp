@@ -54,6 +54,7 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 
 	if (dmg != 0.0f)
 	{
+		Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
 		m_health -= (int)floorf(dmg);
 		if (m_health < 0)
 		{
@@ -64,6 +65,8 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 		removeResource();
 		return true;
 	}
+	else
+		Sound::getInstance()->play(soundEffect::e_impact, getPosition(), 0.05f);
 	return false;
 }
 

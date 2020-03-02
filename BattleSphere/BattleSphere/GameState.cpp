@@ -507,6 +507,7 @@ bool GameState::update(Game* game, float dt)
 		if (collisionInfo.m_colliding)
 		{
 			// Collision against static object found, remove projectile
+			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 			ProjectileBank::getInstance()->removeProjectile(i);
 		}
 		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)

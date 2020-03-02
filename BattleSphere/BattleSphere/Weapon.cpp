@@ -92,6 +92,7 @@ float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVEC
 	}
 	else if (m_type == REFLECT && m_cdTime < m_duration && !m_ready && projIndex != -1)
 	{
+		Sound::getInstance()->play(soundEffect::e_reflect, robotPos, 0.3f);
 		ProjectileBank::getInstance()->changeDirection(projIndex, robotPos, robotColour, robotId);
 		projIndex = -1;
 	}
@@ -235,6 +236,8 @@ bool Weapon::speedUp(XMVECTOR robotPos)
 	{
 		if (m_type == DASH)
 			Sound::getInstance()->play(soundEffect::e_dash, robotPos, 0.4f);
+		if (m_type == MOVEMENT)
+			Sound::getInstance()->play(soundEffect::e_movement, robotPos, 0.4f);
 		m_ready = false;
 		return true;
 	}
@@ -270,7 +273,7 @@ bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 		{
 			m_currentSpeed = m_speed;
 			m_currentDefense = m_defense;
-			if (m_type == SHIELD)
+			if (m_type == SHIELD || m_type == REFLECT)
 				Sound::getInstance()->play(soundAmbient::e_shield, robotPos, 0.9f);
 			return true;
 		}
@@ -281,7 +284,7 @@ bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 		}
 		else
 		{
-			if (m_type == SHIELD)
+			if (m_type == SHIELD || m_type == REFLECT)
 				Sound::getInstance()->stop(soundAmbient::e_shield);
 		}
 	}
