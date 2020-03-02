@@ -6,7 +6,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	setRotation(rot);
 	m_direction = dir;
 	m_type = type;
-	m_damage = damage;
+	m_damage = (float)damage;
 	m_velocity = 0.0f;
 	m_owner = owner;
 
@@ -20,7 +20,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	}
 	else if (type == RIFLE)
 	{
-		m_velocity = 5.0f;
+		m_velocity = 80.0f;
 		//setScale(0.5f, 0.5f, 0.8f);
 		setScale(0.15f, 0.15f, 0.3f);
 	}

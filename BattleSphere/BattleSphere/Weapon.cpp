@@ -61,11 +61,11 @@ Weapon::Weapon(int type)
 	{
 		m_cooldown = 0.0f;
 		m_speed = 1000;
-		m_damage = 8;
+		m_damage = 0.08f;
 		m_range = 4.123295f; // Blade range
 		m_scale = 1.0f;
 		m_spinPerSec = 0.0f;
-		m_maxSpinPerSec = 5.0f;
+		m_maxSpinPerSec = 700.0f;
 		m_relativePos = XMVectorSet(0.0f, -0.5f, 0.0f, 0.0f);
 		setEmission(0.5f, 0.5f, 0.5f, -1);
 	}
@@ -191,9 +191,9 @@ void Weapon::upgrade()
 	else if (m_type == BEYBLADE)
 	{
 		m_cooldown = 0.0f;
-		m_damage += 6;
+		m_damage += 0.02f;
 		m_scale *= 2.0f;
-		m_maxSpinPerSec += 1;
+		m_maxSpinPerSec += 200;
 		setScale(m_scale, 1.0f, m_scale);
 	}
 	else
@@ -335,7 +335,7 @@ bool Weapon::updateTime(float dt)
 			m_spinPerSec += m_maxSpinPerSec / 3.0f * dt;
 			if (m_spinPerSec > m_maxSpinPerSec)
 				m_spinPerSec = m_maxSpinPerSec;
-			rotate(0, 1, 0, -m_spinPerSec);
+			rotate(0, 1, 0, -m_spinPerSec * dt);
 		}
 		else
 		{
@@ -343,7 +343,7 @@ bool Weapon::updateTime(float dt)
 			if (m_spinPerSec < 0)
 				m_spinPerSec = 0.0f;
 			else
-			rotate(0, 1, 0, -m_spinPerSec);
+			rotate(0, 1, 0, -m_spinPerSec * dt);
 		}
 		m_spinning = false;
 		return false;
