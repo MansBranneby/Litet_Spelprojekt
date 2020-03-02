@@ -1,6 +1,6 @@
 #pragma once
 #include "StructsAndEnums.h"
-#define MAX_PARTICLES 8192*8 // Maximum threads * amount computed per thread 
+#define MAX_PARTICLES 512 * 16 *8 // Max groups * Threads per group * computed per thread
 #define MAX_ADD 1000
 
 class Particles
@@ -18,21 +18,38 @@ private:
 	{
 		particle particles[MAX_ADD];
 	};
-	struct newParticleGroupParams
+
+	struct drawParameters 
 	{
-		UINT drawParams[4];
-		UINT ThreadGroupCount[3];
+		UINT vertexCountPerInstance = 0;
+		UINT instanceCount = 1;
+		UINT startVertexLocation = 0;
+		UINT startInstanceLocation = 0;
+	};
+
+	struct particleDispatchParams
+	{
+		drawParameters drawParams;
+		UINT threadGroupCount = 0;
+	};
+
+	struct particleBuffers
+	{
+		ID3D11Buffer* sBParams = nullptr;
+		ID3D11UnorderedAccessView* sBParamsUAV = nullptr;
+
+		ID3D11Buffer* sBParticles = nullptr;
+		ID3D11UnorderedAccessView* sBParticlesUAV = nullptr;
+		ID3D11ShaderResourceView* sBParticlesSRV = nullptr;
 	};
 
 	// Compute shader
 	ComputeShader m_computeShaderParticles;
 	ConstantBuffer* m_computeShaderConstantBuffer;
-	ID3D11Buffer* m_structuredBufferCSPingParam;
-	ID3D11Buffer* m_structuredBufferCSPing;
-	ID3D11Buffer* m_structuredBufferCSPongParam;
-	ID3D11Buffer* m_structuredBufferCSPong;
-	ID3D11UnorderedAccessView* m_structuredBufferUAVCS[2]; // Ping and pong view
-	int m_readIndex;
+	particleBuffers* m_prevParticles;
+	particleBuffers* m_updatedParticles;
+	particleBuffers m_actualBuffers[2];
+	std::vector<particle> m_particleToAdd;
 
 	// Vertex shader
 	VertexShader m_vertexShaderParticles;

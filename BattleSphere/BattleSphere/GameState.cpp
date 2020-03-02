@@ -440,6 +440,9 @@ bool GameState::update(Game* game, float dt)
 	// Update spawning drone
 	m_spawnDrone->update(m_robots, dt);
 
+	// Update particles
+	m_particles.update(dt);
+
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
 
@@ -540,10 +543,10 @@ void GameState::draw(Game* game, renderPass pass)
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
-
+		
 				game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
 				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
-
+		
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
 				{
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
@@ -573,6 +576,7 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
+		//m_particles.draw();
 	}
 
 }

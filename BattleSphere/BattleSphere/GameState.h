@@ -4,6 +4,7 @@
 #include "CollisionTests.h"
 #include "StructsAndEnums.h"
 #include "SpawnDrone.h"
+#include "Particles.h"
 
 class GameState : public State 
 {
@@ -27,6 +28,9 @@ private:
 	bool m_zoomingOutToStart;
 	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
 	void updateDynamicCamera(float dT);
+
+	// Particles
+	Particles m_particles;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
