@@ -68,7 +68,6 @@ void GameState::updateDynamicCamera(float dT)
 		newLookAt /= (float)nrOfPlayers;
 		newLookAt.m128_f32[3] -= 100.0f;
 
-
 		// Calculate biggest distance
 		float xDifference = maxX - minX;
 		float zDifference = maxZ - minZ;
@@ -217,6 +216,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (XMVectorGetX(XMVector3Length(rob - resource)) < 1.5f &&
 						!m_resources[j]->isBlocked())
 					{
+						Sound::getInstance()->play(soundEffect::e_pickup, rob, 0.4f);
 						m_spawnDrone->freeSpawn(m_resources[j]->getSpawnIndex());
 						m_robots[i]->setResourceIndex(j);
 						m_resources[j]->setBlocked(true);
@@ -258,6 +258,7 @@ void GameState::handleInputs(Game* game, float dt)
 						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
 							m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType());
+							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
 							for (int k = 0; k < XUSER_MAX_COUNT; k++)
 							{
@@ -409,6 +410,15 @@ GameState::GameState()
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
+	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
+	m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
+	m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
+	m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
+	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
+	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
+	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
+	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
 	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
@@ -500,6 +510,9 @@ bool GameState::update(Game* game, float dt)
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
 
+	// Update sounds
+	Sound::getInstance()->update(dt);
+
 	// Update dynamic camera
 	updateDynamicCamera(dt);
 
@@ -540,6 +553,7 @@ bool GameState::update(Game* game, float dt)
 		if (collisionInfo.m_colliding)
 		{
 			// Collision against static object found, remove projectile
+			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 			ProjectileBank::getInstance()->removeProjectile(i);
 		}
 		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)

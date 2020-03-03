@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d11.h>
+#include <dxgidebug.h>
 #include "Camera.h"
 //#include <d3dcompiler.h>
 //#pragma comment (lib, "d3d11.lib")
@@ -17,7 +18,7 @@ private:
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;
 	IDXGISwapChain* m_swapChain;
-
+	ID3D11Debug* m_debug;
 	ID3D11DepthStencilState* m_pDSStateEnabled;
 	ID3D11DepthStencilState* m_pDSStateDisabled;
 
@@ -36,6 +37,9 @@ public:
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
+
+	
+
 	ID3D11DepthStencilState* getDSSEnabled();
 	ID3D11DepthStencilState* getDSSDisabled();
 	float getWidth();
@@ -43,6 +47,7 @@ public:
 
 	HRESULT createDirect3DContext(HWND wndHandle);
 	void initializeCam(float width, float height, float nearPlane, float farPlane);
+	void reportLiveObjects();
 
 	void release();
 };

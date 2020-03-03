@@ -2,7 +2,7 @@
 
 Weapon::Weapon(int type)
 {
-	m_relativePos = XMVectorSet(1.4f, 0.4f, 0.2f, 0.0f);
+	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
 	m_damage = 0;
 	m_type = type;
 	m_recoil = 0.0f;
@@ -92,6 +92,7 @@ float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVEC
 	}
 	else if (m_type == REFLECT && m_cdTime < m_duration && !m_ready && projIndex != -1)
 	{
+		Sound::getInstance()->play(soundEffect::e_reflect, robotPos, 0.3f);
 		ProjectileBank::getInstance()->changeDirection(projIndex, robotPos, robotColour, robotId);
 		projIndex = -1;
 	}
@@ -219,16 +220,24 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
 		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		if (m_type == PISTOL)
+			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
+		if (m_type == RIFLE)
+			Sound::getInstance()->play(soundEffect::e_rifle, projPos, 0.3f, -0.5f, 0.0f);
 
 		return true;
 	}
 	return false;
 }
 
-bool Weapon::speedUp()
+bool Weapon::speedUp(XMVECTOR robotPos)
 {
 	if ((m_type == MOVEMENT || m_type == DASH) && m_ready)
 	{
+		if (m_type == DASH)
+			Sound::getInstance()->play(soundEffect::e_dash, robotPos, 0.4f);
+		if (m_type == MOVEMENT)
+			Sound::getInstance()->play(soundEffect::e_movement, robotPos, 0.4f);
 		m_ready = false;
 		return true;
 	}
@@ -255,7 +264,7 @@ bool Weapon::reflect()
 	return false;
 }
 
-bool Weapon::updateTime(float dt)
+bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 {
 	if (!m_ready)
 	{
@@ -264,12 +273,19 @@ bool Weapon::updateTime(float dt)
 		{
 			m_currentSpeed = m_speed;
 			m_currentDefense = m_defense;
+			if (m_type == SHIELD || m_type == REFLECT)
+				Sound::getInstance()->play(soundAmbient::e_shield, robotPos, 0.9f);
 			return true;
 		}
-		if (m_cdTime > m_duration + m_cooldown) // Ability ready again
+		else if (m_cdTime > m_duration + m_cooldown) // Ability ready again
 		{
 			m_cdTime = 0.0f;
 			m_ready = true;
+		}
+		else
+		{
+			if (m_type == SHIELD || m_type == REFLECT)
+				Sound::getInstance()->stop(soundAmbient::e_shield);
 		}
 	}
 	m_currentSpeed = 1.0f;

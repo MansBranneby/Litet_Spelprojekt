@@ -21,7 +21,7 @@ Robot::Robot(int playerId)
 	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
-
+	m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
 	// Position history
 	m_positionHistorySize = 0; 
 	m_positionHistoryCap = 100;
@@ -54,6 +54,7 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 
 	if (dmg != 0.0f)
 	{
+		Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
 		m_health -= (int)floorf(dmg);
 		if (m_health < 0)
 		{
@@ -64,6 +65,8 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 		removeResource();
 		return true;
 	}
+	else
+		Sound::getInstance()->play(soundEffect::e_impact, getPosition(), 0.05f);
 	return false;
 }
 
@@ -129,7 +132,7 @@ void Robot::useWeapon(int side, float dt)
 	if (m_currentWeapon[side] != -1)
 	{
 		m_weapons[m_currentWeapon[side]]->shoot(m_playerId, getPosition(), m_colour, m_currentRotation, side, dt);
-		m_weapons[m_currentWeapon[side]]->speedUp();
+		m_weapons[m_currentWeapon[side]]->speedUp(getPosition());
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();
 	}
@@ -144,9 +147,9 @@ void Robot::changeWeapon(int side)
 			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		
 		if (side == RIGHT)
-			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.4f, 0.4f, 0.2f, 0.0f));
+			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
 		else
-			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
+			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
 		m_ready = false;
 	}
 }
@@ -214,10 +217,14 @@ void Robot::removeResource()
 void Robot::update(float dt)
 {
 	GameObject::update();
-
+	XMVECTOR position = GameObject::getPosition();
+	Lights::getInstance()->setPosition(m_lightIndex, position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]);
+	objectData objectData = GameObject::getData();
+	XMVECTOR color = objectData.material.emission;
+	Lights::getInstance()->setColor(m_lightIndex, color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]);
 	for (int i = 0; i < m_weapons.size(); i++)
 	{
-		m_weapons[i]->updateTime(dt);
+		m_weapons[i]->updateTime(dt, getPosition());
 	}
 }
 
