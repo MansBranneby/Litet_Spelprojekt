@@ -77,7 +77,6 @@ private:
 	std::unique_ptr<SoundEffectInstance> m_ambientInstances[NR_AMBIENT_SOUNDS];
 	std::unique_ptr<SoundEffectInstance> m_musicInstances[NR_MUSIC_SOUNDS];
 	int m_index;
-	float m_slowStop;
 
 public:
 	static Sound* getInstance();

@@ -69,7 +69,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 
 		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_startGame)
 		{
-			Sound::getInstance()->play(soundUI::e_front, 0.05f);
+			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 			game->getInput()->setBlocked(j, true);
 			m_menuState = MenuState::e_robotSelection;
 			game->updatePlayerStatus();
@@ -171,7 +171,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		//PRESS A//
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(i))
 		{
-			Sound::getInstance()->play(soundUI::e_front, 0.05f);
+			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 			if (robotNr == -1)
 				robotNr = game->setPlayerIdIndex(i);
 			game->getInput()->setBlocked(i, true);
@@ -198,7 +198,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		//PRESS B//
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
 		{
-			Sound::getInstance()->play(soundUI::e_back, 0.05f);
+			Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 			game->getInput()->setBlocked(i, true);
 
 			switch (m_readyState[robotNr])
@@ -251,7 +251,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 	{
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) == -1) // To main menu
 		{
-			Sound::getInstance()->play(soundUI::e_back, 0.05f);
+			Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 			game->getInput()->setBlocked(i, true);
 			int nrOfPlayers = 0;
 			for (int j = 0; j < XUSER_MAX_COUNT; j++)

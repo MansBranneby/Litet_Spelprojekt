@@ -4,7 +4,7 @@ Sound* Sound::m_instance = nullptr;
 
 Sound::Sound()
 {
-	// TODO: ADD SUSPEND AND RESUME AND MENU STUFF
+	// TODO: ADD SUSPEND AND RESUME
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 	#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
@@ -14,7 +14,7 @@ Sound::Sound()
 	m_listener.SetPosition(XMVectorSet(0, 0, 0, 0));
 
 	m_ui[(int)soundUI::e_traverse] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/traverse.wav");
-	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/front.wav");
+	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/accept.wav");
 	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
 
 	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
@@ -124,12 +124,12 @@ void Sound::update(float dt)
 		// No audio device is active
 		if (m_audEngine->IsCriticalError())
 		{
-			// TODO
+			// TODO:
 		}
 	}
 
 	/*
-	TODO for music later I think
+	TODO: for music later I think
 	if (m_retryAudio)
 	{
 		m_retryAudio = false;
