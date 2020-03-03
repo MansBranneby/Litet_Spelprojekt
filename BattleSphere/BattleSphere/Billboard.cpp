@@ -26,7 +26,7 @@ Billboard::Billboard(int variant, int modelNr, int subModelNr)
 
 	m_state = BillboardState::e_none;
 	m_UVincrement = { 0.0f, 0.0f, 0.0f };
-	m_velocityUV = { -0.01f, 0.0f, 0.0f };
+	m_velocityUV = { 0.0f, 0.0f, 0.0f };
 	m_flashSpeed = 0.0f;
 	m_flashFactor = 0.0f;
 	m_colourChangeSpeed = 0.0f;
@@ -34,6 +34,24 @@ Billboard::Billboard(int variant, int modelNr, int subModelNr)
 	m_colourDecider = 1.0f;
 	m_colourA = DirectX::XMVectorZero();
 	m_colourB = DirectX::XMVectorZero();
+}
+
+Billboard::Billboard(int variant, int modelNr, int subModelNr, BillboardData billboardData)
+{
+	m_variant = variant;
+	m_modelNr = modelNr;
+	m_subModelNr = subModelNr;
+
+	m_state = billboardData.state;
+	m_UVincrement = { 0.0f, 0.0f, 0.0f };
+	m_velocityUV = billboardData.velocityUV;
+	m_flashSpeed = billboardData.flashSpeed;
+	m_flashFactor = 0.0;
+	m_colourChangeSpeed = billboardData.colourChangeSpeed;
+	m_colourChangeFactor = 0.0f;
+	m_colourDecider = 1.0f;
+	m_colourA = billboardData.colourA;
+	m_colourB = billboardData.colourB;
 }
 
 void Billboard::setState(BillboardState state)

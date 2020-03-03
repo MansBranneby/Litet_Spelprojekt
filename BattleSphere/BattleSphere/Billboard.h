@@ -38,6 +38,7 @@ private:
 public:
 	Billboard();
 	Billboard(int variant, int modelNr, int subModelNr);
+	Billboard(int variant, int modelNr, int subModelNr, BillboardData billboardData);
 
 	void setState(BillboardState state); 
 	void setFlashState(float flashSpeed); // Initialize flash state

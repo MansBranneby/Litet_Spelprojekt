@@ -26,18 +26,24 @@ private:
 
 	// Texture
 	ID3D11ShaderResourceView* m_SRV;
-	ConstantBuffer* m_textureAnimationCB;
+	ConstantBuffer* m_constantBufferBillboard;
+
+	// Billboard data
+	BillboardData m_billboardData;
 
 public:
 	SubModel();
 	~SubModel();
 
+	void setBillboardData(BillboardData billboardData);
 	void updateTextureAnimationCB(BillboardData billboardData);
 	void setMaterialInfo(material mat);
 	void updateMaterialInfo(material mat);
 	void setFaces(int* indexBuffer, int nrOfIndices);
 	void setSRV(ID3D11ShaderResourceView* SRV);
 
+	BillboardData getBillboardData();
+	
 	void draw();
 	void draw(BillboardData billboardData);
 	void cullDraw();

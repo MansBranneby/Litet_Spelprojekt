@@ -513,6 +513,11 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	return updatedVertices;
 }
 
+BillboardData Model::getSubModelBillboardData(int subModelNr)
+{
+	return  m_subModels[subModelNr].getBillboardData();
+}
+
 int Model::getNrOfSubModels() const
 {
 	return m_nrOfSubModels;
@@ -784,7 +789,11 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 		tempSRV = createTexture(inputStream.str()); // Create texture
 		inputStream.clear();
 
-		parseBillboardString(line);
+		// Set submodel texture
+		m_subModels[i].setSRV(tempSRV);
+
+		// Billboard data
+		m_subModels[i].setBillboardData(getBillboardDataFromFile(line));
 
 		//?
 
@@ -809,9 +818,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 		// Set submodel material
 		m_subModels[i].setMaterialInfo(tempMat);
-		// Set submodel texture
-		m_subModels[i].setSRV(tempSRV);
-
+	
 		// Get number of indices
 		int nrOfIndices = 0;
 		std::getline(in, line);
@@ -868,16 +875,18 @@ ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
 	return tempSRV;
 }
 
-void Model::parseBillboardString(std::string line)
+BillboardData Model::getBillboardDataFromFile(std::string line)
 {
+	BillboardData data;
+
 	std::istringstream inputStream;
 	std::string FIT;
-	float flashSpeed = 0.0f;
-	float interpolateSpeed = 0.0f;
-	DirectX::XMFLOAT3 colourA, colourB;
-	DirectX::XMFLOAT3 velocityUV;
 	size_t start, end;
 	std::string token;
+	std::string colourString, translateString;
+	std::istringstream colours, translation;
+	std::string hell;
+	bool flashing = false, interpolating = false, translating = false;
 
 	if (line != "" && line != "\r")
 	{
@@ -894,51 +903,75 @@ void Model::parseBillboardString(std::string line)
 
 			if (FIT == "F")
 			{
+				flashing = true;
 				// How fast material blinks
-				inputStream >> flashSpeed;
+				inputStream >> data.flashSpeed;
 			}
 			else if (FIT == "I")
 			{
+				interpolating = true;
 				// How fast model interpolated between colours
-				inputStream >> interpolateSpeed;
-			
+				inputStream >> data.colourChangeSpeed;
 
-				std::string colString;
-				std::istringstream colours;
-				std::getline(inputStream, colString);
-				start = colString.find('(') + 1;
-				end = colString.find(')') - start;
-				std::string hell = colString.substr(start, end);
+				std::getline(inputStream, colourString);
+
+				// Remove parantheses
+				start = colourString.find('(') + 1;
+				end = colourString.find(')') - start;
+				hell = colourString.substr(start, end);
 				colours.str(hell);
 				colours.clear();
 
 				// Colour A
-				colours >> colourA.x;
-				colours >> colourA.y;
-				colours >> colourA.z;
+				colours >> data.colourA.m128_f32[0];
+				colours >> data.colourA.m128_f32[1];
+				colours >> data.colourA.m128_f32[2];
 
-				start = colString.find_last_of('(') + 1;
-				end = colString.find_last_of(')') - start;
-				hell = colString.substr(start, end);
+				// Remove parantheses
+				start = colourString.find_last_of('(') + 1;
+				end = colourString.find_last_of(')') - start;
+				hell = colourString.substr(start, end);
 				colours.str(hell);
-				colours.str(colString);
 				
-
 				// Colour B
-				colours >> colourB.x;
-				colours >> colourB.y;
-				colours >> colourB.z;
+				colours >> data.colourB.m128_f32[0];
+				colours >> data.colourB.m128_f32[1];
+				colours >> data.colourB.m128_f32[2];
 			}
 			else if (FIT == "T")
 			{
-				inputStream >> velocityUV.x;
-				inputStream >> velocityUV.y;
-				inputStream >> velocityUV.z;
+				translating = true;
+				std::getline(inputStream, translateString);
+				// Remove parantheses
+				start = translateString.find('(') + 1;
+				end = translateString.find(')') - start;
+				hell = translateString.substr(start, end);
+				translation.str(hell);
+
+				translation >> data.velocityUV.m128_f32[0];
+				translation >> data.velocityUV.m128_f32[1];
+				translation >> data.velocityUV.m128_f32[2];
 			}
 
 			inputStream.clear();
 			line.erase(0, start + end + 1);
 		}
-			
 	}
+
+	if (flashing && !interpolating && !translating)
+		data.state = BillboardState::e_flashing;
+	else if (!flashing && interpolating && !translating)
+		data.state = BillboardState::e_interpolating;
+	else if (!flashing && !interpolating && translating)
+		data.state = BillboardState::e_translating;
+	else if (flashing && interpolating && !translating)
+		data.state = BillboardState::e_flashing_interpolating;
+	else if (flashing && !interpolating && translating)
+		data.state = BillboardState::e_flashing_translating;
+	else if (!flashing && interpolating && translating)
+		data.state = BillboardState::e_interpolating_translating;
+	else if (flashing && interpolating && translating)
+		data.state = BillboardState::e_all;
+
+	return data;
 }

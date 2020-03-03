@@ -67,7 +67,6 @@ using namespace DirectX;
 #define BIGGEST_NORMAL_INDEX 5 // Update if adding resources!
 // Special - bigger than normal number - resources
 
-//#define OBJECT_TYPES 9
 enum class ObjectType
 {
 	e_extra,
@@ -152,7 +151,8 @@ enum class BillboardState
 struct BillboardData
 {
 	BillboardState state = BillboardState::e_none;
-	float padding0[3];
+	float colourChangeSpeed = 0.0f;
+	float padding[2];
 	// Translate
 	XMVECTOR velocityUV = DirectX::XMVectorZero();
 	// Interpolate
@@ -162,7 +162,8 @@ struct BillboardData
 	float maxY = 0.0f; // Min y coordinate of billboard
 	// Flash
 	float flashFactor = 0.0f;
-	float padding1[3];
+	float flashSpeed = 0.0f;
+	float padding1[2];
 	DirectX::XMVECTOR colourA;
 	DirectX::XMVECTOR colourB;
 };

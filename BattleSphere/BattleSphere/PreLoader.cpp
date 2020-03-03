@@ -127,7 +127,7 @@ PreLoader::PreLoader()
 
 	// Billboards
 	loadFromFile(ObjectType::e_billboard, "TestTower");
-	loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	//loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	//// Background
 
@@ -179,6 +179,12 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(ObjectType type, objectData da
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
+}
+
+BillboardData PreLoader::getSubModelBillboardData(ObjectType type, int variant, int modelNr, int subModelNr)
+{
+	
+	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);;
 }
 
 int PreLoader::getNrOfVariants(ObjectType type) const

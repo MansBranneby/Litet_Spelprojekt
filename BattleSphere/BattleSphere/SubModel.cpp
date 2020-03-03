@@ -19,7 +19,7 @@ SubModel::SubModel()
 	m_nrOfCulledIndices = 0;
 
 	// Constant buffer for texture animation
-	m_textureAnimationCB = nullptr;
+	m_constantBufferBillboard = nullptr;
 }
 
 SubModel::~SubModel()
@@ -27,7 +27,7 @@ SubModel::~SubModel()
 	if (m_indexBuffer) m_indexBuffer->Release();
 
 	if (m_constantBuffer) delete m_constantBuffer;
-	if (m_constantBuffer) delete m_textureAnimationCB;
+	if (m_constantBuffer) delete m_constantBufferBillboard;
 	if (m_mat) _aligned_free(m_mat);
 	if (m_indexArray) delete[] m_indexArray;
 	if (m_culledIndiceBuffer) m_culledIndiceBuffer->Release();
@@ -66,12 +66,18 @@ void SubModel::createCulledIndexBuffer()
 	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
 }
 
+void SubModel::setBillboardData(BillboardData billboardData)
+{
+	m_billboardData = billboardData;
+	m_constantBufferBillboard = new ConstantBuffer(&billboardData, sizeof(billboardData));
+}
+
 void SubModel::updateTextureAnimationCB(BillboardData BillboardData)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	DX::getInstance()->getDeviceContext()->Map(*m_textureAnimationCB->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferBillboard->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, &BillboardData, sizeof(BillboardData));
-	DX::getInstance()->getDeviceContext()->Unmap(*m_textureAnimationCB->getConstantBuffer(), 0);
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferBillboard->getConstantBuffer(), 0);
 }
 
 void SubModel::setMaterialInfo(material mat)
@@ -81,9 +87,6 @@ void SubModel::setMaterialInfo(material mat)
 	//TODO: Create constant buffer
 	m_constantBuffer = new ConstantBuffer(m_mat, sizeof(material));
 	m_materialCBuffer = *m_constantBuffer->getConstantBuffer();
-
-	// TODO GLENN
-	m_textureAnimationCB = new ConstantBuffer(m_mat, sizeof(BillboardData));
 }
 
 void SubModel::updateMaterialInfo(material mat)
@@ -114,6 +117,11 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 void SubModel::setSRV(ID3D11ShaderResourceView* SRV)
 {
 	m_SRV = SRV;
+}
+
+BillboardData SubModel::getBillboardData()
+{
+	return m_billboardData;
 }
 
 void SubModel::draw()
@@ -156,7 +164,7 @@ void SubModel::draw(BillboardData billboardData)
 	updateTextureAnimationCB(billboardData);
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
-	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(5, 1, m_textureAnimationCB->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(5, 1, m_constantBufferBillboard->getConstantBuffer());
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 }
 

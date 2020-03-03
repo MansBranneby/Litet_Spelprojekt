@@ -60,6 +60,8 @@ private:
 	vertexAndId* m_vertexAndId;
 	void setVPMatrix();
 
+	BillboardData getBillboardDataFromFile(std::string line);
+
 public:
 	void draw();
 	void draw(BillboardData BillboardData, int subModelNr);
@@ -73,6 +75,7 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
+	BillboardData getSubModelBillboardData(int subModelNr);
 	int getNrOfSubModels() const;
 	void setObjectData(objectData data, int modelNr = -1);
 	void setObjectData(objectData data, objectData relativeData, int subModelNr = -1);
@@ -82,6 +85,6 @@ public:
 	void loadModel(std::ifstream& in, ObjectType type);
 	ID3D11ShaderResourceView* createTexture(std::string fileName);
 
-	void parseBillboardString(std::string line);
+	
 };
 
