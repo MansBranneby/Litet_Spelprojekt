@@ -2,7 +2,7 @@
 
 Weapon::Weapon(int type)
 {
-	m_relativePos = XMVectorSet(1.4f, 0.4f, 0.2f, 0.0f);
+	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
 	m_damage = 0;
 	m_type = type;
 	m_recoil = 0.0f;

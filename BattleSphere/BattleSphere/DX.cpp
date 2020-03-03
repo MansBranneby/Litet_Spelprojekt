@@ -4,6 +4,7 @@ DX* DX::m_instance = nullptr;
 
 DX::DX()
 {
+	m_debug = nullptr;
 	m_device = nullptr;
 	m_deviceContext = nullptr;
 	m_swapChain = nullptr;
@@ -118,6 +119,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 
 	// fill the swap chain description struct
 	scd.BufferCount = 1;                                    // one back buffer
+	
 	scd.BufferDesc.Height = (UINT)m_height;
 	scd.BufferDesc.Width = (UINT)m_width;
 	scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
@@ -146,7 +148,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 		&m_device,
 		NULL,
 		&m_deviceContext);
-
+	hr = m_device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&m_debug));
 	createStencilStates();
 	return hr;
 }
@@ -157,12 +159,22 @@ void DX::initializeCam(float width, float height, float nearPlane, float farPlan
 	m_camera->initialize(width, height, nearPlane, farPlane);
 }
 
+
+void DX::reportLiveObjects()
+{
+	m_debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+}
+
+
+
 void DX::release()
 {
+	m_swapChain->SetFullscreenState(false, NULL);
 	if (m_camera) delete m_camera;
-	getDevice()->Release();
 	getDeviceContext()->Release();
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
 	m_pDSStateEnabled->Release();
+	m_debug->Release();
+	getDevice()->Release();
 }

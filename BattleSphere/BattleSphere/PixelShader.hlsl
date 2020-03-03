@@ -81,7 +81,6 @@ float rayConeIntersection(Light light, float3 camPos, float3 camDir)
 		float t1 = (-b - det) / (2. * a);
 		float t2 = (-b + det) / (2. * a);
 
-		// This is a bit messy; there ought to be a more elegant solution.
 		t = t1;
 		if (t < 0. || t2 > 0. && t2 < t) t = t2;
 		if (t < 0.) return -1;
@@ -165,6 +164,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			//Directional light
 
 			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
+			
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
 			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
 			break;
@@ -218,19 +218,18 @@ float4 PS_main(PS_IN input) : SV_Target
 					//Calculate intensity;
 					float3 right = cross(normalize(light.Direction), normalize(light.Position.xyz - cameraPos.xyz));
 					float3 up = cross(normalize(light.Direction), right);
-					float3 projPos = worldPos - dot(up, worldPos - light.Position.xyz) * up;
-					spotIntensity2 = dot(normalize(projPos - light.Position.xyz), normalize(light.Direction));
-					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f);
-					spotIntensity2 = (spotIntensity2 - cosa) / (1 - cosa);
-					/*if (spotIntensity2 > 0)
-						spotIntensity2 = sqrt(spotIntensity2);
-					else
-						spotIntensity2 = 0;*/
+					float3 projPos = worldPos - dot(up, worldPos - light.Position.xyz) * up; //Project the world position on to the light direction and light right vector plane
+					spotIntensity2 = dot(normalize(projPos - light.Position.xyz), normalize(light.Direction)); //Calculate angle between vector towards the point and the lights direction
+					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f); // Maximum cos angle
+					float maxCos = lerp(cosa, 1, 0.5f);
+					spotIntensity2 = smoothstep(cosa, maxCos, spotIntensity2); //Smoothstep between max angle and minimum angle
 
 					
-					attenuation2 = 0.6f;
+					float d2 = distance(light.Position, worldPos);
+					attenuation2 = DoAttenuation(light, d2) * 0.6f;
 				}
-				else {
+				else 
+				{
 					spotIntensity2 = 0;
 					attenuation2 = 0;
 					worldPos = input.posWC;
@@ -254,7 +253,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 
 
-			lightCol = Lights[LightIndex[i]].color * max(attenuation1 * spotIntensity1, attenuation2 * spotIntensity2) * light.Intensity;
+			lightCol = Lights[LightIndex[i]].color * max(attenuation1 * spotIntensity1, attenuation2 * spotIntensity2) * light.Intensity; //Choose between ground and volumetric light depending on which has the most impact
 			break;
 		}
 		
