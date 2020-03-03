@@ -101,41 +101,41 @@ PreLoader::PreLoader()
 	// Initialize backface culler
 	m_bFCuller = new BackfaceCuller;
 
-	// Load objects
-	loadFromFile(ObjectType::e_drone, "Drone");
-	loadFromFile(ObjectType::e_weapon, "GamePlay\\Weapon1");
-	loadFromFile(ObjectType::e_resource, "GamePlay\\Weapon1");
-	loadFromFile(ObjectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
-	loadFromFile(ObjectType::e_node, "Building", "1mesh1mat");
-	loadFromFile(ObjectType::e_projectile, "1mesh1mat", "1mesh1mat");
+	//// Load objects
+	//loadFromFile(ObjectType::e_drone, "Drone");
+	//loadFromFile(ObjectType::e_weapon, "GamePlay\\Weapon1");
+	//loadFromFile(ObjectType::e_resource, "GamePlay\\Weapon1");
+	//loadFromFile(ObjectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
+	//loadFromFile(ObjectType::e_node, "Building", "1mesh1mat");
+	//loadFromFile(ObjectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
-	// On map (with collision)
-	loadFromFile(ObjectType::e_static, "OnMap\\Bar", "BarColl");
-	loadFromFile(ObjectType::e_static, "OnMap\\Wall", "WallColl");
-	loadFromFile(ObjectType::e_static, "OnMap\\GasStation", "GasStationColl");
-	loadFromFile(ObjectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
-	loadFromFile(ObjectType::e_static, "Background\\Edge", "EdgeColl");
-		// Nodes
-	loadFromFile(ObjectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
+	//// On map (with collision)
+	//loadFromFile(ObjectType::e_static, "OnMap\\Bar", "BarColl");
+	//loadFromFile(ObjectType::e_static, "OnMap\\Wall", "WallColl");
+	//loadFromFile(ObjectType::e_static, "OnMap\\GasStation", "GasStationColl");
+	//loadFromFile(ObjectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+	//loadFromFile(ObjectType::e_static, "Background\\Edge", "EdgeColl");
+	//	// Nodes
+	//loadFromFile(ObjectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 
-		// Static Background (Skyscrapers with collision) // Later billboards?
-	loadFromFile(ObjectType::e_static, "Background\\BSTower", "BSTowerColl");
-	loadFromFile(ObjectType::e_static, "Background\\SS1", "SS1Coll");
-	loadFromFile(ObjectType::e_static, "Background\\SS2", "SS2Coll");
-	loadFromFile(ObjectType::e_static, "Background\\SS3", "SS3Coll");
-	loadFromFile(ObjectType::e_static, "Background\\SS4", "SS4Coll");
+	//	// Static Background (Skyscrapers with collision) // Later billboards?
+	//loadFromFile(ObjectType::e_static, "Background\\BSTower", "BSTowerColl");
+	//loadFromFile(ObjectType::e_static, "Background\\SS1", "SS1Coll");
+	//loadFromFile(ObjectType::e_static, "Background\\SS2", "SS2Coll");
+	//loadFromFile(ObjectType::e_static, "Background\\SS3", "SS3Coll");
+	//loadFromFile(ObjectType::e_static, "Background\\SS4", "SS4Coll");
 
 	// Billboards
 	loadFromFile(ObjectType::e_billboard, "TestTower");
 	loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
-	// Background
+	//// Background
 
-	loadFromFile(ObjectType::e_scene, "Background\\Ground");
-	loadFromFile(ObjectType::e_scene, "Background\\Freeway");
-	loadFromFile(ObjectType::e_scene, "Other\\Car");
-	loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
-	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
+	//loadFromFile(ObjectType::e_scene, "Background\\Ground");
+	//loadFromFile(ObjectType::e_scene, "Background\\Freeway");
+	//loadFromFile(ObjectType::e_scene, "Other\\Car");
+	//loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
+	////loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
 }
 
 PreLoader::~PreLoader()

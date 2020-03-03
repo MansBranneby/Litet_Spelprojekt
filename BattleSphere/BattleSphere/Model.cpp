@@ -777,11 +777,14 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 
 		//// Diffuse texture
 		std::getline(in, line);
-		if (!line.empty() && *line.rbegin() == '\r') 
-			line.erase(line.length() - 1, 1);
-		inputStream.str(line);
+		std::string textureString = line.substr(0, line.find("{"));
+		if (!textureString.empty() && *textureString.rbegin() == ' ')
+			textureString.erase(textureString.length() - 1, 1);
+		inputStream.str(textureString);
 		tempSRV = createTexture(inputStream.str()); // Create texture
 		inputStream.clear();
+
+		parseBillboardString(line);
 
 		//?
 
@@ -863,4 +866,79 @@ ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
 	}
 
 	return tempSRV;
+}
+
+void Model::parseBillboardString(std::string line)
+{
+	std::istringstream inputStream;
+	std::string FIT;
+	float flashSpeed = 0.0f;
+	float interpolateSpeed = 0.0f;
+	DirectX::XMFLOAT3 colourA, colourB;
+	DirectX::XMFLOAT3 velocityUV;
+	size_t start, end;
+	std::string token;
+
+	if (line != "" && line != "\r")
+	{
+		start = line.find("{");
+		line.erase(0, start);
+
+		while ( (start = line.find("{")) != std::string::npos)
+		{
+			start += 1;
+			end = line.find("}") - start;
+			token = line.substr(start , end);
+			inputStream.str(token);
+			inputStream >> FIT;
+
+			if (FIT == "F")
+			{
+				// How fast material blinks
+				inputStream >> flashSpeed;
+			}
+			else if (FIT == "I")
+			{
+				// How fast model interpolated between colours
+				inputStream >> interpolateSpeed;
+			
+
+				std::string colString;
+				std::istringstream colours;
+				std::getline(inputStream, colString);
+				start = colString.find('(') + 1;
+				end = colString.find(')') - start;
+				std::string hell = colString.substr(start, end);
+				colours.str(hell);
+				colours.clear();
+
+				// Colour A
+				colours >> colourA.x;
+				colours >> colourA.y;
+				colours >> colourA.z;
+
+				start = colString.find_last_of('(') + 1;
+				end = colString.find_last_of(')') - start;
+				hell = colString.substr(start, end);
+				colours.str(hell);
+				colours.str(colString);
+				
+
+				// Colour B
+				colours >> colourB.x;
+				colours >> colourB.y;
+				colours >> colourB.z;
+			}
+			else if (FIT == "T")
+			{
+				inputStream >> velocityUV.x;
+				inputStream >> velocityUV.y;
+				inputStream >> velocityUV.z;
+			}
+
+			inputStream.clear();
+			line.erase(0, start + end + 1);
+		}
+			
+	}
 }

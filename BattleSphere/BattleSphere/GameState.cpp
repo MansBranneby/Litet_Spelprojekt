@@ -572,7 +572,7 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass == renderPass::e_opaque)
 	{
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		/*for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
@@ -594,35 +594,35 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			game->getPreLoader()->draw(ObjectType::e_resource, m_resources[i]->getData(), 0, 0);
-		}
+		}*/
 	}
 	else if (pass == renderPass::e_transparent)
 	{
-		// Scene (Background objects without collision)
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
-			game->getPreLoader()->draw(ObjectType::e_scene, i);
+		//// Scene (Background objects without collision)
+		//for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
+		//	game->getPreLoader()->draw(ObjectType::e_scene, i);
 
-		//Static
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_static); i++)
-			game->getPreLoader()->draw(ObjectType::e_static, i);
+		////Static
+		//for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_static); i++)
+		//	game->getPreLoader()->draw(ObjectType::e_static, i);
 
-		game->getPreLoader()->draw(ObjectType::e_scene);
-		game->getPreLoader()->draw(ObjectType::e_scene, 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(), 0);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
-		}
-		// Tokyo drift
-		for (int i = 0; i < OBJECT_NR_1; i++)
-		{
-			if (m_dboHandler->isDrawn(i))
-				game->getPreLoader()->draw(ObjectType::e_extra, m_dboHandler->getData(i));
-		}
+		//game->getPreLoader()->draw(ObjectType::e_scene);
+		//game->getPreLoader()->draw(ObjectType::e_scene, 1);
+		//game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(), 0);
+		//game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		//game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		//game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		//game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
+		//for (int i = 0; i < m_nodes.size(); i++)
+		//{
+		//	game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
+		//}
+		//// Tokyo drift
+		//for (int i = 0; i < OBJECT_NR_1; i++)
+		//{
+		//	if (m_dboHandler->isDrawn(i))
+		//		game->getPreLoader()->draw(ObjectType::e_extra, m_dboHandler->getData(i));
+		//}
 	}
 	else if (pass == renderPass::e_billboard)
 	{

@@ -81,5 +81,7 @@ public:
 	void loadModel(std::ifstream& in);
 	void loadModel(std::ifstream& in, ObjectType type);
 	ID3D11ShaderResourceView* createTexture(std::string fileName);
+
+	void parseBillboardString(std::string line);
 };
 
