@@ -4,20 +4,20 @@
 void GameState::spawnNodes()
 {
 	Node* node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
+	//node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	//node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
+	//node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
 	node = new Node(rand() % 3);
-	node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
-	node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
+	//node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
+	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
 }
 
@@ -91,7 +91,7 @@ void GameState::updateDynamicCamera(float dT)
 					newPos.m128_f32[2] += difference;
 					newLookAt.m128_f32[2] += difference;
 				}
-				m_zoomingOutToStart = false;
+					m_zoomingOutToStart = false;
 			}
 		}
 		else // If not zooming out
@@ -140,7 +140,7 @@ void GameState::updateDynamicCamera(float dT)
 		if (closest < 0.01f) // Limit closest to avoid zero and negative speeds
 			closest = 0.01f;
 
-		if (m_zoomingOutToStart) // If zooming out to start pos is true, set the position and look at, also increase speeds
+		if (m_zoomingOutToStart || m_devZoomOut) // If zooming out to start pos is true, set the position and look at, also increase speeds
 		{
 			changeSpeed *= 2.0f;
 			newPos = m_camStartPos;
@@ -239,9 +239,23 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
-						// TODO: change range or way to calc?
-						if (XMVectorGetX(XMVector3Length(m_robots[i]->getPosition() - m_nodes[j]->getPosition())) < 5.0f &&
-							m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+						// TODO: Robot position y is 1.9f so collsion mesh must be at y = 2, after that delete the radius * 2
+						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
+						bool collision = false;
+						for (int k = 0; k < cm.size(); k+=3)
+						{
+							unsigned int ind1 = k + 1;
+							unsigned int ind2 = k + 2;
+							if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x,
+								XMVECTOR{ cm[k].x, cm[k].y, cm[k].z },
+								XMVECTOR{ cm[ind1].x, cm[ind1].y, cm[ind1].z },
+								XMVECTOR{ cm[ind2].x, cm[ind2].y, cm[ind2].z }).m_colliding)
+							{
+								collision = true;
+								break;
+							}
+						}
+						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
 							m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType());
 							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
@@ -264,6 +278,16 @@ void GameState::handleInputs(Game* game, float dt)
 							break;
 						}
 					}
+				}
+
+				// Camera dev zoom
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK))
+				{
+					m_devZoomOut = true;
+				}
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_START))
+				{
+					m_devZoomOut = false;
 				}
 
 				// Change weapons
@@ -368,6 +392,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 GameState::GameState()
 {
+	m_devZoomOut = false;
 	srand((unsigned int)time(NULL));
 
 	m_type = stateType::e_gameState;
@@ -394,10 +419,26 @@ GameState::GameState()
 	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
+	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
+	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
+	//m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
+	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
+	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
+	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	
+	// Skyscrapers
+	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
+	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
+	m_lights->addAreaLight(35, 20, 77, 60, 0.5f, 0.0f, 0.8f, 25);
+	m_lights->addAreaLight(10, 20, 80, 55, 0.0f, 0.6f, 0.8f, 23);
 
 	m_lights->addAreaLight(172, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10); // Under map
 	m_lights->addAreaLight(32, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
 	m_lights->addAreaLight(32, -30, 69, 50, 0.2f, 0.7f, 1.0f, 10);
+
+	m_lights->addAreaLight(-125, 18, -9.4f, 50, 0.06f, 0.9f, 0.9f, 10); // Golden duck
 
 	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
 	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
@@ -620,7 +661,7 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
 	}
 

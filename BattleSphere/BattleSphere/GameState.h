@@ -31,6 +31,7 @@ private:
 	bool m_zoomingOutToStart;
 	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
 	void updateDynamicCamera(float dT);
+	bool m_devZoomOut;
 
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;

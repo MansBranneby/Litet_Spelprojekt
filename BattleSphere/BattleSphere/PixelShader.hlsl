@@ -197,6 +197,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			
 			break;
 		case 4: //Volumetric spotlight
+			//return float4(1, 1, 1, 1);
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 
 			float3 cameraDir = normalize(input.posWC - cameraPos.xyz);
@@ -223,6 +224,7 @@ float4 PS_main(PS_IN input) : SV_Target
 					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f); // Maximum cos angle
 					float maxCos = lerp(cosa, 1, 0.5f);
 					spotIntensity2 = smoothstep(cosa, maxCos, spotIntensity2); //Smoothstep between max angle and minimum angle
+					worldPos = projPos;
 
 					
 					float d2 = distance(light.Position, worldPos);
