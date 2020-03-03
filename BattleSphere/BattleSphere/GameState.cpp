@@ -630,7 +630,10 @@ void GameState::draw(Game* game, renderPass pass)
 			{
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
-				game->getPreLoader()->draw(objectType::e_robot, m_robots[i]->getData(), 1, 2);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+
+				game->getPreLoader()->draw(objectType::e_robot);
 				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
 
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
@@ -641,7 +644,7 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0);
+			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
 		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
