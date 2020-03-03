@@ -61,6 +61,8 @@ ShadowMapping* g_shadowMapping;
 GameState* g_gameState;
 MainMenuState* g_mainMenuState;
 
+int g_sunMoonIndex;
+
 struct MaterialTest
 {
 	XMVECTOR Ka, Kd, Ks, Ke;
@@ -175,7 +177,7 @@ void createRenderResources()
 
 	g_shadowMapping = new ShadowMapping();
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - g_shadowMapping->getCamera()->getPosition());
-	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
+	g_sunMoonIndex = Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
 		(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 
 	g_gameState = new GameState();
@@ -458,18 +460,18 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						g_shadowMapping->getCamera()->setPosition(sunPos);
 						rotCoeff = 1.4f - sunColorCoeff;
 
-						Lights::getInstance()->setColor(0, sunColor[0], sunColor[1], sunColor[2]);
-						Lights::getInstance()->setDirection(0, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
-						Lights::getInstance()->setIntensity(0, intensity);
+						Lights::getInstance()->setColor(g_sunMoonIndex, sunColor[0], sunColor[1], sunColor[2]);
+						Lights::getInstance()->setDirection(g_sunMoonIndex, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
+						Lights::getInstance()->setIntensity(g_sunMoonIndex, intensity);
 					}
 					else
 					{
 						g_shadowMapping->getCamera()->setPosition(moonPos);
 						rotCoeff = 1.4f - moonColorCoeff;
 
-						Lights::getInstance()->setColor(0, moonColor[0], moonColor[1], moonColor[2]);
-						Lights::getInstance()->setDirection(0, XMVectorGetX(moonDir), XMVectorGetY(moonDir), XMVectorGetZ(moonDir));
-						Lights::getInstance()->setIntensity(0, intensity);
+						Lights::getInstance()->setColor(g_sunMoonIndex, moonColor[0], moonColor[1], moonColor[2]);
+						Lights::getInstance()->setDirection(g_sunMoonIndex, XMVectorGetX(moonDir), XMVectorGetY(moonDir), XMVectorGetZ(moonDir));
+						Lights::getInstance()->setIntensity(g_sunMoonIndex, intensity);
 					}
 					g_shadowMapping->getCamera()->updateBuffers();
 				}
@@ -481,6 +483,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_menuAni);
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
+					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
 					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -561,8 +564,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
 		g_pixelShaderDownsample.release();
-		DX::getInstance()->release();
-		delete DX::getInstance();
+		
 		Graph::getInstance()->release();
 		delete Graph::getInstance();
 
@@ -574,7 +576,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_gameState;
 		delete g_menu;
 		delete g_shadowMapping;
-
+		//DX::getInstance()->reportLiveObjects();
+		DX::getInstance()->release();
+		delete DX::getInstance();
 		DestroyWindow(wndHandle);
 	}
 

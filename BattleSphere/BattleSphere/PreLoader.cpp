@@ -315,6 +315,12 @@ void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData 
 	m_objects[typ][variant][modelNr].draw();
 }
 
+void PreLoader::setSubModelData(objectType type, objectData data, int modelNr, int subModelNr)
+{
+	int typ = int(type);
+	m_objects[typ][0][modelNr].setObjectData(data, subModelNr);
+}
+
 void PreLoader::cull(objectType type, int variant)
 {
 	m_bFCuller->turnOnCullingPipeline();
