@@ -107,7 +107,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "Building", "1mesh1mat");
-	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
+	loadFromFile(objectType::e_projectile, "projectile", "1mesh1mat");
 
 	// On map (with collision)
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
