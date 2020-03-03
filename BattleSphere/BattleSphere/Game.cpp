@@ -70,6 +70,8 @@ QuadtreeNode* Game::getQuadtree()
 Game::Game()
 {
 	m_nrOfPlayers = 0;
+	m_playerId[0] = -1;
+	m_robots[0] = nullptr;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		m_playerId[i] = -1;
