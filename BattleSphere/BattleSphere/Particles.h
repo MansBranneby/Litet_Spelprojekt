@@ -3,9 +3,6 @@
 #define MAX_PARTICLES 512 * 16 *8 // Max groups * Threads per group * computed per thread
 #define MAX_ADD 1000
 
-class Particles
-{
-private:
 	struct particle
 	{
 		float posX, posY, posZ;
@@ -14,12 +11,10 @@ private:
 		float colorX, colorY, colorZ;
 	};
 
-	struct newParticleGroup
-	{
-		particle particles[MAX_ADD];
-	};
-
-	struct drawParameters 
+class Particles
+{
+private:
+	struct drawParameters
 	{
 		UINT vertexCountPerInstance = 0;
 		UINT instanceCount = 1;
@@ -27,16 +22,23 @@ private:
 		UINT startInstanceLocation = 0;
 	};
 
+	struct dispatchParameters
+	{
+		UINT threadGroupCountX = 0;
+		UINT threadGroupCountY = 1;
+		UINT threadGroupCountZ = 1;
+	};
+
 	struct particleDispatchParams
 	{
-		drawParameters drawParams;
-		UINT threadGroupCount = 0;
+		drawParameters draw;
+		dispatchParameters dispatch;
 	};
 
 	struct particleBuffers
 	{
-		ID3D11Buffer* sBParams = nullptr;
-		ID3D11UnorderedAccessView* sBParamsUAV = nullptr;
+		ID3D11Buffer* bParams = nullptr;
+		ID3D11UnorderedAccessView* bParamsUAV = nullptr;
 
 		ID3D11Buffer* sBParticles = nullptr;
 		ID3D11UnorderedAccessView* sBParticlesUAV = nullptr;

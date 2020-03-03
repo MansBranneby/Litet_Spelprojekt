@@ -91,52 +91,6 @@ void VertexShader::createBCInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
 	(*pVS)->Release();
 }
 
-void VertexShader::createParticleInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob)
-{
-	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-	{
-		"POSITION",		// "semantic" name in shader
-		0,				// "semantic" index (not used)
-		DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-		0,							 // input slot
-		0,							 // offset of first element
-		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-		0							 // used for INSTANCING (ignore)
-	},
-	{
-		"VELOCITY",
-		0,				// same slot as previous (same vertexBuffer)
-		DXGI_FORMAT_R32G32B32_FLOAT,
-		0,
-		12,							// offset of FIRST element (after POSITION)
-		D3D11_INPUT_PER_VERTEX_DATA,
-		0
-	},
-			{
-		"SIZE",
-		0,				// same slot as previous (same vertexBuffer)
-		DXGI_FORMAT_R32G32_FLOAT,
-		0,
-		24,							// offset of FIRST element (after POSITION)
-		D3D11_INPUT_PER_VERTEX_DATA,
-		0
-	},
-			{
-		"COLOR",
-		0,				// same slot as previous (same vertexBuffer)
-		DXGI_FORMAT_R32G32B32_FLOAT,
-		0,
-		32,							// offset of FIRST element (after POSITION)
-		D3D11_INPUT_PER_VERTEX_DATA,
-		0
-	}
-	};
-
-	DX::getInstance()->getDevice()->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), (*pVS)->GetBufferPointer(), (*pVS)->GetBufferSize(), &m_vertexLayout);
-
-	(*pVS)->Release();
-}
-
 VertexShader::VertexShader()
 {
 	m_vertexLayout = nullptr;
@@ -154,10 +108,6 @@ VertexShader::VertexShader(LPCWSTR fileName, int type)
 	{
 	case 1:
 		createBCInputLayout(&pVS, &errorBlob);
-		break;
-
-	case 2:
-		createParticleInputLayout(&pVS, &errorBlob);
 		break;
 
 	default:

@@ -21,14 +21,13 @@ cbuffer deltaTime : register(b1)
 	float4x4 VP;
 };
 
-[maxvertexcount(3)]
+[maxvertexcount(4)]
 void GS_main(
 	point GSIn input[1], 
 	inout TriangleStream< PSIn > output
 )
 {
 	PSIn elements[4] = (PSIn[4])0;
-
 	float3 norm = normalize(camPos.xyz - input[0].pos.xyz);
 	float3 right = cross(norm, float3(0, 1, 0));
 	float3 up = cross(right, norm);
@@ -36,8 +35,8 @@ void GS_main(
 	up *= input[0].size.y;
 	elements[0].pos = input[0].pos + float4(- right / 2 + up / 2, 0.0f);
 	elements[1].pos = elements[0].pos + float4(right, 0.0f);
-	elements[3].pos = elements[1].pos - float4(up, 0.0f);
-	elements[2].pos = elements[3].pos - float4(right, 0.0f);
+	elements[2].pos = elements[1].pos + float4(-up - right, 0.0f);
+	elements[3].pos = elements[2].pos + float4(right, 0.0f);
 
 	for (int j = 0; j < 4; j++)
 	{

@@ -576,7 +576,7 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
-		//m_particles.draw();
+		m_particles.draw();
 	}
 
 }

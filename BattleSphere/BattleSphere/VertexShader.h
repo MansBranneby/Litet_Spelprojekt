@@ -18,9 +18,6 @@ private:
 	// Creates backface culling input layout
 	void createBCInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob);
 
-	// Create particle input layout
-	void createParticleInputLayout(ID3DBlob** pVS, ID3DBlob** errorBlob);
-
 public:
 	VertexShader();
 	VertexShader(LPCWSTR fileName, int type = 0);

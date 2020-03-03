@@ -32,9 +32,9 @@ Index 4: ThreadGroupCount
 */
 
 static const uint particlesPerThread = 8;
-RWStructuredBuffer<uint> prevParams : register(u0); // Read
+RWBuffer<uint> prevParams : register(u0); // Read
 RWStructuredBuffer<particle> prev : register(u1);
-RWStructuredBuffer<uint> updatedParams : register(u2); // Write
+RWBuffer<uint> updatedParams : register(u2); // Write
 RWStructuredBuffer<particle> updated : register(u3);
 
 static const uint computationsPerThread = 8;
@@ -45,24 +45,25 @@ static const uint threadAmount = 16;
 void CS_main(uint3 dTID : SV_DispatchThreadID)
 {
 	// Each thread computes computationsPerThread amount of particles
-	for (uint i = dTID.x; i < dTID.x + computationsPerThread; i++)
+	for (uint i = dTID.x * computationsPerThread; i < dTID.x * computationsPerThread + computationsPerThread; i++)
 	{
 		// Is i a particle from previous frame?
 		if (i < prevParams[0])
 		{
-			particle p = prev[i];
-
+			particle p = updateParticle(prev[i]);
+		
 			// If particle is above yLimit, forward it to updated buffer
+			//if (true)
 			if (p.pos.y > yLimit)
 			{
 				// Update amount of particles in updated buffer
 				uint outIdx = 0;
 				InterlockedAdd(updatedParams[0], 1, outIdx);
-
+		
 				updated[outIdx] = p;
 
 				// Update dispatch thread group count, do not add the first group
-				if (outIdx > 0 && (outIdx % threadAmount) == 0)
+				if ((outIdx % (threadAmount * computationsPerThread)) == 0)
 					InterlockedAdd(updatedParams[4], 1);
 			}
 		}
