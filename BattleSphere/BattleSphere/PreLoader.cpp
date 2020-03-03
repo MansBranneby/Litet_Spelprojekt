@@ -114,10 +114,21 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
 	loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 
+		// Static Background (Skyscrapers with collision) // Later billboards?
+	loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
+	loadFromFile(objectType::e_static, "Background\\SS1", "SS1Coll");
+	loadFromFile(objectType::e_static, "Background\\SS2", "SS2Coll");
+	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
+	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");
+
+
 	// Background
+	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
+
 	loadFromFile(objectType::e_scene, "Background\\Ground");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
@@ -171,6 +182,11 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 int PreLoader::getNrOfVariants(objectType type) const
 {
 	return (int)m_objects[(int)type].size();
+}
+
+int PreLoader::getNrOfModels(objectType type, int variants) const
+{
+	return m_nrOfmodels[(int)type][variants];
 }
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)

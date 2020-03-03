@@ -55,12 +55,55 @@ float DoSpotCone(Light light, float4 L)
 	return smoothstep(minCos, maxCos, cosAngle);
 }
 
+float rayConeIntersection(Light light, float3 camPos, float3 camDir)
+{
+	float3 co = camPos - light.Position.xyz;
+	float3 lightDir = normalize(light.Direction.xyz);
+	float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f);
+	//float a = pow(dot(camDir, lightDir), 2) - pow(cosa, 2);
+	float a = dot(camDir, lightDir) * dot(camDir, lightDir) - cosa * cosa;
+	//float b = 2 * (dot(camDir, lightDir) * dot(co, lightDir) - dot(camDir, co) * pow(cosa, 2));
+	float b = 2.0f * (dot(camDir, lightDir) * dot(co, lightDir) - dot(camDir, co) * cosa * cosa);
+	//float c = pow(dot(co, lightDir), 2) - dot(co, co) * pow(cosa, 2);
+	float c = dot(co, lightDir) * dot(co, lightDir) - dot(co, co) * cosa * cosa;
+
+	float det = b * b - 4. * a * c;
+	
+	if (det < -0.01f) return -1;
+	float t = 0;
+	
+		
+	if (abs(det) < 0.1f) {
+		t = (-b / (2 * a));
+	}
+	else {
+		det = sqrt(det);
+		float t1 = (-b - det) / (2. * a);
+		float t2 = (-b + det) / (2. * a);
+
+		// This is a bit messy; there ought to be a more elegant solution.
+		t = t1;
+		if (t < 0. || t2 > 0. && t2 < t) t = t2;
+		if (t < 0.) return -1;
+	}
+
+
+	float3 cp = camPos.xyz + t * camDir.xyz - light.Position.xyz;
+	float h = dot(cp, lightDir);
+	if (h < 0. || h > light.Range) return -1;
+
+	
+
+	return t;
+}
+
 Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
 float4 PS_main(PS_IN input) : SV_Target
 {
+
 	////LIGHTING//// (for one light)
 	uint2 tileIndex = uint2(floor(input.pos.xy / BLOCK_SIZE));
 	uint startOffset = LightGrid[tileIndex].x;
@@ -126,12 +169,21 @@ float4 PS_main(PS_IN input) : SV_Target
 			lightCol = Lights[LightIndex[i]].color * light.Intensity * shadowCoeff;
 			break;
 		case 2:
-			//return float4(1, 1, 1, 1);
+			L = normalize(lightPos.xyz - input.posWC);
+			float spotIntensity = DoSpotCone(light, float4(L, 0.0f));
+			float attenuation = DoAttenuation(light, d);
+	
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			float attenuation = DoAttenuation(light, d);
-			float spotIntensity = DoSpotCone(light, float4(L, 1.0f));
-			lightCol = Lights[LightIndex[i]].color * attenuation * spotIntensity * light.Intensity;
+			
+
+
+		
+			
+			
+			
+			lightCol = light.color * attenuation * spotIntensity * light.Intensity;
+
 			
 			break;
 		case 3:
@@ -144,7 +196,68 @@ float4 PS_main(PS_IN input) : SV_Target
 			LKs = float3(0, 0, 0);
 			
 			break;
+		case 4: //Volumetric spotlight
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
+
+			float3 cameraDir = normalize(input.posWC - cameraPos.xyz);
+			float attenuation1, attenuation2;
+			float spotIntensity2;
+			float3 worldPos;
+
+			float spotIntensity1 = DoSpotCone(light, float4(L, 0.0f));
+			attenuation1 = DoAttenuation(light, d);
+
+			worldPos = input.posWC;
+			float t = rayConeIntersection(Lights[LightIndex[i]], cameraPos.xyz, cameraDir);
+			if (t >= 0)
+			{
+				worldPos = cameraPos.xyz + cameraDir * t;
+				if (distance(cameraPos.xyz, worldPos) <= distance(input.posWC.xyz, cameraPos.xyz) + 0.01f)
+				{
+
+					//Calculate intensity;
+					float3 right = cross(normalize(light.Direction), normalize(light.Position.xyz - cameraPos.xyz));
+					float3 up = cross(normalize(light.Direction), right);
+					float3 projPos = worldPos - dot(up, worldPos - light.Position.xyz) * up;
+					spotIntensity2 = dot(normalize(projPos - light.Position.xyz), normalize(light.Direction));
+					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f);
+					spotIntensity2 = (spotIntensity2 - cosa) / (1 - cosa);
+					/*if (spotIntensity2 > 0)
+						spotIntensity2 = sqrt(spotIntensity2);
+					else
+						spotIntensity2 = 0;*/
+
+					
+					attenuation2 = 0.6f;
+				}
+				else {
+					spotIntensity2 = 0;
+					attenuation2 = 0;
+					worldPos = input.posWC;
+				}
+				
+			}
+			else
+			{
+				
+				spotIntensity2 = 0;
+				attenuation2 = 0;
+				worldPos = input.posWC;
+			}
+
+			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - worldPos); // Vector towards light
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
+
+
+
+			//return float4(1, 1, 1, 1);
+
+
+
+			lightCol = Lights[LightIndex[i]].color * max(attenuation1 * spotIntensity1, attenuation2 * spotIntensity2) * light.Intensity;
+			break;
 		}
+		
 		
 		
 

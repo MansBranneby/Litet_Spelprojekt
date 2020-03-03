@@ -151,6 +151,19 @@ void CS_main(ComputeShaderInput IN)
 				}
 			}
 			break;
+			case 4: // Volumetric spot light
+			{
+				float coneRadius = tan(radians(light.SpotlightAngle)) * light.Range;
+				Cone cone = { mul(V, light.Position).xyz, light.Range, mul(V, float4(normalize(light.Direction.xyz), 0.0f)).xyz, coneRadius };
+				if (ConeInsideFrustum(cone, GroupFrustum))
+				{
+
+					// Add light to light list for opaque geometry.
+					o_AppendLight(i);
+
+				}
+			}
+			break;
 			case 0: //Point light
 			{
 

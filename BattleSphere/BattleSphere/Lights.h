@@ -30,9 +30,12 @@ public:
 	int addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity);
 	int addSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity);
 	int addAreaLight(float x, float y, float z, float radius, float r, float g, float b, float intensity);
+	int addVolumetricSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity);
+	int addVolumetricSpotLight();
 	int addPointLight();
 	int addDirectionalLight();
 	int addSpotLight();
+	int addAreaLight();
 	void setPosition(int index, float x, float y, float z);
 	void setDirection(int index, float dx, float dy, float dz);
 	void setColor(int index, float r, float g, float b);

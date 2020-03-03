@@ -73,8 +73,8 @@ Graph::Graph()
 	m_nodes[1].pos = XMVectorSet(106.0f, 0.0f, -18.0f, 0.0f);
 	m_nodes[2].pos = XMVectorSet(-100.0f, 0.0f, -50.0f, 0.0f);
 	m_nodes[3].pos = XMVectorSet(-120.0f, 0.0f, -12.0f, 0.0f);
-	m_nodes[4].pos = XMVectorSet(156.0f, 0.0f, 13.0f, 0.0f);
-	m_nodes[5].pos = XMVectorSet(156.0f, 0.0f, 50.0f, 0.0f);
+	m_nodes[4].pos = XMVectorSet(154.0f, 0.0f, -5.0f, 0.0f);
+	m_nodes[5].pos = XMVectorSet(154.0f, 0.0f, 50.0f, 0.0f);
 	m_nodes[6].pos = XMVectorSet(106.0f, 0.0f, -58.0f, 0.0f);
 	m_nodes[7].pos = XMVectorSet(122.0f, 0.0f, -78.0f, 0.0f);
 	m_nodes[8].pos = XMVectorSet(102.0f, 0.0f, -110.0f, 0.0f);
