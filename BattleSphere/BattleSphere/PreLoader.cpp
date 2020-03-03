@@ -111,6 +111,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_projectile, "1mesh1mat", "1mesh1mat");
 
 	// On map (with collision)
+	loadFromFile(objectType::e_static, "Background\\SS", "SSColl");
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
@@ -121,11 +122,10 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\NodeGoldenDuck", "NodeGoldenDuckColl");
 
 		// Static Background (Skyscrapers with collision) // Later billboards?
-	loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
-	loadFromFile(objectType::e_static, "Background\\SS1", "SS1Coll");
-	loadFromFile(objectType::e_static, "Background\\SS2", "SS2Coll");
+	//loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
+	/*loadFromFile(objectType::e_static, "Background\\SS2", "SS2Coll");
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
-	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");
+	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
 
 	// Background
@@ -136,6 +136,8 @@ PreLoader::PreLoader()
 	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
 	loadFromFile(objectType::e_scene, "Background\\Background");
+	loadFromFile(objectType::e_scene, "Background\\SSB");
+	loadFromFile(objectType::e_scene, "Background\\BBScenery");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");

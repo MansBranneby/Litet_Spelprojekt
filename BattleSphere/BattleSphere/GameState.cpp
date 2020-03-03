@@ -410,14 +410,19 @@ GameState::GameState()
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
-	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
-	m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
-	m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
-	m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
-	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
-	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
-	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
+	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
+	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
+	//m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
+	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
+	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
+	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	
+	// Skyscrapers
+	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
+	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
+	m_lights->addAreaLight(35, 20, 77, 60, 0.5f, 0.0f, 0.8f, 25);
+	m_lights->addAreaLight(10, 20, 80, 55, 0.0f, 0.6f, 0.8f, 23);
 
 	m_lights->addAreaLight(172, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10); // Under map
 	m_lights->addAreaLight(32, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
