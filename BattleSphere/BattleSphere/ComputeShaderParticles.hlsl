@@ -17,7 +17,7 @@ static const uint airResistance = 0.1f;
 
 particle updateParticle(particle prevParticle)
 {
-	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + float3(0, -9.82, 0);
+	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + float3(0, -9.82f, 0);
 	prevParticle.vel += acceleration * dt;
 	prevParticle.pos += prevParticle.vel * dt;
 	return prevParticle;
@@ -56,13 +56,14 @@ void CS_main(uint3 dTID : SV_DispatchThreadID)
 			//if (true)
 			if (p.pos.y > yLimit)
 			{
-				// Update amount of particles in updated buffer
-				uint outIdx = 0;
+				// Update amount of particles in updated param buffer
+				uint outIdx;
 				InterlockedAdd(updatedParams[0], 1, outIdx);
-		
+
+				// Add particle updated buffer
 				updated[outIdx] = p;
 
-				// Update dispatch thread group count, do not add the first group
+				// Update dispatch thread group count
 				if ((outIdx % (threadAmount * computationsPerThread)) == 0)
 					InterlockedAdd(updatedParams[4], 1);
 			}

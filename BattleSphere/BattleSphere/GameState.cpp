@@ -398,6 +398,15 @@ GameState::GameState()
 	m_fOVPlanes[1].m128_f32[2] *= -1;
 	m_fOVPlanes[2].m128_f32[2] *= -1;
 	m_fOVPlanes[3].m128_f32[2] *= -1;
+
+	// TODO: REMOVE
+	XMVECTOR pos = { 0, 60, 0, 0 };
+	//XMVECTOR dir = XMVector3Normalize(XMVectorSet(0, 1, 0, 0));
+	XMVECTOR dir = XMVector3Normalize(XMVectorSet(-1, 0, 0, 0));
+	XMVECTOR col = { 0.7f, 0, 0, 0 };
+	XMVECTOR size = { 1, 1, 0, 0 };
+	//m_particles.addParticles(pos, col, size, 31000, 20.0f, dir);
+	m_particles.addSpark(pos, dir);
 }
 
 GameState::~GameState()

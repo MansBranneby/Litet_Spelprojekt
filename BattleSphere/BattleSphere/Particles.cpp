@@ -1,5 +1,10 @@
 #include "Particles.h"
 
+float Particles::randF()
+{
+	return 2.0f*((float)rand()- (float)RAND_MAX/2.0f) / (float)RAND_MAX;
+}
+
 Particles::Particles()
 {
 	// Create shaders
@@ -22,13 +27,11 @@ Particles::Particles()
 	sBDesc.ByteWidth = sizeof(particle) * MAX_PARTICLES;
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Buffer.FirstElement = 0;
 	uavDesc.Buffer.NumElements = MAX_PARTICLES;
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = MAX_PARTICLES;
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
@@ -54,7 +57,6 @@ Particles::Particles()
 	paramSBDesc.ByteWidth = sizeof(particleDispatchParams);
 	paramSBDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
 	uavDesc.Format = DXGI_FORMAT_R32_UINT;
-	uavDesc.Buffer.FirstElement = 0;
 	uavDesc.Buffer.NumElements = sizeof(particleDispatchParams) / sizeof(UINT);
 
 	if (SUCCEEDED(DX::getInstance()->getDevice()->CreateBuffer(&paramSBDesc, 0, &m_prevParticles->bParams)))
@@ -66,24 +68,6 @@ Particles::Particles()
 
 	// Create compute shader constant buffer, to update delta time
 	m_computeShaderConstantBuffer = new ConstantBuffer(&XMVectorSet(0, 0, 0, 0), sizeof(XMVECTOR));
-
-	// TODO: Remove
-	particle test =
-	{
-		0.0f, 50.0f, 0.0f,
-		20.0f, 10.0f, 0.0f,
-		20.0f, 20.0f,
-		0.0f, 1.0f, 0.0f
-	};
-	particle test1 =
-	{
-		10.0f, 50.0f, 0.0f,
-		0.0f, 20.0f, 0.0f,
-		20.0f, 20.0f,
-		1.0f, 0.0f, 0.0f
-	};
-	m_particleToAdd.push_back(test);
-	m_particleToAdd.push_back(test1);
 }
 
 Particles::~Particles()
@@ -109,29 +93,92 @@ Particles::~Particles()
 void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, XMVECTOR direction)
 {
 	int nrToAdd = (amount > MAX_ADD || amount <= 0) ? MAX_ADD : amount;
-	bool dirGiven = XMVectorEqual(direction, XMVectorSet(0, 0, 0, 0)).m128_f32[0] ? false : true;
-
+	bool dirGiven = XMVector3Equal(direction, XMVectorSet(0, 0, 0, 0)) ? false : true;
 	
 	if (dirGiven) // If direction was given, randomize nrToAdd velocity vectors after direction
 	{
+		// Calculate direction normal
 		float nX = direction.m128_f32[0];
 		float nY = direction.m128_f32[1];
 		float nZ = direction.m128_f32[2];
-		//XMVectorRotateRight()
-		//XMMATRIX tBN;
+
+		// Calculate direction tangent, rotate direction in two axis to get a non-parallel vector
+		XMVECTOR temp = XMVector3Rotate(direction, XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), 1));
+		temp = XMVector3Rotate(temp, XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), 1)); // Bottom
+		XMVECTOR tangent = XMVector3Cross(direction, temp);
+		float tX = tangent.m128_f32[0];
+		float tY = tangent.m128_f32[1];
+		float tZ = tangent.m128_f32[2];
+
+		// Calculate direction bitangent
+		XMVECTOR bitangent = XMVector3Cross(direction, tangent);
+		float bX = bitangent.m128_f32[0];
+		float bY = bitangent.m128_f32[1];
+		float bZ = bitangent.m128_f32[2];
+
+		// Calculate TBN matrix
+		XMMATRIX tBN = 
+		{
+			tX, tY, tZ, 0.0f,
+			bX, bY, bZ, 0.0f,
+			nX, nY, nZ, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f
+		};
+
 		for (int i = 0; i < nrToAdd; i++)
 		{
-
+			XMVECTOR randomZVec = XMVector3Normalize(XMVectorSet
+			(
+				randF(), 
+				randF(),
+				1, 
+				0
+			));
+			XMVECTOR vel = XMVector3Transform(randomZVec, tBN);
+			//XMVECTOR vel = randomZVec;
+			vel *= velocity * (1.0f + 0.4f*randF());
+			particle p =
+			{
+				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
+				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
+				size.m128_f32[0], size.m128_f32[1],
+				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
+			};
+			m_particleToAdd.push_back(p);
 		}
 	}
 	else // If no direction was given, randomize nrToAdd velocity vectors
 	{
 		for (int i = 0; i < nrToAdd; i++)
 		{
+			XMVECTOR vel = XMVector3Normalize(XMVectorSet
+			(
+				randF(),
+				randF(),
+				randF(),
+				0.0f
+			));
 
+			vel *= velocity * (1.0f + 0.4f * randF());
+			particle p =
+			{
+				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
+				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
+				size.m128_f32[0], size.m128_f32[1],
+				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
+			};
+			m_particleToAdd.push_back(p);
 		}
 	}
 	
+}
+
+void Particles::addSpark(XMVECTOR impactPos, XMVECTOR projectileDir)
+{
+	XMVECTOR dir = XMVector3Normalize(-projectileDir);
+	XMVECTOR col = { 243.0f/255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	XMVECTOR size = { 1, 1, 0, 0 };
+	addParticles(impactPos, col, size, 20, 7.0f, dir);
 }
 
 void Particles::update(float dT)
