@@ -223,6 +223,7 @@ float4 PS_main(PS_IN input) : SV_Target
 					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f); // Maximum cos angle
 					float maxCos = lerp(cosa, 1, 0.5f);
 					spotIntensity2 = smoothstep(cosa, maxCos, spotIntensity2); //Smoothstep between max angle and minimum angle
+					worldPos = projPos;
 
 					
 					float d2 = distance(light.Position, worldPos);
