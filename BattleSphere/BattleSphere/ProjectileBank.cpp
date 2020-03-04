@@ -22,7 +22,10 @@ void ProjectileBank::addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, 
 
 void ProjectileBank::removeProjectile(int index)
 {
+	
 	delete m_projectiles[index];
+
+
 	m_projectiles.erase(m_projectiles.begin() + index);
 }
 
@@ -30,7 +33,9 @@ void ProjectileBank::moveProjectiles(float dt)
 {
 	for (int i = 0; i < m_projectiles.size(); i++)
 	{
-		m_projectiles[i]->move(dt);
+		if (m_projectiles[i]->move(dt)) {
+			removeProjectile(i);
+		}
 	}
 }
 

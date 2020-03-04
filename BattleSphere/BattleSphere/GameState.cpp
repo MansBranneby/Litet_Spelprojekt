@@ -563,7 +563,11 @@ bool GameState::update(Game* game, float dt)
 		{
 			// Collision against static object found, remove projectile
 			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
-			ProjectileBank::getInstance()->removeProjectile(i);
+
+			if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY)
+				ProjectileBank::getInstance()->getList()[i]->explode();
+			else
+				ProjectileBank::getInstance()->removeProjectile(i);
 		}
 		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)
 		{
@@ -642,14 +646,11 @@ void GameState::draw(Game* game, renderPass pass)
 				}
 			}
 		}
-		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
 		}
+		game->getPreLoader()->draw(objectType::e_ground);
 	}
 	if (pass != renderPass::e_opaque)
 	{
@@ -668,7 +669,14 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
+			
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+			if(pass != renderPass::e_shadow || ProjectileBank::getInstance()->getList()[i]->getType() != (int)ENERGY)
+				game->getPreLoader()->drawOneMaterial(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData());
+			//game->getPreLoader()->draw();
 		}
 	}
 

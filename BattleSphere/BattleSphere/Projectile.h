@@ -12,9 +12,14 @@ using namespace DirectX;
 #define PISTOL 0
 #define RIFLE 1
 
+#define ENERGY_EXPLODE_TIME 0.15f
+#define ENERGY_EXPLODE_RADIUS 20.0f
+#define ENERGY_EXPLODE_FADETIME 0.5f
 class Projectile : public GameObject
 {
 private:
+	bool m_explode;
+	float m_explodeTime;
 	int m_owner;
 	int m_type;
 	int m_damage;
@@ -31,6 +36,7 @@ public:
 	int getDamage();
 	float getVelocity();
 	XMVECTOR getDirection();
-
-	void move(float dt);
+	bool isExploding();
+	void explode();
+	bool move(float dt);
 };

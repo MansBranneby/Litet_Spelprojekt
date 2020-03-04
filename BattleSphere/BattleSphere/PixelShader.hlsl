@@ -127,6 +127,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
 	float shadowCoeff = sum / 25.0;
 	
+	
+	
 	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	

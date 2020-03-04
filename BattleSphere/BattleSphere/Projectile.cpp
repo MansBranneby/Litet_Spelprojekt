@@ -9,18 +9,30 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	m_damage = damage;
 	m_velocity = 0.0f;
 	m_owner = owner;
-
+	m_explode = false;
+	m_explodeTime = 0;
 	m_material.emission = colour;
+
 
 	if (type == PISTOL)
 	{
 		m_velocity = 40.0f;
 		setScale(0.35f, 0.35f, 0.35f);
 	}
+
 	else if (type == RIFLE)
 	{
 		m_velocity = 80.0f;
 		setScale(0.35f, 0.35f, 0.35f);
+	}
+	else if (type == ENERGY)
+	{
+		m_velocity = 40.0f;
+		setScale(2.0f, 2.0f, 2.0f);
+		m_material.emission = XMVectorSet(0, 0, 0, -1);
+		m_material.specular = XMVectorSet(0, 0, 0, -1);
+		m_material.diffuse = colour;
+		m_material.emission.m128_f32[3] = 0.2f;
 	}
 }
 
@@ -63,7 +75,43 @@ XMVECTOR Projectile::getDirection()
 	return m_direction;
 }
 
-void Projectile::move(float dt)
+bool Projectile::isExploding()
 {
-	GameObject::move(m_direction * dt * m_velocity);
+	return m_explode;
+}
+
+void Projectile::explode()
+{
+	m_explode = true;
+	m_velocity = 0;
+}
+
+bool Projectile::move(float dt)
+{
+	
+	if (m_explode)
+	{
+		m_explodeTime += dt;
+		if(m_explodeTime < ENERGY_EXPLODE_TIME)
+		{
+			float scale = 2.0f + sin(m_explodeTime * XM_PI / (ENERGY_EXPLODE_TIME * 2)) * ENERGY_EXPLODE_RADIUS;
+			setScale(scale, scale, scale);
+		}
+		else
+		{
+			m_material.emission.m128_f32[3] = 0.2f * (1 - ((m_explodeTime - ENERGY_EXPLODE_TIME) / (ENERGY_EXPLODE_FADETIME)));
+			if(m_material.emission.m128_f32[3] <= 0)
+			{
+				m_explode = true;
+				setScale(0, 0, 0);
+				return true;
+			}
+		}
+		
+		
+	}
+	else {
+		GameObject::move(m_direction * dt * m_velocity);
+	}
+	return false;
 }

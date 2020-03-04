@@ -52,6 +52,13 @@ Weapon::Weapon(int type)
 		m_defense = 0.0f;
 		setScale(1.8f, 1.8f, 0.2f);
 	}
+	else if (m_type == ENERGY)
+	{
+		m_damage = 20;
+		m_cooldown = 0.5f;
+		m_recoil = 0.0f;
+		setScale(3.8f, 3.8f, 1.8f);
+	}
 	else
 	{
 		m_damage = 5;
@@ -162,6 +169,7 @@ void Weapon::upgrade()
 		if (m_duration > 6.0)
 			m_duration = 6.0f;
 	}
+	
 	else
 	{
 		m_damage += 2;
@@ -183,7 +191,7 @@ void Weapon::upgrade()
 
 bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt)
 {
-	if ((m_type == PISTOL || m_type == RIFLE) && m_ready)
+	if ((m_type == PISTOL || m_type == RIFLE || m_type == ENERGY) && m_ready)
 	{
 		m_ready = false;
 

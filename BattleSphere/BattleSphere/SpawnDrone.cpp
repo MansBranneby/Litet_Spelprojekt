@@ -237,7 +237,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 		{
 			spawnIndex = getSpawnIndex(); // TODO: Edit INDEX FOR SPECIAL BELOW
 			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 1.2f);
-			resource = new Resource(true, spawnIndex, (rand() % 4) + 2, 1.2f);
+			resource = new Resource(true, spawnIndex, 6, 1.2f);
 		}
 
 		// Set resource under drone

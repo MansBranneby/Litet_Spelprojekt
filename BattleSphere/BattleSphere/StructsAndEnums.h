@@ -63,8 +63,8 @@ using namespace DirectX;
 #define SHIELD 3
 #define DASH 4
 #define REFLECT 5
-
-#define BIGGEST_NORMAL_INDEX 5 // Update if adding resources!
+#define ENERGY 6
+#define BIGGEST_NORMAL_INDEX 6 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 
@@ -93,7 +93,8 @@ enum class renderPass
 	e_menuAni,
 	e_menuScene,
 	e_opaque,
-	e_transparent
+	e_transparent,
+	e_shadow
 };
 
 enum class stateType
