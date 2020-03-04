@@ -196,10 +196,7 @@ void CS_main(ComputeShaderInput IN)
 			
 			}
 		}
-		else
-		{
-			break;
-		}
+		
 	}
 	GroupMemoryBarrierWithGroupSync();
 	if (IN.groupIndex == 0)

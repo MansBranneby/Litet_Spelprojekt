@@ -15,14 +15,12 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	if (type == PISTOL)
 	{
 		m_velocity = 40.0f;
-		//setScale(0.5f, 0.5f, 0.8f);
-		setScale(0.15f, 0.15f, 0.3f);
+		setScale(0.35f, 0.35f, 0.35f);
 	}
 	else if (type == RIFLE)
 	{
 		m_velocity = 80.0f;
-		//setScale(0.5f, 0.5f, 0.8f);
-		setScale(0.15f, 0.15f, 0.3f);
+		setScale(0.35f, 0.35f, 0.35f);
 	}
 }
 

@@ -20,8 +20,8 @@ class Lights
 	
 private:
 	LightData m_lights[LIGHT_COUNT] = { 0 };
-	int m_nrOfLights = 0;
 	static Lights* m_instance;
+	int getFreeIndex();
 	void setLightData();
 public:
 	static Lights* getInstance();
@@ -42,6 +42,7 @@ public:
 	void setRange(int index, float range);
 	void setIntensity(int index, float intensity);
 	void setAngle(int index, float angleDeg);
+	void disable(int index);
 	void Initialize();
 	
 	Lights();

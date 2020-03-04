@@ -66,6 +66,8 @@ public:
 	int getResourceIndex();
 	void removeResource();
 
+	int m_lightIndex;
+
 	void update(float dt);
 	void move(XMVECTOR dPos);
 

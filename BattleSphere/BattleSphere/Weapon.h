@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "ProjectileBank.h"
 #include "StructsAndEnums.h"
+#include "Sound.h"
 
 using namespace DirectX;
 
@@ -35,7 +36,7 @@ public:
 	void upgrade();
 
 	bool shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt);
-	bool speedUp();
+	bool speedUp(XMVECTOR robotPos);
 	bool shield();
 	bool reflect();
 
@@ -48,7 +49,7 @@ public:
 	bool getActive();
 	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
 
-	bool updateTime(float dt);
+	bool updateTime(float dt, XMVECTOR robotPos);
 
 	void release();
 };
