@@ -115,7 +115,8 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
-	loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+	//loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
+	loadFromFile(objectType::e_static, "OnMap\\Scenery", "SceneryColl");
 	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
@@ -135,7 +136,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_ground, "Background\\Ground");
 	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
-	loadFromFile(objectType::e_scene, "Background\\Background");
+	//loadFromFile(objectType::e_scene, "Background\\Background"); // Background plane
 	loadFromFile(objectType::e_scene, "Background\\SSB");
 	loadFromFile(objectType::e_scene, "Background\\BBScenery");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");

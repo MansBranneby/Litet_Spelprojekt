@@ -67,7 +67,7 @@ float rayConeIntersection(Light light, float3 camPos, float3 camDir)
 	//float c = pow(dot(co, lightDir), 2) - dot(co, co) * pow(cosa, 2);
 	float c = dot(co, lightDir) * dot(co, lightDir) - dot(co, co) * cosa * cosa;
 
-	float det = b * b - 4. * a * c;
+	float det = b * b - 4.0f * a * c;
 	
 	if (det < -0.01f) return -1;
 	float t = 0;
@@ -229,7 +229,7 @@ float4 PS_main(PS_IN input) : SV_Target
 					worldPos = projPos;
 					
 					
-					float d2 = distance(light.Position, worldPos);
+					float d2 = distance(light.Position.xyz, worldPos);
 					attenuation2 = DoAttenuation(light, d2) * 0.6f;
 					
 				}

@@ -16,6 +16,7 @@ int Lights::getFreeIndex()
 		if (!m_lights[i].enabled)
 			return i;
 	}
+	return -1;
 }
 
 void Lights::setLightData()
