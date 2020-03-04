@@ -2,7 +2,7 @@
 
 void Resource::setMaterial()
 {
-	if (m_type == PISTOL || m_type == RIFLE)
+	if (m_type == PISTOL || m_type == RIFLE || m_type == SNIPER)
 		m_material.emission = RED_EMISSION;
 	else if (m_type == MOVEMENT || m_type == DASH)
 		m_material.emission = GREEN_EMISSION;
@@ -100,6 +100,10 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	else if (type == REFLECT)
 	{
 		m_originalScale = XMVectorSet(1.8f * scale, 1.8f * scale, 0.2f * scale, 1.0f);
+	}
+	else if (type == SNIPER)
+	{
+		m_originalScale = XMVectorSet(1.8f * scale, 1.8f * scale, 1.8f * scale, 1.0f);
 	}
 	else
 	{

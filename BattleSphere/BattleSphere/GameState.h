@@ -8,6 +8,8 @@
 #include "Graph.h"
 #include "SpawnDrone.h"
 #include "Sound.h"
+#include "Node.h"
+#include "LineShots.h"
 
 class GameState : public State 
 {
@@ -19,6 +21,7 @@ private:
 	std::vector<Node*> m_nodes;
 	Lights* m_lights;
 	Transparency m_transparency;
+	LineShots m_lineShots;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;

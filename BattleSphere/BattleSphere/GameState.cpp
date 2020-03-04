@@ -471,6 +471,9 @@ GameState::GameState()
 	
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
+
+	// Sniper stuff
+	m_lineShots.createVertexBuffer();
 }
 
 GameState::~GameState()
@@ -525,14 +528,39 @@ bool GameState::update(Game* game, float dt)
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
+		XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+		XMVECTOR end = XMVectorSet(0, 0, 0, 0);
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			m_robots[i]->update(dt);
+			m_robots[i]->update(dt, game->getQuadtree(), start, end);
+			m_lineShots.setColour(i, m_robots[i]->getColour());
+			// delete everything and do it all again but in a different way, we have a lot of time btw xD lets goooooooo
+			for (int side = 0; side < 2; side++)
+			{
+				if (m_robots[i]->getCurrentWeapon(side) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SNIPER)
+				{
+					if (m_lineShots.updateLineStatus(i, start, end, m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getActive(), dt))
+					{
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int j = 0; j < 4; j++)
+						{
+							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								{
+									m_input->setVibration(j, 0.5f);
+									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+				}
+			
+			}
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
-
 	}
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
@@ -663,13 +691,19 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
-	}
-
-	// Tokyo drift
-	for (int i = 0; i < OBJECT_NR_1; i++)
-	{
-		if (m_dboHandler->isDrawn(i))
-			game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				m_lineShots.draw(i);
+			}
+		}
 	}
 	
+	// Tokyo drift
+	//for (int i = 0; i < OBJECT_NR_1; i++)
+	//{
+	//	if (m_dboHandler->isDrawn(i))
+	//		game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+	//}
 }

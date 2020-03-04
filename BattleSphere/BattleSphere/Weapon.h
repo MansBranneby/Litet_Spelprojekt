@@ -9,6 +9,7 @@
 #include "ProjectileBank.h"
 #include "StructsAndEnums.h"
 #include "Sound.h"
+#include "QuadtreeNode.h"
 
 using namespace DirectX;
 
@@ -49,6 +50,7 @@ public:
 	bool getActive();
 	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
 
+	void updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	bool updateTime(float dt, XMVECTOR robotPos);
 
 	void release();

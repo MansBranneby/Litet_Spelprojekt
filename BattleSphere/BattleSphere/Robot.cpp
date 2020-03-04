@@ -5,12 +5,13 @@ Robot::Robot(int playerId)
 	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 20.0f;
+	m_vel = XMVectorSet(0,0,0,0);
 	m_currentRotation = 0.0;
-	m_currentWeapon[LEFT] = -1;
-	m_currentWeapon[RIGHT] = 0;
 	m_score = 0;
 	m_resource = -1;
-	Weapon* pistol = new Weapon(PISTOL);
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	Weapon* pistol = new Weapon(SNIPER);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -127,6 +128,11 @@ void Robot::setColour(float x, float y, float z)
 	m_material.emission = m_colour = XMVectorSet(x, y, z, -1);
 }
 
+XMVECTOR Robot::getColour()
+{
+	return m_colour;
+}
+
 void Robot::useWeapon(int side, float dt)
 {
 	if (m_currentWeapon[side] != -1)
@@ -214,7 +220,7 @@ void Robot::removeResource()
 	m_resource = -1;
 }
 
-void Robot::update(float dt)
+void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 {
 	GameObject::update();
 	XMVECTOR position = GameObject::getPosition();
@@ -226,6 +232,11 @@ void Robot::update(float dt)
 	{
 		m_weapons[i]->updateTime(dt, getPosition());
 	}
+	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == SNIPER && m_weapons[m_currentWeapon[RIGHT]]->getActive())
+		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
+	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER && m_weapons[m_currentWeapon[LEFT]]->getActive())
+		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
+	
 }
 
 void Robot::move(XMVECTOR dPos)

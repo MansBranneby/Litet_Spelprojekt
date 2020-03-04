@@ -52,6 +52,7 @@ public:
 	float getCurrentRot();
 	bool isReady(float dt);
 	void setColour(float x, float y, float z);
+	XMVECTOR getColour();
 
 	void useWeapon(int side, float dt);
 	void changeWeapon(int side);
@@ -68,7 +69,7 @@ public:
 
 	int m_lightIndex;
 
-	void update(float dt);
+	void update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	void move(XMVECTOR dPos);
 
 	// History of positions

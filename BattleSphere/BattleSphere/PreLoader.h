@@ -1,11 +1,6 @@
 #pragma once
 #include "BackfaceCuller.h"
 #include "Model.h"
-#include "Weapon.h"
-#include "Robot.h"
-#include "Node.h"
-#include "Projectile.h"
-#include "Resource.h"
 
 // objectType enum: e_drone, e_weapon, e_robot, e_node, e_projectile, e_resource, e_scene, e_static
 
