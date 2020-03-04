@@ -1,5 +1,10 @@
 #pragma once
 #include "DX.h"
+#include "ConstantBuffer.h"
+#include "VertexShader.h"
+#include "GeometryShader.h"
+#include "PixelShader.h"
+#include "ComputeShader.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Lights.h"
