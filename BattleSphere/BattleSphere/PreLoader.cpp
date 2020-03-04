@@ -132,7 +132,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
 	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
-	loadFromFile(objectType::e_scene, "Background\\Ground");
+	loadFromFile(objectType::e_ground, "Background\\Ground");
 	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
 	loadFromFile(objectType::e_scene, "Background\\Background");
