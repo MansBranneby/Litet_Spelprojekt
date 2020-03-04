@@ -24,6 +24,7 @@ private:
 	static Graph* m_instance;
 
 	std::vector<graphNode> m_nodes;
+	int m_goal[4];
 	std::vector<XMVECTOR> m_path[MAX_USER];
 	XMVECTOR m_pulsePos[MAX_USER];
 	float m_pulseLength[MAX_USER];

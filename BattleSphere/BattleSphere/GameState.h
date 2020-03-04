@@ -7,6 +7,8 @@
 #include "StructsAndEnums.h"
 #include "Graph.h"
 #include "SpawnDrone.h"
+#include "Particles.h"
+#include "Sound.h"
 #include "BillboardHandler.h"
 
 class GameState : public State 
@@ -32,9 +34,13 @@ private:
 	bool m_zoomingOutToStart;
 	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
 	void updateDynamicCamera(float dT);
+	bool m_devZoomOut;
 
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
+
+	// Particles
+	Particles m_particles;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

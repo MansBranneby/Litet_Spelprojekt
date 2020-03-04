@@ -9,6 +9,16 @@ Lights::~Lights()
 {
 }
 
+int Lights::getFreeIndex()
+{
+	for (int i = 0; i < LIGHT_COUNT; i++)
+	{
+		if (!m_lights[i].enabled)
+			return i;
+	}
+	return -1;
+}
+
 void Lights::setLightData()
 {
 	for (int i = 0; i < LIGHT_COUNT; i++)
@@ -16,7 +26,7 @@ void Lights::setLightData()
 		m_lights[i].enabled = false;
 		m_lights[i].intensity = 1;
 	}
-	m_nrOfLights = 0;
+
 
 }
 
@@ -38,208 +48,221 @@ LightData* Lights::getLights()
 
 int Lights::addPointLight(float x, float y, float z, float radius, float r, float g, float b, float intensity)
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 0;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_lights[m_nrOfLights].range = radius;
-	m_nrOfLights++;
-	return m_nrOfLights - 1;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].x = x;
+	m_lights[lightIndex].y = y;
+	m_lights[lightIndex].z = z;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].type = 0;
+	m_lights[lightIndex].r = r;
+	m_lights[lightIndex].g = g;
+	m_lights[lightIndex].b = b;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].intensity = intensity;
+	m_lights[lightIndex].range = radius;
+	
+	return lightIndex;
 }
 
 int Lights::addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity)
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].dx = dx;
-	m_lights[m_nrOfLights].dy = dy;
-	m_lights[m_nrOfLights].dz = dz;
-	m_lights[m_nrOfLights].type = 1;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].dx = dx;
+	m_lights[lightIndex].dy = dy;
+	m_lights[lightIndex].dz = dz;
+	m_lights[lightIndex].type = 1;
+	m_lights[lightIndex].r = r;
+	m_lights[lightIndex].g = g;
+	m_lights[lightIndex].b = b;
+	m_lights[lightIndex].a = 1;
 
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_nrOfLights++;
-	return m_nrOfLights - 1;
+	m_lights[lightIndex].intensity = intensity;
+	
+	return lightIndex;
 }
 
 int Lights::addSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity)
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 2;
-	m_lights[m_nrOfLights].spotLightAngle = angleDeg;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = range;
-	m_lights[m_nrOfLights].dx = dx;
-	m_lights[m_nrOfLights].dy = dy;
-	m_lights[m_nrOfLights].dz = dz;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].type = 2;
+	m_lights[lightIndex].spotLightAngle = angleDeg;
+	m_lights[lightIndex].r = r;
+	m_lights[lightIndex].g = g;
+	m_lights[lightIndex].b = b;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].x = x;
+	m_lights[lightIndex].y = y;
+	m_lights[lightIndex].z = z;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].range = range;
+	m_lights[lightIndex].dx = dx;
+	m_lights[lightIndex].dy = dy;
+	m_lights[lightIndex].dz = dz;
+	m_lights[lightIndex].intensity = intensity;
 	
-	return m_nrOfLights - 1;
+	
+	return lightIndex;
 }
 
 int Lights::addAreaLight(float x, float y, float z, float radius, float r, float g, float b, float intensity)
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 3;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_lights[m_nrOfLights].range = radius;
-	m_nrOfLights++;
-	return m_nrOfLights - 1;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].x = x;
+	m_lights[lightIndex].y = y;
+	m_lights[lightIndex].z = z;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].type = 3;
+	m_lights[lightIndex].r = r;
+	m_lights[lightIndex].g = g;
+	m_lights[lightIndex].b = b;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].intensity = intensity;
+	m_lights[lightIndex].range = radius;
+	
+	return lightIndex;
 }
 
 int Lights::addVolumetricSpotLight(float x, float y, float z, float range, float dx, float dy, float dz, float r, float g, float b, float angleDeg, float intensity)
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 4;
-	m_lights[m_nrOfLights].spotLightAngle = angleDeg;
-	m_lights[m_nrOfLights].r = r;
-	m_lights[m_nrOfLights].g = g;
-	m_lights[m_nrOfLights].b = b;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = x;
-	m_lights[m_nrOfLights].y = y;
-	m_lights[m_nrOfLights].z = z;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = range;
-	m_lights[m_nrOfLights].dx = dx;
-	m_lights[m_nrOfLights].dy = dy;
-	m_lights[m_nrOfLights].dz = dz;
-	m_lights[m_nrOfLights].intensity = intensity;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].type = 4;
+	m_lights[lightIndex].spotLightAngle = angleDeg;
+	m_lights[lightIndex].r = r;
+	m_lights[lightIndex].g = g;
+	m_lights[lightIndex].b = b;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].x = x;
+	m_lights[lightIndex].y = y;
+	m_lights[lightIndex].z = z;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].range = range;
+	m_lights[lightIndex].dx = dx;
+	m_lights[lightIndex].dy = dy;
+	m_lights[lightIndex].dz = dz;
+	m_lights[lightIndex].intensity = intensity;
+	
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 int Lights::addVolumetricSpotLight()
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 4;
-	m_lights[m_nrOfLights].spotLightAngle = 0;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_lights[m_nrOfLights].dx = 0;
-	m_lights[m_nrOfLights].dy = -1;
-	m_lights[m_nrOfLights].dz = 0;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].type = 4;
+	m_lights[lightIndex].spotLightAngle = 0;
+	m_lights[lightIndex].r = 0;
+	m_lights[lightIndex].g = 0;
+	m_lights[lightIndex].b = 0;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].x = 0;
+	m_lights[lightIndex].y = 0;
+	m_lights[lightIndex].z = 0;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].range = 0;
+	m_lights[lightIndex].dx = 0;
+	m_lights[lightIndex].dy = -1;
+	m_lights[lightIndex].dz = 0;
+	m_lights[lightIndex].intensity = 1;
+	
 
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 int Lights::addPointLight()
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 0;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].x = 0;
+	m_lights[lightIndex].y = 0;
+	m_lights[lightIndex].z = 0;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].type = 0;
+	m_lights[lightIndex].r = 0;
+	m_lights[lightIndex].g = 0;
+	m_lights[lightIndex].b = 0;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].intensity = 1;
+	m_lights[lightIndex].range = 0;
+	
 	
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 int Lights::addDirectionalLight()
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].dx = 0;
-	m_lights[m_nrOfLights].dy = 0;
-	m_lights[m_nrOfLights].dz = 0;
-	m_lights[m_nrOfLights].type = 1;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
+	int lightIndex = getFreeIndex();
 
-	m_lights[m_nrOfLights].intensity = 1;
-	m_nrOfLights++;
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].dx = 0;
+	m_lights[lightIndex].dy = 0;
+	m_lights[lightIndex].dz = 0;
+	m_lights[lightIndex].type = 1;
+	m_lights[lightIndex].r = 0;
+	m_lights[lightIndex].g = 0;
+	m_lights[lightIndex].b = 0;
+	m_lights[lightIndex].a = 1;
+
+	m_lights[lightIndex].intensity = 1;
+	
 	
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 int Lights::addSpotLight()
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].type = 2;
-	m_lights[m_nrOfLights].spotLightAngle = 0;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_lights[m_nrOfLights].dx = 0;
-	m_lights[m_nrOfLights].dy = -1;
-	m_lights[m_nrOfLights].dz = 0;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].type = 2;
+	m_lights[lightIndex].spotLightAngle = 0;
+	m_lights[lightIndex].r = 0;
+	m_lights[lightIndex].g = 0;
+	m_lights[lightIndex].b = 0;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].x = 0;
+	m_lights[lightIndex].y = 0;
+	m_lights[lightIndex].z = 0;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].range = 0;
+	m_lights[lightIndex].dx = 0;
+	m_lights[lightIndex].dy = -1;
+	m_lights[lightIndex].dz = 0;
+	m_lights[lightIndex].intensity = 1;
+	
 	
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 int Lights::addAreaLight()
 {
-	m_lights[m_nrOfLights].enabled = true;
-	m_lights[m_nrOfLights].x = 0;
-	m_lights[m_nrOfLights].y = 0;
-	m_lights[m_nrOfLights].z = 0;
-	m_lights[m_nrOfLights].w = 1;
-	m_lights[m_nrOfLights].type = 3;
-	m_lights[m_nrOfLights].r = 0;
-	m_lights[m_nrOfLights].g = 0;
-	m_lights[m_nrOfLights].b = 0;
-	m_lights[m_nrOfLights].a = 1;
-	m_lights[m_nrOfLights].intensity = 1;
-	m_lights[m_nrOfLights].range = 0;
-	m_nrOfLights++;
+	int lightIndex = getFreeIndex();
+
+	m_lights[lightIndex].enabled = true;
+	m_lights[lightIndex].x = 0;
+	m_lights[lightIndex].y = 0;
+	m_lights[lightIndex].z = 0;
+	m_lights[lightIndex].w = 1;
+	m_lights[lightIndex].type = 3;
+	m_lights[lightIndex].r = 0;
+	m_lights[lightIndex].g = 0;
+	m_lights[lightIndex].b = 0;
+	m_lights[lightIndex].a = 1;
+	m_lights[lightIndex].intensity = 1;
+	m_lights[lightIndex].range = 0;
+	
 
 
-	return m_nrOfLights - 1;
+	return lightIndex;
 }
 
 void Lights::setPosition(int index, float x, float y, float z)
@@ -284,6 +307,11 @@ void Lights::setAngle(int index, float angleDeg)
 	m_lights[index].spotLightAngle = angleDeg;
 	
 
+}
+
+void Lights::disable(int index)
+{
+	m_lights[index].enabled = false;
 }
 
 void Lights::Initialize()
