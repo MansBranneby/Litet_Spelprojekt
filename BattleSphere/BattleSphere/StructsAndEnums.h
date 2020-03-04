@@ -1,5 +1,10 @@
 #pragma once
 #include "DX.h"
+#include "ConstantBuffer.h"
+#include "VertexShader.h"
+#include "GeometryShader.h"
+#include "PixelShader.h"
+#include "ComputeShader.h"
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Lights.h"
@@ -40,8 +45,8 @@ using namespace DirectX;
 
 // Spawning
 #define START_SPAWNED_RESOURCES 4
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
-#define SPAWN_INTERVAL 30.0f
+#define MAX_RESOURCES_OUT_PER_PLAYER 10 // Default 2
+#define SPAWN_INTERVAL 5.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
 // Resource

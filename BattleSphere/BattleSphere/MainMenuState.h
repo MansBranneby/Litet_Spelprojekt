@@ -5,13 +5,21 @@
 
 #define SELECTIONSPEED 1000.0f
 
-enum MenuState
+const XMVECTOR ROBOT_START_POS[4]
+{
+	XMVectorSet(-85.0f, 2.0f, 50.0f, 0),
+	XMVectorSet(100.0f, 2.0f, -50.0f, 0),
+	XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
+	XMVectorSet(120.0f, 2.0f, 50.0f, 0)
+};
+
+enum class MenuState
 {
 	e_mainMenu,
 	e_robotSelection,
 	e_optionsMenu
 };
-enum ActiveMainMenu
+enum class ActiveMainMenu
 {
 	e_startGame,
 	e_options,
