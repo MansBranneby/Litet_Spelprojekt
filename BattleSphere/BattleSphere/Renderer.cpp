@@ -294,7 +294,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	g_lightCulling.computeFrustum();
 	createRenderResources(); // Creates instances of graphics classes etc.
 	g_transparency.initialize();
-	
+
 	if (wndHandle)
 	{
 		IMGUI_CHECKVERSION();
@@ -443,6 +443,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					for (int i = 0; i < XUSER_MAX_COUNT; i++)
 					{
+						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
 							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());

@@ -12,15 +12,16 @@ struct PSIn
 	float3 col : COLOR;
 };
 
-cbuffer cameraPosition : register(b0)
+cbuffer deltaTime : register(b0)
+{
+	float4x4 VP;
+};
+
+cbuffer cameraPosition : register(b1)
 {
 	float4 camPos;
 };
 
-cbuffer deltaTime : register(b1)
-{
-	float4x4 VP;
-};
 
 [maxvertexcount(4)]
 void GS_main(

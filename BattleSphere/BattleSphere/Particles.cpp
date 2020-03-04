@@ -280,8 +280,8 @@ void Particles::draw()
 	// Set geometry shader
 	ID3D11Buffer* camInfo[2] =
 	{
-		*DX::getInstance()->getCam()->getConstantBufferPosition()->getConstantBuffer(),
-		*DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer()
+		*DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer(),
+		*DX::getInstance()->getCam()->getConstantBufferPosition()->getConstantBuffer()
 	};
 	DX::getInstance()->getDeviceContext()->GSSetConstantBuffers(0, 2, camInfo);
 	DX::getInstance()->getDeviceContext()->GSSetShader(&m_geometryShaderParticles.getGeometryShader(), nullptr, NULL);
