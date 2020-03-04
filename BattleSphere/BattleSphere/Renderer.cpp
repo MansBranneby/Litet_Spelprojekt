@@ -316,8 +316,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_mainMenuState = new MainMenuState();
 		g_Game->pushState(g_gameState);
 		g_Game->pushState(g_mainMenuState);
-		//g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
-		g_Game->changeState(stateType::e_gameState); // Set initial state for the game
+		g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
+		//g_Game->changeState(stateType::e_gameState); // Set initial state for the game
 
 		int counterFrames = 0;
 		int fps = 0;
