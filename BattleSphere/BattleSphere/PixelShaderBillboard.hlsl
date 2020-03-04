@@ -265,7 +265,7 @@ float4 PS_main(PS_IN input) : SV_Target
 		break;
 	case 1: // Interpolate
 		// w value decides if default colour or colourA and colourB should be used
-		(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+		fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
 		break;
 	case 2: // Translate
 		{
@@ -275,7 +275,7 @@ float4 PS_main(PS_IN input) : SV_Target
 		break;
 	case 3: // Flash and interpolate
 		// w value decides if default colour or colourA and colourB should be used
-		(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+		fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
 		fragmentCol *= flashFactor;
 		break;
 	case 4: // Flash and translate
@@ -287,7 +287,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	case 5: // Interpolate and translate
 		{
 			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-			(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+			fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
 			fragmentCol += (modelTexture * 0.5f);
 		}
 		break;
@@ -300,8 +300,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			modelTexture *= flashFactor;
 		
 			// w value decides if default colour or colourA and colourB should be used
-			(colourA.w > 0.0f || colourB.w > 0.0f) ? fragmentCol = changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
-			
+			fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+
 			// Add texture onto fragmentCol
 			fragmentCol += (modelTexture * 0.5f);
 		}

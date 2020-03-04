@@ -881,11 +881,9 @@ BillboardData Model::getBillboardDataFromFile(std::string line)
 
 	std::istringstream inputStream;
 	std::string FIT;
-	size_t start, end;
-	std::string token;
-	std::string colourString, translateString;
+	size_t start, end, startInterpolate, endInterpolate, startTranslate, endTranslate;
+	std::string token, colourString, translateString;
 	std::istringstream colours, translation;
-	std::string hell;
 	bool flashing = false, interpolating = false, translating = false;
 
 	if (line != "" && line != "\r")
@@ -916,37 +914,40 @@ BillboardData Model::getBillboardDataFromFile(std::string line)
 				std::getline(inputStream, colourString);
 
 				// Remove parantheses
-				start = colourString.find('(') + 1;
-				end = colourString.find(')') - start;
-				hell = colourString.substr(start, end);
-				colours.str(hell);
+				startInterpolate = colourString.find('(') + 1;
+				endInterpolate = colourString.find(')') - startInterpolate;
+				token = colourString.substr(startInterpolate, endInterpolate);
 				colours.clear();
+				colours.str(token);
 
 				// Colour A
 				colours >> data.colourA.m128_f32[0];
 				colours >> data.colourA.m128_f32[1];
 				colours >> data.colourA.m128_f32[2];
+				colours >> data.colourB.m128_f32[3];
 
 				// Remove parantheses
-				start = colourString.find_last_of('(') + 1;
-				end = colourString.find_last_of(')') - start;
-				hell = colourString.substr(start, end);
-				colours.str(hell);
+				startInterpolate = colourString.find_last_of('(') + 1;
+				endInterpolate = colourString.find_last_of(')') - startInterpolate;
+				token = colourString.substr(startInterpolate, endInterpolate);
+				colours.clear();
+				colours.str(token);
 				
 				// Colour B
 				colours >> data.colourB.m128_f32[0];
 				colours >> data.colourB.m128_f32[1];
 				colours >> data.colourB.m128_f32[2];
+				colours >> data.colourB.m128_f32[3];
 			}
 			else if (FIT == "T")
 			{
 				translating = true;
 				std::getline(inputStream, translateString);
 				// Remove parantheses
-				start = translateString.find('(') + 1;
-				end = translateString.find(')') - start;
-				hell = translateString.substr(start, end);
-				translation.str(hell);
+				startTranslate = translateString.find('(') + 1;
+				endTranslate = translateString.find(')') - startTranslate;
+				token = translateString.substr(startTranslate, endTranslate);
+				translation.str(token);
 
 				translation >> data.velocityUV.m128_f32[0];
 				translation >> data.velocityUV.m128_f32[1];

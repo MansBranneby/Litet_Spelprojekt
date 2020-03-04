@@ -164,8 +164,8 @@ struct BillboardData
 	float flashFactor = 0.0f;
 	float flashSpeed = 0.0f;
 	float padding1[2];
-	DirectX::XMVECTOR colourA;
-	DirectX::XMVECTOR colourB;
+	DirectX::XMVECTOR colourA = DirectX::XMVectorZero();
+	DirectX::XMVECTOR colourB = DirectX::XMVectorZero();
 };
 
 // Game update return data
