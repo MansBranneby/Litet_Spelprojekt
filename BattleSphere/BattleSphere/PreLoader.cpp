@@ -111,7 +111,6 @@ PreLoader::PreLoader()
 	loadFromFile(ObjectType::e_projectile, "projectile", "1mesh1mat");
 
 	// On map (with collision)
-	loadFromFile(ObjectType::e_static, "Background\\SS", "SSColl");
 	loadFromFile(ObjectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(ObjectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(ObjectType::e_static, "OnMap\\GasStation", "GasStationColl");
@@ -128,8 +127,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
 	// Billboards
-	loadFromFile(ObjectType::e_billboard, "TestTower");
-	loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	loadFromFile(ObjectType::e_billboard, "Background\\SS", "SSColl");
 
 	// Background
 	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
