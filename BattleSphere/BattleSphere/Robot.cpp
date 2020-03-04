@@ -138,7 +138,7 @@ void Robot::useWeapon(int side, float dt)
 	}
 }
 
-void Robot::changeWeapon(int side)
+int Robot::changeWeapon(int side)
 {
 	if (m_weapons.size() > 2) 
 	{
@@ -151,12 +151,21 @@ void Robot::changeWeapon(int side)
 		else
 			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
 		m_ready = false;
+		return m_weapons[m_currentWeapon[side]]->getType();
 	}
+	return -1;
 }
 
 int Robot::getCurrentWeapon(int side)
 {
 	return m_currentWeapon[side];
+}
+
+int Robot::getNextWeapon()
+{
+	if (m_weapons.size() > 4)
+		return m_currentWeapon[RIGHT] + 2 & (int)m_weapons.size();
+	return -1;
 }
 
 std::vector<Weapon*> Robot::getWeapons()

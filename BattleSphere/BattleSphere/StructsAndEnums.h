@@ -91,7 +91,8 @@ enum class renderPass
 	e_menuAni,
 	e_menuScene,
 	e_opaque,
-	e_transparent
+	e_transparent,
+	e_userInterface
 };
 
 enum class stateType

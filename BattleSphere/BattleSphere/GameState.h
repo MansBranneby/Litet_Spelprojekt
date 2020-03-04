@@ -8,6 +8,7 @@
 #include "Graph.h"
 #include "SpawnDrone.h"
 #include "Sound.h"
+#include "UserInterface.h"
 
 class GameState : public State 
 {
@@ -19,6 +20,7 @@ private:
 	std::vector<Node*> m_nodes;
 	Lights* m_lights;
 	Transparency m_transparency;
+	UserInterface* m_userInterface;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;
@@ -46,6 +48,7 @@ public:
 	void pause();
 	void resume();
 	
+	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
 	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);

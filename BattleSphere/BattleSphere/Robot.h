@@ -54,8 +54,9 @@ public:
 	void setColour(float x, float y, float z);
 
 	void useWeapon(int side, float dt);
-	void changeWeapon(int side);
+	int changeWeapon(int side);
 	int getCurrentWeapon(int side);
+	int getNextWeapon();
 	std::vector<Weapon*> getWeapons();
 	bool upgradeWeapon(int type);
 
