@@ -1,6 +1,7 @@
 struct GSIn
 {
 	float4 pos : SV_POSITION;
+	float3 vel : VELOCITY;
 	float2 size : SIZE;
 	float3 col : COLOR;
 };
@@ -29,7 +30,7 @@ void GS_main(
 {
 	PSIn elements[4] = (PSIn[4])0;
 	float3 norm = normalize(camPos.xyz - input[0].pos.xyz);
-	float3 right = cross(norm, float3(0, 1, 0));
+	float3 right = normalize(input[0].vel);
 	float3 up = cross(right, norm);
 	right *= input[0].size.x;
 	up *= input[0].size.y;

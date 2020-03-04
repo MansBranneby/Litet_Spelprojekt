@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "StructsAndEnums.h"
 #define MAX_PARTICLES 512 * 16 *8 // Max groups * Threads per group * computed per thread
-#define MAX_ADD 65536
+#define MAX_ADD 1000
 
 	struct particle
 	{
@@ -71,7 +71,7 @@ public:
 
 	void addParticles(XMVECTOR pos, XMVECTOR color, XMVECTOR size, int amount = 200, float velocity = 3.0f, XMVECTOR direction = { 0.0f, 0.0f, 0.0f, 0.0f });
 	void addSpark(XMVECTOR impactPos, XMVECTOR projectileDir);
-	void update(float dT); // Update time constant buffer and view proj matrices
+	void update(float dT);
 	void draw();
 };
 

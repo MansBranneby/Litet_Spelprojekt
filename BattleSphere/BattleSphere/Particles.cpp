@@ -2,7 +2,7 @@
 
 float Particles::randF()
 {
-	return 2.0f*((float)rand()- (float)RAND_MAX/2.0f) / (float)RAND_MAX;
+	return 2.0f * ((float)rand() - (float)RAND_MAX / 2.0f) / (float)RAND_MAX;
 }
 
 Particles::Particles()
@@ -94,7 +94,7 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 {
 	int nrToAdd = (amount > MAX_ADD || amount <= 0) ? MAX_ADD : amount;
 	bool dirGiven = XMVector3Equal(direction, XMVectorSet(0, 0, 0, 0)) ? false : true;
-	
+
 	if (dirGiven) // If direction was given, randomize nrToAdd velocity vectors after direction
 	{
 		// Calculate direction normal
@@ -117,7 +117,7 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 		float bZ = bitangent.m128_f32[2];
 
 		// Calculate TBN matrix
-		XMMATRIX tBN = 
+		XMMATRIX tBN =
 		{
 			tX, tY, tZ, 0.0f,
 			bX, bY, bZ, 0.0f,
@@ -129,14 +129,14 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 		{
 			XMVECTOR randomZVec = XMVector3Normalize(XMVectorSet
 			(
-				randF(), 
 				randF(),
-				1, 
+				randF(),
+				1,
 				0
 			));
 			XMVECTOR vel = XMVector3Transform(randomZVec, tBN);
 			//XMVECTOR vel = randomZVec;
-			vel *= velocity * (1.0f + 0.4f*randF());
+			vel *= velocity * (1.0f + 0.4f * randF());
 			particle p =
 			{
 				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
@@ -170,15 +170,15 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 			m_particleToAdd.push_back(p);
 		}
 	}
-	
+
 }
 
 void Particles::addSpark(XMVECTOR impactPos, XMVECTOR projectileDir)
 {
 	XMVECTOR dir = XMVector3Normalize(-projectileDir);
-	XMVECTOR col = { 243.0f/255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
-	XMVECTOR size = { 1, 1, 0, 0 };
-	addParticles(impactPos, col, size, 20, 7.0f, dir);
+	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
+	addParticles(impactPos, col, size, 10, 5.0f, dir);
 }
 
 void Particles::update(float dT)
