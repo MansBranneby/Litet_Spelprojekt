@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "StructsAndEnums.h"
 #define MAX_PARTICLES 512 * 16 *8 // Max groups * Threads per group * computed per thread
-#define MAX_ADD 1000
+#define MAX_ADD 2000
 
 	struct particle
 	{

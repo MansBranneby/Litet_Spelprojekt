@@ -28,17 +28,21 @@ void GS_main(
 	inout TriangleStream< PSIn > output
 )
 {
+	// Calculate quad vectors
 	PSIn elements[4] = (PSIn[4])0;
 	float3 norm = normalize(camPos.xyz - input[0].pos.xyz);
 	float3 right = normalize(input[0].vel);
 	float3 up = cross(right, norm);
 	right *= input[0].size.x;
 	up *= input[0].size.y;
+
+	// Build quad around point
 	elements[0].pos = input[0].pos + float4(- right / 2 + up / 2, 0.0f);
 	elements[1].pos = elements[0].pos + float4(right, 0.0f);
 	elements[2].pos = elements[1].pos + float4(-up - right, 0.0f);
 	elements[3].pos = elements[2].pos + float4(right, 0.0f);
 
+	// Send quad corners to pixel shader
 	for (int j = 0; j < 4; j++)
 	{
 		elements[j].col = input[0].col;

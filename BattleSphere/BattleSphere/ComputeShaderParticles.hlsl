@@ -1,5 +1,3 @@
-#define MOVEMENT_SPEED 20.0f
-
 cbuffer deltaTime : register(b0)
 {
 	float dt;
@@ -53,7 +51,6 @@ void CS_main(uint3 dTID : SV_DispatchThreadID)
 			particle p = updateParticle(prev[i]);
 		
 			// If particle is above yLimit, forward it to updated buffer
-			//if (true)
 			if (p.pos.y > yLimit)
 			{
 				// Update amount of particles in updated param buffer

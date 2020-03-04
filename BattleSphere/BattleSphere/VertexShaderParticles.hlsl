@@ -18,8 +18,9 @@ StructuredBuffer<particle> particles : register(t0);
 
 GSIn VS_main(uint vID : SV_VertexID)
 {
+	// Passthrough shader
 	GSIn output = (GSIn)0;
-	output.pos = float4(particles[vID].pos, 1);
+	output.pos = float4(particles[vID].pos, 1.0f);
 	output.vel = particles[vID].vel;
 	output.size = particles[vID].size;
 	output.col = particles[vID].col;
