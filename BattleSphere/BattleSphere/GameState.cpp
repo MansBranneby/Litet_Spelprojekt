@@ -680,6 +680,18 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
+
+		m_particles.draw();
+	}
 			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), 0, 0);
 		}
 		// Tokyo drift
