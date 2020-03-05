@@ -8,6 +8,9 @@ Robot::Robot(int playerId)
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
+	//m_weaponPointer = 0;
+	m_nextW = -1;
+	m_nextnextW = -1;
 	m_score = 0;
 	m_resource = -1;
 	Weapon* pistol = new Weapon(PISTOL);
@@ -138,25 +141,82 @@ void Robot::useWeapon(int side, float dt)
 	}
 }
 
-void Robot::changeWeapon(int side)
+int Robot::changeWeapon(int side)
 {
 	if (m_weapons.size() > 2) 
 	{
-		m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
-		if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
-			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
-		
+		//m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
+		//if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
+		//	m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
+
+
+		//m_weaponPointer = (m_weaponPointer + 1) % (int)m_weapons.size(); // Move pointer to next weapon		
+		//bool occupied = true;
+		//while (occupied)
+		//{
+		//	if (m_weaponPointer == m_currentWeapon[(side + 1) % 2] || m_weaponPointer == m_currentWeapon[side])
+		//		m_weaponPointer = (m_weaponPointer + 1) % (int)m_weapons.size(); // Occupied, move pointer to next index
+		//	else
+		//	{
+		//		m_currentWeapon[side] = m_weaponPointer;
+		//		occupied = false;
+		//	}
+
+		//}
+
+		bool occupied = true;
+		m_currentWeapon[side] = m_nextW;
+		if (m_weapons.size() == 3)
+		{
+			while (occupied)
+			{
+				m_nextW = (m_nextW + 1) % (int)m_weapons.size();
+				if (m_nextW != m_currentWeapon[(side + 1) % 2] && m_nextW != m_currentWeapon[side])
+					occupied = false;
+			}
+
+		}
+		else if (m_weapons.size() > 3)
+		{
+			m_nextW = m_nextnextW;
+			while (occupied)
+			{
+				m_nextnextW = (m_nextnextW + 1) % (int)m_weapons.size();
+				if (m_nextnextW != m_currentWeapon[(side + 1) % 2] && m_nextnextW != m_currentWeapon[side] && m_nextnextW != m_nextW)
+					occupied = false;
+			}
+		}
+
+
+		//m_currentWeapon[side] = (m_weaponPointer + 1) % (int)m_weapons.size(); // Change to next weapon
+		//m_weaponPointer = m_currentWeapon[side]; // Update weapon pointer
 		if (side == RIGHT)
 			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
 		else
 			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
 		m_ready = false;
+		return m_weapons[m_currentWeapon[side]]->getType();
 	}
+	return -1;
 }
 
 int Robot::getCurrentWeapon(int side)
 {
 	return m_currentWeapon[side];
+}
+
+int Robot::getNextWeapon()
+{
+	if (m_weapons.size() > 2)
+		return m_weapons[m_nextW]->getType();
+	return -1;
+}
+
+int Robot::getNextNextWeapon()
+{
+	if (m_weapons.size() > 3)
+		return m_weapons[m_nextnextW]->getType();
+	return -1;
 }
 
 std::vector<Weapon*> Robot::getWeapons()
@@ -177,12 +237,23 @@ void Robot::resetScore()
 void Robot::addWeapon(int type)
 {
 	Weapon* weapon = new Weapon(type);
+	m_weapons.push_back(weapon);
+	if (m_weapons.size() == 3)
+		m_nextW = 2;
+	if (m_weapons.size() == 4)
+	{
+		m_nextnextW = 3;
+	}
 	if (m_currentWeapon[LEFT] == -1)
 	{
-		m_currentWeapon[LEFT] = 1;
+		m_weapons.push_back(m_weapons[0]);
+		m_weapons.erase(m_weapons.begin());
+		m_currentWeapon[LEFT] = 0;
+		m_currentWeapon[RIGHT] = 1;
+		//m_weaponPointer = 1;
 		weapon->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
 	}
-	m_weapons.push_back(weapon);
+	//m_weapons.push_back(weapon);
 }
 
 bool Robot::upgradeWeapon(int type)

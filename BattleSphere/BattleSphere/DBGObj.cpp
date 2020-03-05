@@ -95,7 +95,7 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 		m_weights.push_back(XMVectorSet(65.0f, -8.0f, 49.0f, 1.0f));
 		// Curve 3
 		m_weights.push_back(XMVectorSet(65.0f, -8.0f, 49.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(53.0f, -5.0f, 30.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(65.0f, -5.0f, 30.0f, 1.0f));
 		m_weights.push_back(XMVectorSet(65.0f, 1.0f, 16.0f, 1.0f));
 		m_weights.push_back(XMVectorSet(93.0f, 1.0f, 16.0f, 1.0f));
 		// Curve 2

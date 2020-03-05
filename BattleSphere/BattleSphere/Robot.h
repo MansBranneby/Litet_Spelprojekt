@@ -24,6 +24,9 @@ private:
 	float m_currentRotation;
 	std::vector<Weapon*> m_weapons;
 	int m_currentWeapon[2];
+	//int m_weaponPointer;
+	int m_nextW;
+	int m_nextnextW;
 	int m_resource;
 	int m_score;
 	float m_time;
@@ -54,8 +57,10 @@ public:
 	void setColour(float x, float y, float z);
 
 	void useWeapon(int side, float dt);
-	void changeWeapon(int side);
+	int changeWeapon(int side);
 	int getCurrentWeapon(int side);
+	int getNextWeapon();
+	int getNextNextWeapon();
 	std::vector<Weapon*> getWeapons();
 	bool upgradeWeapon(int type);
 

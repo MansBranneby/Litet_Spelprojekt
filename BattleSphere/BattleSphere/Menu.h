@@ -14,6 +14,7 @@ private:
 	VertexShader* m_vertexShader;
 	PixelShader* m_pixelShader;
 	PixelShader* m_pixelShaderAni;
+	PixelShader* m_pixelShaderUI;
 
 	void initializeResources();
 
