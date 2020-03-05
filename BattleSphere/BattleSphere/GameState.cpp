@@ -794,7 +794,7 @@ void GameState::draw(Game* game, renderPass pass)
 				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
 				switch (wepType)
 				{
-				case 6: // Beyblade
+				case BEYBLADE:
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
 					break;
 
@@ -808,7 +808,7 @@ void GameState::draw(Game* game, renderPass pass)
 					int wepType = weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getType();
 					switch (wepType)
 					{
-					case 6: // Beyblade
+					case BEYBLADE:
 						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
 						break;
 
@@ -865,8 +865,6 @@ void GameState::draw(Game* game, renderPass pass)
 				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 		}
 
-		m_particles.draw();
-
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -874,6 +872,8 @@ void GameState::draw(Game* game, renderPass pass)
 				m_lineShots.draw(i);
 			}
 		}
+
+		m_particles.draw();
 	}
 	else if (pass == renderPass::e_billboard)
 	{

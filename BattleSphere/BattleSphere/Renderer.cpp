@@ -236,7 +236,8 @@ void shadowRender()
 	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_shadowMapping->getVertexShader().getvertexLayout());
 
-	g_Game->draw();
+	g_Game->draw(renderPass::e_opaque);
+	g_Game->draw(renderPass::e_transparent);
 }
 
 void billboardRender()

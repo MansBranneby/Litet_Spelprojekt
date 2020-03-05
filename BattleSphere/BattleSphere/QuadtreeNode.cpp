@@ -310,7 +310,7 @@ float QuadtreeNode::testCollisionRay(XMFLOAT2 start, XMFLOAT2 dir)
 				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
 				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
 
-				XMVECTOR startReal = { start.x, 0.5f, start.y };
+				XMVECTOR startReal = { start.x, 3.4f, start.y };
 				XMVECTOR dirReal = { dir.x, 0.0f, dir.y };
 
 				float currT = testRayTriangle(startReal, dirReal, triangles);

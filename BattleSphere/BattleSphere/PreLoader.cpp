@@ -122,6 +122,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
+	loadFromFile(objectType::e_static, "OnMap\\NodeGoldenDuck", "NodeGoldenDuckColl");
 
 		// Static Background (Skyscrapers with collision) // Later billboards?
 	//loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
