@@ -695,9 +695,13 @@ void GameState::draw(Game* game, renderPass pass)
 	else if (pass == renderPass::e_billboard)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+		std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
 
-		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+		for (int i = 0; i < BB.size(); ++i)
 			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+
+		for (int i = 0; i < staticBB.size(); ++i)
+			game->getPreLoader()->draw(ObjectType::e_static_billboard, staticBB[i].getBillboardData(), staticBB[i].getModelNr(), staticBB[i].getSubModelNumber(), staticBB[i].getVariant());
 	}
 
 }

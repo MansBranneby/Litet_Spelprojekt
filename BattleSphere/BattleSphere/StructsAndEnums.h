@@ -74,6 +74,7 @@ using namespace DirectX;
 
 enum class ObjectType
 {
+	e_static_billboard,
 	e_extra,
 	e_drone,
 	e_weapon,

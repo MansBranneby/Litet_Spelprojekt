@@ -126,8 +126,8 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
-	// Billboards
-	loadFromFile(ObjectType::e_billboard, "Background\\SS", "SSColl");
+	// Collidable Billboards
+	loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
 
 	// Background
 	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
