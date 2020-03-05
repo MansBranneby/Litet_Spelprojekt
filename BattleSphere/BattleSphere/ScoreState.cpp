@@ -7,6 +7,20 @@ ScoreState::ScoreState()
 
 	// Background
 	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\ScoreScreen_background.png", true, 0.0f, 0.0f, 1920.0f, 1080.0f));
+	
+	// Texture for the numbers (one to nine) that represent players' scores
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_0.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_1.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_2.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_3.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_4.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_5.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_6.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_7.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_8.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\ScoreState\\Score_9.png", true, 0.0f, 0.0f, 200.0f, 200.0f));
+
+
 	Lights::getInstance()->addPointLight(-10, 0, -10, 50, 0.6, 0.0, 0.6, 5.0);
 }
 

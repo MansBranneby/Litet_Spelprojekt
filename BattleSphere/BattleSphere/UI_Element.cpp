@@ -94,7 +94,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 	ZeroMemory(&vertexData, sizeof(vertexData));
 	vertexData.pSysMem = m_vertexList;
 	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	
+
 	std::wstring wName(fileName);
 	const wchar_t* wcName = wName.c_str();
 	HRESULT hr = CoInitialize(NULL);
