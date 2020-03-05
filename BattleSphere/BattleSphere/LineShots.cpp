@@ -10,7 +10,7 @@ LineShots::LineShots()
 		m_widthAlpha[i].x = 0.0f;
 		m_widthAlpha[i].y = 0.0f;
 		m_active[i] = false;
-		m_didDamage[i] = false;
+		m_animOn[i] = false;
 		m_colour[i] = XMVectorSet(1,1,1,0);
 	}
 
@@ -53,29 +53,32 @@ void LineShots::setColour(int index, XMVECTOR colour)
 	m_colour[index] = colour;
 }
 
-bool LineShots::updateLineStatus(int index, XMVECTOR start, XMVECTOR end, bool active, float dt)
+void LineShots::setActive(int index, bool active)
 {
 	m_active[index] = active;
+}
+
+void LineShots::updateLineStatus(int index, XMVECTOR start, XMVECTOR end, bool active, float dt)
+{
 	m_lines[index][0] = start;
 	m_lines[index][1] = end;
-	if (active)
+	if (active && !m_animOn[index])
+	{
+		m_animOn[index] = true;
+	}
+
+	if (m_animOn[index])
 	{
 		m_anim[index] += dt;
 	}
 
-	m_widthAlpha[index].x = max(0.1f, 0.1f + sin(m_anim[index] * 10));//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 8.0f);
-	m_widthAlpha[index].y = max(0.3f, 0.3f + sin(m_anim[index] * 10));//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 1.5f);
-	if (m_anim[index] > 0.4)
+	m_widthAlpha[index].x = max(0.15f, 0.15f + sin(m_anim[index] * 15) / 2.5f);//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 8.0f);
+	m_widthAlpha[index].y = max(0.3f, 0.3f + sin(m_anim[index] * 15) / 2.5f);//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 1.5f);
+	if (m_anim[index] > 0.3f)
 	{
-		m_didDamage[index] = false;
+		m_animOn[index] = false;
 		m_anim[index] = 0.0f;
 	}
-	if (!m_didDamage[index])
-	{
-		m_didDamage[index] = true;
-		return true;
-	}
-	return false;
 }
 
 void LineShots::draw(int index)

@@ -196,10 +196,54 @@ void GameState::handleInputs(Game* game, float dt)
 				// Use weapon
 				if (m_input->getTriggerR(i) > 0.2)
 				{
+					// dumb stuff for sniper
+					XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+					XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+					if (m_robots[i]->getCurrentWeapon(RIGHT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
+						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getReady())
+					{
+						m_robots[i]->getSniperLine(RIGHT, start, end);
+						m_lineShots.updateLineStatus(i, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int j = 0; j < 4; j++)
+						{
+							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								{
+									m_input->setVibration(j, 0.5f);
+									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+
 					m_robots[i]->useWeapon(RIGHT, dt);
 				}
 				if (m_input->getTriggerL(i) > 0.2)
 				{
+					// dumb stuff for sniper
+					XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+					XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+					if (m_robots[i]->getCurrentWeapon(LEFT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
+						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getReady())
+					{
+						m_robots[i]->getSniperLine(LEFT, start, end);
+						m_lineShots.updateLineStatus(i, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int j = 0; j < 4; j++)
+						{
+							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								{
+									m_input->setVibration(j, 0.5f);
+									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+
 					m_robots[i]->useWeapon(LEFT, dt);
 				}
 
@@ -534,28 +578,18 @@ bool GameState::update(Game* game, float dt)
 		{
 			m_robots[i]->update(dt, game->getQuadtree(), start, end);
 			m_lineShots.setColour(i, m_robots[i]->getColour());
-			// delete everything and do it all again but in a different way, we have a lot of time btw xD lets goooooooo
+
+			bool activated = false;
 			for (int side = 0; side < 2; side++)
 			{
 				if (m_robots[i]->getCurrentWeapon(side) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SNIPER)
 				{
-					if (m_lineShots.updateLineStatus(i, start, end, m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getActive(), dt))
-					{
-						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
-						for (int j = 0; j < 4; j++)
-						{
-							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
-							{
-								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
-								{
-									m_input->setVibration(j, 0.5f);
-									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getDamage(), end - start, -1);
-								}
-							}
-						}
-					}
+					activated = true;
+					m_lineShots.setActive(i, true);
+					m_lineShots.updateLineStatus(i, start, end, false, dt);
 				}
-			
+				if (!activated)
+					m_lineShots.setActive(i, false);
 			}
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;

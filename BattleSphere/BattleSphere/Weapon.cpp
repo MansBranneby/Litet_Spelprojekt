@@ -3,6 +3,8 @@
 Weapon::Weapon(int type)
 {
 	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
+	m_sniperLine[0] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_sniperLine[1] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_damage = 0;
 	m_type = type;
 	m_recoil = 0.0f;
@@ -55,8 +57,7 @@ Weapon::Weapon(int type)
 	else if (type == SNIPER)
 	{
 		m_damage = 30;
-		m_cooldown = 2.0f;
-		m_duration = 0.5f;
+		m_cooldown = 1.8f;
 
 		setScale(0.1f, 0.1f, 0.8f);
 	}
@@ -119,9 +120,20 @@ float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVEC
 	return m_currentDefense;
 }
 
+void Weapon::getSniperLine(XMVECTOR& start, XMVECTOR& end)
+{
+	start = m_sniperLine[0];
+	end = m_sniperLine[1];
+}
+
 bool Weapon::getActive()
 {
 	return m_cdTime < m_duration && !m_ready;
+}
+
+bool Weapon::getReady()
+{
+	return m_ready;
 }
 
 void Weapon::upgrade()
@@ -169,6 +181,15 @@ void Weapon::upgrade()
 			m_cooldown = 8.0f;
 		if (m_duration > 6.0)
 			m_duration = 6.0f;
+	}
+	else if (m_type == SNIPER)
+	{
+		m_cooldown -= 0.2f;
+		m_damage += 5;
+		if (m_cooldown < 1.0f)
+			m_cooldown = 1.0f;
+		if (m_damage > 50)
+			m_duration = 50;
 	}
 	else
 	{
@@ -304,8 +325,12 @@ void Weapon::updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot
 	dir2.y = XMVectorGetZ(dir);
 	float t = qtn->testCollisionRay(start2, dir2);
 	if (t == -1.0f)
-		t = 200.0f;
+		t = 400.0f;
 	end = start + dir * t;
+	//start = XMVectorSetY(start, 2.0f);
+	//end = XMVectorSetY(end, 2.0f);
+	m_sniperLine[0] = start;
+	m_sniperLine[1] = end;
 }
 
 bool Weapon::updateTime(float dt, XMVECTOR robotPos)

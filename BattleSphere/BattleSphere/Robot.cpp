@@ -133,6 +133,11 @@ XMVECTOR Robot::getColour()
 	return m_colour;
 }
 
+void Robot::getSniperLine(int side, XMVECTOR& start, XMVECTOR& end)
+{
+	m_weapons[m_currentWeapon[side]]->getSniperLine(start, end);
+}
+
 void Robot::useWeapon(int side, float dt)
 {
 	if (m_currentWeapon[side] != -1)
@@ -232,9 +237,9 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 	{
 		m_weapons[i]->updateTime(dt, getPosition());
 	}
-	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == SNIPER && m_weapons[m_currentWeapon[RIGHT]]->getActive())
+	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
-	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER && m_weapons[m_currentWeapon[LEFT]]->getActive())
+	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
 	
 }

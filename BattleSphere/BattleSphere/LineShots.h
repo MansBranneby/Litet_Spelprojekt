@@ -13,7 +13,7 @@ private:
 	XMVECTOR m_lines[MAX_USER][2];
 	XMFLOAT4 m_widthAlpha[MAX_USER];
 	float m_anim[MAX_USER];
-	bool m_didDamage[MAX_USER];
+	bool m_animOn[MAX_USER];
 	bool m_active[MAX_USER];
 	XMVECTOR m_colour[MAX_USER];
 
@@ -30,8 +30,9 @@ public:
 
 	void createVertexBuffer();
 	void setColour(int index, XMVECTOR colour);
+	void setActive(int index, bool active);
 
-	bool updateLineStatus(int index, XMVECTOR start, XMVECTOR end, bool active, float dt);
+	void updateLineStatus(int index, XMVECTOR start, XMVECTOR end, bool active, float dt);
 	void draw(int index);
 };
 

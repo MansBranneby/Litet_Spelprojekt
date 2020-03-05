@@ -17,6 +17,7 @@ class Weapon : public GameObject
 {
 private:
 	XMVECTOR m_relativePos;
+	XMVECTOR m_sniperLine[2];
 	int m_damage;
 	int m_type;
 	float m_recoil;
@@ -48,7 +49,9 @@ public:
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
+	bool getReady();
 	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
+	void getSniperLine(XMVECTOR &start, XMVECTOR &end);
 
 	void updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	bool updateTime(float dt, XMVECTOR robotPos);

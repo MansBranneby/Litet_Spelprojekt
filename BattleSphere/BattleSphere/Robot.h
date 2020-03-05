@@ -53,6 +53,7 @@ public:
 	bool isReady(float dt);
 	void setColour(float x, float y, float z);
 	XMVECTOR getColour();
+	void getSniperLine(int side, XMVECTOR &start, XMVECTOR &end);
 
 	void useWeapon(int side, float dt);
 	void changeWeapon(int side);
