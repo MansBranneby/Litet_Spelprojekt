@@ -40,6 +40,9 @@ private:
 	// Particles
 	Particles m_particles;
 
+	// Sound
+	float m_sawInterval;
+
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 

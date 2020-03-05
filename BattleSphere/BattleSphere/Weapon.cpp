@@ -91,6 +91,16 @@ float Weapon::getDamage()
 	return m_damage;
 }
 
+float Weapon::getSpinPerSec()
+{
+	return m_spinPerSec;
+}
+
+float Weapon::getSpinTime()
+{
+	return 1.0f / (m_spinPerSec * 4.0f / 360.0f + 0.01f);
+}
+
 float Weapon::getSpinDPS()
 {
 	return m_spinPerSec * m_damage;
@@ -193,7 +203,7 @@ void Weapon::upgrade()
 	{
 		m_cooldown = 0.0f;
 		m_damage += 0.02f;
-		m_scale *= 2.0f;
+		m_scale += 0.5f;
 		m_maxSpinPerSec += 200;
 		setScale(m_scale, 1.0f, m_scale);
 	}
@@ -254,7 +264,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		else
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
-		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, (float)m_damage, robotId);
 		if (m_type == PISTOL)
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
@@ -361,6 +371,8 @@ bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 			else
 			rotate(0, 1, 0, -m_spinPerSec * dt);
 		}
+
+		//Sound::getInstance()->play(soundAmbient::e_melee, robotPos, 0.1f * m_spinPerSec/m_maxSpinPerSec, 0.7f, 1.0f);
 		m_spinning = false;
 		return false;
 	}

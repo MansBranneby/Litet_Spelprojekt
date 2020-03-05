@@ -176,6 +176,7 @@ CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume, DirectX::
 					shortest = length;
 					collisionInfo.m_normal = normals[j];
 					collisionInfo.m_colliding = true;
+					collisionInfo.m_contactPoint = contactPoints[j];
 				}
 			}	
 		}

@@ -90,7 +90,7 @@ Particles::~Particles()
 	}
 }
 
-void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, XMVECTOR direction)
+void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, float lifeSpan, float spread, XMVECTOR direction)
 {
 	int nrToAdd = (amount > MAX_ADD || amount <= 0) ? MAX_ADD : amount;
 	bool dirGiven = XMVector3Equal(direction, XMVectorSet(0, 0, 0, 0)) ? false : true;
@@ -129,8 +129,8 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 		{
 			XMVECTOR randomZVec = XMVector3Normalize(XMVectorSet
 			(
-				randF(),
-				randF(),
+				randF() * spread,
+				randF() * spread,
 				1,
 				0
 			));
@@ -142,6 +142,7 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
 				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
 				size.m128_f32[0], size.m128_f32[1],
+				0.0f, lifeSpan,
 				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
 			};
 			m_particleToAdd.push_back(p);
@@ -165,6 +166,7 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
 				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
 				size.m128_f32[0], size.m128_f32[1],
+				0.0f, lifeSpan,
 				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
 			};
 			m_particleToAdd.push_back(p);
@@ -178,7 +180,19 @@ void Particles::addSpark(XMVECTOR impactPos, XMVECTOR projectileDir)
 	XMVECTOR dir = XMVector3Normalize(-projectileDir);
 	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
 	XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
-	addParticles(impactPos, col, size, 10, 5.0f, dir);
+	addParticles(impactPos, col, size, 20, 25.0f, 0.35f, 1.0f, dir);
+	//XMVECTOR dir = XMVectorSet(0,0,0,0);
+	//XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	//XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
+	//addParticles(impactPos, col, size, 1000, 25.0f, 1.0f, 1.0f, dir);
+}
+
+void Particles::addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir)
+{
+	XMVECTOR dir = XMVector3Normalize(sparkDir);
+	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.8f, 0.15f, 0.0f, 0.0f };
+	addParticles(cutPos, col, size, 100, 45.0f, 0.5f, 0.2f, dir);
 }
 
 void Particles::update(float dT)

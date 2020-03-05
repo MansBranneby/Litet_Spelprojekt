@@ -43,7 +43,7 @@ int Robot::getPlayerId()
 }
 
 
-bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex)
+bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool playSound)
 {
 	if (m_currentWeapon[RIGHT] != -1)
 		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
@@ -53,9 +53,11 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex)
 	if (projIndex != -1)
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 
+
 	if (damage != 0.0f)
 	{
-		Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
+		if (playSound)
+			Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
 		m_health -= damage;
 		if (m_health < 0)
 		{
@@ -66,7 +68,7 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex)
 		removeResource();
 		return true;
 	}
-	else
+	else if (playSound)
 		Sound::getInstance()->play(soundEffect::e_impact, getPosition(), 0.05f);
 	return false;
 }

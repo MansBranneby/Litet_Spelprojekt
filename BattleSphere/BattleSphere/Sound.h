@@ -22,9 +22,10 @@ enum class soundEffect
 	e_turnin = 6,
 	e_damage = 7,
 	e_impact = 8,
-	e_explosion = 9,
-	e_blast = 10,
-	e_traverse = 11
+	e_sawcut = 9,
+	e_explosion = 10,
+	e_blast = 11,
+	e_traverse = 12
 };
 
 enum class soundAmbient
@@ -32,8 +33,8 @@ enum class soundAmbient
 	e_background = 0,
 	e_drone = 1,
 	e_shield = 2,
-	e_car = 3,
-	e_melee = 4,
+	e_melee = 3,
+	e_car = 4,
 	e_path = 5
 };
 
@@ -50,7 +51,7 @@ enum class soundUI
 	e_back = 2,
 };
 
-#define NR_EFFECT_SOUNDS 9
+#define NR_EFFECT_SOUNDS 10
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
 #define NR_UI_SOUNDS 3

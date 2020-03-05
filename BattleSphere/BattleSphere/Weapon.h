@@ -51,6 +51,8 @@ public:
 	XMVECTOR getRelativePos();
 	int getType();
 	float getDamage();
+	float getSpinPerSec();
+	float getSpinTime();
 	float getSpinDPS();
 	float getRange();
 	float getRecoil();

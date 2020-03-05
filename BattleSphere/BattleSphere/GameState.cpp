@@ -3,19 +3,19 @@
 
 void GameState::spawnNodes()
 {
-	Node* node = new Node(rand() % 3);
+	Node* node = new Node(rand() % 2);
 	//node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 3);
+	node = new Node(rand() % 2);
 	//node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 3);
+	node = new Node(rand() % 2);
 	//node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 3);
+	node = new Node(rand() % 2);
 	//node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
@@ -91,7 +91,7 @@ void GameState::updateDynamicCamera(float dT)
 					newPos.m128_f32[2] += difference;
 					newLookAt.m128_f32[2] += difference;
 				}
-					m_zoomingOutToStart = false;
+				m_zoomingOutToStart = false;
 			}
 		}
 		else // If not zooming out
@@ -242,7 +242,7 @@ void GameState::handleInputs(Game* game, float dt)
 						// TODO: Robot position y is 1.9f so collsion mesh must be at y = 2, after that delete the radius * 2
 						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
 						bool collision = false;
-						for (int k = 0; k < cm.size(); k+=3)
+						for (int k = 0; k < cm.size(); k += 3)
 						{
 							unsigned int ind1 = k + 1;
 							unsigned int ind2 = k + 2;
@@ -365,7 +365,6 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
 					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
-
 					if (collisionInfo.m_colliding)
 					{
 						// Collision found, stop tests
@@ -427,7 +426,7 @@ GameState::GameState()
 	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	
+
 	// Skyscrapers
 	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
 	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
@@ -480,6 +479,8 @@ GameState::GameState()
 
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
+
+	m_sawInterval = 0.0f;
 }
 
 GameState::~GameState()
@@ -547,49 +548,80 @@ bool GameState::update(Game* game, float dt)
 	}
 
 	// Collision melee weapon
-	int nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr)
-			nrOfPlayers++;
-	}
-
-	for (int i = 0; i < nrOfPlayers; i++)
-	{
-		std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
-		int bladeIdx = -1;
-		int leftSide = m_robots[i]->getCurrentWeapon(LEFT);
-		if (weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE)
-			bladeIdx = m_robots[i]->getCurrentWeapon(RIGHT);
-		else if (leftSide != -1 && weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
-			bladeIdx = m_robots[i]->getCurrentWeapon(LEFT);
-
-		// If player is using Beyblade
-		if (bladeIdx != -1)
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			XMVECTOR beybladeRobPos = m_robots[i]->getPosition();
-			float beyBladeRange = weapons[bladeIdx]->getRange();
-			// Loop through and possibly damage other players
-			for (int j = 1; j < nrOfPlayers; j++)
-			{
-				int otherIdx = (i + j) % nrOfPlayers;
-				if (m_robots[otherIdx]->isDrawn())
-				{
-					XMVECTOR otherRobPos = m_robots[otherIdx]->getPosition();
-					XMVECTOR dirToVictim = beybladeRobPos - otherRobPos;
-					float beyBladeDamage = weapons[bladeIdx]->getSpinDPS() * dt;
 
-					// Beyblade is within range, damage player.
-					if (beyBladeDamage != 0.0f && XMVector3Length(dirToVictim).m128_f32[0] <= beyBladeRange)
+
+			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+			int bladeIdx = -1;
+			int leftSide = m_robots[i]->getCurrentWeapon(LEFT);
+			if (weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(RIGHT);
+			else if (leftSide != -1 && weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(LEFT);
+
+			// If player is using Beyblade
+			if (bladeIdx != -1)
+			{
+				float beybladeRange = weapons[bladeIdx]->getRange();
+				XMVECTOR beybladeRobPos = m_robots[i]->getPosition();
+				m_sawInterval += dt;
+
+				// Add spark if colliding with static objects
+				boundingData beybladeBD{
+					beybladeRobPos,
+					XMFLOAT2(beybladeRange, beybladeRange),
+					XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
+					XMVectorSet(0.0f, 0.0f, 0.f, 0.0f)
+				};
+				CollisionInfo colInfo;
+				colInfo = game->getQuadtree()->testCollision(beybladeBD, beybladeRobPos);
+				if (m_sawInterval > weapons[bladeIdx]->getSpinTime() && colInfo.m_colliding)
+				{
+					m_sawInterval = 0.0f;
+					Sound::getInstance()->play(soundEffect::e_sawcut, colInfo.m_contactPoint, 0.02f);
+					XMVECTOR cutDir = XMVector3Cross((colInfo.m_contactPoint - beybladeRobPos), XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+					m_particles.addCutSpark(colInfo.m_contactPoint, cutDir);
+				}
+
+
+				// Loop through and possibly damage other players
+				for (int j = 1; j < XUSER_MAX_COUNT; j++)
+				{
+					int otherIdx = (i + j) % XUSER_MAX_COUNT;
+					if (m_robots[otherIdx] != nullptr && m_robots[otherIdx]->isDrawn())
 					{
-						// Set vibration and drop resource
-						int resourceIndex = m_robots[otherIdx]->getResourceIndex();
-						m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1);
-						m_input->setVibration(otherIdx, 0.5f);
-						if (resourceIndex != -1)
+						XMVECTOR otherRobPos = m_robots[otherIdx]->getPosition();
+						XMVECTOR dirToVictim = otherRobPos - beybladeRobPos;
+						float disToVic = XMVector3Length(dirToVictim).m128_f32[0];
+						float beyBladeDamage = weapons[bladeIdx]->getSpinDPS() * dt;
+
+						// Beyblade is within range, damage player.
+						if (beyBladeDamage != 0.0f && disToVic <= beybladeRange)
 						{
-							m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
-							m_resources[resourceIndex]->setBlocked(false);
+							// Play sawcut sound and add spark
+							if (m_sawInterval > 1.0f / (weapons[bladeIdx]->getSpinPerSec() * 4.0f / 360.0f + 0.01f))
+							{
+								m_sawInterval = 0.0f;
+								Sound::getInstance()->play(soundEffect::e_sawcut, otherRobPos, 0.02f);
+
+								// Add spark
+								XMVECTOR dir = XMVector3Cross(dirToVictim, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+								XMVECTOR cutPos = beybladeRobPos + XMVector3Normalize(dirToVictim) * (disToVic - 1.54710078f);
+								m_particles.addCutSpark(cutPos, dir);
+							}
+
+							// Set vibration and drop resource
+							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
+							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false);
+							m_input->setVibration(otherIdx, 0.5f);
+							if (resourceIndex != -1)
+							{
+								m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
+								m_resources[resourceIndex]->setBlocked(false);
+							}
 						}
 					}
 				}
@@ -691,7 +723,7 @@ void GameState::draw(Game* game, renderPass pass)
 
 				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
 				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
-				game->getPreLoader()->draw(objectType::e_robot);	
+				game->getPreLoader()->draw(objectType::e_robot);
 
 				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
 				switch (wepType)

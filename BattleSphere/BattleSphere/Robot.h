@@ -43,7 +43,7 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
-	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex);
+	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool playSound = true);
 	void setHealth(float health);
 	float getHealth();
 	void setVelocity(float velocity);
