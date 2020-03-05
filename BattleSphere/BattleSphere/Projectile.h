@@ -22,7 +22,7 @@ private:
 	XMVECTOR m_direction;
 
 public:
-	Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner);
+	Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, float damage, int owner);
 
 	void setDirection(XMVECTOR relPos, XMVECTOR colour, int owner);
 

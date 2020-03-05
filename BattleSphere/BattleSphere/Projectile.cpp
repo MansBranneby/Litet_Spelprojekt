@@ -1,12 +1,12 @@
 #include "Projectile.h"
 
-Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner)
+Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, float damage, int owner)
 {
 	setPosition(pos);
 	setRotation(rot);
 	m_direction = dir;
 	m_type = type;
-	m_damage = (float)damage;
+	m_damage = damage;
 	m_velocity = 0.0f;
 	m_owner = owner;
 

@@ -82,7 +82,7 @@ public:
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
-	void loadModel(std::ifstream& in, ObjectType type);
+	void loadModel(std::ifstream& in, objectType type);
 	ID3D11ShaderResourceView* createTexture(std::string fileName);
 
 	

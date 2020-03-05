@@ -73,7 +73,7 @@ using namespace DirectX;
 #define BIGGEST_NORMAL_INDEX 6 // Update if adding resources!
 // Special - bigger than normal number - resources
 
-enum class ObjectType
+enum class objectType
 {
 	e_extra,
 	e_drone,

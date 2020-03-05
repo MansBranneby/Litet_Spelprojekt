@@ -710,7 +710,7 @@ void Model::loadModel(std::ifstream& in)
 	computeOBB(); // Calculate information for bounding volume data
 }
 
-void Model::loadModel(std::ifstream& in, ObjectType type)
+void Model::loadModel(std::ifstream& in, objectType type)
 {
 	std::string line;
 	std::istringstream inputStream;

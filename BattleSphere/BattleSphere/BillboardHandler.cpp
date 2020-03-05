@@ -7,16 +7,16 @@ BillboardHandler::BillboardHandler()
 BillboardHandler::BillboardHandler(PreLoader* preLoader)
 {
 	// Create as many billboards as submodels
-	for (int i = 0; i < preLoader->getNrOfVariants(ObjectType::e_billboard); ++i)
+	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_billboard); ++i)
 	{
-		for (int j = 0; j < preLoader->getNrOfModels(ObjectType::e_billboard, i); ++j)
+		for (int j = 0; j < preLoader->getNrOfModels(objectType::e_billboard, i); ++j)
 		{
 			if (j == 1)
 				float b = 10.0f;
 
-			for (int k = 0; k < preLoader->getNrOfSubModels(ObjectType::e_billboard, j, i); ++k)
+			for (int k = 0; k < preLoader->getNrOfSubModels(objectType::e_billboard, j, i); ++k)
 			{
-				BillboardData tempBillboardData = preLoader->getSubModelBillboardData(ObjectType::e_billboard, i, j, k);
+				BillboardData tempBillboardData = preLoader->getSubModelBillboardData(objectType::e_billboard, i, j, k);
 				m_billboards.push_back(Billboard(i, j, k, tempBillboardData)); // Each billboard knows its variantNr, modelNr and submodelNr
 			}
 		}
