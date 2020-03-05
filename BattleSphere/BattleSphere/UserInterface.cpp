@@ -2,7 +2,7 @@
 
 void UserInterface::setElementPos()
 {
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 36; i++)
 		m_elements[i]->setDrawn(false);
 	for (int i = 0; i < m_nrOfPlayers; i++) // Iterate players
 	{
