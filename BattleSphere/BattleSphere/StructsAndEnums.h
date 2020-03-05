@@ -68,8 +68,9 @@ using namespace DirectX;
 #define SHIELD 3
 #define DASH 4
 #define REFLECT 5
+#define BEYBLADE 6
 
-#define BIGGEST_NORMAL_INDEX 5 // Update if adding resources!
+#define BIGGEST_NORMAL_INDEX 6 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 

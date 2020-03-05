@@ -6,7 +6,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	setRotation(rot);
 	m_direction = dir;
 	m_type = type;
-	m_damage = damage;
+	m_damage = (float)damage;
 	m_velocity = 0.0f;
 	m_owner = owner;
 
@@ -48,7 +48,7 @@ int Projectile::getType()
 	return m_type;
 }
 
-int Projectile::getDamage()
+float Projectile::getDamage()
 {
 	return m_damage;
 }

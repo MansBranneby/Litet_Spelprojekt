@@ -499,14 +499,19 @@ void Model::setObjectData(objectData data, int modelNr)
 	updateSubResource();
 }
 
-void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
+void Model::setObjectData(objectData data, objectData relativeData, int modelNr, bool leftMaterial)
 {
 	setPosition(data.pos, relativeData.pos);
 	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	if (modelNr != -1)
-		m_subModels[modelNr].updateMaterialInfo(data.material);
+	{
+		if (leftMaterial)
+			m_subModels[modelNr].updateMaterialInfo(data.material);
+		else
+			m_subModels[modelNr].updateMaterialInfo(relativeData.material);
+	}
 	updateRelSubResource();
 }
 

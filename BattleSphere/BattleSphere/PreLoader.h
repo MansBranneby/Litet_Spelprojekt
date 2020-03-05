@@ -50,7 +50,7 @@ public:
 	void drawCM(objectType type, objectData data, objectData relativeData, int variant = 0);
 	void draw(objectType type, int variant = 0);
 	void draw(objectType type, objectData data, int modelNr = -1, int subModelNr = -1, int variant = 0);
-	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0);
+	void draw(objectType type, objectData data, objectData relativeData, int modelNr = -1, int subModelNr = -1, int variant = 0, bool leftMaterial = true);
 	void drawOneMaterial(objectType type, objectData data, int variant = 0);
 	void drawOneMaterial(objectType type, objectData data, objectData relativeData, int variant = 0);
 	void drawOneModel(objectType type, objectData data, int modelNr, int variant = 0);

@@ -16,7 +16,7 @@ class Weapon : public GameObject
 {
 private:
 	XMVECTOR m_relativePos;
-	int m_damage;
+	float m_damage;
 	int m_type;
 	float m_recoil;
 	float m_currentRecoil;
@@ -24,6 +24,12 @@ private:
 	float m_currentSpeed;
 	float m_defense;
 	float m_currentDefense;
+
+	bool m_spinning;
+	float m_scale;
+	float m_range;
+	float m_spinPerSec;
+	float m_maxSpinPerSec;
 
 	bool m_ready;
 	float m_cooldown;
@@ -39,11 +45,14 @@ public:
 	bool speedUp(XMVECTOR robotPos);
 	bool shield();
 	bool reflect();
+	bool spin(float dt);
 
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
 	int getType();
-	int getDamage();
+	float getDamage();
+	float getSpinDPS();
+	float getRange();
 	float getRecoil();
 	float getSpeed();
 	bool getActive();
