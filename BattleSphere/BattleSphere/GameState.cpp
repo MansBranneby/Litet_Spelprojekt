@@ -382,7 +382,8 @@ void GameState::handleInputs(Game* game, float dt)
 					newPos += collisionInfo.m_normal;
 				else break;
 			}
-
+			// TODO GLENN
+			//newPos = { 165.0f, 46.0f, 135.0f };
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
 		}
@@ -626,6 +627,20 @@ bool GameState::update(Game* game, float dt)
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
+	// Check if there's only one player alive
+	// If so then change to ScoreState
+	float nrOfDeadPlayers = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] == nullptr)
+			nrOfDeadPlayers++;
+	}
+	if (nrOfDeadPlayers == 3)
+	{
+		setPaused(true);
+		activateState(game, stateType::e_scoreState);
+	}
+
 	return 0;
 }
 
@@ -695,9 +710,13 @@ void GameState::draw(Game* game, renderPass pass)
 	else if (pass == renderPass::e_billboard)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+		std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
 
-		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+		for (int i = 0; i < BB.size(); ++i)
 			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+
+		for (int i = 0; i < staticBB.size(); ++i)
+			game->getPreLoader()->draw(ObjectType::e_static_billboard, staticBB[i].getBillboardData(), staticBB[i].getModelNr(), staticBB[i].getSubModelNumber(), staticBB[i].getVariant());
 	}
 
 }

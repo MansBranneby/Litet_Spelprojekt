@@ -47,7 +47,7 @@ private:
 
 public:
 	GameState(Game* game);
-	virtual ~GameState();
+	~GameState();
 
 	void pause();
 	void resume();
