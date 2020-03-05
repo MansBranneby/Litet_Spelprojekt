@@ -2,19 +2,19 @@
 
 void GameState::spawnNodes()
 {
-	Node* node = new Node(rand() % 2);
+	Node* node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 2);
+	node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(106.0f, 0.2f, -18.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 2);
+	node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(-100.0f, 0.3f, -50.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 90.0f);
 	m_nodes.push_back(node);
-	node = new Node(rand() % 2);
+	node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(-120.0f, 0.2f, -12.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
