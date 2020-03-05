@@ -101,8 +101,6 @@ bool Game::update(float dt)
 	return returnValue;
 }
 
-
-
 void Game::draw(renderPass pass)
 {
 	for (int i = 0; i < m_states.size(); i++)

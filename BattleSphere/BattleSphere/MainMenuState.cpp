@@ -531,10 +531,10 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 			{
 				
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
+				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 
-				game->getPreLoader()->draw(objectType::e_robot);
+				game->getPreLoader()->draw(ObjectType::e_robot);
 			}
 		}
 	}

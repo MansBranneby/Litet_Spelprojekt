@@ -177,6 +177,12 @@
     <ClCompile Include="Sound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Billboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BillboardHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicResources.h">
@@ -341,6 +347,15 @@
     <ClInclude Include="Sound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Billboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -355,12 +370,6 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="ComputeShaderVGaussian.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
     <FxCompile Include="VertexShaderFinalRender.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
@@ -370,28 +379,18 @@
     <FxCompile Include="PixelShaderDownsample.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="VertexShaderShadowMapping.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="GeometryShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="VertexShaderCulling.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
-    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="PixelShaderMenu.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="VertexShaderMenu.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
-    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
@@ -432,6 +431,14 @@
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="VertexShaderShadowMapping.hlsl" />
+    <FxCompile Include="ComputeShaderHGaussian.hlsl" />
+    <FxCompile Include="ComputeShaderVGaussian.hlsl" />
+    <FxCompile Include="PixelShaderBillboard.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
     <FxCompile Include="ComputeShaderHGaussian.hlsl" />
     <FxCompile Include="ComputeShaderVGaussian.hlsl" />
     <FxCompile Include="VertexShaderShadowMapping.hlsl" />

@@ -1,6 +1,6 @@
 #include "PreLoader.h"
 
-void PreLoader::loadFromFile(objectType type, std::string filename, std::string collisionFilename)
+void PreLoader::loadFromFile(ObjectType type, std::string filename, std::string collisionFilename)
 {
 	int typ = (int)type;
 	std::string line;
@@ -29,21 +29,21 @@ void PreLoader::loadFromFile(objectType type, std::string filename, std::string 
 	(collisionFilename == "") ? m_nrOfCMeshes[typ].push_back(0) : loadCollisionMesh(type, collisionFilename);
 }
 
-void PreLoader::setObjectData(objectType type, objectData data, int variant)
+void PreLoader::setObjectData(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].setObjectData(data);
 }
 
-void PreLoader::setObjectData(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::setObjectData(ObjectType type, objectData data, objectData relativeData, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].setObjectData(data, relativeData);
 }
 
-void PreLoader::loadCollisionMesh(objectType type, std::string filename)
+void PreLoader::loadCollisionMesh(ObjectType type, std::string filename)
 {
 	int typ = (int)type;
 	std::string line;
@@ -68,28 +68,28 @@ void PreLoader::loadCollisionMesh(objectType type, std::string filename)
 	setCMeshData(type, tempData, variant);
 }
 
-void PreLoader::setModelData(objectType type, objectData data, int variant)
+void PreLoader::setModelData(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].setObjectData(data);
 }
 
-void PreLoader::setModelData(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::setModelData(ObjectType type, objectData data, objectData relativeData, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].setObjectData(data, relativeData);
 }
 
-void PreLoader::setCMeshData(objectType type, objectData data, int variant)
+void PreLoader::setCMeshData(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++)
 		m_cMesh[typ][variant][i].setObjectData(data);
 }
 
-void PreLoader::setCMeshData(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::setCMeshData(ObjectType type, objectData data, objectData relativeData, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++)
@@ -110,19 +110,18 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
-	loadFromFile(objectType::e_projectile, "projectile", "1mesh1mat");
+	loadFromFile(ObjectType::e_projectile, "projectile", "1mesh1mat");
 
 	// On map (with collision)
-	loadFromFile(objectType::e_static, "Background\\SS", "SSColl");
-	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
-	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
-	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(ObjectType::e_static, "Background\\SS", "SSColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\Bar", "BarColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\Wall", "WallColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\GasStation", "GasStationColl");
 	//loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
-	loadFromFile(objectType::e_static, "OnMap\\Scenery", "SceneryColl");
-	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\Scenery", "SceneryColl");
+	loadFromFile(ObjectType::e_static, "Background\\Edge", "EdgeColl");
 		// Nodes
-	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
-	loadFromFile(objectType::e_static, "OnMap\\NodeGoldenDuck", "NodeGoldenDuckColl");
+	loadFromFile(ObjectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 
 		// Static Background (Skyscrapers with collision) // Later billboards?
 	//loadFromFile(objectType::e_static, "Background\\BSTower", "BSTowerColl");
@@ -130,20 +129,23 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
+	// Billboards
+	loadFromFile(ObjectType::e_billboard, "TestTower");
+	loadFromFile(ObjectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
-	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
-	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
+	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
+	loadFromFile(ObjectType::e_scene, "OnMap\\Apartment");
 
-	loadFromFile(objectType::e_scene, "Background\\Ground");
+	loadFromFile(ObjectType::e_scene, "Background\\Ground");
 	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
-	loadFromFile(objectType::e_scene, "Background\\Apartment2");
+	loadFromFile(ObjectType::e_scene, "Background\\Apartment2");
 	//loadFromFile(objectType::e_scene, "Background\\Background"); // Background plane
-	loadFromFile(objectType::e_scene, "Background\\SSB");
-	loadFromFile(objectType::e_scene, "Background\\BBScenery");
-	loadFromFile(objectType::e_scene, "Background\\Freeway");
-	loadFromFile(objectType::e_scene, "Other\\Car");
-	loadFromFile(objectType::e_extra, "Other\\CarDBO");
+	loadFromFile(ObjectType::e_scene, "Background\\SSB");
+	loadFromFile(ObjectType::e_scene, "Background\\BBScenery");
+	loadFromFile(ObjectType::e_scene, "Background\\Freeway");
+	loadFromFile(ObjectType::e_scene, "Other\\Car");
+	loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
 	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
 }
 
@@ -151,7 +153,7 @@ PreLoader::~PreLoader()
 {	
 	if (m_bFCuller) delete m_bFCuller;
 
-	for (int i = 0; i < OBJECT_TYPES; i++)
+	for (int i = 0; i < (int)ObjectType::e_nrOfEnums; i++)
 	{
 		for (int j = 0; j < m_objects[i].size(); j++)
 			if (m_objects[i][j]) delete[] m_objects[i][j];
@@ -160,47 +162,58 @@ PreLoader::~PreLoader()
 	}
 }
 
-objectData PreLoader::getBVObjectData(objectType type, int modelNr, int variant) const
+objectData PreLoader::getBVObjectData(ObjectType type, int modelNr, int variant) const
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getBVObjectData();
 }
 
-boundingData PreLoader::getBoundingData(objectType type, int modelNr, int variant) const
+boundingData PreLoader::getBoundingData(ObjectType type, int modelNr, int variant) const
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getBoundingData();
 }
 
-std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, int modelNr, int variant) const
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(ObjectType type, int modelNr, int variant) const
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh();
 }
 
-std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData data, int modelNr, int variant) const
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(ObjectType type, objectData data, int modelNr, int variant) const
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data);
 }
 
-std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant) const
+std::vector<XMFLOAT3> PreLoader::getCollisionMesh(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant) const
 {
 	int typ = (int)type;
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
-int PreLoader::getNrOfVariants(objectType type) const
+BillboardData PreLoader::getSubModelBillboardData(ObjectType type, int variant, int modelNr, int subModelNr)
+{
+	
+	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);;
+}
+
+int PreLoader::getNrOfVariants(ObjectType type) const
 {
 	return (int)m_objects[(int)type].size();
 }
 
-int PreLoader::getNrOfModels(objectType type, int variants) const
+int PreLoader::getNrOfModels(ObjectType type, int variant) const
 {
-	return m_nrOfmodels[(int)type][variants];
+	return m_nrOfmodels[(int)type][variant];
 }
 
-void PreLoader::setStaticData(objectType type, objectData data, int variant)
+int PreLoader::getNrOfSubModels(ObjectType type, int modelNr, int variant) const
+{
+	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
+}
+
+void PreLoader::setStaticData(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
@@ -213,14 +226,14 @@ void PreLoader::setStaticData(objectType type, objectData data, int variant)
 	}
 }
 
-void PreLoader::draw(objectType type, int variant)
+void PreLoader::draw(ObjectType type, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 		m_objects[typ][variant][i].draw();
 }
 
-void PreLoader::draw(objectType type, objectData data, int modelNr, int subModelNr, int variant)
+void PreLoader::draw(ObjectType type, objectData data, int modelNr, int subModelNr, int variant)
 {
 	int typ = (int)type;
 	if (modelNr != -1) 
@@ -244,14 +257,19 @@ void PreLoader::draw(objectType type, objectData data, objectData relativeData, 
 	}
 }
 
-void PreLoader::drawCM(objectType type, int variant)
+void PreLoader::draw(ObjectType type, BillboardData billboardData, int modelNr, int subModelNr, int variant)
+{
+	m_objects[(int)type][variant][modelNr].draw(billboardData, subModelNr);
+}
+
+void PreLoader::drawCM(ObjectType type, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++)
 		m_cMesh[typ][variant][i].draw();
 }
 
-void PreLoader::drawCM(objectType type, objectData data, int variant)
+void PreLoader::drawCM(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfCMeshes[typ][variant]; i++)
@@ -261,7 +279,7 @@ void PreLoader::drawCM(objectType type, objectData data, int variant)
 	}
 }
 
-void PreLoader::drawCM(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::drawCM(ObjectType type, objectData data, objectData relativeData, int variant)
 {
 	int typ = (int)type;
 	std::vector<int> a = m_nrOfCMeshes[typ];
@@ -272,7 +290,7 @@ void PreLoader::drawCM(objectType type, objectData data, objectData relativeData
 	}
 }
 
-void PreLoader::drawOneMaterial(objectType type, objectData data, int variant)
+void PreLoader::drawOneMaterial(ObjectType type, objectData data, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
@@ -285,7 +303,7 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, int variant)
 	}
 }
 
-void PreLoader::drawOneMaterial(objectType type, objectData data, objectData relativeData, int variant)
+void PreLoader::drawOneMaterial(ObjectType type, objectData data, objectData relativeData, int variant)
 {
 	int typ = (int)type;
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
@@ -298,41 +316,42 @@ void PreLoader::drawOneMaterial(objectType type, objectData data, objectData rel
 	}
 }
 
-void PreLoader::drawOneModel(objectType type, objectData data, int modelNr, int variant)
+void PreLoader::drawOneModel(ObjectType type, objectData data, int modelNr, int variant)
 {
 	int typ = (int)type;
 		m_objects[typ][variant][modelNr].setObjectData(data);
 		m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::drawOneModel(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+void PreLoader::drawOneModel(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant)
 {
 	int typ = (int)type;
 	m_objects[typ][variant][modelNr].setObjectData(data, relativeData);
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::drawOneModelAndMat(objectType type, objectData data, int modelNr, int variant)
+void PreLoader::drawOneModelAndMat(ObjectType type, objectData data, int modelNr, int variant)
 {
 	int typ = (int)type;
 	m_objects[typ][variant][modelNr].setAllObjectData(data);
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
+
+void PreLoader::drawOneModelAndMat(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant)
 {
 	int typ = (int)type;
 	m_objects[typ][variant][modelNr].setAllObjectData(data, relativeData);
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::setSubModelData(objectType type, objectData data, int modelNr, int subModelNr)
+void PreLoader::setSubModelData(ObjectType type, objectData data, int modelNr, int subModelNr)
 {
 	int typ = int(type);
 	m_objects[typ][0][modelNr].setObjectData(data, subModelNr);
 }
 
-void PreLoader::cull(objectType type, int variant)
+void PreLoader::cull(ObjectType type, int variant)
 {
 	m_bFCuller->turnOnCullingPipeline();
 	int typ = (int)type;
