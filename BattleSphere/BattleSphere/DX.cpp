@@ -175,6 +175,6 @@ void DX::release()
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
 	m_pDSStateEnabled->Release();
-	m_debug->Release();
+	if(m_debug)	m_debug->Release();
 	getDevice()->Release();
 }

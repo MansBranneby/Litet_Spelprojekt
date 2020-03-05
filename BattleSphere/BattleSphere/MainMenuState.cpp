@@ -316,7 +316,8 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		if (game->getRobots()[i] != nullptr)
 		{
 			game->getRobots()[i]->rotate(0.0f, 1.0f, 0.0f, dt * 20);
-			game->getRobots()[i]->update(dt);
+			XMVECTOR x, y; // Just here for the dumb call
+			game->getRobots()[i]->update(dt, game->getQuadtree(), x, y);
 		}
 			
 	}

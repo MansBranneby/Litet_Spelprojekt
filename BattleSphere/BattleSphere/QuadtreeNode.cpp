@@ -261,3 +261,82 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 	}
 	return false;
 }
+
+float QuadtreeNode::testCollisionRay(XMFLOAT2 start, XMFLOAT2 dir)
+{
+	XMFLOAT2 point[4];
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, m_boundingData.pos - m_boundingData.halfWD.x * m_boundingData.xAxis + m_boundingData.halfWD.y * m_boundingData.zAxis);//Top Left;
+	point[0].x = pos.x;
+	point[0].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos + m_boundingData.halfWD.x * m_boundingData.xAxis + m_boundingData.halfWD.y * m_boundingData.zAxis);//Top Right;
+	point[1].x = pos.x;
+	point[1].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos - m_boundingData.halfWD.x * m_boundingData.xAxis - m_boundingData.halfWD.y * m_boundingData.zAxis);//Bottom Left;
+	point[2].x = pos.x;
+	point[2].y = pos.z;
+	XMStoreFloat3(&pos, m_boundingData.pos + m_boundingData.halfWD.x * m_boundingData.xAxis - m_boundingData.halfWD.y * m_boundingData.zAxis);//Bottom Right;
+	point[3].x = pos.x;
+	point[3].y = pos.z;
+	bool collision = false;
+	if (start.x < point[1].x && start.x > point[0].x&& start.y > point[2].y&& start.y < point[0].y)
+		collision = true;
+
+	if (!collision)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&start) + XMLoadFloat2(&dir) * 300, XMLoadFloat2(&point[1]), XMLoadFloat2(&point[3]));
+	if (!collision)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&start) + XMLoadFloat2(&dir) * 300, XMLoadFloat2(&point[0]), XMLoadFloat2(&point[2]));
+	if (!collision)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&start) + XMLoadFloat2(&dir) * 300, XMLoadFloat2(&point[0]), XMLoadFloat2(&point[1]));
+	if (!collision)
+		collision = testLineLine(XMLoadFloat2(&start), XMLoadFloat2(&start) + XMLoadFloat2(&dir) * 300, XMLoadFloat2(&point[2]), XMLoadFloat2(&point[3]));
+
+	float t = -1.0f;
+	if (collision)
+	{
+		t = -1.0f;
+		if (m_children.size() == 0)
+		{
+			//Epic triangle collision detection :OO
+			//collision
+			for (int i = 0; i < m_cMeshes.size(); i += 3)
+			{
+				int ind1 = i + 1;
+				int ind2 = i + 2;
+
+				XMVECTOR triangles[3];
+				triangles[0] = XMLoadFloat3(&m_cMeshes[i]);
+				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
+				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
+
+				XMVECTOR startReal = { start.x, 0.5f, start.y };
+				XMVECTOR dirReal = { dir.x, 0.0f, dir.y };
+
+				float currT = testRayTriangle(startReal, dirReal, triangles);
+				if (currT != -1.0f)
+				{
+					//Check if lowest
+					if (t > currT || t == -1.0f)
+						t = currT;
+				}
+					
+			}
+			return t;
+		}
+		else
+		{
+			for (int i = 0; i < m_children.size(); i++)
+			{
+				float currT = m_children[i]->testCollisionRay(start, dir);
+				if (currT != -1.0f)
+				{
+					//Check if lowest
+					if (t > currT || t == -1.0f)
+						t = currT;
+				}
+			}
+			return t;
+		}
+	}
+	return -1.0f;
+}

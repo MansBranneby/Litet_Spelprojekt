@@ -3,6 +3,8 @@
 Weapon::Weapon(int type)
 {
 	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
+	m_sniperLine[0] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_sniperLine[1] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_damage = 0;
 	m_type = type;
 	m_recoil = 0.0f;
@@ -51,6 +53,13 @@ Weapon::Weapon(int type)
 		m_duration = 3.0f;
 		m_defense = 0.0f;
 		setScale(1.8f, 1.8f, 0.2f);
+	}
+	else if (type == SNIPER)
+	{
+		m_damage = 30;
+		m_cooldown = 1.8f;
+
+		setScale(0.1f, 0.1f, 0.8f);
 	}
 	else
 	{
@@ -111,9 +120,20 @@ float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVEC
 	return m_currentDefense;
 }
 
+void Weapon::getSniperLine(XMVECTOR& start, XMVECTOR& end)
+{
+	start = m_sniperLine[0];
+	end = m_sniperLine[1];
+}
+
 bool Weapon::getActive()
 {
-	return m_cdTime < m_duration;
+	return m_cdTime < m_duration && !m_ready;
+}
+
+bool Weapon::getReady()
+{
+	return m_ready;
 }
 
 void Weapon::upgrade()
@@ -161,6 +181,15 @@ void Weapon::upgrade()
 			m_cooldown = 8.0f;
 		if (m_duration > 6.0)
 			m_duration = 6.0f;
+	}
+	else if (m_type == SNIPER)
+	{
+		m_cooldown -= 0.2f;
+		m_damage += 5;
+		if (m_cooldown < 1.0f)
+			m_cooldown = 1.0f;
+		if (m_damage > 50)
+			m_duration = 50;
 	}
 	else
 	{
@@ -219,7 +248,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		else
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
 
-		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		ProjectileBank::getInstance()->addProjectile(projPos, robotColour, projRot, projDir, m_type, m_damage, robotId);
 		if (m_type == PISTOL)
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
@@ -227,6 +256,12 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 
 		return true;
 	}
+	else if (m_type == SNIPER && m_ready)
+	{
+		m_ready = false;
+		return true;
+	}
+
 	return false;
 }
 
@@ -262,6 +297,40 @@ bool Weapon::reflect()
 		return true;
 	}
 	return false;
+}
+
+void Weapon::updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
+{
+	
+	float rotInRad = XMConvertToRadians(rot);
+
+	start = XMVector3Rotate(
+		XMVectorSet(
+			XMVectorGetX(m_relativePos),
+			XMVectorGetY(m_relativePos),
+			0.0f, 0.0f),
+		XMVectorSet(0, (float)sin(rotInRad / 2), 0, (float)cos(rotInRad / 2))
+	) + robotPos;
+
+	XMVECTOR dir;
+	if (side)
+		dir = XMVector3Normalize(XMVector3Cross((start - robotPos), XMVectorSet(0, 1, 0, 0)));
+	else
+		dir = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), (start - robotPos)));
+
+	XMFLOAT2 start2, dir2;
+	start2.x = XMVectorGetX(start);
+	start2.y = XMVectorGetZ(start);
+	dir2.x = XMVectorGetX(dir);
+	dir2.y = XMVectorGetZ(dir);
+	float t = qtn->testCollisionRay(start2, dir2);
+	if (t == -1.0f)
+		t = 400.0f;
+	end = start + dir * t;
+	//start = XMVectorSetY(start, 2.0f);
+	//end = XMVectorSetY(end, 2.0f);
+	m_sniperLine[0] = start;
+	m_sniperLine[1] = end;
 }
 
 bool Weapon::updateTime(float dt, XMVECTOR robotPos)
