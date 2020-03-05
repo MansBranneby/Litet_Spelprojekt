@@ -12,7 +12,7 @@ private:
 public:
 	static ProjectileBank* getInstance();
 
-	void addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner);
+	void addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, float blastRange, int owner);
 	void removeProjectile(int index);
 	void moveProjectiles(float dt);
 	void changeDirection(int index, XMVECTOR relPos, XMVECTOR colour, int owner);

@@ -105,7 +105,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_drone, "Drone");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
-	loadFromFile(objectType::e_robot, "GamePlay\\BattleSphere", "BattleSphere");
+	loadFromFile(objectType::e_robot, "GamePlay\\BattleFish", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
 	loadFromFile(objectType::e_projectile, "untitled", "1mesh1mat");

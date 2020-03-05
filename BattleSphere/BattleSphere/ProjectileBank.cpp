@@ -14,9 +14,9 @@ ProjectileBank* ProjectileBank::getInstance()
 	return m_instance;
 }
 
-void ProjectileBank::addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner)
+void ProjectileBank::addProjectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, float blastRange, int owner)
 {
-	Projectile* proj = new Projectile(pos, colour, rot, dir, type, damage, owner);
+	Projectile* proj = new Projectile(pos, colour, rot, dir, type, damage, blastRange, owner);
 	m_projectiles.push_back(proj);
 }
 

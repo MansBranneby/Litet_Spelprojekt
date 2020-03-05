@@ -6,7 +6,6 @@
 #include "PixelShader.h"
 #include "ComputeShader.h"
 #include <DirectXMath.h>
-#include "ConstantBuffer.h"
 #include "Lights.h"
 #include <vector>
 #include <cmath>
@@ -99,7 +98,8 @@ enum class renderPass
 	e_menuScene,
 	e_opaque,
 	e_transparent,
-	e_shadow
+	e_shadow,
+	e_particles
 };
 
 enum class stateType

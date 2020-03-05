@@ -13,7 +13,6 @@ using namespace DirectX;
 #define RIFLE 1
 
 #define ENERGY_EXPLODE_TIME 0.15f
-#define ENERGY_EXPLODE_RADIUS 20.0f
 #define ENERGY_EXPLODE_FADETIME 0.5f
 class Projectile : public GameObject
 {
@@ -23,11 +22,12 @@ private:
 	int m_owner;
 	int m_type;
 	int m_damage;
+	float m_blastRange;
 	float m_velocity;
 	XMVECTOR m_direction;
 
 public:
-	Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner);
+	Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, float blastRange, int owner);
 
 	void setDirection(XMVECTOR relPos, XMVECTOR colour, int owner);
 
@@ -36,6 +36,7 @@ public:
 	int getDamage();
 	float getVelocity();
 	XMVECTOR getDirection();
+	float getBlastRange();
 	bool isExploding();
 	void explode();
 	bool move(float dt);

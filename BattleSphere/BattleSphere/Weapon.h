@@ -24,7 +24,7 @@ private:
 	float m_currentSpeed;
 	float m_defense;
 	float m_currentDefense;
-
+	float m_blastRange;
 	bool m_ready;
 	float m_cooldown;
 	float m_duration;

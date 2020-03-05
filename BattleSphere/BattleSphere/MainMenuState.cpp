@@ -44,7 +44,7 @@ MainMenuState::MainMenuState()
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 696.0f, -400.0f, 302.0f, 47.0f));
 
 	m_uiElements[2]->setAnimated(true);
-	Lights::getInstance()->addPointLight(0, 0, -10, 50, 1, 1, 1, 10);
+	//Lights::getInstance()->addPointLight(0, 0, -10, 50, 1, 1, 1, 10);
 }
 
 MainMenuState::~MainMenuState()
@@ -531,8 +531,9 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 			{
 				
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
+
+				//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);*/
 
 				game->getPreLoader()->draw(objectType::e_robot);
 			}

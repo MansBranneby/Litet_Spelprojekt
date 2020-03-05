@@ -126,7 +126,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
 	scd.OutputWindow = wndHandle;                           // the window to be used
 	scd.SampleDesc.Count = 1;                               // how many multisamples
-	scd.Windowed = false;                                    // windowed/full-screen mode
+	scd.Windowed = true;                                    // windowed/full-screen mode
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 
@@ -175,6 +175,6 @@ void DX::release()
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
 	m_pDSStateEnabled->Release();
-	m_debug->Release();
+	if(m_debug) m_debug->Release();
 	getDevice()->Release();
 }

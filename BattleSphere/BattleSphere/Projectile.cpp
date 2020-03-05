@@ -1,6 +1,6 @@
 #include "Projectile.h"
 
-Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, int owner)
+Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, float blastRange, int owner)
 {
 	setPosition(pos);
 	setRotation(rot);
@@ -13,6 +13,8 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	m_explodeTime = 0;
 	m_material.emission = colour;
 
+	m_material.emission.m128_f32[3] = 1;
+	m_blastRange = blastRange;
 
 	if (type == PISTOL)
 	{
@@ -27,7 +29,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	}
 	else if (type == ENERGY)
 	{
-		m_velocity = 40.0f;
+		m_velocity = 20.0f;
 		setScale(2.0f, 2.0f, 2.0f);
 		m_material.emission = XMVectorSet(0, 0, 0, -1);
 		m_material.specular = XMVectorSet(0, 0, 0, -1);
@@ -75,6 +77,11 @@ XMVECTOR Projectile::getDirection()
 	return m_direction;
 }
 
+float Projectile::getBlastRange()
+{
+	return m_blastRange;
+}
+
 bool Projectile::isExploding()
 {
 	return m_explode;
@@ -94,7 +101,7 @@ bool Projectile::move(float dt)
 		m_explodeTime += dt;
 		if(m_explodeTime < ENERGY_EXPLODE_TIME)
 		{
-			float scale = 2.0f + sin(m_explodeTime * XM_PI / (ENERGY_EXPLODE_TIME * 2)) * ENERGY_EXPLODE_RADIUS;
+			float scale = 2.0f + sin(m_explodeTime * XM_PI / (ENERGY_EXPLODE_TIME * 2)) * m_blastRange;
 			setScale(scale, scale, scale);
 		}
 		else
@@ -112,6 +119,7 @@ bool Projectile::move(float dt)
 	}
 	else {
 		GameObject::move(m_direction * dt * m_velocity);
+		
 	}
 	return false;
 }

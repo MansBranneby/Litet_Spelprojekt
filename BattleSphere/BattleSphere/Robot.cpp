@@ -10,7 +10,7 @@ Robot::Robot(int playerId)
 	m_currentWeapon[RIGHT] = 0;
 	m_score = 0;
 	m_resource = -1;
-	Weapon* pistol = new Weapon(ENERGY);
+	Weapon* pistol = new Weapon(RIFLE);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -41,7 +41,7 @@ int Robot::getPlayerId()
 }
 
 
-bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
+bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex, bool deleteProjectile)
 {
 	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
@@ -49,7 +49,7 @@ bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 	if (m_currentWeapon[LEFT] != -1)
 		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 
-	if (projIndex != -1)
+	if (projIndex != -1 && deleteProjectile)
 	{
 		
 		ProjectileBank::getInstance()->removeProjectile(projIndex);

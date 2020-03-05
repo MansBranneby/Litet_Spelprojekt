@@ -43,7 +43,8 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
-	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex);
+	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true);
+
 	void setHealth(int health);
 	int getHealth();
 	void setVelocity(float velocity);

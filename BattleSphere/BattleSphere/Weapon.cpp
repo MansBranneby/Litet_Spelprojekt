@@ -4,6 +4,7 @@ Weapon::Weapon(int type)
 {
 	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
 	m_damage = 0;
+	m_blastRange = 0;
 	m_type = type;
 	m_recoil = 0.0f;
 	m_cooldown = 0.0f;
@@ -55,9 +56,10 @@ Weapon::Weapon(int type)
 	else if (m_type == ENERGY)
 	{
 		m_damage = 20;
-		m_cooldown = 0.5f;
+		m_cooldown = 2.5f;
 		m_recoil = 0.0f;
 		setScale(3.8f, 3.8f, 1.8f);
+		m_blastRange = 20;
 	}
 	else
 	{
@@ -128,7 +130,11 @@ void Weapon::upgrade()
 	if (m_type == RIFLE)
 	{
 		m_damage += 2;
-		m_recoil -= 0.1f;
+		if (m_recoil > 0.2f)
+		{
+			m_recoil -= 0.1f;
+
+		}
 		m_cooldown -= 0.03f;
 		if (m_damage > 20)
 			m_damage = 20;
@@ -169,7 +175,16 @@ void Weapon::upgrade()
 		if (m_duration > 6.0)
 			m_duration = 6.0f;
 	}
-	
+	else if (m_type == ENERGY)
+	{
+		if(m_cooldown > 1.0f)
+			m_cooldown -= 0.2f;
+		if(m_blastRange < 60)
+			m_blastRange += 5;
+		if(m_damage < 60)
+			m_damage += 10;
+		
+	}
 	else
 	{
 		m_damage += 2;
@@ -226,8 +241,10 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			projDir = XMVector3Cross((projPos - robotPos), XMVectorSet(0, 1, 0, 0));
 		else
 			projDir = XMVector3Cross(XMVectorSet(0, 1, 0, 0), (projPos - robotPos));
-
-		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, robotId);
+		float random = float(rand() % 100 - 50) / 100;
+		projDir += (projPos - robotPos) * random * m_recoil;
+		projDir = XMVectorSetY(projDir, 0.0f);
+		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, m_blastRange, robotId);
 		if (m_type == PISTOL)
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
