@@ -679,7 +679,7 @@ bool GameState::update(Game* game, float dt)
 
 							// Set vibration and drop resource
 							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
-							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false);
+							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false, false);
 							m_input->setVibration(otherIdx, 0.5f);
 							if (resourceIndex != -1)
 							{
@@ -725,7 +725,6 @@ bool GameState::update(Game* game, float dt)
 
 
 			// Collision against static object found, remove projectile
-			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 
 			if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY)
 			{
@@ -763,6 +762,7 @@ bool GameState::update(Game* game, float dt)
 			else
 			{
 				// Add spark particles
+				Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 				m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
 				ProjectileBank::getInstance()->removeProjectile(i);
 			}
@@ -866,7 +866,7 @@ void GameState::draw(Game* game, renderPass pass)
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 
-	if (pass == renderPass::e_opaque)
+	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -874,8 +874,8 @@ void GameState::draw(Game* game, renderPass pass)
 			{
 				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
 
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
+				//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 				game->getPreLoader()->draw(objectType::e_robot);
 
 				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
@@ -906,6 +906,7 @@ void GameState::draw(Game* game, renderPass pass)
 				}
 			}
 		}
+		game->getPreLoader()->draw(objectType::e_ground);
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
 			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
@@ -925,7 +926,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 	}
-	else if (pass == renderPass::e_transparent)
+	else if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
 	{
 		// Scene (Background objects without collision)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
@@ -948,7 +949,7 @@ void GameState::draw(Game* game, renderPass pass)
 			{
 				if (pass != renderPass::e_shadow || ProjectileBank::getInstance()->getList()[i]->getType() != (int)ENERGY)
 					game->getPreLoader()->drawOneMaterial(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData());
-				//game->getPreLoader()->draw();
+				
 			}
 
 

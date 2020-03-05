@@ -44,7 +44,7 @@ int Robot::getPlayerId()
 }
 
 
-bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
+bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
 {
 	if (m_currentWeapon[RIGHT] != -1)
 		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);

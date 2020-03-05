@@ -292,7 +292,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			};
 		}
 		else {
-			fragmentCol += lightCol * 0.3f;
+			fragmentCol += lightCol.xyz * 0.3f;
 		}
 		
 	}
