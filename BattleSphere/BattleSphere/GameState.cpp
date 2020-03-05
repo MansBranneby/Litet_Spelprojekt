@@ -301,7 +301,8 @@ void GameState::handleInputs(Game* game, float dt)
 						int type = m_robots[i]->changeWeapon(RIGHT);
 						if (type != -1)
 						{
-							m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon());
+							//m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon());
+							m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
 						}
 					}
 
@@ -310,7 +311,8 @@ void GameState::handleInputs(Game* game, float dt)
 						int type = m_robots[i]->changeWeapon(LEFT);
 						if (type != -1)
 						{
-							m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon());
+							//m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon());
+							m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
 						}
 					}	
 				}

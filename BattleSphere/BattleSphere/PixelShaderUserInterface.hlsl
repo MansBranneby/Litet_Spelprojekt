@@ -18,10 +18,9 @@ float4 PS_main(VS_OUT input) : SV_Target
 {
 	float4 elementColour = elementTex.Sample(sampAni, input.tex).xyzw;
 	
-	if (colour.x != 0.0f && colour.y != 0.0f && colour.z != 0.0f)
+	if (colour.x != 0.0f || colour.y != 0.0f || colour.z != 0.0f)
 		elementColour.xyz = colour.xyz;
 	
 	elementColour.w *= input.alpha;
-
 	return elementColour;
 };

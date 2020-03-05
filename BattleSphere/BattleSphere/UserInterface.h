@@ -28,6 +28,7 @@ public:
 	void setPlayerColours(int playerIndex, XMVECTOR colour);
 	void setSlotID(int playerIndex, int abilityType);
 	void setSlotID(int playerIndex, int abilityType, int side, int newIndex);
+	void setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext);
 
 	void update();
 	void draw();
