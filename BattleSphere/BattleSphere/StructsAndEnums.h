@@ -66,7 +66,7 @@ using namespace DirectX;
 #define BEYBLADE 7
 #define ENERGY 1
 
-#define BIGGEST_NORMAL_INDEX 7 // Update if adding resources!
+#define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 
