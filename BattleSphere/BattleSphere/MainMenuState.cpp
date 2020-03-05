@@ -188,7 +188,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[robNrPlus13]->setDrawn(true); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
 				game->getRobots()[i]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
-				changeColour(game, i, true);
+				changeColour(game, robotNr, true);
 				m_readyState[robotNr]++;
 				break;
 			case 1:
@@ -228,14 +228,14 @@ void MainMenuState::hi_robotSelection(Game* game)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, i, true);
+			changeColour(game, robotNr, true);
 		}
 		//Left
 		if (game->getInput()->getThumbLX(i) < -0.4f && m_readyState[robotNr] == 1 && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, i, false);
+			changeColour(game, robotNr, false);
 		}
 
 	}
