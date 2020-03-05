@@ -1,10 +1,5 @@
 #pragma once
 #include "DX.h"
-#include "ConstantBuffer.h"
-#include "VertexShader.h"
-#include "GeometryShader.h"
-#include "PixelShader.h"
-#include "ComputeShader.h"
 #include <DirectXMath.h>
 #include "Lights.h"
 #include <vector>
@@ -44,8 +39,8 @@ using namespace DirectX;
 
 // Spawning
 #define START_SPAWNED_RESOURCES 4
-#define MAX_RESOURCES_OUT_PER_PLAYER 10 // Default 2
-#define SPAWN_INTERVAL 5.0f
+#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
+#define SPAWN_INTERVAL 30.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
 // Resource
@@ -67,29 +62,33 @@ using namespace DirectX;
 #define SHIELD 3
 #define DASH 4
 #define REFLECT 5
-#define ENERGY 6
-#define BIGGEST_NORMAL_INDEX 6 // Update if adding resources!
+#define SNIPER 6
+#define BEYBLADE 7
+#define ENERGY 8
+
+#define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 
-#define OBJECT_TYPES 10 // Nr of object types
+#define OBJECT_TYPES 9 // Nr of object types
 enum class objectType
 {
-	e_drone = 0,
-	e_weapon = 1,
-	e_robot = 2,
-	e_node = 3,
-	e_projectile = 4,
-	e_resource = 5,
-	e_scene = 6,
-	e_ground = 7,
-	e_static = 8,
-	e_extra
+	e_extra,
+	e_drone,
+	e_weapon,
+	e_robot,
+	e_node,
+	e_projectile,
+	e_resource,
+	e_scene,
+	e_static,
+	e_billboard,
+	e_nrOfEnums
 };
 
 enum class renderPass
 {
-	
+	e_billboard,
 	e_scene,
 	e_downSample,
 	e_final,
@@ -124,8 +123,6 @@ struct material
 	XMVECTOR emission = XMVectorSet(0.5f, 0, 0.5f, 0); // emission.xyz, opacity (d)
 };
 
-
-
 enum class uiType
 {
 	e_mainMenuSelection,
@@ -141,6 +138,40 @@ struct objectData
 	XMVECTOR rotation = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR scale = XMVectorSet(1, 1, 1, 0);
 	material material;
+};
+
+
+// Billboard effects
+enum class BillboardState
+{
+	e_flashing,
+	e_interpolating,
+	e_translating,
+	e_flashing_interpolating,
+	e_flashing_translating,
+	e_interpolating_translating,
+	e_all,
+	e_none
+};
+// Data used to animate texture
+struct BillboardData
+{
+	BillboardState state = BillboardState::e_none;
+	float colourChangeSpeed = 0.0f;
+	float padding[2];
+	// Translate
+	XMVECTOR velocityUV = DirectX::XMVectorZero();
+	// Interpolate
+	float colourDecider = 1.0f;
+	float colourChangeFactor = 0.0f;
+	float minY = 0.0f; // Max y coordinate of billboard
+	float maxY = 0.0f; // Min y coordinate of billboard
+	// Flash
+	float flashFactor = 0.0f;
+	float flashSpeed = 0.0f;
+	float padding1[2];
+	DirectX::XMVECTOR colourA = DirectX::XMVectorZero();
+	DirectX::XMVECTOR colourB = DirectX::XMVectorZero();
 };
 
 // Game update return data
@@ -170,16 +201,9 @@ struct vectorPairProjections {
 // Information acquired from collision detection
 struct CollisionInfo
 {
-	bool m_colliding;
-	DirectX::XMVECTOR m_normal;
-	DirectX::XMVECTOR m_contactPoint;
-
-	CollisionInfo()
-	{
-		m_colliding = false;
-		m_normal = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
-		m_contactPoint = DirectX::XMVECTOR{ 0.0f, 0.0f, 0.0f };
-	}
+	bool m_colliding = false;
+	DirectX::XMVECTOR m_normal{ 0.0f, 0.0f, 0.0f };
+	DirectX::XMVECTOR m_contactPoint{ 0.0f, 0.0f, 0.0f };
 };
 
 struct vertexAndId

@@ -3,6 +3,8 @@
 Weapon::Weapon(int type)
 {
 	m_relativePos = XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f);
+	m_sniperLine[0] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_sniperLine[1] = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_damage = 0;
 	m_blastRange = 0;
 	m_type = type;
@@ -11,11 +13,16 @@ Weapon::Weapon(int type)
 	m_duration = 0.0f;
 	m_speed = 1.0f;
 	m_cdTime = 0.0f;
+	m_range = 10.0f;
+	m_spinPerSec = 0.0f;
+	m_maxSpinPerSec = 0.0f;
+	m_scale = 1.0f;
 	m_ready = true;
 	m_currentRecoil = 0.0f;
 	m_currentSpeed = 1.0f;
 	m_currentDefense = 1.0f;
 	m_defense = 1.0f;
+	m_spinning = false;
 
 	if (type == RIFLE)
 	{
@@ -53,6 +60,25 @@ Weapon::Weapon(int type)
 		m_defense = 0.0f;
 		setScale(1.8f, 1.8f, 0.2f);
 	}
+	else if (type == SNIPER)
+	{
+		m_damage = 30;
+		m_cooldown = 1.8f;
+
+		setScale(0.1f, 0.1f, 0.8f);
+	}
+	else if (type == BEYBLADE)
+	{
+		m_cooldown = 0.0f;
+		m_speed = 1000;
+		m_damage = 0.08f;
+		m_range = 4.123295f; // Blade range
+		m_scale = 1.0f;
+		m_spinPerSec = 0.0f;
+		m_maxSpinPerSec = 700.0f;
+		m_relativePos = XMVectorSet(0.0f, -0.5f, 0.0f, 0.0f);
+		setEmission(0.5f, 0.5f, 0.5f, -1);
+	}
 	else if (m_type == ENERGY)
 	{
 		m_damage = 20;
@@ -78,9 +104,29 @@ int Weapon::getType()
 	return m_type;
 }
 
-int Weapon::getDamage()
+float Weapon::getDamage()
 {
 	return m_damage;
+}
+
+float Weapon::getSpinPerSec()
+{
+	return m_spinPerSec;
+}
+
+float Weapon::getSpinTime()
+{
+	return 1.0f / (m_spinPerSec * 4.0f / 360.0f + 0.01f);
+}
+
+float Weapon::getSpinDPS()
+{
+	return m_spinPerSec * m_damage;
+}
+
+float Weapon::getRange()
+{
+	return m_range * m_scale + +1.54710078f; // Blade range + robot range
 }
 
 float Weapon::getRecoil()
@@ -93,7 +139,7 @@ float Weapon::getSpeed()
 	return m_currentSpeed;
 }
 
-float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int &projIndex)
+float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex)
 {
 	if (m_type == DASH && m_cdTime < m_duration + 0.1f && !m_ready)
 	{
@@ -113,16 +159,27 @@ float Weapon::getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVEC
 			XMVector3Rotate(
 				XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
 				XMVectorSet(0, (float)sin(rotInRad / 2), 0, (float)cos(rotInRad / 2))
-				);
+			);
 		if (XMVectorGetX(XMVector3Dot(projDir, robotDir)) > 0.0f)
 			return 1.0f;
 	}
 	return m_currentDefense;
 }
 
+void Weapon::getSniperLine(XMVECTOR& start, XMVECTOR& end)
+{
+	start = m_sniperLine[0];
+	end = m_sniperLine[1];
+}
+
 bool Weapon::getActive()
 {
-	return m_cdTime < m_duration;
+	return m_cdTime < m_duration && !m_ready;
+}
+
+bool Weapon::getReady()
+{
+	return m_ready;
 }
 
 void Weapon::upgrade()
@@ -175,6 +232,25 @@ void Weapon::upgrade()
 		if (m_duration > 6.0)
 			m_duration = 6.0f;
 	}
+	else if (m_type == SNIPER)
+	{
+		m_cooldown -= 0.2f;
+		m_damage += 5;
+		if (m_cooldown < 1.0f)
+			m_cooldown = 1.0f;
+		if (m_damage > 50)
+			m_duration = 50;
+	}
+	else if (m_type == BEYBLADE)
+	{
+		if (m_damage < 0.2f)
+			m_damage += 0.02f;
+		if (m_scale < 2.5f) 
+			m_scale += 0.5f;
+		if (m_maxSpinPerSec < 2000)
+			m_maxSpinPerSec += 200;
+		setScale(m_scale, 1.0f, m_scale);
+	}
 	else if (m_type == ENERGY)
 	{
 		if(m_cooldown > 1.0f)
@@ -195,7 +271,7 @@ void Weapon::upgrade()
 		if (m_cooldown < 0.1f)
 			m_cooldown = 0.1f;
 	}
-	
+
 	/*
 	if (m_damage > 25.0f) m_damage = 25.0f;
 	if (m_recoil < 0.0f) m_recoil = 0.0f;
@@ -228,7 +304,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		if (m_currentRecoil >= m_recoil)
 			m_currentRecoil = 0.0f;
 
-		// TODO add recoil here 
+		// TODO add recoil here
 		if (m_recoil / 2 <= m_currentRecoil)
 			rotate(XMVectorSet(0.0, 1.0, 0.0f, rot));
 		else
@@ -244,7 +320,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		float random = float(rand() % 100 - 50) / 100;
 		projDir += (projPos - robotPos) * random * m_recoil;
 		projDir = XMVectorSetY(projDir, 0.0f);
-		ProjectileBank::getInstance()->addProjectile(projPos+projDir, robotColour, projRot, projDir, m_type, m_damage, m_blastRange, robotId);
+		ProjectileBank::getInstance()->addProjectile(projPos, robotColour, projRot, projDir, m_type, (float)m_damage, robotId);
 		if (m_type == PISTOL)
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
@@ -252,6 +328,12 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 
 		return true;
 	}
+	else if (m_type == SNIPER && m_ready)
+	{
+		m_ready = false;
+		return true;
+	}
+
 	return false;
 }
 
@@ -289,33 +371,107 @@ bool Weapon::reflect()
 	return false;
 }
 
+void Weapon::updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
+{
+	
+	float rotInRad = XMConvertToRadians(rot);
+
+	start = XMVector3Rotate(
+		XMVectorSet(
+			XMVectorGetX(m_relativePos),
+			XMVectorGetY(m_relativePos),
+			0.0f, 0.0f),
+		XMVectorSet(0, (float)sin(rotInRad / 2), 0, (float)cos(rotInRad / 2))
+	) + robotPos;
+
+	XMVECTOR dir;
+	if (side)
+		dir = XMVector3Normalize(XMVector3Cross((start - robotPos), XMVectorSet(0, 1, 0, 0)));
+	else
+		dir = XMVector3Normalize(XMVector3Cross(XMVectorSet(0, 1, 0, 0), (start - robotPos)));
+
+	XMFLOAT2 start2, dir2;
+	start2.x = XMVectorGetX(start);
+	start2.y = XMVectorGetZ(start);
+	dir2.x = XMVectorGetX(dir);
+	dir2.y = XMVectorGetZ(dir);
+	float t = qtn->testCollisionRay(start2, dir2);
+	if (t == -1.0f)
+		t = 400.0f;
+	end = start + dir * t;
+	//start = XMVectorSetY(start, 2.0f);
+	//end = XMVectorSetY(end, 2.0f);
+	m_sniperLine[0] = start;
+	m_sniperLine[1] = end;
+}
+
+bool Weapon::spin(float dt)
+{
+	if ((m_type == BEYBLADE))
+	{
+		m_spinning = true;
+		return true;
+	}
+	return false;
+}
+
 bool Weapon::updateTime(float dt, XMVECTOR robotPos)
 {
-	if (!m_ready)
+	if (m_type != BEYBLADE)
 	{
-		m_cdTime += dt;
-		if (m_cdTime < m_duration) // Using ability
+		if (!m_ready)
 		{
-			m_currentSpeed = m_speed;
-			m_currentDefense = m_defense;
-			if (m_type == SHIELD || m_type == REFLECT)
-				Sound::getInstance()->play(soundAmbient::e_shield, robotPos, 0.9f);
-			return true;
+			m_cdTime += dt;
+			if (m_cdTime < m_duration) // Using ability
+			{
+				m_currentSpeed = m_speed;
+				m_currentDefense = m_defense;
+				if (m_type == SHIELD || m_type == REFLECT)
+					Sound::getInstance()->play(soundAmbient::e_shield, robotPos, 0.9f);
+				return true;
+			}
+			else if (m_cdTime > m_duration + m_cooldown) // Ability ready again
+			{
+				m_cdTime = 0.0f;
+				m_ready = true;
+			}
+			else
+			{
+				if (m_type == SHIELD || m_type == REFLECT)
+					Sound::getInstance()->stop(soundAmbient::e_shield);
+			}
 		}
-		else if (m_cdTime > m_duration + m_cooldown) // Ability ready again
+		m_currentSpeed = 1.0f;
+		m_currentDefense = 1.0f;
+
+		if (m_type == BEYBLADE)
 		{
-			m_cdTime = 0.0f;
-			m_ready = true;
+
+		}
+		return false;
+	}
+	else
+	{
+		if (m_spinning)
+		{
+			m_spinPerSec += m_maxSpinPerSec / 3.0f * dt;
+			if (m_spinPerSec > m_maxSpinPerSec)
+				m_spinPerSec = m_maxSpinPerSec;
+			rotate(0, 1, 0, -m_spinPerSec * dt);
 		}
 		else
 		{
-			if (m_type == SHIELD || m_type == REFLECT)
-				Sound::getInstance()->stop(soundAmbient::e_shield);
+			m_spinPerSec -= m_maxSpinPerSec / 2.0f * dt;
+			if (m_spinPerSec < 0)
+				m_spinPerSec = 0.0f;
+			else
+			rotate(0, 1, 0, -m_spinPerSec * dt);
 		}
+
+		//Sound::getInstance()->play(soundAmbient::e_melee, robotPos, 0.1f * m_spinPerSec/m_maxSpinPerSec, 0.7f, 1.0f);
+		m_spinning = false;
+		return false;
 	}
-	m_currentSpeed = 1.0f;
-	m_currentDefense = 1.0f;
-	return false;
 }
 
 void Weapon::setRelativePos(XMVECTOR pos)

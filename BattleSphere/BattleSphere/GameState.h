@@ -9,6 +9,9 @@
 #include "SpawnDrone.h"
 #include "Particles.h"
 #include "Sound.h"
+#include "Node.h"
+#include "LineShots.h"
+#include "BillboardHandler.h"
 
 class GameState : public State 
 {
@@ -18,8 +21,10 @@ private:
 	Robot** m_robots;
 	std::vector<Resource*> m_resources;
 	std::vector<Node*> m_nodes;
+	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
 	Transparency m_transparency;
+	LineShots m_lineShots;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;
@@ -40,11 +45,14 @@ private:
 	// Particles
 	Particles m_particles;
 
+	// Sound
+	float m_sawInterval;
+
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 
 public:
-	GameState();
+	GameState(Game* game);
 	virtual ~GameState();
 
 	void pause();

@@ -4,7 +4,7 @@ void Model::computeOBB()
 {
 	const int nrOfPairs = 179;
 
-	// Get 1 degree rotation matrix
+	// Get 1 degree rotation matrix wa 
 	float vx = 0.0f;
 	float vy = 1.0f; // Rotate around the Y-axis
 	float vz = 0.0f;
@@ -114,6 +114,15 @@ void Model::computeOBB()
 	m_bData.zAxis = pair[bestPairIndex].vec2;
 }
 
+void Model::computeMinMaxY()
+{
+	for (int i = 0; i < m_nrOfVertices; ++i)
+	{	
+		m_minY = min(m_minY, m_vertices[i].posY);
+		m_maxY = max(m_maxY, m_vertices[i].posY);
+	}
+}
+
 void Model::createVertexBuffer()
 {
 	m_modelMatrixData = new XMMATRIX();
@@ -192,10 +201,23 @@ void Model::draw()
 	UINT32 offset = 0;
 	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
 	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
+
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		m_subModels[i].draw();
 	}
+}
+
+void Model::draw(BillboardData BillboardData, int subModelNr)
+{
+	UINT32 vertexSize = sizeof(vertex);
+	UINT32 offset = 0;
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(1, 1, &m_matrixCBuffer);
+	BillboardData.minY = m_minY;
+	BillboardData.maxY = m_maxY;
+
+	m_subModels[subModelNr].draw(BillboardData);
 }
 
 void Model::cullDraw()
@@ -234,6 +256,9 @@ Model::Model()
 	m_vertexBuffer = nullptr;
 	m_vertexCullingBuffer = nullptr;
 	m_vertexAndId = nullptr;
+
+	m_minY = INFINITY;
+	m_maxY = -INFINITY;
 }
 
 Model::~Model()
@@ -488,6 +513,16 @@ std::vector<XMFLOAT3> Model::getCollisionMesh(objectData data, objectData relati
 	return updatedVertices;
 }
 
+BillboardData Model::getSubModelBillboardData(int subModelNr)
+{
+	return  m_subModels[subModelNr].getBillboardData();
+}
+
+int Model::getNrOfSubModels() const
+{
+	return m_nrOfSubModels;
+}
+
 void Model::setObjectData(objectData data, int modelNr)
 {
 	setPosition(data.pos);
@@ -499,14 +534,19 @@ void Model::setObjectData(objectData data, int modelNr)
 	updateSubResource();
 }
 
-void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
+void Model::setObjectData(objectData data, objectData relativeData, int modelNr, bool leftMaterial)
 {
 	setPosition(data.pos, relativeData.pos);
 	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	if (modelNr != -1)
-		m_subModels[modelNr].updateMaterialInfo(data.material);
+	{
+		if (leftMaterial)
+			m_subModels[modelNr].updateMaterialInfo(data.material);
+		else
+			m_subModels[modelNr].updateMaterialInfo(relativeData.material);
+	}
 	updateRelSubResource();
 }
 
@@ -611,10 +651,11 @@ void Model::loadModel(std::ifstream& in)
 		inputStream.clear();
 
 		// Diffuse texture
-
+		std::string hey;
 		std::getline(in, line);
-
-		//?
+		inputStream.str(line);
+		inputStream >> hey;
+		inputStream.clear();
 
 		// Refraction
 		std::getline(in, line);
@@ -711,6 +752,7 @@ void Model::loadModel(std::ifstream& in, objectType type)
 
 	m_subModels = new SubModel[m_nrOfSubModels];
 	material tempMat;
+	ID3D11ShaderResourceView* tempSRV;
 	for (int i = 0; i < m_nrOfSubModels; i++)
 	{
 		// Ambient
@@ -743,9 +785,20 @@ void Model::loadModel(std::ifstream& in, objectType type)
 		inputStream >> tempMat.specular.m128_f32[3];
 		inputStream.clear();
 
-		// Diffuse texture
-
+		//// Diffuse texture
 		std::getline(in, line);
+		std::string textureString = line.substr(0, line.find("{"));
+		if (!textureString.empty() && *textureString.rbegin() == ' ')
+			textureString.erase(textureString.length() - 1, 1);
+		inputStream.str(textureString);
+		tempSRV = createTexture(inputStream.str()); // Create texture
+		inputStream.clear();
+
+		// Set submodel texture
+		m_subModels[i].setSRV(tempSRV);
+
+		// Billboard data
+		m_subModels[i].setBillboardData(getBillboardDataFromFile(line));
 
 		//?
 
@@ -770,7 +823,7 @@ void Model::loadModel(std::ifstream& in, objectType type)
 
 		// Set submodel material
 		m_subModels[i].setMaterialInfo(tempMat);
-
+	
 		// Get number of indices
 		int nrOfIndices = 0;
 		std::getline(in, line);
@@ -782,14 +835,18 @@ void Model::loadModel(std::ifstream& in, objectType type)
 		int* indices = new int[nrOfIndices];
 		for (int j = 0; j < nrOfIndices; j += 3)
 		{
+			int index0 = j;
+			int index1 = j + 1;
+			int index2 = j + 2;
+
 			std::getline(in, line);
 			inputStream.str(line);
-			inputStream >> indices[j] >> indices[j + 1] >> indices[j + 2];
+			inputStream >> indices[index0] >> indices[index1] >> indices[index2];
 
 			// Save vertex indices 
-			m_indices.push_back(indices[j]);
-			m_indices.push_back(indices[j + 1]);
-			m_indices.push_back(indices[j + 2]);
+			m_indices.push_back(indices[index0]);
+			m_indices.push_back(indices[index1]);
+			m_indices.push_back(indices[index2]);
 			inputStream.clear();
 		}
 		m_subModels[i].setFaces(indices, nrOfIndices);
@@ -801,4 +858,126 @@ void Model::loadModel(std::ifstream& in, objectType type)
 	// Create bounding volume
 	computeOBB(); // Calculate information for bounding volume data
 
+	computeMinMaxY(); // Calculate min and max y for billboard colour interpolation 
+}
+
+ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
+{
+	ID3D11ShaderResourceView* tempSRV = nullptr;
+
+	if (fileName != "\r" && fileName != "")
+	{
+		std::wstring wFileName(fileName.length(), L' ');
+		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
+
+		HRESULT hr = CoInitialize(NULL);
+		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &tempSRV);
+
+		if (FAILED(hr))
+			MessageBox(NULL, L"Error createTexture in Model.cpp", L"Error", MB_OK | MB_ICONERROR);
+	}
+
+	return tempSRV;
+}
+
+BillboardData Model::getBillboardDataFromFile(std::string line)
+{
+	BillboardData data;
+
+	std::istringstream inputStream;
+	std::string FIT;
+	size_t start, end, startInterpolate, endInterpolate, startTranslate, endTranslate;
+	std::string token, colourString, translateString;
+	std::istringstream colours, translation;
+	bool flashing = false, interpolating = false, translating = false;
+
+	if (line != "" && line != "\r")
+	{
+		start = line.find("{");
+		line.erase(0, start);
+
+		while ( (start = line.find("{")) != std::string::npos)
+		{
+			start += 1;
+			end = line.find("}") - start;
+			token = line.substr(start , end);
+			inputStream.str(token);
+			inputStream >> FIT;
+
+			if (FIT == "F")
+			{
+				flashing = true;
+				// How fast material blinks
+				inputStream >> data.flashSpeed;
+			}
+			else if (FIT == "I")
+			{
+				interpolating = true;
+				// How fast model interpolated between colours
+				inputStream >> data.colourChangeSpeed;
+
+				std::getline(inputStream, colourString);
+
+				// Remove parantheses
+				startInterpolate = colourString.find('(') + 1;
+				endInterpolate = colourString.find(')') - startInterpolate;
+				token = colourString.substr(startInterpolate, endInterpolate);
+				colours.clear();
+				colours.str(token);
+
+				// Colour A
+				colours >> data.colourA.m128_f32[0];
+				colours >> data.colourA.m128_f32[1];
+				colours >> data.colourA.m128_f32[2];
+				colours >> data.colourB.m128_f32[3];
+
+				// Remove parantheses
+				startInterpolate = colourString.find_last_of('(') + 1;
+				endInterpolate = colourString.find_last_of(')') - startInterpolate;
+				token = colourString.substr(startInterpolate, endInterpolate);
+				colours.clear();
+				colours.str(token);
+				
+				// Colour B
+				colours >> data.colourB.m128_f32[0];
+				colours >> data.colourB.m128_f32[1];
+				colours >> data.colourB.m128_f32[2];
+				colours >> data.colourB.m128_f32[3];
+			}
+			else if (FIT == "T")
+			{
+				translating = true;
+				std::getline(inputStream, translateString);
+				// Remove parantheses
+				startTranslate = translateString.find('(') + 1;
+				endTranslate = translateString.find(')') - startTranslate;
+				token = translateString.substr(startTranslate, endTranslate);
+				translation.str(token);
+
+				translation >> data.velocityUV.m128_f32[0];
+				translation >> data.velocityUV.m128_f32[1];
+				translation >> data.velocityUV.m128_f32[2];
+			}
+
+			inputStream.clear();
+			line.erase(0, start + end + 1);
+		}
+	}
+
+	if (flashing && !interpolating && !translating)
+		data.state = BillboardState::e_flashing;
+	else if (!flashing && interpolating && !translating)
+		data.state = BillboardState::e_interpolating;
+	else if (!flashing && !interpolating && translating)
+		data.state = BillboardState::e_translating;
+	else if (flashing && interpolating && !translating)
+		data.state = BillboardState::e_flashing_interpolating;
+	else if (flashing && !interpolating && translating)
+		data.state = BillboardState::e_flashing_translating;
+	else if (!flashing && interpolating && translating)
+		data.state = BillboardState::e_interpolating_translating;
+	else if (flashing && interpolating && translating)
+		data.state = BillboardState::e_all;
+
+	return data;
 }

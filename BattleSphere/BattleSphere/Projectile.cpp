@@ -1,6 +1,6 @@
 #include "Projectile.h"
 
-Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, int damage, float blastRange, int owner)
+Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir, int type, float damage, float blastRange, int owner)
 {
 	setPosition(pos);
 	setRotation(rot);
@@ -62,7 +62,7 @@ int Projectile::getType()
 	return m_type;
 }
 
-int Projectile::getDamage()
+float Projectile::getDamage()
 {
 	return m_damage;
 }

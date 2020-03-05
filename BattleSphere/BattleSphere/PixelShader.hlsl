@@ -9,6 +9,7 @@ struct PS_IN
 	float2 tex : TEXCOORDS;
 	float3 nor : NORMAL;
 };
+
 struct Light {
 	int Enabled;
 	int Type;
@@ -40,15 +41,15 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 cbuffer PS_ROBOT_DATA : register (b4) 
 {
 	float4 playerPosition[4];
-
 };
+
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
 }
+
 float DoSpotCone(Light light, float4 L)
 {
-	
 	float minCos = cos(radians(light.SpotlightAngle));
 	float maxCos = lerp(minCos, 1, 0.5f);
 	float cosAngle = dot(normalize(light.Direction), -L.xyz);
@@ -100,6 +101,7 @@ Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
+
 float4 PS_main(PS_IN input) : SV_Target
 {
 
@@ -318,6 +320,6 @@ float4 PS_main(PS_IN input) : SV_Target
 		}
 
 	}
-	
-	return float4(fragmentCol, KeIn.w);
+
+	return float4(fragmentCol , KeIn.w);
 };

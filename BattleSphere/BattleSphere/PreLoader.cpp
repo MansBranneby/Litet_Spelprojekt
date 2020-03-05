@@ -104,7 +104,9 @@ PreLoader::PreLoader()
 	// Load objects
 	loadFromFile(objectType::e_drone, "Drone");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_weapon, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
+	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleFish", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
@@ -128,6 +130,9 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
+	// Billboards
+	loadFromFile(objectType::e_billboard, "TestTower");
+	loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTown"); // Later to static
@@ -149,7 +154,7 @@ PreLoader::~PreLoader()
 {	
 	if (m_bFCuller) delete m_bFCuller;
 
-	for (int i = 0; i < OBJECT_TYPES; i++)
+	for (int i = 0; i < (int)objectType::e_nrOfEnums; i++)
 	{
 		for (int j = 0; j < m_objects[i].size(); j++)
 			if (m_objects[i][j]) delete[] m_objects[i][j];
@@ -188,14 +193,25 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 	return m_cMesh[typ][variant][modelNr].getCollisionMesh(data, relativeData);
 }
 
+BillboardData PreLoader::getSubModelBillboardData(objectType type, int variant, int modelNr, int subModelNr)
+{
+	
+	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);;
+}
+
 int PreLoader::getNrOfVariants(objectType type) const
 {
 	return (int)m_objects[(int)type].size();
 }
 
-int PreLoader::getNrOfModels(objectType type, int variants) const
+int PreLoader::getNrOfModels(objectType type, int variant) const
 {
-	return m_nrOfmodels[(int)type][variants];
+	return m_nrOfmodels[(int)type][variant];
+}
+
+int PreLoader::getNrOfSubModels(objectType type, int modelNr, int variant) const
+{
+	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
 }
 
 void PreLoader::setStaticData(objectType type, objectData data, int variant)
@@ -230,16 +246,21 @@ void PreLoader::draw(objectType type, objectData data, int modelNr, int subModel
 	}
 }
 
-void PreLoader::draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant)
+void PreLoader::draw(objectType type, objectData data, objectData relativeData, int modelNr, int subModelNr, int variant, bool leftMaterial)
 {
 	int typ = (int)type;
 	if (modelNr != -1)
-		m_objects[typ][variant][modelNr].setObjectData(data, relativeData, subModelNr);
+		m_objects[typ][variant][modelNr].setObjectData(data, relativeData, subModelNr, leftMaterial);
 	for (int i = 0; i < m_nrOfmodels[typ][variant]; i++)
 	{
 		m_objects[typ][variant][i].setObjectData(data, relativeData);
 		m_objects[typ][variant][i].draw();
 	}
+}
+
+void PreLoader::draw(objectType type, BillboardData billboardData, int modelNr, int subModelNr, int variant)
+{
+	m_objects[(int)type][variant][modelNr].draw(billboardData, subModelNr);
 }
 
 void PreLoader::drawCM(objectType type, int variant)
@@ -316,6 +337,7 @@ void PreLoader::drawOneModelAndMat(objectType type, objectData data, int modelNr
 	m_objects[typ][variant][modelNr].setAllObjectData(data);
 	m_objects[typ][variant][modelNr].draw();
 }
+
 
 void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData relativeData, int modelNr, int variant)
 {

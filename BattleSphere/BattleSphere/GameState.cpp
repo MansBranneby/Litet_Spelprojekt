@@ -1,5 +1,4 @@
 #include "GameState.h"
-#include "GameState.h"
 
 void GameState::spawnNodes()
 {
@@ -196,10 +195,54 @@ void GameState::handleInputs(Game* game, float dt)
 				// Use weapon
 				if (m_input->getTriggerR(i) > 0.2)
 				{
+					// dumb stuff for sniper
+					XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+					XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+					if (m_robots[i]->getCurrentWeapon(RIGHT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
+						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getReady())
+					{
+						m_robots[i]->getSniperLine(RIGHT, start, end);
+						m_lineShots.updateLineStatus(i, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int j = 0; j < 4; j++)
+						{
+							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								{
+									m_input->setVibration(j, 0.5f);
+									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+
 					m_robots[i]->useWeapon(RIGHT, dt);
 				}
 				if (m_input->getTriggerL(i) > 0.2)
 				{
+					// dumb stuff for sniper
+					XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+					XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+					if (m_robots[i]->getCurrentWeapon(LEFT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
+						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getReady())
+					{
+						m_robots[i]->getSniperLine(LEFT, start, end);
+						m_lineShots.updateLineStatus(i, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int j = 0; j < 4; j++)
+						{
+							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								{
+									m_input->setVibration(j, 0.5f);
+									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+
 					m_robots[i]->useWeapon(LEFT, dt);
 				}
 
@@ -365,7 +408,6 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
 					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
-
 					if (collisionInfo.m_colliding)
 					{
 						// Collision found, stop tests
@@ -390,7 +432,7 @@ void GameState::handleInputs(Game* game, float dt)
 	}
 }
 
-GameState::GameState()
+GameState::GameState(Game* game)
 {
 	m_devZoomOut = false;
 	srand((unsigned int)time(NULL));
@@ -403,6 +445,9 @@ GameState::GameState()
 	m_spawnDrone = new SpawnDrone(&m_resources);
 	spawnNodes();
 
+	// Create billboards
+	m_billboardHandler = BillboardHandler(game->getPreLoader());
+	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
@@ -480,24 +525,25 @@ GameState::GameState()
 
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
+
+	// Sniper stuff
+	m_lineShots.createVertexBuffer();
+
+	m_sawInterval = 0.0f;
 }
 
 GameState::~GameState()
 {
 	for (int i = 0; i < m_resources.size(); i++)
-	{
 		delete m_resources[i];
-	}
-
 	for (int i = 0; i < m_nodes.size(); i++)
-	{
 		delete m_nodes[i];
-	}
+	if (m_dboHandler) 
+		delete m_dboHandler;
 	if (m_spawnDrone)
 		delete m_spawnDrone;
 
-	//Dynamic background objects
-	delete m_dboHandler;
+
 }
 
 void GameState::pause()
@@ -531,37 +577,138 @@ bool GameState::update(Game* game, float dt)
 	// Update particles
 	m_particles.update(dt);
 
+	// Update billboards
+	m_billboardHandler.updateBillboards(dt);
+
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
 
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
+		XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+		XMVECTOR end = XMVectorSet(0, 0, 0, 0);
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			m_robots[i]->update(dt);
+			m_robots[i]->update(dt, game->getQuadtree(), start, end);
+			m_lineShots.setColour(i, m_robots[i]->getColour());
+
+			bool activated = false;
+			for (int side = 0; side < 2; side++)
+			{
+				if (m_robots[i]->getCurrentWeapon(side) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SNIPER)
+				{
+					activated = true;
+					m_lineShots.setActive(i, true);
+					m_lineShots.updateLineStatus(i, start, end, false, dt);
+				}
+				if (!activated)
+					m_lineShots.setActive(i, false);
+			}
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
+	}
 
+	// Collision melee weapon
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+		{
+
+
+			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+			int bladeIdx = -1;
+			int leftSide = m_robots[i]->getCurrentWeapon(LEFT);
+			if (weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(RIGHT);
+			else if (leftSide != -1 && weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(LEFT);
+
+			// If player is using Beyblade
+			if (bladeIdx != -1)
+			{
+				float beybladeRange = weapons[bladeIdx]->getRange();
+				XMVECTOR beybladeRobPos = m_robots[i]->getPosition();
+				m_sawInterval += dt;
+
+				// Add spark if colliding with static objects
+				boundingData beybladeBD{
+					beybladeRobPos,
+					XMFLOAT2(beybladeRange, beybladeRange),
+					XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
+					XMVectorSet(0.0f, 0.0f, 0.f, 0.0f)
+				};
+				CollisionInfo colInfo;
+				colInfo = game->getQuadtree()->testCollision(beybladeBD, beybladeRobPos);
+				if (m_sawInterval > weapons[bladeIdx]->getSpinTime() && colInfo.m_colliding)
+				{
+					m_sawInterval = 0.0f;
+					Sound::getInstance()->play(soundEffect::e_sawcut, colInfo.m_contactPoint, 0.02f);
+					XMVECTOR cutDir = XMVector3Cross((colInfo.m_contactPoint - beybladeRobPos), XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+					m_particles.addCutSpark(colInfo.m_contactPoint, cutDir);
+				}
+
+
+				// Loop through and possibly damage other players
+				for (int j = 1; j < XUSER_MAX_COUNT; j++)
+				{
+					int otherIdx = (i + j) % XUSER_MAX_COUNT;
+					if (m_robots[otherIdx] != nullptr && m_robots[otherIdx]->isDrawn())
+					{
+						XMVECTOR otherRobPos = m_robots[otherIdx]->getPosition();
+						XMVECTOR dirToVictim = otherRobPos - beybladeRobPos;
+						float disToVic = XMVector3Length(dirToVictim).m128_f32[0];
+						float beyBladeDamage = weapons[bladeIdx]->getSpinDPS() * dt;
+
+						// Beyblade is within range, damage player.
+						if (beyBladeDamage != 0.0f && disToVic <= beybladeRange)
+						{
+							// Play sawcut sound and add spark
+							if (m_sawInterval > 1.0f / (weapons[bladeIdx]->getSpinPerSec() * 4.0f / 360.0f + 0.01f))
+							{
+								m_sawInterval = 0.0f;
+								Sound::getInstance()->play(soundEffect::e_sawcut, otherRobPos, 0.02f);
+
+								// Add spark
+								XMVECTOR dir = XMVector3Cross(dirToVictim, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+								XMVECTOR cutPos = beybladeRobPos + XMVector3Normalize(dirToVictim) * (disToVic - 1.54710078f);
+								m_particles.addCutSpark(cutPos, dir);
+							}
+
+							// Set vibration and drop resource
+							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
+							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false);
+							m_input->setVibration(otherIdx, 0.5f);
+							if (resourceIndex != -1)
+							{
+								m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
+								m_resources[resourceIndex]->setBlocked(false);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// COLLISION PROJECTILES VS STATIC OBJECTS
-	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
-	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
 		if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 		{
-			XMVECTOR right = +XMVector3Cross(ProjectileBank::getInstance()->getList()[i]->getDirection(), XMVectorSet(0, 1, 0, 0)) * 0.5f;
-			XMVECTOR forward = ProjectileBank::getInstance()->getList()[i]->getDirection();
+			
 			m_particles.addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(),
 				ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 1, 5.0f
 			);
 
 
 		}
+
+		boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
+		boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
@@ -718,49 +865,75 @@ void GameState::draw(Game* game, renderPass pass)
 {
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	if (pass == renderPass::e_particles)
-	{
-		m_particles.draw();
 
-	}
-	else
+	if (pass == renderPass::e_opaque)
 	{
-		if (pass != renderPass::e_transparent)
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-
-			for (int i = 0; i < XUSER_MAX_COUNT; i++)
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->draw(objectType::e_robot);
+
+				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
+				switch (wepType)
 				{
-					std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+				case BEYBLADE:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
+					break;
 
-					game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
-					//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				default:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
+					break;
+				}
 
-					game->getPreLoader()->draw(objectType::e_robot);
-					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
-
-					if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+				{
+					int wepType = weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getType();
+					switch (wepType)
 					{
+					case BEYBLADE:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
+						break;
+
+					default:
 						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+						break;
 					}
 				}
 			}
-			for (int i = 0; i < m_resources.size(); i++)
-			{
-				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
-			}
-			game->getPreLoader()->draw(objectType::e_ground);
 		}
-		if (pass != renderPass::e_opaque)
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 		{
-			// Scene (Background objects without collision)
-			for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
-				game->getPreLoader()->draw(objectType::e_scene, i);
+			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
+		}
+		for (int i = 0; i < m_resources.size(); i++)
+		{
+			int resType = m_resources[i]->getType();
+			switch (resType)
+			{
+			case BEYBLADE: // Beyblade
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 1);
+				break;
 
-			//Static
-			for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
-				game->getPreLoader()->draw(objectType::e_static, i);
+			default:
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+				break;
+			}
+		}
+	}
+	else if (pass == renderPass::e_transparent)
+	{
+		// Scene (Background objects without collision)
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+			game->getPreLoader()->draw(objectType::e_scene, i);
+
+		//Static
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
+			game->getPreLoader()->draw(objectType::e_static, i);
 
 			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
 			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
@@ -786,8 +959,26 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 			}
 
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				m_lineShots.draw(i);
+			}
 		}
 
+		
+	}
+	else if (pass == renderPass::e_particles)
+	{
+		m_particles.draw();
+	}
+	else if (pass == renderPass::e_billboard)
+	{
+		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+
+		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
 
 }

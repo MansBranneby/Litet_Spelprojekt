@@ -19,7 +19,7 @@ class Robot : public GameObject
 private:
 	int m_playerId;
 	XMVECTOR m_colour;
-	int m_health;
+	float m_health;
 	float m_velocity;
 	float m_currentRotation;
 	std::vector<Weapon*> m_weapons;
@@ -43,16 +43,17 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
-	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true);
-
-	void setHealth(int health);
-	int getHealth();
+	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);
+	void setHealth(float health);
+	float getHealth();
 	void setVelocity(float velocity);
 	float getVelocity();
 	void setCurrentRot(float deg);
 	float getCurrentRot();
 	bool isReady(float dt);
 	void setColour(float x, float y, float z);
+	XMVECTOR getColour();
+	void getSniperLine(int side, XMVECTOR &start, XMVECTOR &end);
 
 	void useWeapon(int side, float dt);
 	void changeWeapon(int side);
@@ -69,7 +70,7 @@ public:
 
 	int m_lightIndex;
 
-	void update(float dt);
+	void update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	void move(XMVECTOR dPos);
 
 	// History of positions

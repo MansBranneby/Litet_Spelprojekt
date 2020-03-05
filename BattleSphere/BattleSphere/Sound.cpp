@@ -26,7 +26,8 @@ Sound::Sound()
 	m_effect[(int)soundEffect::e_turnin] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/turnin.wav");
 	m_effect[(int)soundEffect::e_damage] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/damage.wav");
 	m_effect[(int)soundEffect::e_impact] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/impact.wav");
-	
+	m_effect[(int)soundEffect::e_sawcut] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/SawbladeHit.wav");
+
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
 	m_ambient[(int)soundAmbient::e_shield] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/shield.wav");
