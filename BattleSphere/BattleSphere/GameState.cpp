@@ -1,5 +1,4 @@
 #include "GameState.h"
-#include "GameState.h"
 
 void GameState::spawnNodes()
 {
@@ -91,7 +90,7 @@ void GameState::updateDynamicCamera(float dT)
 					newPos.m128_f32[2] += difference;
 					newLookAt.m128_f32[2] += difference;
 				}
-					m_zoomingOutToStart = false;
+				m_zoomingOutToStart = false;
 			}
 		}
 		else // If not zooming out
@@ -286,7 +285,7 @@ void GameState::handleInputs(Game* game, float dt)
 						// TODO: Robot position y is 1.9f so collsion mesh must be at y = 2, after that delete the radius * 2
 						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
 						bool collision = false;
-						for (int k = 0; k < cm.size(); k+=3)
+						for (int k = 0; k < cm.size(); k += 3)
 						{
 							unsigned int ind1 = k + 1;
 							unsigned int ind2 = k + 2;
@@ -345,7 +344,7 @@ void GameState::handleInputs(Game* game, float dt)
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_LEFT_SHOULDER))
 					{
 						m_robots[i]->changeWeapon(LEFT);
-					}	
+					}
 				}
 
 				// TODO: add collision and remove projectile
@@ -409,7 +408,6 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
 					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
-
 					if (collisionInfo.m_colliding)
 					{
 						// Collision found, stop tests
@@ -434,7 +432,7 @@ void GameState::handleInputs(Game* game, float dt)
 	}
 }
 
-GameState::GameState()
+GameState::GameState(Game* game)
 {
 	m_devZoomOut = false;
 	srand((unsigned int)time(NULL));
@@ -447,6 +445,9 @@ GameState::GameState()
 	m_spawnDrone = new SpawnDrone(&m_resources);
 	spawnNodes();
 
+	// Create billboards
+	m_billboardHandler = BillboardHandler(game->getPreLoader());
+	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
@@ -455,14 +456,14 @@ GameState::GameState()
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
-	m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
-	m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
-	m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
-	m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
-	m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
-	m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
-	m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
+	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
+	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
+	//m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
+	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
+	//m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
+	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
+	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
+	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
 	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
@@ -471,16 +472,25 @@ GameState::GameState()
 	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	
+
 	// Skyscrapers
 	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
 	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
 	m_lights->addAreaLight(35, 20, 77, 60, 0.5f, 0.0f, 0.8f, 25);
+	m_lights->addAreaLight(172, 20, 71, 50, 0.5f, 0.0f, 0.8f, 25);
 	m_lights->addAreaLight(10, 20, 80, 55, 0.0f, 0.6f, 0.8f, 23);
 
+	// Right tunnels
+	m_lights->addAreaLight(238, 8, 31, 60, 1.0f, 1.0f, 1.0f, 25);
+	m_lights->addAreaLight(238, 8, 120, 30, 1.0f, 1.0f, 1.0f, 25);
+	m_lights->addAreaLight(193, 47, 118, 50, 0.2f, 0.7f, 1.0f, 10);
+
 	m_lights->addAreaLight(172, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10); // Under map
+	m_lights->addAreaLight(95, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
 	m_lights->addAreaLight(32, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
 	m_lights->addAreaLight(32, -30, 69, 50, 0.2f, 0.7f, 1.0f, 10);
+	m_lights->addAreaLight(-20, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
+	m_lights->addAreaLight(-100, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
 
 	m_lights->addAreaLight(-125, 18, -9.4f, 50, 0.06f, 0.9f, 0.9f, 10); // Golden duck
 
@@ -512,30 +522,28 @@ GameState::GameState()
 	m_fOVPlanes[1].m128_f32[2] *= -1;
 	m_fOVPlanes[2].m128_f32[2] *= -1;
 	m_fOVPlanes[3].m128_f32[2] *= -1;
-	
+
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
 
 	// Sniper stuff
 	m_lineShots.createVertexBuffer();
+
+	m_sawInterval = 0.0f;
 }
 
 GameState::~GameState()
 {
 	for (int i = 0; i < m_resources.size(); i++)
-	{
 		delete m_resources[i];
-	}
-
 	for (int i = 0; i < m_nodes.size(); i++)
-	{
 		delete m_nodes[i];
-	}
+	if (m_dboHandler) 
+		delete m_dboHandler;
 	if (m_spawnDrone)
 		delete m_spawnDrone;
 
-	//Dynamic background objects
-	delete m_dboHandler;
+
 }
 
 void GameState::pause()
@@ -565,6 +573,12 @@ bool GameState::update(Game* game, float dt)
 
 	// Update spawning drone
 	m_spawnDrone->update(m_robots, dt);
+
+	// Update particles
+	m_particles.update(dt);
+
+	// Update billboards
+	m_billboardHandler.updateBillboards(dt);
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -597,11 +611,95 @@ bool GameState::update(Game* game, float dt)
 		}
 	}
 
+	// Collision melee weapon
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+		{
+
+
+			std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+			int bladeIdx = -1;
+			int leftSide = m_robots[i]->getCurrentWeapon(LEFT);
+			if (weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(RIGHT);
+			else if (leftSide != -1 && weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
+				bladeIdx = m_robots[i]->getCurrentWeapon(LEFT);
+
+			// If player is using Beyblade
+			if (bladeIdx != -1)
+			{
+				float beybladeRange = weapons[bladeIdx]->getRange();
+				XMVECTOR beybladeRobPos = m_robots[i]->getPosition();
+				m_sawInterval += dt;
+
+				// Add spark if colliding with static objects
+				boundingData beybladeBD{
+					beybladeRobPos,
+					XMFLOAT2(beybladeRange, beybladeRange),
+					XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
+					XMVectorSet(0.0f, 0.0f, 0.f, 0.0f)
+				};
+				CollisionInfo colInfo;
+				colInfo = game->getQuadtree()->testCollision(beybladeBD, beybladeRobPos);
+				if (m_sawInterval > weapons[bladeIdx]->getSpinTime() && colInfo.m_colliding)
+				{
+					m_sawInterval = 0.0f;
+					Sound::getInstance()->play(soundEffect::e_sawcut, colInfo.m_contactPoint, 0.02f);
+					XMVECTOR cutDir = XMVector3Cross((colInfo.m_contactPoint - beybladeRobPos), XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+					m_particles.addCutSpark(colInfo.m_contactPoint, cutDir);
+				}
+
+
+				// Loop through and possibly damage other players
+				for (int j = 1; j < XUSER_MAX_COUNT; j++)
+				{
+					int otherIdx = (i + j) % XUSER_MAX_COUNT;
+					if (m_robots[otherIdx] != nullptr && m_robots[otherIdx]->isDrawn())
+					{
+						XMVECTOR otherRobPos = m_robots[otherIdx]->getPosition();
+						XMVECTOR dirToVictim = otherRobPos - beybladeRobPos;
+						float disToVic = XMVector3Length(dirToVictim).m128_f32[0];
+						float beyBladeDamage = weapons[bladeIdx]->getSpinDPS() * dt;
+
+						// Beyblade is within range, damage player.
+						if (beyBladeDamage != 0.0f && disToVic <= beybladeRange)
+						{
+							// Play sawcut sound and add spark
+							if (m_sawInterval > 1.0f / (weapons[bladeIdx]->getSpinPerSec() * 4.0f / 360.0f + 0.01f))
+							{
+								m_sawInterval = 0.0f;
+								Sound::getInstance()->play(soundEffect::e_sawcut, otherRobPos, 0.02f);
+
+								// Add spark
+								XMVECTOR dir = XMVector3Cross(dirToVictim, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+								XMVECTOR cutPos = beybladeRobPos + XMVector3Normalize(dirToVictim) * (disToVic - 1.54710078f);
+								m_particles.addCutSpark(cutPos, dir);
+							}
+
+							// Set vibration and drop resource
+							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
+							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false);
+							m_input->setVibration(otherIdx, 0.5f);
+							if (resourceIndex != -1)
+							{
+								m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
+								m_resources[resourceIndex]->setBlocked(false);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// COLLISION PROJECTILES VS STATIC OBJECTS
-	boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
-	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+
 	for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 	{
+		boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
+		boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+
 		// Save projectile pointer
 		Projectile* projectile = ProjectileBank::getInstance()->getList()[i];
 
@@ -614,6 +712,9 @@ bool GameState::update(Game* game, float dt)
 		// Remove based on conditions
 		if (collisionInfo.m_colliding)
 		{
+			// Add spark particles
+			m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+
 			// Collision against static object found, remove projectile
 			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 			ProjectileBank::getInstance()->removeProjectile(i);
@@ -637,6 +738,9 @@ bool GameState::update(Game* game, float dt)
 
 					if (collisionInfo.m_colliding && ProjectileBank::getInstance()->getList()[i]->getOwner() != j)
 					{
+						// Add spark particles
+						m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+
 						int resourceIndex = m_robots[j]->getResourceIndex();
 						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 						{
@@ -674,9 +778,9 @@ void GameState::draw(Game* game, renderPass pass)
 {
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	if (pass != renderPass::e_transparent)
-	{
 
+	if (pass == renderPass::e_opaque)
+	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -685,13 +789,33 @@ void GameState::draw(Game* game, renderPass pass)
 
 				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
 				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
-
 				game->getPreLoader()->draw(objectType::e_robot);
-				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
+
+				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
+				switch (wepType)
+				{
+				case 6: // Beyblade
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
+					break;
+
+				default:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
+					break;
+				}
 
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
 				{
-					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+					int wepType = weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getType();
+					switch (wepType)
+					{
+					case 6: // Beyblade
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
+						break;
+
+					default:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
+						break;
+					}
 				}
 			}
 		}
@@ -701,21 +825,29 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		for (int i = 0; i < m_resources.size(); i++)
 		{
-			game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+			int resType = m_resources[i]->getType();
+			switch (resType)
+			{
+			case 6: // Beyblade
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 1);
+				break;
+
+			default:
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0);
+				break;
+			}
 		}
 	}
-	if (pass != renderPass::e_opaque)
+	else if (pass == renderPass::e_transparent)
 	{
 		// Scene (Background objects without collision)
-		for(int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
 			game->getPreLoader()->draw(objectType::e_scene, i);
-		
+
 		//Static
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
 			game->getPreLoader()->draw(objectType::e_static, i);
 
-		game->getPreLoader()->draw(objectType::e_scene);
-		game->getPreLoader()->draw(objectType::e_scene, 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
@@ -725,6 +857,16 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
+
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
+
+		m_particles.draw();
+
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -733,11 +875,12 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 	}
-	
-	// Tokyo drift
-	//for (int i = 0; i < OBJECT_NR_1; i++)
-	//{
-	//	if (m_dboHandler->isDrawn(i))
-	//		game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
-	//}
+	else if (pass == renderPass::e_billboard)
+	{
+		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+
+		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+	}
+
 }

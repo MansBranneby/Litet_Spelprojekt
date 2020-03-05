@@ -10,10 +10,16 @@ SubModel::SubModel()
 	m_nrOfIndices = 0;
 	m_indexArray = nullptr;
 
+	// Texture
+	m_SRV = nullptr;
+
 	// Backface culling
 	m_culledIndiceBuffer = nullptr;
 	m_clearedIndiceBuffer = nullptr;
 	m_nrOfCulledIndices = 0;
+
+	// Constant buffer for texture animation
+	m_constantBufferBillboard = nullptr;
 }
 
 SubModel::~SubModel()
@@ -21,10 +27,12 @@ SubModel::~SubModel()
 	if (m_indexBuffer) m_indexBuffer->Release();
 
 	if (m_constantBuffer) delete m_constantBuffer;
+	if (m_constantBuffer) delete m_constantBufferBillboard;
 	if (m_mat) _aligned_free(m_mat);
 	if (m_indexArray) delete[] m_indexArray;
 	if (m_culledIndiceBuffer) m_culledIndiceBuffer->Release();
 	if (m_clearedIndiceBuffer) m_clearedIndiceBuffer->Release();
+	if (m_SRV) m_SRV->Release();
 }
 
 void SubModel::createIndexBuffer()
@@ -56,6 +64,20 @@ void SubModel::createCulledIndexBuffer()
 	indexData.pSysMem = m_indexArray;
 
 	DX::getInstance()->getDevice()->CreateBuffer(&culledIndexBufferDesc, &indexData, &m_culledIndiceBuffer);
+}
+
+void SubModel::setBillboardData(BillboardData billboardData)
+{
+	m_billboardData = billboardData;
+	m_constantBufferBillboard = new ConstantBuffer(&billboardData, sizeof(billboardData));
+}
+
+void SubModel::updateTextureAnimationCB(BillboardData BillboardData)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferBillboard->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &BillboardData, sizeof(BillboardData));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferBillboard->getConstantBuffer(), 0);
 }
 
 void SubModel::setMaterialInfo(material mat)
@@ -92,6 +114,16 @@ void SubModel::setFaces(int* indexBuffer, int nrOfIndices)
 	createCulledIndexBuffer();
 }
 
+void SubModel::setSRV(ID3D11ShaderResourceView* SRV)
+{
+	m_SRV = SRV;
+}
+
+BillboardData SubModel::getBillboardData()
+{
+	return m_billboardData;
+}
+
 void SubModel::draw()
 {
 	// Bind indexbuffer
@@ -104,10 +136,36 @@ void SubModel::draw()
 	else
 		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
 
+	ID3D11ShaderResourceView* nullSRV = { nullptr };
+		
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 	
+}
+
+void SubModel::draw(BillboardData billboardData)
+{
+
+	// Bind indexbuffer
+	DX::getInstance()->getDeviceContext()->IASetIndexBuffer(m_culledIndiceBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+    DX* instance = DX::getInstance();
+	XMVECTOR emission = m_mat->emission;
+	if (emission.m128_f32[0] > 0 || emission.m128_f32[1] > 0 || emission.m128_f32[2] > 0)
+		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSEnabled(), 1);
+	else
+		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
+
+	// Set texture if model has one other set it to nullptr
+	ID3D11ShaderResourceView* nullSRV = { nullptr };	
+	(m_SRV != nullptr) ? (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV)) : (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV));
+
+	updateTextureAnimationCB(billboardData);
+	// Bind constantbuffer
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(5, 1, m_constantBufferBillboard->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);
 }
 
 void SubModel::cullDraw()

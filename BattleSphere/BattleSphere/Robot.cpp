@@ -22,11 +22,13 @@ Robot::Robot(int playerId)
 	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
+	m_vel = XMVectorSet(0, 0, 0, 0);
+
 	m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
 	// Position history
-	m_positionHistorySize = 0; 
+	m_positionHistorySize = 0;
 	m_positionHistoryCap = 100;
-	m_positionHistoryPtr = 0;	
+	m_positionHistoryPtr = 0;
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
 }
@@ -42,43 +44,44 @@ int Robot::getPlayerId()
 }
 
 
-bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
+bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool playSound)
 {
-	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
-		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 	if (m_currentWeapon[LEFT] != -1)
-		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 
 	if (projIndex != -1)
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 
-	if (dmg != 0.0f)
+
+	if (damage != 0.0f)
 	{
-		Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
-		m_health -= (int)floorf(dmg);
+		if (playSound)
+			Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
+		m_health -= damage;
 		if (m_health < 0)
 		{
 			m_health = 0;
 			setDrawn(false);
 		}
-		m_material.emission = m_colour * (float)m_health / 100.0f;
+		m_material.emission = m_colour * m_health / 100.0f;
 		removeResource();
 		return true;
 	}
-	else
+	else if (playSound)
 		Sound::getInstance()->play(soundEffect::e_impact, getPosition(), 0.05f);
 	return false;
 }
 
-void Robot::setHealth(int health)
+void Robot::setHealth(float health)
 {
 	setDrawn(true);
 	m_health = health;
 	m_material.emission = m_colour;
 }
 
-int Robot::getHealth()
+float Robot::getHealth()
 {
 	return m_health;
 }
@@ -146,21 +149,25 @@ void Robot::useWeapon(int side, float dt)
 		m_weapons[m_currentWeapon[side]]->speedUp(getPosition());
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();
+		m_weapons[m_currentWeapon[side]]->spin(dt);
 	}
 }
 
 void Robot::changeWeapon(int side)
 {
-	if (m_weapons.size() > 2) 
+	if (m_weapons.size() > 2)
 	{
 		m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
 			m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
-		
-		if (side == RIGHT)
-			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
-		else
-			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
+
+		if (m_weapons[m_currentWeapon[side]]->getType() != BEYBLADE)
+		{
+			if (side == RIGHT)
+				m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
+			else
+				m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
+		}
 		m_ready = false;
 	}
 }
@@ -191,7 +198,8 @@ void Robot::addWeapon(int type)
 	if (m_currentWeapon[LEFT] == -1)
 	{
 		m_currentWeapon[LEFT] = 1;
-		weapon->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
+		if (type != BEYBLADE)
+		weapon->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
 	}
 	m_weapons.push_back(weapon);
 }
@@ -247,7 +255,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 void Robot::move(XMVECTOR dPos)
 {
 	GameObject::move(dPos);
-	
+
 	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
 	);

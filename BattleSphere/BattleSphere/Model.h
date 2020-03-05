@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include "StructsAndEnums.h"
+#include "WICTextureLoader.h"
 
 class Model
 {
@@ -34,6 +35,11 @@ private:
 	// To calculate bounding volumes
 	void computeOBB();
 
+	// Calculate min and max y coordinates
+	float m_minY;
+	float m_maxY;
+	void computeMinMaxY();
+
 	void createVertexBuffer(); // For vertex buffer
 	void createVertexCullingBuffer(); // For vertex culling buffer
 	void createVertexCBuffer(); // For model matrix
@@ -54,8 +60,11 @@ private:
 	vertexAndId* m_vertexAndId;
 	void setVPMatrix();
 
+	BillboardData getBillboardDataFromFile(std::string line);
+
 public:
 	void draw();
+	void draw(BillboardData BillboardData, int subModelNr);
 	void cullDraw();
 	Model();
 	~Model();
@@ -66,11 +75,16 @@ public:
 	std::vector<XMFLOAT3> getCollisionMesh(); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data); // Delete after use
 	std::vector<XMFLOAT3> getCollisionMesh(objectData data, objectData relativeData); // Delete after use
+	BillboardData getSubModelBillboardData(int subModelNr);
+	int getNrOfSubModels() const;
 	void setObjectData(objectData data, int modelNr = -1);
-	void setObjectData(objectData data, objectData relativeData, int modelNr = -1);
+	void setObjectData(objectData data, objectData relativeData, int modelNr = -1, bool leftMaterial = true);
 	void setAllObjectData(objectData data);
 	void setAllObjectData(objectData data, objectData relativeData);
 	void loadModel(std::ifstream& in);
 	void loadModel(std::ifstream& in, objectType type);
+	ID3D11ShaderResourceView* createTexture(std::string fileName);
+
+	
 };
 
