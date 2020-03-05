@@ -528,6 +528,9 @@ bool GameState::update(Game* game, float dt)
 	// Update spawning drone
 	m_spawnDrone->update(m_robots, dt);
 
+	// Update particles
+	m_particles.update(dt);
+
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
 
@@ -561,6 +564,9 @@ bool GameState::update(Game* game, float dt)
 		// Remove based on conditions
 		if (collisionInfo.m_colliding)
 		{
+			// Add spark particles
+			m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+
 			// Collision against static object found, remove projectile
 			Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
 
@@ -588,6 +594,9 @@ bool GameState::update(Game* game, float dt)
 
 					if (collisionInfo.m_colliding && ProjectileBank::getInstance()->getList()[i]->getOwner() != j)
 					{
+						// Add spark particles
+						m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+
 						int resourceIndex = m_robots[j]->getResourceIndex();
 						if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 						{
@@ -639,7 +648,7 @@ void GameState::draw(Game* game, renderPass pass)
 
 				game->getPreLoader()->draw(objectType::e_robot);
 				game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
-
+		
 				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
 				{
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
@@ -669,7 +678,6 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 		for (int i = 0; i < m_nodes.size(); i++)
 		{
-			
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
 		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
@@ -680,11 +688,13 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 	}
 
-	// Tokyo drift
-	for (int i = 0; i < OBJECT_NR_1; i++)
-	{
-		if (m_dboHandler->isDrawn(i))
-			game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
+
+		m_particles.draw();
 	}
-	
 }

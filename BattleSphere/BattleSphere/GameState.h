@@ -7,6 +7,7 @@
 #include "StructsAndEnums.h"
 #include "Graph.h"
 #include "SpawnDrone.h"
+#include "Particles.h"
 #include "Sound.h"
 
 class GameState : public State 
@@ -35,6 +36,9 @@ private:
 
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
+
+	// Particles
+	Particles m_particles;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
