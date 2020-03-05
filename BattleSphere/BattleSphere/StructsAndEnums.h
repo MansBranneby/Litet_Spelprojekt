@@ -74,6 +74,7 @@ using namespace DirectX;
 
 enum class ObjectType
 {
+	e_static_billboard,
 	e_extra,
 	e_drone,
 	e_weapon,
@@ -104,6 +105,7 @@ enum class stateType
 {
 	e_gameState,
 	e_mainMenu,
+	e_scoreState,
 	e_default
 };
 
