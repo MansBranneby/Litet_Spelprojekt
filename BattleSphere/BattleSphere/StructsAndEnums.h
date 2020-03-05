@@ -105,6 +105,7 @@ enum class stateType
 {
 	e_gameState,
 	e_mainMenu,
+	e_scoreState,
 	e_default
 };
 

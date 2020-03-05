@@ -382,7 +382,8 @@ void GameState::handleInputs(Game* game, float dt)
 					newPos += collisionInfo.m_normal;
 				else break;
 			}
-
+			// TODO GLENN
+			//newPos = { 165.0f, 46.0f, 135.0f };
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
 		}
@@ -625,6 +626,20 @@ bool GameState::update(Game* game, float dt)
 
 	//Dynamic background objects
 	m_dboHandler->update(dt);
+
+	// Check if there's only one player alive
+	// If so then change to ScoreState
+	float nrOfDeadPlayers = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] == nullptr)
+			nrOfDeadPlayers++;
+	}
+	if (nrOfDeadPlayers == 3)
+	{
+		setPaused(true);
+		activateState(game, stateType::e_scoreState);
+	}
 
 	return 0;
 }
