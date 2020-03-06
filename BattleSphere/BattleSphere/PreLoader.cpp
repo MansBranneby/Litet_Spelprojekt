@@ -118,6 +118,7 @@ PreLoader::PreLoader()
 
 	// On map (with collision)
 	loadFromFile(objectType::e_static, "Background\\SS", "SSColl");
+	loadFromFile(objectType::e_static, "Background\\BSPD", "BSPDColl");
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
