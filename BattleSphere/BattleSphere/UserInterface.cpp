@@ -26,9 +26,9 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Reflect.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Sniper.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 2																		 
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -36,9 +36,9 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Reflect.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Sniper.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 3																		  
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -46,9 +46,9 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Reflect.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Sniper.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 4																
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -56,9 +56,9 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Reflect.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Sniper.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
+	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 
 	for (int i = 0; i < 16; i++) // No abilities selected or in queue
 		m_slotID[i] = -1;
