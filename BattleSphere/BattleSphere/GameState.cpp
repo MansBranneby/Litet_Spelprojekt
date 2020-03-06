@@ -495,6 +495,9 @@ GameState::GameState(Game* game)
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
 
+	index = m_lights->addVolumetricSpotLight(-255.0f, 18.0f, 168.0f, 170.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 20.0f, 4.0f); // BSPD
+	m_lights->addAreaLight(-229.0f, 18.0f, 174.0f, 60.0f, 0.0f, 0.5f, 1.0f, 50);
+
 	m_BSPDLightIndex[0] = m_lights->addVolumetricSpotLight(-52.0f, 59.0f, 133.0f, 70.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 7.0f, 2.0f); // BSPD
 	m_BSPDLightIndex[1] = m_lights->addVolumetricSpotLight(-101.0f, 59.0f, 110.0f, 70.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 7.0f, 2.0f);
 
