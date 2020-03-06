@@ -12,6 +12,7 @@
 #include "Node.h"
 #include "LineShots.h"
 #include "BillboardHandler.h"
+#include "UserInterface.h"
 
 class GameState : public State 
 {
@@ -25,6 +26,7 @@ private:
 	Lights* m_lights;
 	Transparency m_transparency;
 	LineShots m_lineShots;
+	UserInterface* m_userInterface;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;
@@ -58,6 +60,7 @@ public:
 	void pause();
 	void resume();
 	
+	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
 	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);

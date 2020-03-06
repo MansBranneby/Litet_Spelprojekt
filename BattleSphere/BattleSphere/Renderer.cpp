@@ -182,6 +182,23 @@ void createRenderResources()
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 }
 
+void setUserInterfacePipeline()
+{
+	//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+	DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+	DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xffffffff);
+
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera(false)->getConstantBufferVP()->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
+
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_menu->getVertexShader()->getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(2)->getPixelShader(), nullptr, 0);
+}
+
 void downsample()
 {
 	g_bloom->setRenderTarget(nullptr, renderPass::e_downSample);
@@ -451,11 +468,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						}
 					}
 
+					// Bloom
 					downsample();
-
 					g_bloom->run();
 
 					finalRender();
+
+					// User interface
+					setUserInterfacePipeline();
+					g_Game->draw(renderPass::e_userInterface);
 
 					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
 					if (rotation >= 360)
