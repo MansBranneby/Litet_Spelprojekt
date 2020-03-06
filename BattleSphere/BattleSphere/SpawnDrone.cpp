@@ -231,7 +231,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 		{
 			spawnIndex = getSpecialSpawnIndex(); // TODO:: Change spawn types
 			//resource = new Resource(true, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 3.0f);
-			resource = new Resource(true, spawnIndex, RIFLE, 3.0f);
+			resource = new Resource(true, spawnIndex, ENERGY, 3.0f);
 		}
 
 		else
