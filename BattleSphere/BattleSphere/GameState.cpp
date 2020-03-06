@@ -468,7 +468,7 @@ GameState::GameState(Game* game)
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 1.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
 	//m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
@@ -477,7 +477,7 @@ GameState::GameState(Game* game)
 	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	//index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 1.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
 	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
@@ -970,7 +970,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 	}
-	else if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
+	if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
 	{
 		// Scene (Background objects without collision)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
@@ -1014,11 +1014,11 @@ void GameState::draw(Game* game, renderPass pass)
 
 		
 	}
-	else if (pass == renderPass::e_particles)
+	if (pass == renderPass::e_particles)
 	{
 		m_particles.draw();
 	}
-	else if (pass == renderPass::e_billboard)
+	if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 
