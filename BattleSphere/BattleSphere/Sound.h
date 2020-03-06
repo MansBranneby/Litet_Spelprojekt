@@ -24,8 +24,8 @@ enum class soundEffect
 	e_impact = 8,
 	e_sawcut = 9,
 	e_sniper = 10,
-	e_explosion = 11,
-	e_blast = 12
+	e_energy = 11,
+	e_explosion = 12
 };
 
 enum class soundAmbient
@@ -51,7 +51,7 @@ enum class soundUI
 	e_back = 2,
 };
 
-#define NR_EFFECT_SOUNDS 11
+#define NR_EFFECT_SOUNDS 13
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
 #define NR_UI_SOUNDS 3

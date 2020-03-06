@@ -325,6 +325,8 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
 			Sound::getInstance()->play(soundEffect::e_rifle, projPos, 0.3f, -0.5f, 0.0f);
+		if (m_type == ENERGY)
+			Sound::getInstance()->play(soundEffect::e_energy, projPos, 0.3f, 0.0f, 0.0f);
 
 		return true;
 	}

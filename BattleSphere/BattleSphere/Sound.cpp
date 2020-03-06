@@ -28,6 +28,8 @@ Sound::Sound()
 	m_effect[(int)soundEffect::e_impact] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/impact.wav");
 	m_effect[(int)soundEffect::e_sawcut] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/SawbladeHit.wav");
 	m_effect[(int)soundEffect::e_sniper] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
+	m_effect[(int)soundEffect::e_energy] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/energygun2.wav");
+	m_effect[(int)soundEffect::e_explosion] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/explosion.wav");
 
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");

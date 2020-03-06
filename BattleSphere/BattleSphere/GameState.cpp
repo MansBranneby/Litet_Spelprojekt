@@ -589,7 +589,10 @@ void GameState::firstTimeSetUp(Game* game)
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-			m_userInterface->setPlayerColours(i, m_robots[i]->getData().material.emission);
+		{
+			m_userInterface->setPlayerColours(i, m_robots[i]->getColour());
+			m_lineShots.setColour(i, m_robots[i]->getColour());
+		}
 	}
 
 }
@@ -632,7 +635,6 @@ bool GameState::update(Game* game, float dt)
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
 			m_robots[i]->update(dt, game->getQuadtree(), start, end);
-			m_lineShots.setColour(i, m_robots[i]->getColour());
 
 			bool activated = false;
 			for (int side = 0; side < 2; side++)
@@ -780,11 +782,9 @@ bool GameState::update(Game* game, float dt)
 							float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
 							if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 							{
+								int resourceIndex = m_robots[k]->getResourceIndex();
 								robots[k]->damagePlayer((ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange()))), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
 								m_input->setVibration(k, 1.0f);
-
-								int resourceIndex = m_robots[k]->getResourceIndex();
-
 
 								if (resourceIndex != -1)
 								{
@@ -795,9 +795,8 @@ bool GameState::update(Game* game, float dt)
 							}
 						}
 					}
-
-				}
 				ProjectileBank::getInstance()->getList()[i]->explode();
+				}
 			}
 
 			else
@@ -842,11 +841,9 @@ bool GameState::update(Game* game, float dt)
 										float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
 										if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 										{
+											int resourceIndex = m_robots[k]->getResourceIndex();
 											robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1+ ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[k]->getDirection(), -1, false);
 											m_input->setVibration(k, 1.0f);
-
-											int resourceIndex = m_robots[k]->getResourceIndex();
-
 
 											if (resourceIndex != -1)
 											{
@@ -858,7 +855,6 @@ bool GameState::update(Game* game, float dt)
 									}
 
 								}
-
 								ProjectileBank::getInstance()->getList()[i]->explode();
 							}
 
