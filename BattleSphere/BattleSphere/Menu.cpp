@@ -13,6 +13,7 @@ Menu::Menu()
 	m_vertexShader = new VertexShader(L"VertexShaderMenu.hlsl");
 	m_pixelShader = new PixelShader(L"PixelShaderMenu.hlsl");
 	m_pixelShaderAni = new PixelShader(L"PixelShaderUIAni.hlsl");
+	m_pixelShaderUI = new PixelShader(L"PixelShaderUserInterface.hlsl");
 
 	initializeResources();
 }
@@ -25,11 +26,13 @@ Menu::~Menu()
 	m_vertexShader->release();
 	m_pixelShader->release();
 	m_pixelShaderAni->release();
+	m_pixelShaderUI->release();
 //	m_depthState->Release();
 
 	delete m_vertexShader;
 	delete m_pixelShader;
 	delete m_pixelShaderAni;
+	delete m_pixelShaderUI;
 }
 
 //ID3D11DepthStencilState* Menu::getDepthStencilState()
@@ -52,8 +55,10 @@ VertexShader* Menu::getVertexShader()
 
 PixelShader* Menu::getPixelShader(int index)
 {
-	if (!index)
+	if (index == 0)
 		return m_pixelShader;
-	else
+	else if (index == 1)
 		return m_pixelShaderAni;
+	else
+		return m_pixelShaderUI;
 }

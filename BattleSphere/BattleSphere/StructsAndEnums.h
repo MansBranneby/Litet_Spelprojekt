@@ -99,7 +99,8 @@ enum class renderPass
 	e_opaque,
 	e_transparent,
 	e_shadow,
-	e_particles
+	e_particles,
+	e_userInterface
 };
 
 enum class stateType

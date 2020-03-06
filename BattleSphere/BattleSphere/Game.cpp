@@ -131,7 +131,10 @@ void Game::changeState(stateType state)
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (m_states[i]->getType() == state)
+		{
 			m_states[i]->setPaused(false);
+			m_states[i]->firstTimeSetUp(this);
+		}
 	}
 }
 
