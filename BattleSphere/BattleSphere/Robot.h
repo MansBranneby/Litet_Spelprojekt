@@ -43,6 +43,7 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
+	XMVECTOR getColour();
 	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex);
 	void setHealth(int health);
 	int getHealth();
@@ -61,6 +62,7 @@ public:
 
 	void addScore(int score);
 	void resetScore();
+	int getScore() const;
 
 	void setResourceIndex(int index);
 	int getResourceIndex();

@@ -6,7 +6,7 @@ class ScoreState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
-	std::vector<int> pointPerPlayer; // Keeps track of the points for each player
+	std::vector<UI_Element*> m_uiElements_numbers;
 
 public:
 	ScoreState();

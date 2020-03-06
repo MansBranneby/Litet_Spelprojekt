@@ -40,6 +40,11 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
+XMVECTOR Robot::getColour()
+{
+	return m_colour;
+}
+
 
 bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
 {
@@ -172,6 +177,11 @@ void Robot::addScore(int score)
 void Robot::resetScore()
 {
 	m_score = 0;
+}
+
+int Robot::getScore() const
+{
+	return m_score;
 }
 
 void Robot::addWeapon(int type)
