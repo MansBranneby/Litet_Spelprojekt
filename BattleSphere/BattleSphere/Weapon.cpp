@@ -84,7 +84,7 @@ Weapon::Weapon(int type)
 		m_damage = 20;
 		m_cooldown = 2.5f;
 		m_recoil = 0.0f;
-		setScale(3.8f, 3.8f, 1.8f);
+		setScale(1.0f, 1.0f, 1.0f);
 		m_blastRange = 20;
 	}
 	else

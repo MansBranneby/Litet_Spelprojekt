@@ -929,6 +929,10 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
 					break;
 
+				case ENERGY:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2, false);
+					break;
+
 				default:
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 					break;
@@ -941,6 +945,10 @@ void GameState::draw(Game* game, renderPass pass)
 					{
 					case BEYBLADE:
 						game->getPreLoader()->draw(objectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 0, 1, false);
+						break;
+
+					case ENERGY:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2);
 						break;
 
 					default:
@@ -959,6 +967,10 @@ void GameState::draw(Game* game, renderPass pass)
 			{
 			case BEYBLADE: // Beyblade
 				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 1);
+				break;
+
+			case ENERGY:
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 2);
 				break;
 
 			default:
@@ -993,7 +1005,7 @@ void GameState::draw(Game* game, renderPass pass)
 				{
 					if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
 						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
-					else
+					else if(ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
 
 						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
 				}
