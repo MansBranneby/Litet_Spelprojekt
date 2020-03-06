@@ -117,8 +117,16 @@ void Game::pushState(State* state)
 
 void Game::changeState(stateType state)
 {
+	if (state == stateType::e_mainMenu)
+	{
+		Sound::getInstance()->play(soundMusic::e_menu, 0.01f);
+	}
 	if (state == stateType::e_gameState)
+	{
+		Sound::getInstance()->stop(soundMusic::e_menu);
+		Sound::getInstance()->play(soundMusic::e_game, 0.005f);
 		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+	}
 
 	for (int i = 0; i < m_states.size(); i++)
 	{

@@ -331,6 +331,7 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 	else if (m_type == SNIPER && m_ready)
 	{
 		m_ready = false;
+		Sound::getInstance()->play(soundEffect::e_sniper, robotPos+m_relativePos, 0.5f, 0.0f, 0.0f);
 		return true;
 	}
 
