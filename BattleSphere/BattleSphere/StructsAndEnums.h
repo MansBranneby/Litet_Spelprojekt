@@ -100,7 +100,6 @@ enum class renderPass
 	e_transparent,
 	e_shadow,
 	e_particles,
-	e_transparent,
 	e_userInterface
 };
 
