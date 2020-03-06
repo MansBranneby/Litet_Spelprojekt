@@ -282,7 +282,6 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
-						// TODO: Robot position y is 1.9f so collsion mesh must be at y = 2, after that delete the radius * 2
 						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
 						bool collision = false;
 						for (int k = 0; k < cm.size(); k += 3)
@@ -300,7 +299,11 @@ void GameState::handleInputs(Game* game, float dt)
 						}
 						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
-							m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType());
+							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+							{
+								// Update user interface with new ability
+								m_userInterface->setSlotID(i, m_resources[m_robots[i]->getResourceIndex()]->getType()); 
+							}
 							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
 							for (int k = 0; k < XUSER_MAX_COUNT; k++)
@@ -338,13 +341,23 @@ void GameState::handleInputs(Game* game, float dt)
 				{
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_RIGHT_SHOULDER))
 					{
-						m_robots[i]->changeWeapon(RIGHT);
+						int type = m_robots[i]->changeWeapon(RIGHT);
+						if (type != -1)
+						{
+							//m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon());
+							m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
+						}
 					}
 
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_LEFT_SHOULDER))
 					{
-						m_robots[i]->changeWeapon(LEFT);
-					}
+						int type = m_robots[i]->changeWeapon(LEFT);
+						if (type != -1)
+						{
+							//m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon());
+							m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
+						}
+					}	
 				}
 
 				// TODO: add collision and remove projectile
@@ -526,6 +539,9 @@ GameState::GameState(Game* game)
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
 
+	// User interface
+	m_userInterface = nullptr;
+
 	// Sniper stuff
 	m_lineShots.createVertexBuffer();
 
@@ -544,6 +560,9 @@ GameState::~GameState()
 		delete m_spawnDrone;
 
 
+
+	// User interface
+	delete m_userInterface;
 }
 
 void GameState::pause()
@@ -554,12 +573,34 @@ void GameState::resume()
 {
 }
 
+void GameState::firstTimeSetUp(Game* game)
+{
+	m_robots = game->getRobots();
+	
+	//// Create user interface (based on number of players) ////
+	int nrOfPlayers = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			nrOfPlayers++;
+	}
+	m_userInterface = new UserInterface(nrOfPlayers);  // Create user interface
+	
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			m_userInterface->setPlayerColours(i, m_robots[i]->getData().material.emission);
+	}
+
+}
+
 void GameState::handleInput(Game* game)
 {
 }
 
 bool GameState::update(Game* game, float dt)
 {
+
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
@@ -855,6 +896,9 @@ bool GameState::update(Game* game, float dt)
 		m_nodes[i]->updateTime(dt);
 	}
 
+	// Update user interface
+	m_userInterface->update();
+
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
@@ -986,4 +1030,11 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
 
+
+	
+	// User interface
+	if (pass == renderPass::e_userInterface)
+	{
+		m_userInterface->draw();
+	}
 }

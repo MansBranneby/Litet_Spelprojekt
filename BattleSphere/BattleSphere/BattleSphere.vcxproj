@@ -194,6 +194,7 @@
     <ClCompile Include="Transparency.cpp" />
     <ClCompile Include="UI_Animation.cpp" />
     <ClCompile Include="UI_Element.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
@@ -252,6 +253,7 @@
     <ClInclude Include="Transparency.h" />
     <ClInclude Include="UI_Animation.h" />
     <ClInclude Include="UI_Element.h" />
+    <ClInclude Include="UserInterface.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="Weapon.h" />
   </ItemGroup>
@@ -438,6 +440,11 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_main</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="PixelShaderUserInterface.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="VertexShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS_main</EntryPointName>

@@ -201,6 +201,44 @@ float UI_Element::getPosY()
 	return m_posY;
 }
 
+void UI_Element::setPos(float posX, float posY)
+{
+	if (m_posX != posX || m_posY != posY) // Only update if a change is made
+	{
+		m_posX = posX;
+		m_posY = posY;
+
+		float left, right, top, bottom;
+		left = m_posX - m_sizeX / 2.0f;
+		right = left + m_sizeX;
+		top = m_posY + m_sizeY / 2.0f;
+		bottom = top - m_sizeY;
+
+		m_vertexList[0].posX = left;
+		m_vertexList[0].posY = top;
+
+		m_vertexList[1].posX = right;
+		m_vertexList[1].posY = bottom;
+
+		m_vertexList[2].posX = left;
+		m_vertexList[2].posY = bottom;
+
+		m_vertexList[3].posX = left;
+		m_vertexList[3].posY = top;
+
+		m_vertexList[4].posX = right;
+		m_vertexList[4].posY = top;
+
+		m_vertexList[5].posX = right;
+		m_vertexList[5].posY = bottom;
+
+		D3D11_MAPPED_SUBRESOURCE mappedMemory;
+		DX::getInstance()->getDeviceContext()->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, m_vertexList, sizeof(vertex) * 6);
+		DX::getInstance()->getDeviceContext()->Unmap(m_vertexBuffer, 0);
+	}
+}
+
 void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest)
 {
 	m_destinationX += deltaX;
