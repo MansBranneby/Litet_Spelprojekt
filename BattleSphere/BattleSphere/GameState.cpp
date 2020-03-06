@@ -780,7 +780,7 @@ bool GameState::update(Game* game, float dt)
 							float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
 							if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 							{
-								robots[k]->damagePlayer((int)(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange()))), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
+								robots[k]->damagePlayer((ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange()))), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
 								m_input->setVibration(k, 1.0f);
 
 								int resourceIndex = m_robots[k]->getResourceIndex();
@@ -951,10 +951,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 		game->getPreLoader()->draw(objectType::e_ground);
-		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-		}
+		
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
@@ -991,8 +988,15 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 			{
-				if (pass != renderPass::e_shadow || ProjectileBank::getInstance()->getList()[i]->getType() != (int)ENERGY)
-					game->getPreLoader()->drawOneMaterial(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData());
+				
+				for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+				{
+					if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
+						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
+					else
+
+						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
+				}
 				
 			}
 
