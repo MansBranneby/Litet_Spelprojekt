@@ -36,6 +36,28 @@ Robot::Robot(int playerId)
 	m_positionHistoryPtr = 0;
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+
+	
+	
+}
+
+bool Robot::isAi()
+{
+	return m_isAi;
+}
+
+void Robot::setAIGoal(XMVECTOR position)
+{
+	if (m_currentMission.index == 0)
+	{
+		std::vector<XMVECTOR> a = Graph::getInstance()->calculateAIPath(getPosition(), position);
+		if (a.size() > 0)
+		{
+			m_currentMission = m_ai.setMission(a);
+
+		}
+	}
+	
 }
 
 void Robot::setPlayerId(int playerId)
@@ -311,7 +333,15 @@ void Robot::removeResource()
 
 void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 {
-	GameObject::update();
+	
+	if (m_currentMission.index != 0)
+	{
+		m_currentMission = m_ai.update(dt, m_velocity, m_currentMission);
+		setPosition(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f));
+		
+	}
+	
+	/*GameObject::update();
 	XMVECTOR position = GameObject::getPosition();
 	Lights::getInstance()->setPosition(m_lightIndex, position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]);
 	objectData objectData = GameObject::getData();
@@ -324,13 +354,13 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
 	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
-		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
+		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);*/
 	
 }
 
 void Robot::move(XMVECTOR dPos)
 {
-	GameObject::move(dPos);
+	/*GameObject::move(dPos);
 
 	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
@@ -341,7 +371,7 @@ void Robot::move(XMVECTOR dPos)
 		m_weapons[m_currentWeapon[LEFT]]->setPosition(
 			m_weapons[m_currentWeapon[LEFT]]->getRelativePos()
 		);
-	}
+	}*/
 }
 
 void Robot::storePositionInHistory(DirectX::XMVECTOR position)

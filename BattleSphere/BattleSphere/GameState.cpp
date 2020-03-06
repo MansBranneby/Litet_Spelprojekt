@@ -278,7 +278,7 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 
 				// Turn in resources
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
+				//if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
 				{
 					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
@@ -620,6 +620,29 @@ bool GameState::update(Game* game, float dt)
 
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
+	if (m_robots[0]->getResourceIndex() != -1)
+	{
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			if (m_nodes[i]->isType(m_resources[m_robots[0]->getResourceIndex()]->getType()))
+			{
+				m_robots[0]->setAIGoal(Graph::getInstance()->getNodePos(i));
+				break;
+			}
+
+		}
+	}
+	else
+	{
+		for (int i = 0; i < m_resources.size(); i++)
+		{
+			if (!m_resources[i]->isBlocked())
+			{
+				m_robots[0]->setAIGoal(m_resources[i]->getPosition());
+				break;
+			}
+		}
+	}
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
