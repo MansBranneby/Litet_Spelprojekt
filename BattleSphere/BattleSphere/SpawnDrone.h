@@ -32,12 +32,14 @@ private:
 	float m_collectedTime;
 	bool m_spawnDroneTravelling;
 	bool m_spawnDroneRotating;
+	GameObject m_BSPDdoor;
 	GameObject m_spawnDroneBody;
 	GameObject m_spawnDronePropeller[4];
 	void setTravelTarget(XMVECTOR target);
 	void setRotationTarget(XMVECTOR target);
 	bool travelAndCheck(float dT, bool fastTravel);
 	bool assignMission(Robot** robots);
+	bool translateDoor(float dt, bool open);
 
 public:
 	SpawnDrone(std::vector<Resource*>* m_resourcesPtr);

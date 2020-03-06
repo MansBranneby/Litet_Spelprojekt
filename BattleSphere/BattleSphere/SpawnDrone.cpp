@@ -263,6 +263,29 @@ bool SpawnDrone::assignMission(Robot** robots)
 	return  false;
 }
 
+bool SpawnDrone::translateDoor(float dt, bool open)
+{
+	if (open)
+	{
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] - dt * 2.0f, 0.0f);
+		if (m_BSPDdoor.getPosition().m128_f32[1] <= BSPD_DOOR_OPEN)
+		{
+			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_OPEN, 0.0f);
+			return true;
+		}
+	}
+	else
+	{
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] + dt * 2.0f, 0.0f);
+		if (m_BSPDdoor.getPosition().m128_f32[1] >= BSPD_DOOR_CLOSED)
+		{
+			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_CLOSED, 0.0f);
+			return true;
+		}
+	}
+	return false;
+}
+
 SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 {
 	m_resources = m_resourcesPtr;
@@ -284,6 +307,8 @@ SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 	m_travelTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_travelDirection = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_spawnDroneBody.setPosition(DRONE_START);
+	m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_CLOSED, 0.0f);
+
 	XMVECTOR droneStart = DRONE_START;
 	Lights::getInstance()->setPosition(
 		m_droneLightIndex,
@@ -319,18 +344,33 @@ void SpawnDrone::update(Robot** robots, float dT)
 		if (m_collectedTime >= SPAWN_INTERVAL)
 		{
 			if (assignMission(robots)) // If mission assignable, advance state
-				m_spawnDroneState++;
+				m_spawnDroneState = 14;
 		}
 		break;
-
+	case 14:
+		if (translateDoor(dT, true))
+			m_spawnDroneState++;
+		break;
+	case 15: // Set to rise spot
+		XMVECTOR target = DRONE_RISE_START;
+		setTravelTarget(target);
+		//setRotationTarget(m_transportDestination);
+		m_spawnDroneState++;
+		break;
+	case 16: // Travel to rise spot 
+		translateDoor(dT, false);
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState = 0;
+		break;
 	case 0: // Set target to rising point
-		XMVECTOR target = m_spawnDroneBody.getPosition();
+		target = m_spawnDroneBody.getPosition();
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
 		setRotationTarget(m_transportDestination);
 		m_spawnDroneState++;
 		break;
 	case 1: // Rise 
+		translateDoor(dT, false);
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
@@ -343,6 +383,7 @@ void SpawnDrone::update(Robot** robots, float dT)
 		break;
 
 	case 3: // Travel
+		translateDoor(dT, false);
 		if (travelAndCheck(dT, true))
 			m_spawnDroneState++;
 		break;
@@ -440,6 +481,9 @@ objectData SpawnDrone::getData(int model)
 		return m_spawnDronePropeller[3].getData();
 		break;
 
+	case 4:
+		return m_BSPDdoor.getData();
+		break;
 	default:
 		return m_spawnDroneBody.getData();
 		break;

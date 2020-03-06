@@ -29,7 +29,10 @@ using namespace DirectX;
 #define ROTATION_SPEED 60.0f
 #define FAST_TRAVEL_SPEED 35.0f
 #define SLOW_TRAVEL_SPEED 14.0f
-#define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+#define DRONE_START XMVectorSet(-88.0f, 13.0f, 145.0f, -1)
+#define DRONE_RISE_START XMVectorSet(-60.0f, 13.0f, 85.0f, -1)
+#define BSPD_DOOR_CLOSED 0.0f
+#define BSPD_DOOR_OPEN -13.0f
 //#define DRONE_START XMVectorSet(66.0f, 5.0f, 46.5f, -1)
 #define RESOURCE_OFFSET -8.0f
 #define LIGHT_OFFSET 0.0f
@@ -84,6 +87,7 @@ enum class objectType
 	e_ground,
 	e_static,
 	e_billboard,
+	e_BSPD,
 	e_nrOfEnums
 };
 
