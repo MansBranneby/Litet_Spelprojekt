@@ -59,7 +59,7 @@ public:
 
 	float getPosX();
 	float getPosY();
-	void setPos(float posX, float posY);
+	void setPos(float posX, float posY); // Not tested
 	void setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest);
 	void setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest);
 	void fadeOut(float fadeTime, float delay);

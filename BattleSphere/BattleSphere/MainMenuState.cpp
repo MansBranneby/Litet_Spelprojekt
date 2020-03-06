@@ -23,8 +23,8 @@ MainMenuState::MainMenuState()
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_selection.png", true, 0.0f, 30.0f, 844.0f, 67.0f));
 	
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_box.png", true, 0.0f, 33.0f, 738.0f, 169.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\MainMenuAnimation\\box_ani_sprite3.png", true, 0.0f, -140.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\MainMenuAnimation\\box_ani_sprite3.png", true, 0.0f, -309.0f, 2960.0f, 1080.0f, 740.0f, 170.0f, 19));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_box.png", true, 0.0f, -140.0f, 738.0f, 169.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_box.png", true, 0.0f, -309.0f, 738.0f, 169.0f));
 	
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_startGame.png", true, 0.0f, 33.0f, 666.0f, 66.0f));
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\menu_options.png", true, 0.0f, -140.0f, 416.0f, 66.0f));
@@ -188,7 +188,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[robNrPlus13]->setDrawn(true); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
 				game->getRobots()[i]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
-				changeColour(game, i, true);
+				changeColour(game, robotNr, true);
 				m_readyState[robotNr]++;
 				break;
 			case 1:
@@ -228,14 +228,14 @@ void MainMenuState::hi_robotSelection(Game* game)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, i, true);
+			changeColour(game, robotNr, true);
 		}
 		//Left
 		if (game->getInput()->getThumbLX(i) < -0.4f && m_readyState[robotNr] == 1 && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, i, false);
+			changeColour(game, robotNr, false);
 		}
 
 	}
@@ -456,13 +456,13 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 	switch (m_robotColour[robotNr])
 	{
 	case 0:
-		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(0.5f, 1.0f, 0.5f);
 		break;
 	case 1:
-		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 0.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.5f, 0.0f);
 		break;
 	case 2:
-		game->getRobots()[robotNr]->setColour(0.0f, 0.0f, 1.0f);
+		game->getRobots()[robotNr]->setColour(1.0f, 0.8f, 1.0f);
 		break;
 	case 3:
 		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 1.0f);
@@ -474,6 +474,10 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 		break;
 	}
 	Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
+}
+
+void MainMenuState::firstTimeSetUp(Game* game)
+{
 }
 
 void MainMenuState::handleInput(Game* game)
@@ -515,7 +519,7 @@ void MainMenuState::draw(Game* game, renderPass pass)
 	{
 		for (int i = 0; i < m_uiElements.size(); i++)
 		{
-			if (m_uiElements[i]->isDrawn() && i != 2)
+			if (m_uiElements[i]->isDrawn() && i != 2 && i != 3 && i != 4)
 				m_uiElements[i]->draw();
 		}
 	}
@@ -523,6 +527,10 @@ void MainMenuState::draw(Game* game, renderPass pass)
 	{
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[2]->getConstantBuffer()->getConstantBuffer());
 		m_uiElements[2]->draw();
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[3]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[3]->draw();
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[4]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[4]->draw();
 	}
 	else
 	{
@@ -531,10 +539,10 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 			{
 				
-				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 
-				game->getPreLoader()->draw(ObjectType::e_robot);
+				game->getPreLoader()->draw(objectType::e_robot);
 			}
 		}
 	}
