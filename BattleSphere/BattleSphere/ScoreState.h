@@ -1,15 +1,51 @@
 #pragma once
 #include "State.h"
-#include "UI_Element.h"
+#include "Transparency.h"
+#include "Lights.h"
+#include "DBOHandler.h"
+#include "CollisionTests.h"
+#include "StructsAndEnums.h"
+#include "Graph.h"
+#include "SpawnDrone.h"
+#include "Particles.h"
+#include "Sound.h"
+#include "BillboardHandler.h"
 
 class ScoreState : public State
 {
 private:
-	std::vector<UI_Element*> m_uiElements;
-	std::vector<UI_Element*> m_uiElements_numbers;
+	Input* m_input;
+	Robot** m_robots;
+	std::vector<Resource*> m_resources;
+	std::vector<Node*> m_nodes;
+	BillboardHandler m_billboardHandler;
+	Lights* m_lights;
+	Transparency m_transparency;
+
+	// Spawning
+	SpawnDrone* m_spawnDrone;
+	void spawnNodes();
+
+	// Dynamic camera
+	XMVECTOR m_camStartPos;
+	XMVECTOR m_camStartLookAt;
+	XMVECTOR m_vecToCam;
+	bool m_zoomingOutToStart;
+	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
+	void updateDynamicCamera(float dT);
+	bool m_devZoomOut;
+
+	// Dynamic background objects
+	DBOHandler* m_dboHandler;
+
+	// Particles
+	Particles m_particles;
+
+	void handleMovement(Game* game, float dt, int id);
+	void handleInputs(Game* game, float dt);
 
 public:
-	ScoreState();
+	ScoreState(Game* game);
 	~ScoreState();
 
 	void pause();

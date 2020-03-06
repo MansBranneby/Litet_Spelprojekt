@@ -129,6 +129,7 @@ PreLoader::PreLoader()
 	// Collidable Billboards
 	loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
 
+
 	// Background
 	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
 	loadFromFile(ObjectType::e_scene, "OnMap\\Apartment");
@@ -143,6 +144,11 @@ PreLoader::PreLoader()
 	loadFromFile(ObjectType::e_scene, "Other\\Car");
 	loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
 	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
+
+
+
+	//	// ScoreRoom
+	loadFromFile(ObjectType::e_scene, "Background\\ScoreRoom2");
 }
 
 PreLoader::~PreLoader()

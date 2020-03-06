@@ -314,7 +314,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
-		g_scoreState = new ScoreState();
+		g_scoreState = new ScoreState(g_Game);
 		g_gameState = new GameState(g_Game);
 		g_mainMenuState = new MainMenuState();
 		g_Game->pushState(g_scoreState);
@@ -366,7 +366,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
-				if (g_Game->isActive(stateType::e_gameState))
+				if (g_Game->isActive(stateType::e_gameState) || g_Game->isActive(stateType::e_scoreState))
 				{
 					// SHADOW MAPPING
 					ID3D11ShaderResourceView* nullSRV = nullptr;
@@ -433,7 +433,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				//// RENDER ////
 
-				if (g_Game->isActive(stateType::e_gameState))
+				if (g_Game->isActive(stateType::e_gameState) ||g_Game->isActive(stateType::e_scoreState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
 					
@@ -536,61 +536,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					ID3D11ShaderResourceView* nullRTV = { NULL };
 					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
 				}
-				// TODO GLENN
-				else if (g_Game->isActive(stateType::e_scoreState))
-				{
-					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-
-					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-					DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
-					DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xffffffff);
-
-					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera(false)->getConstantBufferVP()->getConstantBuffer());
-					DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
-
-					DX::getInstance()->getDeviceContext()->VSSetShader(&g_menu->getVertexShader()->getVertexShader(), nullptr, 0);
-					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(0)->getPixelShader(), nullptr, 0);
-
-					DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_menu->getVertexShader()->getvertexLayout());
-
-					g_Game->draw(renderPass::e_menu);
-
-					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(1)->getPixelShader(), nullptr, 0);
-					g_Game->draw(renderPass::e_menuAni);
-
-					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-					g_lightCulling.updateSubresource();
-					g_lightCulling.cullLights();
-					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-					DX::getInstance()->getDeviceContext()->OMSetBlendState(0, 0, 0xffffffff);
-					DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
-					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera(true)->getConstantBufferVP()->getConstantBuffer());
-					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, g_menu->getCamera(true)->getConstantBufferPosition()->getConstantBuffer());
-					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, g_constantBufferMaterials->getConstantBuffer());
-
-					DX::getInstance()->getDeviceContext()->VSSetShader(&gVS.getVertexShader(), nullptr, 0);
-					DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
-					DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
-
-					//DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &_vertexBuffer, &vertexSize, &offset);
-					DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
-
-					g_Game->draw(renderPass::e_menuScene);
-
-					//finalRender();
-
-					ID3D11ShaderResourceView* nullRTV = { NULL };
-					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
-				}
-				
 
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
