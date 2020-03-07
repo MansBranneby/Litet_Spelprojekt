@@ -7,7 +7,7 @@ void SpawnDrone::loadLists()
 	m_spawns.push_back({ -120, 100 });
 	m_spawns.push_back({ -74, 85 });
 	m_spawns.push_back({ -46, 85 });
-	m_spawns.push_back({ -15, 85 });
+	m_spawns.push_back({ -15, 85 }); 
 	m_spawns.push_back({ 120, 39 });
 	m_spawns.push_back({ -15, 29 });
 	m_spawns.push_back({ 15, 29 });
@@ -344,108 +344,182 @@ void SpawnDrone::update(Robot** robots, float dT)
 		if (m_collectedTime >= SPAWN_INTERVAL)
 		{
 			if (assignMission(robots)) // If mission assignable, advance state
-				m_spawnDroneState = 14;
+				m_spawnDroneState++;
 		}
 		break;
-	case 14:
+	case 0:
 		if (translateDoor(dT, true))
 			m_spawnDroneState++;
 		break;
-	case 15: // Set to rise spot
+	case 1: // Set to rise spot
 		XMVECTOR target = DRONE_RISE_START;
 		setTravelTarget(target);
-		//setRotationTarget(m_transportDestination);
 		m_spawnDroneState++;
 		break;
-	case 16: // Travel to rise spot 
+	case 2: // Travel to rise spot 
 		translateDoor(dT, false);
 		if (travelAndCheck(dT, false))
-			m_spawnDroneState = 0;
+
+			m_spawnDroneState++;
 		break;
-	case 0: // Set target to rising point
-		target = m_spawnDroneBody.getPosition();
-		target.m128_f32[1] = TRAVEL_HEIGHT;
-		setTravelTarget(target);
+	case 3: // Set target to rising point
 		setRotationTarget(m_transportDestination);
-		m_spawnDroneState++;
+		if (m_transportDestination.m128_f32[0] < 0.0f && m_transportDestination.m128_f32[2] > 30.0f)
+		{
+			if (travelAndCheck(dT, false))
+				m_spawnDroneState = 20;
+		}
+		else
+		{
+			target = m_spawnDroneBody.getPosition();
+			target.m128_f32[1] = TRAVEL_HEIGHT;
+			setTravelTarget(target);
+			m_spawnDroneState++;
+		}
 		break;
-	case 1: // Rise 
+	case 4: // Rise 
 		translateDoor(dT, false);
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 2: // Set target above transport location
+	case 5: // Set target above transport location
 		target = m_transportDestination;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 3: // Travel
+	case 6: // Travel
 		translateDoor(dT, false);
 		if (travelAndCheck(dT, true))
 			m_spawnDroneState++;
 		break;
 
-	case 4: // Set target to decline down to spawn point
+	case 7: // Set target to decline down to spawn point
 		target = m_transportDestination;
 		target.m128_f32[1] -= RESOURCE_OFFSET;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 5: // Decline 
+	case 8: // Decline 
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 6: // Leave resource
+	case 9: // Leave resource
 		(*m_resources)[m_heldResourceIndex]->setPosition(m_transportDestination);
 		(*m_resources)[m_heldResourceIndex]->setBlocked(false);
 		m_heldResourceIndex = -1;
 		m_spawnDroneState++;
 		break;
 
-	case 7: // Set target above transport location, rotate to drone start
+	case 10: // Set target above transport location, rotate to drone start
 		target = m_transportDestination;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
-		setRotationTarget(DRONE_START);
+		setRotationTarget(DRONE_RISE_START);
 		m_spawnDroneState++;
 		break;
 
-	case 8: // Rise 
+	case 11: // Rise 
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 9: // Set target above drone start
-		target = DRONE_START;
+	case 12: // Set target above drone rise start
+		target = DRONE_RISE_START;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 10: // Travel
+	case 13: // Travel
 		if (travelAndCheck(dT, true))
 			m_spawnDroneState++;
 		break;
 
-	case 11: // Set target to decline down to drone start  
-		setTravelTarget(DRONE_START);
+	case 14: // Set target to decline down to drone rise start  
+		setRotationTarget(-DRONE_START);
+		setTravelTarget(DRONE_RISE_START);
 		m_spawnDroneState++;
 		break;
 
-	case 12: // Decline
+	case 15: // Decline
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 13: // Reset switch
+	case 16: // Set target to BSPD building
+		setTravelTarget(DRONE_START);
 		m_spawnDroneState++;
+		break;
+
+	case 17: // Open door and then travel to start
+		if (translateDoor(dT, true))
+		{
+			if (travelAndCheck(dT, false))
+				m_spawnDroneState++;
+		}
+		break;
+	case 18:
+		if (translateDoor(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 19: // Reset switch
+		//m_spawnDroneState++;
 		m_spawnDroneState = -1;
 		Sound::getInstance()->stop(soundAmbient::e_drone);
+		break;
+
+	case 20: // Set travel (without rise)
+		target = m_transportDestination;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+
+	case 21: // Travel (without rise)
+		if (travelAndCheck(dT, true))
+			m_spawnDroneState++;
+		break;
+
+	case 22: // Leave (without rise)
+		(*m_resources)[m_heldResourceIndex]->setPosition(m_transportDestination);
+		(*m_resources)[m_heldResourceIndex]->setBlocked(false);
+		m_heldResourceIndex = -1;
+		m_spawnDroneState++;
+		break;
+
+	case 23: // Set rotate to rise start
+		setRotationTarget(DRONE_RISE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 24: // Rotate to rise start
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+
+	case 25:
+		setTravelTarget(DRONE_RISE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 26:
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 27:
+		setRotationTarget(-DRONE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 28:
+		translateDoor(dT, true);
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState = 16;
 		break;
 	}
 }

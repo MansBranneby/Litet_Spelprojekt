@@ -138,11 +138,12 @@ PreLoader::PreLoader()
 
 	// Billboards
 	loadFromFile(objectType::e_billboard, "TestTower");
-	loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	//loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
 	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
+	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
 	loadFromFile(objectType::e_ground, "Background\\Ground");
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
 	loadFromFile(objectType::e_scene, "Background\\SSB");

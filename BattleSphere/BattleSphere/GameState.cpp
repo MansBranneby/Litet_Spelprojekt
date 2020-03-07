@@ -524,6 +524,9 @@ GameState::GameState(Game* game)
 
 	m_lights->addAreaLight(-125, 18, -9.4f, 50, 0.06f, 0.9f, 0.9f, 10); // Golden duck
 
+	m_lights->addAreaLight(-84, 5.0f, -30.0f, 15.0f, 0.8f, 0.1f, 0.0f, 10); // China town
+	m_lights->addAreaLight(-50, 5.0f, -30.0f, 15.0f, 0.8f, 0.1f, 0.0f, 10);
+
 	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
 	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
 	m_lights->addAreaLight(46.0f, 4.0f, -6.5f, 12.0f, 0.0f, 1.0f, 0.35f, 15.0f); // Gas station cyan
