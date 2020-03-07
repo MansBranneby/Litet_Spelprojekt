@@ -16,7 +16,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(REFLECT);
+	Weapon* pistol = new Weapon(SNIPER);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -211,10 +211,27 @@ int Robot::changeWeapon(int side)
 
 		//m_currentWeapon[side] = (m_weaponPointer + 1) % (int)m_weapons.size(); // Change to next weapon
 		//m_weaponPointer = m_currentWeapon[side]; // Update weapon pointer
+		XMVECTOR relPos = m_weapons[m_currentWeapon[side]]->getRelativePos();
+
 		if (side == RIGHT)
-			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
+		{
+			if (XMVectorGetX(relPos) < 0)
+				relPos = XMVectorSetX(relPos, XMVectorGetX(relPos) * -1);
+			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(relPos);
+
+			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
+				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 1, 0, 180);
+		}
 		else
-			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
+		{
+			if (XMVectorGetX(relPos) > 0)
+				relPos = XMVectorSetX(relPos, XMVectorGetX(relPos) * -1);
+			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(relPos);
+
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) < 90.0f)
+				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+		}
+
 		m_ready = false;
 		return m_weapons[m_currentWeapon[side]]->getType();
 	}
@@ -272,10 +289,12 @@ void Robot::addWeapon(int type)
 		m_currentWeapon[LEFT] = 0;
 		m_currentWeapon[RIGHT] = 1;
 		//m_weaponPointer = 1;
-		weapon->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
 
-		if (type != BEYBLADE)
-		weapon->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
+		XMVECTOR relPos = m_weapons[m_currentWeapon[LEFT]]->getRelativePos();
+		m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSetX(relPos, XMVectorGetX(relPos) * -1));
+
+		if (type == REFLECT)
+			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
 	}
 	//m_weapons.push_back(weapon);
 }
@@ -351,7 +370,7 @@ void Robot::storePositionInHistory(DirectX::XMVECTOR position)
 		// size is less than cap
 		m_positionHistory[m_positionHistoryPtr] = position; // insert at historyPtr
 		m_positionHistoryPtr++;								// step historyPtr
-		m_positionHistorySize++;							// increase size
+		m_positionHistorySize++;							// increase sizePos
 	}
 	else
 	{

@@ -43,7 +43,7 @@ Weapon::Weapon(int type)
 	else if (type == SHIELD)
 	{
 		m_cooldown = 10.0f;
-		m_duration = 5.0f;
+		m_duration = 6.0f;
 		m_defense = 0.0f;
 
 		setScale(0.8f, 0.8f, 0.1f);
@@ -58,8 +58,8 @@ Weapon::Weapon(int type)
 	}
 	else if (type == REFLECT)
 	{
-		m_cooldown = 12.0f;
-		m_duration = 3.0f;
+		m_cooldown = 10.0f;
+		m_duration = 4.0f;
 		m_defense = 0.0f;
 
 		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -234,8 +234,8 @@ void Weapon::upgrade()
 		m_duration += 0.5f;
 		if (m_cooldown < 8.0f)
 			m_cooldown = 8.0f;
-		if (m_duration > 6.0)
-			m_duration = 6.0f;
+		if (m_duration > 7.0)
+			m_duration = 7.0f;
 	}
 	else if (m_type == SNIPER)
 	{

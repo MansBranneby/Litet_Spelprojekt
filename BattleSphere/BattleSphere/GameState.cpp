@@ -927,6 +927,25 @@ void GameState::draw(Game* game, renderPass pass)
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 
+	if (pass == renderPass::e_particles)
+	{
+		m_particles.draw();
+	}
+
+	if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
+	{
+		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+
+		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+	}
+
+	// User interface
+	if (pass == renderPass::e_userInterface)
+	{
+		m_userInterface->draw();
+	}
+
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -1008,6 +1027,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 	}
+
 	if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
 	{
 		// Scene (Background objects without collision)
@@ -1028,6 +1048,14 @@ void GameState::draw(Game* game, renderPass pass)
 			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
 		}
 
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
+
+		// Robot stuff
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -1074,42 +1102,11 @@ void GameState::draw(Game* game, renderPass pass)
 
 			}
 
-
-			// Tokyo drift
-			for (int i = 0; i < OBJECT_NR_1; i++)
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				if (m_dboHandler->isDrawn(i))
-					game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+				m_lineShots.draw(i);
 			}
 
-			for (int i = 0; i < XUSER_MAX_COUNT; i++)
-			{
-				if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-				{
-					m_lineShots.draw(i);
-				}
-			}
-
-
-		}
-		if (pass == renderPass::e_particles)
-		{
-			m_particles.draw();
-		}
-		if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
-		{
-			std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-
-			for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
-				game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
-		}
-
-
-
-		// User interface
-		if (pass == renderPass::e_userInterface)
-		{
-			m_userInterface->draw();
 		}
 	}
 }
