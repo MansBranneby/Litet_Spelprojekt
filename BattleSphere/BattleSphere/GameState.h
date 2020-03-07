@@ -44,9 +44,6 @@ private:
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
 
-	// Particles
-	Particles m_particles;
-
 	// Sound
 	float m_sawInterval;
 

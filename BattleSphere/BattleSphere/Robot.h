@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Weapon.h"
 #include "Resource.h"
+#include "Particles.h"
 
 #define LEFT 0
 #define RIGHT 1
@@ -39,6 +40,9 @@ private:
 	unsigned int m_positionHistoryPtr;	// Pointer to last inserted position
 	// Velocity
 	DirectX::XMVECTOR m_vel;
+
+	// Particles
+	float m_timeSinceParticles;
 
 	void addWeapon(int type);
 public:

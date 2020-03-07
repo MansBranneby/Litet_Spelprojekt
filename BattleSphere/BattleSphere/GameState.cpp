@@ -160,8 +160,13 @@ void GameState::updateDynamicCamera(float dT)
 
 void GameState::handleMovement(Game* game, float dt, int id)
 {
+	// Limit robot look at vector
+	XMVECTOR robLookAt = XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f);
+	if (XMVector3Length(robLookAt).m128_f32[0] > 1.0f)
+		robLookAt = XMVector3Normalize(robLookAt);
+
 	// Save velocity for collision
-	m_robots[id]->setVel(XMVectorSet(m_input->getThumbLX(id), 0.0f, m_input->getThumbLY(id), 0.0f) *
+	m_robots[id]->setVel(robLookAt *
 		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
 
 	// Robot and weapon movement
@@ -619,7 +624,7 @@ bool GameState::update(Game* game, float dt)
 	m_spawnDrone->update(m_robots, dt);
 
 	// Update particles
-	m_particles.update(dt);
+	DX::getInstance()->getParticles()->update(dt);
 
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
@@ -690,7 +695,7 @@ bool GameState::update(Game* game, float dt)
 					m_sawInterval = 0.0f;
 					Sound::getInstance()->play(soundEffect::e_sawcut, colInfo.m_contactPoint, 0.02f);
 					XMVECTOR cutDir = XMVector3Cross((colInfo.m_contactPoint - beybladeRobPos), XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-					m_particles.addCutSpark(colInfo.m_contactPoint, cutDir);
+					DX::getInstance()->getParticles()->addCutSpark(colInfo.m_contactPoint, cutDir);
 				}
 
 
@@ -717,7 +722,7 @@ bool GameState::update(Game* game, float dt)
 								// Add spark
 								XMVECTOR dir = XMVector3Cross(dirToVictim, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 								XMVECTOR cutPos = beybladeRobPos + XMVector3Normalize(dirToVictim) * (disToVic - 1.54710078f);
-								m_particles.addCutSpark(cutPos, dir);
+								DX::getInstance()->getParticles()->addCutSpark(cutPos, dir);
 							}
 
 							// Set vibration and drop resource
@@ -743,7 +748,7 @@ bool GameState::update(Game* game, float dt)
 		if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 		{
 			
-			m_particles.addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(),
+			DX::getInstance()->getParticles()->addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(),
 				ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 1, 5.0f
 			);
 
@@ -773,7 +778,7 @@ bool GameState::update(Game* game, float dt)
 			{
 				if (!ProjectileBank::getInstance()->getList()[i]->isExploding())
 				{
-					m_particles.addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(), ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 25, 40);
+					DX::getInstance()->getParticles()->addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(), ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 25, 40);
 					//Damage surrounding players
 					for (int k = 0; k < XUSER_MAX_COUNT; k++)
 					{
@@ -803,7 +808,7 @@ bool GameState::update(Game* game, float dt)
 			{
 				// Add spark particles
 				Sound::getInstance()->play(soundEffect::e_impact, ProjectileBank::getInstance()->getList()[i]->getPosition(), 0.05f);
-				m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+				DX::getInstance()->getParticles()->addSpark(projectile->getData().pos, projectile->getDirection());
 				ProjectileBank::getInstance()->removeProjectile(i);
 			}
 		}
@@ -861,7 +866,7 @@ bool GameState::update(Game* game, float dt)
 						}
 						else
 						{
-							m_particles.addSpark(projectile->getData().pos, projectile->getDirection());
+							DX::getInstance()->getParticles()->addSpark(projectile->getData().pos, projectile->getDirection());
 
 							int resourceIndex = m_robots[j]->getResourceIndex();
 							if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
@@ -1028,7 +1033,7 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 	if (pass == renderPass::e_particles)
 	{
-		m_particles.draw();
+		DX::getInstance()->getParticles()->draw();
 	}
 	if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
 	{
