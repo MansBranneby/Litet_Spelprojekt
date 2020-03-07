@@ -120,10 +120,19 @@ std::vector<XMVECTOR> Graph::calculateAIPath(XMVECTOR startPos, XMVECTOR goal)
 			}
 		}
 		//Are we the goal????
-		XMFLOAT2 currNodePos;
-		currNodePos.x = m_nodes[open[q].index].pos.m128_f32[0];
-		currNodePos.y = m_nodes[open[q].index].pos.m128_f32[2];
-		if (!m_quadtree->testCollision(currNodePos, goalPos))
+		XMVECTOR right = XMVector3Cross(XMVector3Normalize(goal - m_nodes[open[q].index].pos), XMVectorSet(0, 1, 0, 0));
+		XMVECTOR pos1, pos2;
+		pos1 = m_nodes[open[q].index].pos + right * 2;
+		pos2 = m_nodes[open[q].index].pos - right * 2;
+		XMFLOAT2 currNodePos1, currNodePos2;
+		currNodePos1.x = pos1.m128_f32[0];
+		currNodePos1.y = pos1.m128_f32[2];
+
+		currNodePos2.x = pos2.m128_f32[0];
+		currNodePos2.y = pos2.m128_f32[2];
+
+		//XMStoreFloat2(&right, XMVector2Cross(XMLoadFloat2(&currNodePos - goalPos), XMVectorSet(0, 1, 0, 0)));
+		if (!m_quadtree->testCollision(currNodePos1, goalPos) && !m_quadtree->testCollision(currNodePos2, goalPos))
 		{
 			std::vector<XMVECTOR> path;
 			node currentNode = open[q];
@@ -199,7 +208,7 @@ Graph::Graph()
 	m_nodes[1].pos = XMVectorSet(100.6f, 0.0f, -20.0f, 0.0f);
 	m_nodes[2].pos = XMVectorSet(-82.7f, 0.0f, -96.5f, 0.0f);
 	m_nodes[3].pos = XMVectorSet(-116.4f, 0.0f, -9.4f, 0.0f);
-	m_nodes[4].pos = XMVectorSet(156.0f, 0.0f, 13.0f, 0.0f);
+	m_nodes[4].pos = XMVectorSet(151.0f, 0.0f, -7.0f, 0.0f);
 	m_nodes[5].pos = XMVectorSet(156.0f, 0.0f, 50.0f, 0.0f);
 	m_nodes[6].pos = XMVectorSet(106.0f, 0.0f, -58.0f, 0.0f);
 	m_nodes[7].pos = XMVectorSet(122.0f, 0.0f, -78.0f, 0.0f);

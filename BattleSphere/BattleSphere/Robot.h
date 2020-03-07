@@ -22,6 +22,7 @@ private:
 	mission m_currentMission;
 	bool m_isAi;
 
+
 	int m_playerId;
 	XMVECTOR m_colour;
 	float m_health;
@@ -50,7 +51,8 @@ public:
 	Robot(int playerId);
 	//Robot(QuadtreeNode* qtn); Add
 	bool isAi();
-	void setAIGoal(XMVECTOR position);
+	void setAi(bool ai);
+	void setAIGoal(XMVECTOR position, bool update);
 	void setPlayerId(int playerId);
 	int getPlayerId();
 	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);

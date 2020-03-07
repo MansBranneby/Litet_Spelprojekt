@@ -194,7 +194,7 @@ CollisionInfo QuadtreeNode::testCollision(boundingData boundingVolume, DirectX::
 	return collisionInfo;
 }
 
-bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
+bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end, float height)
 {
 	
 	XMFLOAT2 point[4];
@@ -242,8 +242,8 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end)
 				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
 				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
 
-				XMVECTOR startReal = { start.x, 0.5f, start.y };
-				XMVECTOR endReal = { end.x, 0.5f, end.y };
+				XMVECTOR startReal = { start.x, height, start.y };
+				XMVECTOR endReal = { end.x, height, end.y };
 
 				collision = testLineTriangle(startReal, endReal, triangles);
 				if (collision)

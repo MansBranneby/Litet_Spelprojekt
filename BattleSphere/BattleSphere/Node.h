@@ -27,6 +27,6 @@ public:
 	~Node();
 
 	bool isType(int type);
-	void updateTime(float dT);
+	bool updateTime(float dT);
 };
 

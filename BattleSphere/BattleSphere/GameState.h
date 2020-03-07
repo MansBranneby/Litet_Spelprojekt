@@ -41,6 +41,8 @@ private:
 	void updateDynamicCamera(float dT);
 	bool m_devZoomOut;
 
+	bool m_updateMission;
+
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
 

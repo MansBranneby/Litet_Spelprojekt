@@ -24,6 +24,6 @@ public:
 
 	CollisionInfo testCollision(boundingData boundingVolume);
 	CollisionInfo testCollision(boundingData boundingVolume, DirectX::XMVECTOR previousPos);
-	bool testCollision(XMFLOAT2 start, XMFLOAT2 end);
+	bool testCollision(XMFLOAT2 start, XMFLOAT2 end, float height = 0.5f);
 	float testCollisionRay(XMFLOAT2 start, XMFLOAT2 dir);
 };
