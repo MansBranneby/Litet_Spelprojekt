@@ -228,7 +228,7 @@ int Robot::changeWeapon(int side)
 				relPos = XMVectorSetX(relPos, XMVectorGetX(relPos) * -1);
 			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(relPos);
 
-			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) < 90.0f)
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
 				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
 		}
 
