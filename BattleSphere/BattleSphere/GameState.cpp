@@ -334,7 +334,7 @@ void GameState::handleInputs(Game* game, float dt)
 							m_robots[i]->removeResource();
 							if (m_robots[i]->isAi())
 							{
-								for (int i = 0; i < m_robots[i]->getWeapons().size(); i++)
+								for (int j = 0; j < m_robots[i]->getWeapons().size(); j++)
 								{
 									if (m_robots[i]->getCurrentWeapon(0) != -1)
 									{
@@ -629,7 +629,7 @@ void GameState::firstTimeSetUp(Game* game)
 			m_userInterface->setPlayerColours(i, m_robots[i]->getData().material.emission);
 	}
 	//Spawn AI:s
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i < 2; i++)
 	{
 		m_robots[i] = new Robot(i);
 		m_robots[i]->setColour(1, 0, 0);
@@ -639,8 +639,8 @@ void GameState::firstTimeSetUp(Game* game)
 		
 	}
 	m_robots[1]->setPosition(XMVectorSet(100.0f, 2.0f, -50.0f, 0));
-	m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
-	m_robots[3]->setPosition(XMVectorSet(120.0f, 2.0f, 50.0f, 0));
+	/*m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
+	m_robots[3]->setPosition(XMVectorSet(120.0f, 2.0f, 50.0f, 0));*/
 
 }
 
