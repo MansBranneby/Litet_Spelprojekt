@@ -37,6 +37,7 @@ Weapon::Weapon(int type)
 		m_cooldown = 10.0f;
 		m_duration = 4.0f;
 		m_speed = 1.5f;
+
 		setScale(0.1f, 0.8f, 0.1f);
 	}
 	else if (type == SHIELD)
@@ -44,6 +45,7 @@ Weapon::Weapon(int type)
 		m_cooldown = 10.0f;
 		m_duration = 5.0f;
 		m_defense = 0.0f;
+
 		setScale(0.8f, 0.8f, 0.1f);
 	}
 	else if (type == DASH)
@@ -51,6 +53,7 @@ Weapon::Weapon(int type)
 		m_cooldown = 1.5f;
 		m_duration = 0.15f;
 		m_speed = 5.0f;
+
 		setScale(0.2f, 1.6f, 0.2f);
 	}
 	else if (type == REFLECT)
@@ -58,7 +61,8 @@ Weapon::Weapon(int type)
 		m_cooldown = 12.0f;
 		m_duration = 3.0f;
 		m_defense = 0.0f;
-		setScale(1.8f, 1.8f, 0.2f);
+
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == SNIPER)
 	{
@@ -84,8 +88,9 @@ Weapon::Weapon(int type)
 		m_damage = 20;
 		m_cooldown = 2.5f;
 		m_recoil = 0.0f;
-		setScale(1.0f, 1.0f, 1.0f);
 		m_blastRange = 20;
+
+		setScale(1.0f, 1.0f, 1.0f);
 	}
 	else
 	{

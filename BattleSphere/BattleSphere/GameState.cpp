@@ -594,7 +594,6 @@ void GameState::firstTimeSetUp(Game* game)
 			m_lineShots.setColour(i, m_robots[i]->getColour());
 		}
 	}
-
 }
 
 void GameState::handleInput(Game* game)
@@ -636,6 +635,7 @@ bool GameState::update(Game* game, float dt)
 		{
 			m_robots[i]->update(dt, game->getQuadtree(), start, end);
 
+			// SNIPER STUFF
 			bool activated = false;
 			for (int side = 0; side < 2; side++)
 			{
@@ -651,6 +651,27 @@ bool GameState::update(Game* game, float dt)
 			XMVECTOR pos = m_robots[i]->getPosition();
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
+
+			// REFLECT AND SHIELD
+			for (int side = 0; side < 2; side++)
+			{
+				if (game->getRobots()[i]->getCurrentWeapon(side) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == REFLECT)
+				{
+
+					objectData od = m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getData();
+					od.material.ambient = XMVectorSet(-1.0f, -1.0f, -1.0f, 1.0f);
+					od.material.diffuse = m_robots[i]->getData().material.emission;
+					if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getActive())
+					{
+						od.material.emission = XMVectorSet(-1.0f, -1.0f, -1.0f, 0.2f);
+					}
+					else
+						od.material.emission = XMVectorSet(-1.0f, -1.0f, -1.0f, 0.0f);
+					game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 0, 0, 3);
+					od.material.emission = m_robots[i]->getData().material.emission;
+					game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 1, 2, 3);
+				}
+			}
 		}
 	}
 
@@ -929,6 +950,10 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2, false);
 					break;
 
+				case REFLECT:
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1, 3);
+					break;
+
 				default:
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 					break;
@@ -944,7 +969,11 @@ void GameState::draw(Game* game, renderPass pass)
 						break;
 
 					case ENERGY:
-						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2);
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 2, 2);
+						break;
+
+					case REFLECT:
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1, 3);
 						break;
 
 					default:
@@ -955,7 +984,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 		game->getPreLoader()->draw(objectType::e_ground);
-		
+
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
@@ -967,6 +996,10 @@ void GameState::draw(Game* game, renderPass pass)
 
 			case ENERGY:
 				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 2);
+				break;
+
+			case REFLECT:
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 3);
 				break;
 
 			default:
@@ -985,27 +1018,60 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
 			game->getPreLoader()->draw(objectType::e_static, i);
 
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-			for (int i = 0; i < m_nodes.size(); i++)
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
+
+				int wepType = weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getType();
+				switch (wepType)
+				{
+				case REFLECT:
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 3);
+					break;
+
+				default:
+					break;
+				}
+
+				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
+				{
+					int wepType = weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getType();
+					switch (wepType)
+					{
+					case REFLECT:
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 3);
+						break;
+
+					default:
+						break;
+					}
+				}
 			}
+
 			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 			{
-				
+
 				for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 				{
 					if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
 						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
-					else if(ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
+					else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
 
 						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
 				}
-				
+
 			}
 
 
@@ -1016,33 +1082,34 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 			}
 
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
-		{
-			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			for (int i = 0; i < XUSER_MAX_COUNT; i++)
 			{
-				m_lineShots.draw(i);
+				if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+				{
+					m_lineShots.draw(i);
+				}
 			}
+
+
+		}
+		if (pass == renderPass::e_particles)
+		{
+			m_particles.draw();
+		}
+		if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
+		{
+			std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+
+			for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
+				game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 		}
 
-		
-	}
-	if (pass == renderPass::e_particles)
-	{
-		m_particles.draw();
-	}
-	if (pass == renderPass::e_billboard || pass == renderPass::e_shadow)
-	{
-		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-
-		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
-			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
-	}
 
 
-	
-	// User interface
-	if (pass == renderPass::e_userInterface)
-	{
-		m_userInterface->draw();
+		// User interface
+		if (pass == renderPass::e_userInterface)
+		{
+			m_userInterface->draw();
+		}
 	}
 }
