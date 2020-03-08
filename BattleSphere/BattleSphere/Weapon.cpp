@@ -37,13 +37,15 @@ Weapon::Weapon(int type)
 		m_cooldown = 10.0f;
 		m_duration = 4.0f;
 		m_speed = 1.5f;
+
 		setScale(0.1f, 0.8f, 0.1f);
 	}
 	else if (type == SHIELD)
 	{
 		m_cooldown = 10.0f;
-		m_duration = 5.0f;
+		m_duration = 6.0f;
 		m_defense = 0.0f;
+
 		setScale(0.8f, 0.8f, 0.1f);
 	}
 	else if (type == DASH)
@@ -51,14 +53,16 @@ Weapon::Weapon(int type)
 		m_cooldown = 1.5f;
 		m_duration = 0.15f;
 		m_speed = 5.0f;
+
 		setScale(0.2f, 1.6f, 0.2f);
 	}
 	else if (type == REFLECT)
 	{
-		m_cooldown = 12.0f;
-		m_duration = 3.0f;
+		m_cooldown = 10.0f;
+		m_duration = 4.0f;
 		m_defense = 0.0f;
-		setScale(1.8f, 1.8f, 0.2f);
+
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == SNIPER)
 	{
@@ -84,8 +88,9 @@ Weapon::Weapon(int type)
 		m_damage = 20;
 		m_cooldown = 2.5f;
 		m_recoil = 0.0f;
-		setScale(3.8f, 3.8f, 1.8f);
 		m_blastRange = 20;
+
+		setScale(1.0f, 1.0f, 1.0f);
 	}
 	else
 	{
@@ -229,8 +234,8 @@ void Weapon::upgrade()
 		m_duration += 0.5f;
 		if (m_cooldown < 8.0f)
 			m_cooldown = 8.0f;
-		if (m_duration > 6.0)
-			m_duration = 6.0f;
+		if (m_duration > 7.0)
+			m_duration = 7.0f;
 	}
 	else if (m_type == SNIPER)
 	{
@@ -325,12 +330,15 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
 			Sound::getInstance()->play(soundEffect::e_rifle, projPos, 0.3f, -0.5f, 0.0f);
+		if (m_type == ENERGY)
+			Sound::getInstance()->play(soundEffect::e_energy, projPos, 0.3f, 0.0f, 0.0f);
 
 		return true;
 	}
 	else if (m_type == SNIPER && m_ready)
 	{
 		m_ready = false;
+		Sound::getInstance()->play(soundEffect::e_sniper, robotPos+m_relativePos, 0.5f, 0.0f, 0.0f);
 		return true;
 	}
 

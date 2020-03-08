@@ -91,6 +91,7 @@ void Projectile::explode()
 {
 	m_explode = true;
 	m_velocity = 0;
+	Sound::getInstance()->play(soundEffect::e_explosion, getPosition(), 0.3f, 0.0f, 0.0f);
 }
 
 bool Projectile::move(float dt)

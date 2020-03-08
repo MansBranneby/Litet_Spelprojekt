@@ -23,9 +23,9 @@ enum class soundEffect
 	e_damage = 7,
 	e_impact = 8,
 	e_sawcut = 9,
-	e_explosion = 10,
-	e_blast = 11,
-	e_traverse = 12
+	e_sniper = 10,
+	e_energy = 11,
+	e_explosion = 12
 };
 
 enum class soundAmbient
@@ -51,7 +51,7 @@ enum class soundUI
 	e_back = 2,
 };
 
-#define NR_EFFECT_SOUNDS 10
+#define NR_EFFECT_SOUNDS 13
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
 #define NR_UI_SOUNDS 3
@@ -89,6 +89,7 @@ public:
 	void play(soundEffect sound, XMVECTOR pos, float volume = 1.0f, float pitch = 0.0f, float pan = 0.0f);
 
 	void stop(soundAmbient sound);
+	void stop(soundMusic sound);
 
 	void update(float dt);
 

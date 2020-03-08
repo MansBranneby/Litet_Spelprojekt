@@ -105,8 +105,12 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_drone, "Drone");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Beyblade3");
+	loadFromFile(objectType::e_weapon, "GamePlay\\energy");
+	loadFromFile(objectType::e_weapon, "GamePlay\\reflect");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade3");
+	loadFromFile(objectType::e_resource, "GamePlay\\energy");
+	loadFromFile(objectType::e_resource, "GamePlay\\reflect");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleFish", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
@@ -116,6 +120,7 @@ PreLoader::PreLoader()
 
 	// On map (with collision)
 	loadFromFile(objectType::e_static, "Background\\SS", "SSColl");
+	loadFromFile(objectType::e_static, "Background\\BSPD", "BSPDColl");
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
 	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
@@ -348,10 +353,10 @@ void PreLoader::drawOneModelAndMat(objectType type, objectData data, objectData 
 	m_objects[typ][variant][modelNr].draw();
 }
 
-void PreLoader::setSubModelData(objectType type, objectData data, int modelNr, int subModelNr)
+void PreLoader::setSubModelData(objectType type, objectData data, int modelNr, int subModelNr, int variant)
 {
 	int typ = int(type);
-	m_objects[typ][0][modelNr].setObjectData(data, subModelNr);
+	m_objects[typ][variant][modelNr].setObjectData(data, subModelNr);
 }
 
 void PreLoader::cull(objectType type, int variant)

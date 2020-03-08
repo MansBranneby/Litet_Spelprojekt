@@ -6,6 +6,7 @@
 
 #include "DX.h"
 #include "GameObject.h"
+#include "Sound.h"
 
 using namespace DirectX;
 

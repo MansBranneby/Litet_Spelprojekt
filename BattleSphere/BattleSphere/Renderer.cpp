@@ -478,6 +478,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					setUserInterfacePipeline();
 					g_Game->draw(renderPass::e_userInterface);
 
+
 					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
 					if (rotation >= 360)
 						rotation -= 360;

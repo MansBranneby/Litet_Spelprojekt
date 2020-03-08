@@ -103,8 +103,8 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	}
 	else if (type == REFLECT)
 	{
-		m_originalScale = XMVectorSet(1.8f * scale, 1.8f * scale, 0.2f * scale, 1.0f);
-		setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
+		//setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
 	}
 	else if (type == BEYBLADE)
 	{
