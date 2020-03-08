@@ -626,10 +626,13 @@ void GameState::firstTimeSetUp(Game* game)
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-			m_userInterface->setPlayerColours(i, m_robots[i]->getData().material.emission);
+		{
+			m_userInterface->setPlayerColours(i, m_robots[i]->getColour());
+			m_lineShots.setColour(i, m_robots[i]->getColour());
+		}
 	}
 	//Spawn AI:s
-	for (int i = 1; i < 3; i++)
+	for (int i = 1; i < 2; i++)
 	{
 		m_robots[i] = new Robot(i);
 		m_robots[i]->setColour(1, 0, 0);
@@ -639,16 +642,13 @@ void GameState::firstTimeSetUp(Game* game)
 		
 	}
 	m_robots[1]->setPosition(XMVectorSet(100.0f, 2.0f, -50.0f, 0));
-	m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
+	//m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
 	/*m_robots[3]->setPosition(XMVectorSet(120.0f, 2.0f, 50.0f, 0));*/
-		{
-			m_userInterface->setPlayerColours(i, m_robots[i]->getColour());
-			m_lineShots.setColour(i, m_robots[i]->getColour());
-		}
-	}
+		
 }
 
-}
+
+
 
 void GameState::handleInput(Game* game)
 {
@@ -710,6 +710,25 @@ bool GameState::update(Game* game, float dt)
 				}
 				if (closestResource != -1)
 					m_robots[j]->setAIGoal(m_resources[closestResource]->getPosition(), m_updateMission);
+				else {
+					/* Hunt player*/
+					int closestPlayer = -1;
+					float closestDistance = 10000;
+					for (int i = 0; i < XUSER_MAX_COUNT; i++)
+					{
+						if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+						{
+							float distance = XMVectorGetX(XMVector3Length(m_robots[j]->getPosition() - m_robots[i]->getPosition()));
+							if (distance < closestDistance)
+							{
+								closestResource = i;
+								closestDistance = distance;
+							}
+						}
+					}
+					if (closestResource != -1)
+						m_robots[j]->setAIGoal(m_robots[closestPlayer]->getPosition(), m_updateMission);
+				}
 
 			}
 
@@ -823,7 +842,7 @@ bool GameState::update(Game* game, float dt)
 							if (testLineSphere(start, end, m_robots[i]->getPosition(), robotBD.halfWD.x))
 							{
 								m_input->setVibration(j, 0.5f);
-								m_robots[i]->damagePlayer(m_robots[i]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
+								m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
 							}
 						}
 					}
