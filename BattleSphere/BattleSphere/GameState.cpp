@@ -629,7 +629,7 @@ void GameState::firstTimeSetUp(Game* game)
 			m_userInterface->setPlayerColours(i, m_robots[i]->getData().material.emission);
 	}
 	//Spawn AI:s
-	for (int i = 1; i < 2; i++)
+	for (int i = 1; i < 3; i++)
 	{
 		m_robots[i] = new Robot(i);
 		m_robots[i]->setColour(1, 0, 0);
@@ -639,8 +639,8 @@ void GameState::firstTimeSetUp(Game* game)
 		
 	}
 	m_robots[1]->setPosition(XMVectorSet(100.0f, 2.0f, -50.0f, 0));
-	/*m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
-	m_robots[3]->setPosition(XMVectorSet(120.0f, 2.0f, 50.0f, 0));*/
+	m_robots[2]->setPosition(XMVectorSet(-85.0f, 2.0f, -50.0f, 0));
+	/*m_robots[3]->setPosition(XMVectorSet(120.0f, 2.0f, 50.0f, 0));*/
 
 }
 
@@ -781,8 +781,7 @@ bool GameState::update(Game* game, float dt)
 			m_robots[j]->setRotation(0, 1, 0, value);
 			
 			
-			if (findPlayer)
-			{
+		
 
 				XMVECTOR start = XMVectorSet(0, 0, 0, 0);
 				XMVECTOR end = XMVectorSet(0, 0, 0, 0);
@@ -827,7 +826,7 @@ bool GameState::update(Game* game, float dt)
 			}
 
 
-		}
+		
 		
 	
 	}

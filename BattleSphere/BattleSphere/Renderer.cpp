@@ -368,7 +368,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			{
 				//// UPDATE ////
 
-				if (g_Game->update(g_Clock->getDeltaTime()))
+				if (g_Game->update(g_Clock->getDeltaTime() * 1.5f))
 				{
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);

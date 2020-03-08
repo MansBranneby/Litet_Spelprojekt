@@ -341,7 +341,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 	
 	if (m_currentMission.index != 0)
 	{
-		m_currentMission = m_ai.update(dt, m_velocity, m_currentMission);
+		m_currentMission = m_ai.update(dt, getVelocity(), m_currentMission);
 		setPosition(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f));
 		
 	}
