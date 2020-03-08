@@ -113,9 +113,6 @@ void ScoreState::updateDynamicCamera(float dT)
 			}
 		}
 
-
-
-
 		// Project each robot onto FOV planes and find smallest distances
 		float closest = INFINITY;
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -174,10 +171,6 @@ void ScoreState::handleMovement(Game* game, float dt, int id)
 
 		m_robots[id]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
 	}
-
-	// Resource movement
-	if (m_robots[id]->getResourceIndex() != -1)
-		m_resources[m_robots[id]->getResourceIndex()]->setPosition(m_robots[id]->getPosition() + XMVectorSet(0.0f, 1.5f, 0.0f, 0.0f));
 }
 
 void ScoreState::handleInputs(Game* game, float dt)
@@ -192,16 +185,7 @@ void ScoreState::handleInputs(Game* game, float dt)
 			}
 			else if (game->getRobots()[i]->isDrawn())
 			{
-				//// Use weapon
-				//if (m_input->getTriggerR(i) > 0.2)
-				//{
-				//	m_robots[i]->useWeapon(RIGHT, dt);
-				//}
-				//if (m_input->getTriggerL(i) > 0.2)
-				//{
-				//	m_robots[i]->useWeapon(LEFT, dt);
-				//}
-
+			
 				handleMovement(game, dt, i);
 
 
@@ -271,7 +255,7 @@ ScoreState::ScoreState(Game* game)
 	m_devZoomOut = false;
 	srand((unsigned int)time(NULL));
 
-	m_type = stateType::e_gameState;
+	m_type = stateType::e_scoreState;
 	m_input = nullptr;
 	m_robots = nullptr;
 
@@ -280,8 +264,9 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	m_billboardHandler = BillboardHandler(game->getPreLoader());
-	//m_billboardHandler = BillboardHandler();
+	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_static_billboard_score, ObjectType::e_billboard };
+	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
+
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
@@ -389,6 +374,7 @@ void ScoreState::handleInput(Game* game)
 
 bool ScoreState::update(Game* game, float dt)
 {
+	bool exitGame = false;
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
@@ -412,22 +398,69 @@ bool ScoreState::update(Game* game, float dt)
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
-	// Projectile movement
-	//ProjectileBank::getInstance()->moveProjectiles(dt);
-
-	Robot** robots = game->getRobots();
-	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	{
-		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
+	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
+	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+	for (int i = 0; i < BB.size(); ++i)
+	{	
+		if (BB[i].getObjectType() == ObjectType::e_static_billboard_score)
 		{
-			m_robots[i]->update(dt);
-			XMVECTOR pos = m_robots[i]->getPosition();
-			pos.m128_f32[3] = 1;
-			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
+			if (i == 1.0f)
+				float test = 10.0f;
+			// Test each player against collision mesh
+			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
+			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant()); // collision mesh
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
+			{
+				for (int k = 0; k < colMesh.size(); k += 3)
+				{
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
+
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(ObjectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					{
+						// If collision detected tick up nr of collisions
+						nrOfCollisions++;
+						break;
+					}
+				}
+			}
+			if (nrOfCollisions == game->getNrOfPlayers())
+			{
+				m_billboardHandler.setAllStates(i, 0.1f, 1.0f, cyan, cyan, cyan);
+				if (m_input->isPressed(0, XINPUT_GAMEPAD_A))
+				{
+					switch (i)
+					{
+					case 0:
+						exitGame = true;
+						break;
+					case 1:
+						break;
+					case 2:
+						setPaused(true); // Pause this state
+						game->changeState(stateType::e_mainMenu); // Change state to ScoreState
+						break;
+					}
+				}
+				break;
+			}
+			else
+			{
+				m_billboardHandler.setNoneState(i);
+			}
 		}
 	}
 
-	return 0;
+	return exitGame;
 }
 
 void ScoreState::draw(Game* game, renderPass pass)
@@ -441,33 +474,16 @@ void ScoreState::draw(Game* game, renderPass pass)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				std::vector<Weapon*> weapons = m_robots[i]->getWeapons();
-
 				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
 				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
-
 				game->getPreLoader()->draw(ObjectType::e_robot);
-				game->getPreLoader()->draw(ObjectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 0);
-
-				if (game->getRobots()[i]->getCurrentWeapon(LEFT) != -1)
-				{
-					game->getPreLoader()->draw(ObjectType::e_weapon, weapons[game->getRobots()[i]->getCurrentWeapon(LEFT)]->getData(), game->getRobots()[i]->getData());
-				}
+			
 			}
 		}
-		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-		{
-			game->getPreLoader()->draw(ObjectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-		}
-		for (int i = 0; i < m_resources.size(); i++)
-		{
-			game->getPreLoader()->draw(ObjectType::e_resource, m_resources[i]->getData(), 0, 0);
-		}
+
 	}
 	else if (pass == renderPass::e_transparent)
 	{
-		
-
 		//Static
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_static); i++)
 			game->getPreLoader()->draw(ObjectType::e_static, i);
@@ -477,11 +493,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(ObjectType::e_node, m_nodes[i]->getData(), i, 0);
-		}
-
+	
 		// Tokyo drift
 		for (int i = 0; i < OBJECT_NR_1; i++)
 		{
@@ -491,18 +503,14 @@ void ScoreState::draw(Game* game, renderPass pass)
 		// Scene (Background objects without collision)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
 			game->getPreLoader()->draw(ObjectType::e_scene, i);
+
 		m_particles.draw();
 	}
 	else if (pass == renderPass::e_billboard)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-		std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
 
 		for (int i = 0; i < BB.size(); ++i)
-			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
-
-		for (int i = 0; i < staticBB.size(); ++i)
-			game->getPreLoader()->draw(ObjectType::e_static_billboard, staticBB[i].getBillboardData(), staticBB[i].getModelNr(), staticBB[i].getSubModelNumber(), staticBB[i].getVariant());
+			game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
-
 }

@@ -269,8 +269,9 @@ float4 PS_main(PS_IN input) : SV_Target
 		break;
 	case 2: // Translate
 		{
-			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-			fragmentCol += (modelTexture * 0.5f);
+			float4 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy);
+			if (modelTexture.w > 0.0f)
+				fragmentCol = modelTexture;
 		}
 		break;
 	case 3: // Flash and interpolate

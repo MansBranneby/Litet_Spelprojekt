@@ -404,7 +404,8 @@ GameState::GameState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	m_billboardHandler = BillboardHandler(game->getPreLoader());
+	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_billboard, ObjectType::e_static_billboard};
+	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
@@ -720,13 +721,13 @@ void GameState::draw(Game* game, renderPass pass)
 	else if (pass == renderPass::e_billboard)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-		std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
+		//std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
 
 		for (int i = 0; i < BB.size(); ++i)
-			game->getPreLoader()->draw(ObjectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+			game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 
-		for (int i = 0; i < staticBB.size(); ++i)
-			game->getPreLoader()->draw(ObjectType::e_static_billboard, staticBB[i].getBillboardData(), staticBB[i].getModelNr(), staticBB[i].getSubModelNumber(), staticBB[i].getVariant());
+	/*	for (int i = 0; i < staticBB.size(); ++i)
+			game->getPreLoader()->draw(ObjectType::e_static_billboard, staticBB[i].getBillboardData(), staticBB[i].getModelNr(), staticBB[i].getSubModelNumber(), staticBB[i].getVariant());*/
 	}
 
 }

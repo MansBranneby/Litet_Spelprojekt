@@ -126,9 +126,13 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
-	// Collidable Billboards
+	// Collidable billboards
 	loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
 
+	// ScoreRoom billboards
+	loadFromFile(ObjectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
+	loadFromFile(ObjectType::e_billboard, "ScoreRoom\\ScoreRoomTVs");
+	loadFromFile(ObjectType::e_billboard, "ScoreRoom\\bigTV");
 
 	// Background
 	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
@@ -147,8 +151,7 @@ PreLoader::PreLoader()
 
 
 
-	//	// ScoreRoom
-	loadFromFile(ObjectType::e_scene, "Background\\ScoreRoom2");
+
 }
 
 PreLoader::~PreLoader()
@@ -197,7 +200,7 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(ObjectType type, objectData da
 BillboardData PreLoader::getSubModelBillboardData(ObjectType type, int variant, int modelNr, int subModelNr)
 {
 	
-	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);;
+	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);
 }
 
 int PreLoader::getNrOfVariants(ObjectType type) const
@@ -210,7 +213,7 @@ int PreLoader::getNrOfModels(ObjectType type, int variant) const
 	return m_nrOfmodels[(int)type][variant];
 }
 
-int PreLoader::getNrOfSubModels(ObjectType type, int modelNr, int variant) const
+int PreLoader::getNrOfSubModels(ObjectType type, int variant, int modelNr) const
 {
 	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
 }

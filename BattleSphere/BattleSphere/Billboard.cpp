@@ -2,6 +2,7 @@
 
 Billboard::Billboard()
 {
+	m_objectType = ObjectType::e_billboard;
 	m_variant = 0;
 	m_modelNr = 0;
 	m_subModelNr = 0;
@@ -20,6 +21,7 @@ Billboard::Billboard()
 
 Billboard::Billboard(int variant, int modelNr, int subModelNr)
 {
+	m_objectType = ObjectType::e_billboard;
 	m_variant = variant;
 	m_modelNr = modelNr;
 	m_subModelNr = subModelNr;
@@ -36,8 +38,9 @@ Billboard::Billboard(int variant, int modelNr, int subModelNr)
 	m_colourB = DirectX::XMVectorZero();
 }
 
-Billboard::Billboard(int variant, int modelNr, int subModelNr, BillboardData billboardData)
+Billboard::Billboard(ObjectType objectType, int variant, int modelNr, int subModelNr, BillboardData billboardData)
 {
+	m_objectType = objectType;
 	m_variant = variant;
 	m_modelNr = modelNr;
 	m_subModelNr = subModelNr;
@@ -161,6 +164,11 @@ void Billboard::interpolateColours(float dt)
 void Billboard::translateUV(float dt)
 {
 	m_UVincrement += dt * m_velocityUV;
+}
+
+ObjectType Billboard::getObjectType() const
+{
+	return m_objectType;
 }
 
 int Billboard::getVariant() const
