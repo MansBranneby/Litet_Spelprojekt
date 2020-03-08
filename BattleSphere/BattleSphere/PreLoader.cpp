@@ -106,9 +106,11 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_weapon, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_weapon, "GamePlay\\energy");
+	loadFromFile(objectType::e_weapon, "GamePlay\\Railgun");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_resource, "GamePlay\\energy");
+	loadFromFile(objectType::e_resource, "GamePlay\\Railgun");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleFish", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");

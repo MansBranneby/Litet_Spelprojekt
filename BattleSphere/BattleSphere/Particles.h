@@ -89,7 +89,7 @@ public:
 	);
 	void addSpark(XMVECTOR impactPos, XMVECTOR projectileDir);
 	void addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir);
-	void addSmoke(XMVECTOR pos, float startVel, XMVECTOR dir);
+	void addSniperSmoke(XMVECTOR pos, XMVECTOR col, XMVECTOR dir);
 	void addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float robVel);
 	void update(float dT);
 	void draw();

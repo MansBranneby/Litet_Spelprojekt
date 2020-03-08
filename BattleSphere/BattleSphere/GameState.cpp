@@ -2,7 +2,8 @@
 
 void GameState::spawnNodes()
 {
-	Node* node = new Node(rand() % 3);
+	Node* node = new Node(0);
+	//Node* node = new Node(rand() % 3);
 	//node->setPosition(XMVectorSet(150.0f, 0.2f, 120.0f, 0.0f));
 	//node->setRotation(0.0f, 1.0f, 0.0f, 0.0f);
 	m_nodes.push_back(node);
@@ -208,6 +209,10 @@ void GameState::handleInputs(Game* game, float dt)
 					{
 						m_robots[i]->getSniperLine(RIGHT, start, end);
 						m_lineShots.updateLineStatus(i, start, end, true, dt);
+
+						// Add particle effect
+						XMVECTOR col = m_robots[i]->getColour();
+						DX::getInstance()->getParticles()->addSniperSmoke(start, col, end - start);
 						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 						for (int j = 0; j < 4; j++)
 						{
@@ -232,8 +237,13 @@ void GameState::handleInputs(Game* game, float dt)
 					if (m_robots[i]->getCurrentWeapon(LEFT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
 						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getReady())
 					{
+
 						m_robots[i]->getSniperLine(LEFT, start, end);
 						m_lineShots.updateLineStatus(i, start, end, true, dt);
+
+						// Add particle effect
+						XMVECTOR col = m_robots[i]->getColour();
+						DX::getInstance()->getParticles()->addSniperSmoke(start, col, end - start);
 						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 						for (int j = 0; j < 4; j++)
 						{
@@ -261,7 +271,7 @@ void GameState::handleInputs(Game* game, float dt)
 					rob.m128_f32[1] = 0.0f; // Set Y to 0;
 					XMVECTOR resource = m_resources[j]->getPosition();
 					resource.m128_f32[1] = 0.0f; // Set Y to 0; 
-					if (XMVectorGetX(XMVector3Length(rob - resource)) < 1.5f &&
+					if (XMVectorGetX(XMVector3Length(rob - resource)) < 2.0f &&
 						!m_resources[j]->isBlocked())
 					{
 						Sound::getInstance()->play(soundEffect::e_pickup, rob, 0.4f);
@@ -934,6 +944,10 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2, false);
 					break;
 
+				case SNIPER:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 3, 3, false);
+					break;
+
 				default:
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 					break;
@@ -949,7 +963,11 @@ void GameState::draw(Game* game, renderPass pass)
 						break;
 
 					case ENERGY:
-						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 2, 2);
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 2, 2, false);
+						break;
+
+					case SNIPER:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 3, 3, false);
 						break;
 
 					default:
@@ -972,6 +990,10 @@ void GameState::draw(Game* game, renderPass pass)
 
 			case ENERGY:
 				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 2);
+				break;
+
+			case SNIPER:
+				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 3);
 				break;
 
 			default:

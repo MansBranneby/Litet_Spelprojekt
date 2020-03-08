@@ -65,7 +65,7 @@ Weapon::Weapon(int type)
 		m_damage = 30;
 		m_cooldown = 1.8f;
 
-		setScale(0.1f, 0.1f, 0.8f);
+		setScale(2.0f, 2.0f, 2.0f);
 	}
 	else if (type == BEYBLADE)
 	{

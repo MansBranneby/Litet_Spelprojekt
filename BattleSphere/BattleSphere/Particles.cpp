@@ -181,20 +181,10 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 
 void Particles::addSpark(XMVECTOR impactPos, XMVECTOR projectileDir)
 {
-	//XMVECTOR dir = XMVector3Normalize(-projectileDir);
-	//XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
-	//XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
-	//addParticles(impactPos, col, size, 20, 25.0f, 0.35f, 1.0f, dir);
-	//XMVECTOR dir = XMVectorSet(0,0,0,0);
-	//XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
-	//XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
-	//addParticles(impactPos, col, size, 1000, 25.0f, 1.0f, 1.0f, dir);
 	XMVECTOR dir = XMVector3Normalize(-projectileDir);
-	//XMVECTOR dir = { 0.0f, 0.0f, 0.0f, 0.0f };
-	XMVECTOR col = { 96.0f / 255.0f, 96.0f / 255.0f, 96.0f / 255.0f, 0 };
-	XMVECTOR size = { 0.35f, 0.35f, 0.0f, 0.0f };
-	XMVECTOR gravDir = { 0.0f, 0.2f, 0.0f, 0.0f };
-	addParticles(impactPos, col, size, 650, 0.5f, 2.5f, 0.8f, dir, gravDir);
+	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
+	addParticles(impactPos, col, size, 20, 25.0f, 0.35f, 1.0f, dir);
 }
 
 void Particles::addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir)
@@ -205,13 +195,23 @@ void Particles::addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir)
 	addParticles(cutPos, col, size, 100, 45.0f, 0.5f, 0.2f, dir);
 }
 
-void Particles::addSmoke(XMVECTOR smokePos, float startVel, XMVECTOR smokeDir)
+void Particles::addSniperSmoke(XMVECTOR smokePos, XMVECTOR col, XMVECTOR smokeDir)
 {
 	XMVECTOR dir = XMVector3Normalize(smokeDir);
-	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
-	XMVECTOR size = { 0.8f, 0.15f, 0.0f, 0.0f };
-	XMVECTOR gravDir = { 0.0f, 5.0f, 0.0f, 0.0f };
-	addParticles(smokePos, col, size, 100, 45.0f, 0.5f, 0.2f, dir, gravDir);
+	XMVECTOR smokeCol = { 96.0f / 255.0f, 96.0f / 255.0f, 96.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.8f, 0.8f, 0.0f, 0.0f };
+	XMVECTOR gravDir = { 0.0f, 0.2f, 0.0f, 0.0f };
+	XMVECTOR zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float lifeSpan = 2.5f;
+	float vel = 1.2f;
+	addParticles(smokePos + dir * 1.0f, smokeCol, size, 100, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 2.0f, smokeCol, size, 100, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 3.0f, smokeCol, size, 100, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 4.0f, smokeCol, size, 100, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 4.5f, smokeCol, size, 100, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 4.0f, smokeCol, size, 100, 2.0f, lifeSpan, 0.8f, dir, gravDir);
+	addParticles(smokePos + dir * 4.5f, smokeCol, size, 100, 2.0f, lifeSpan, 0.8f, dir, gravDir);
+	addParticles(smokePos, col, size, 200, 70.0f, 0.11f, 0.09f, dir, gravDir);
 }
 
 void Particles::addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float robVel)
