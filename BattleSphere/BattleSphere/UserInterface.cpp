@@ -278,13 +278,26 @@ void UserInterface::draw()
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
 		m_elements[i]->draw();
 	}
-	for (int i = 0; i < 36; i++)
-	{
-		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
-		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+	//for (int i = 0; i < 36; i++)
+	//{
+	//	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	//	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+	//	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
-		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
-		m_elements[i]->draw();
-	}
+	//	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	//	m_elements[i]->draw();
+	//}
+}
+
+void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	int elementIndex = playerIndex * 9 + abilityType;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, cd), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	m_elements[elementIndex]->draw();
 }

@@ -137,7 +137,8 @@ void SubModel::draw()
 		instance->getDeviceContext()->OMSetDepthStencilState(instance->getDSSDisabled(), 1);
 
 	ID3D11ShaderResourceView* nullSRV = { nullptr };
-		
+	(m_SRV != nullptr) ? (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &m_SRV)) : (DX::getInstance()->getDeviceContext()->PSSetShaderResources(4, 1, &nullSRV));
+			
 	// Bind constantbuffer
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(2, 1, &this->m_materialCBuffer);
 	DX::getInstance()->getDeviceContext()->DrawIndexed(m_nrOfIndices, 0, 0);

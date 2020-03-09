@@ -1,6 +1,7 @@
 #pragma once
 #include "StructsAndEnums.h"
 #include "Robot.h"
+#include "ConstantBuffer.h"
 
 class SpawnDrone
 {
@@ -12,7 +13,10 @@ private:
 	std::vector<XMFLOAT2> m_spawns;
 	std::vector<bool> m_freeSpawns;
 	void loadLists();
-
+	
+	// Icon warnings
+	ConstantBuffer* m_constantBufferIcons;
+	XMVECTOR m_nextSpawnWarning;
 
 	// Spawning
 	int m_normalSpawnAmount;
@@ -49,5 +53,6 @@ public:
 	void freeSpawn(int index);
 	void ifHeldDecreaseResourceIndex();
 	objectData getData(int model = -1);
+	void setConstantBuffer(bool on);
 };
 

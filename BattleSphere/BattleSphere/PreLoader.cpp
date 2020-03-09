@@ -152,7 +152,8 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
 	
-	loadFromFile(objectType::e_BSPD, "Background\\BSPDDoor");
+	loadFromFile(objectType::e_BSPD_Door, "Background\\BSPDDoor");
+	loadFromFile(objectType::e_BSPD_Screen, "Background\\BSPDScreen");
 }
 
 PreLoader::~PreLoader()
