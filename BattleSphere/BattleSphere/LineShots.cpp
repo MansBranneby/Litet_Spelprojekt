@@ -72,7 +72,7 @@ void LineShots::updateLineStatus(int index, XMVECTOR start, XMVECTOR end, bool a
 		m_anim[index] += dt;
 	}
 
-	m_widthAlpha[index].x = max(0.15f, 0.15f + sin(m_anim[index] * 15) / 2.5f);//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 8.0f);
+	m_widthAlpha[index].x = max(0.15f, 0.15f + sin(m_anim[index] * 15));//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 8.0f);
 	m_widthAlpha[index].y = max(0.3f, 0.3f + sin(m_anim[index] * 15) / 2.5f);//(sin(pow(m_anim[index], 5.0f) / 2.0f) / 1.5f);
 	if (m_anim[index] > 0.3f)
 	{
@@ -114,6 +114,12 @@ void LineShots::draw(int index)
 		DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		DX::getInstance()->getDeviceContext()->IASetInputLayout(&m_vs.getvertexLayout());
 		DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSDisabled(), 1);
+
+		if(m_animOn[index]) // If shooting, enable emission
+			DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSEnabled(), 1);
 		DX::getInstance()->getDeviceContext()->Draw(2, 0);
+
+		// Disable emission
+		DX::getInstance()->getDeviceContext()->OMSetDepthStencilState(DX::getInstance()->getDSSDisabled(), 1);
 	}
 }

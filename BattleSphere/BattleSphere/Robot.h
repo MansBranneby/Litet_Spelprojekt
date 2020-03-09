@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Weapon.h"
 #include "Resource.h"
+#include "Particles.h"
 #include "AI.h"
 
 #define LEFT 0
@@ -46,11 +47,15 @@ private:
 	// Velocity
 	DirectX::XMVECTOR m_vel;
 
+	// Particles
+	float m_timeSinceParticles;
+
 	void addWeapon(int type);
 public:
 	Robot(int playerId);
 	//Robot(QuadtreeNode* qtn); Add
 	bool isAi();
+	void updateAIWeapon(bool seePlayer);
 	void setAi(bool ai);
 	void setAIGoal(XMVECTOR position, bool update);
 	XMVECTOR getAIRotation();

@@ -5,7 +5,7 @@ Robot::Robot(int playerId)
 	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 20.0f;
-	m_vel = XMVectorSet(0,0,0,0);
+	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
@@ -37,6 +37,9 @@ Robot::Robot(int playerId)
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
 
+	// Particles
+	m_timeSinceParticles = 0.0f;
+
 	
 	
 }
@@ -44,6 +47,88 @@ Robot::Robot(int playerId)
 bool Robot::isAi()
 {
 	return m_isAi;
+}
+
+void Robot::updateAIWeapon(bool seePlayer)
+{
+	///int* tierListR;
+	int tierList[9];
+	int tierListL[9];
+	if (seePlayer)
+	{
+		tierList[0] = 2;
+		tierList[1] = 7;
+		tierList[2] = 3;
+		tierList[3] = 1;
+		tierList[4] = 4;
+		tierList[5] = 0;
+		tierList[6] = 6;
+		tierList[7] = 5;
+		tierList[8] = 8;
+
+		
+		
+	}
+	else {
+		tierList[0] = 2;
+		tierList[1] = 5;
+		tierList[2] = 8;
+		tierList[3] = 1;
+		tierList[4] = 7;
+		tierList[5] = 0;
+		tierList[6] = 4;
+		tierList[7] = 3;
+		tierList[8] = 6;
+
+		
+
+	}
+	int highestR = -1, highestL = -1;
+	int indexR = -1, indexL = -1;
+	for (int k = 0; k < getWeapons().size(); k++)
+	{
+		int tier = tierList[getWeapons()[k]->getType()];
+		//int tierR = tierListL[getWeapons()[k]->getType()];
+		if (tier > highestR)
+		{
+			if (indexR != -1 && highestR > highestL)
+			{
+				highestL = highestR;
+				indexL = indexR;
+				indexR = k;
+				highestR = tier;
+			}
+			else
+			{
+				indexR = k;
+				highestR = tier;
+			}
+		}
+		else if (tier > highestL)
+		{
+			indexL = k;
+			highestL = tier;
+		}
+
+	}
+	for (int k = 0; k < getWeapons().size(); k++)
+	{
+		if (getCurrentWeapon(RIGHT) != -1)
+		{
+			if (getCurrentWeapon(RIGHT) != indexR)
+			{
+				changeWeapon(RIGHT);
+			}
+		}
+		if (getCurrentWeapon(LEFT) != -1)
+		{
+			if (getCurrentWeapon(LEFT) != indexL)
+			{
+				changeWeapon(LEFT);
+			}
+		}
+
+	}
 }
 
 void Robot::setAi(bool ai)
@@ -80,7 +165,6 @@ int Robot::getPlayerId()
 {
 	return m_playerId;
 }
-
 
 bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
 {
@@ -385,7 +469,19 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
 	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
-	
+
+	// Particle engine flame
+	m_timeSinceParticles += dt;
+	if (m_timeSinceParticles > 0.01f)
+	{
+		// Maxvel 0.16
+		m_timeSinceParticles = 0.0f;
+		float rotRadian = XM_PI / 2.0f - XMConvertToRadians(m_currentRotation);
+		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
+		XMVECTOR robPos = getPosition() - lookAt*1.0f;
+		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
+	}
 }
 
 void Robot::move(XMVECTOR dPos)

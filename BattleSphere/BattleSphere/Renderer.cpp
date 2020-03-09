@@ -35,6 +35,9 @@
 #include "Transparency.h"
 #include "Menu.h"
 
+//TODO: REMOVE
+float g_abc = 0;
+
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
@@ -564,7 +567,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//ImGui::ColorPicker4("Pick a color", moonColor);
 				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
 				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
-
 				/*ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
 				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
 				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/

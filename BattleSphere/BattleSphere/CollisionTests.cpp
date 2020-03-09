@@ -328,7 +328,7 @@ bool testLineSphere(XMVECTOR start, XMVECTOR end, XMVECTOR spherePos, float radi
 		return false;
 
 	float t = -b - sqrt(discr);
-	if (t < 0.0f && t > maxT)
+	if (t < 0.0f || t > maxT)
 		return false;
 	return true;
 }
