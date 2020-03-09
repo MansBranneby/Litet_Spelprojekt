@@ -16,7 +16,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(SNIPER);
+	Weapon* pistol = new Weapon(REFLECT);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -221,6 +221,11 @@ int Robot::changeWeapon(int side)
 
 			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
 				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
+			{
+				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 0, 1, 180);
+			}
 		}
 		else
 		{
@@ -230,6 +235,11 @@ int Robot::changeWeapon(int side)
 
 			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
 				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
+			{
+				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+			}
 		}
 
 		m_ready = false;
@@ -295,6 +305,11 @@ void Robot::addWeapon(int type)
 
 		if (type == REFLECT)
 			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+		if (type == SHIELD)
+		{
+			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+		}
 	}
 	//m_weapons.push_back(weapon);
 }

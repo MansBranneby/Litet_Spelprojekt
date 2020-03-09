@@ -42,11 +42,13 @@ Weapon::Weapon(int type)
 	}
 	else if (type == SHIELD)
 	{
-		m_cooldown = 10.0f;
+		m_cooldown = 1.0f;
 		m_duration = 6.0f;
 		m_defense = 0.0f;
 
-		setScale(0.8f, 0.8f, 0.1f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		//rotate(0, 1, 0, 180);
+		//setScale(-1, 1, -1);
 	}
 	else if (type == DASH)
 	{
