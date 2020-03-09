@@ -7,6 +7,7 @@
 //#pragma comment (lib, "d3dcompiler.lib")
 
 class Camera; // Forward declaration
+class Particles;
 
 class DX 
 {
@@ -30,10 +31,14 @@ private:
 	// Camera
 	Camera* m_camera;
 
+	// Particles
+	Particles* m_particles;
+
 public:
 	static DX* getInstance();
 
 	Camera* getCam();
+	Particles* getParticles();
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
@@ -46,7 +51,7 @@ public:
 	float getHeight();
 
 	HRESULT createDirect3DContext(HWND wndHandle);
-	void initializeCam(float width, float height, float nearPlane, float farPlane);
+	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
 	void reportLiveObjects();
 
 	void release();

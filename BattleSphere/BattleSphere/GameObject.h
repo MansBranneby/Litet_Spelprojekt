@@ -52,7 +52,8 @@ public:
 	void setSpecular(float x, float y, float z, float w = -1);
 	void setEmission(float x, float y, float z, float w = -1);
 
-	XMVECTOR getPosition();
+	XMVECTOR const getPosition();
+	XMVECTOR const getStaticRotation();
 	objectData const getData();
 
 	bool isDrawn();
