@@ -20,6 +20,13 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	return wndHandle;
 }
 
+void GraphicResources::updateRenderTarget()
+{
+	createBackBuffer();
+	setViewPort();
+	createDepthStencil();
+}
+
 HWND GraphicResources::initWindow(HINSTANCE hInstance)
 {
 	// TODO Not sure if it's suppose to be here
@@ -142,6 +149,8 @@ void GraphicResources::createBackBuffer()
 
 void GraphicResources::setViewPort()
 {
+	m_viewPort.Width = DX::getInstance()->getWidth();
+	m_viewPort.Height = DX::getInstance()->getHeight();
 	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
 }
 

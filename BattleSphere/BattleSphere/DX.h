@@ -43,15 +43,15 @@ public:
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
 
-	
-
 	ID3D11DepthStencilState* getDSSEnabled();
 	ID3D11DepthStencilState* getDSSDisabled();
 	float getWidth();
 	float getHeight();
 
+	void setWidthAndHeight(float width, float height);
 	HRESULT createDirect3DContext(HWND wndHandle);
 	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
+	void reInitializeCam(float width, float height, float nearPlane, float farPlane);
 	void reportLiveObjects();
 
 	void release();

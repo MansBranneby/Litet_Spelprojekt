@@ -36,6 +36,7 @@ public:
 	~GraphicResources();
 	void bindDepthStencilState();
 	HWND initializeResources(HINSTANCE hInstance);
+	void updateRenderTarget();
 	ID3D11RasterizerState* getRasterizerState() const;
 	ID3D11DepthStencilView* getDepthStencilView() const;
 	ID3D11RenderTargetView** getBackBuffer();

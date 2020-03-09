@@ -58,7 +58,7 @@ PixelShader g_pixelShaderBillboard;
 
 Clock* g_Clock;
 Game* g_Game;
-LightCulling g_lightCulling;
+LightCulling* g_lightCulling;
 
 Transparency g_transparency;
 ShadowMapping* g_shadowMapping;
@@ -180,9 +180,12 @@ void createRenderResources()
 	g_bloom = new Bloom();
 	g_menu = new Menu();
 	g_shadowMapping = new ShadowMapping();
+	g_lightCulling = new LightCulling();
+	g_lightCulling->initialize();
+	g_lightCulling->computeFrustum();
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - g_shadowMapping->getCamera()->getPosition());
 	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
-											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
+		(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 }
 
 void setUserInterfacePipeline()
@@ -304,15 +307,65 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullRTV);
 }
 
+void changeResolution(UINT width, UINT height)
+{
+	// Set directx singleton width and height
+	DX::getInstance()->setWidthAndHeight((float)width, (float)height);
+	
+	// Change camera aspect ratio
+	float nearPlane = 0.1f;
+	float farPlane = 500.0f;
+	DX::getInstance()->reInitializeCam((float)width, (float)height, nearPlane, farPlane);
+
+	// Clear backbuffer views
+	ID3D11RenderTargetView* nullViews = nullptr;
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
+	if ((*g_graphicResources.getBackBuffer())) (*g_graphicResources.getBackBuffer())->Release();
+	if (g_graphicResources.getDepthStencilView()) g_graphicResources.getDepthStencilView()->Release();
+	DX::getInstance()->getDeviceContext()->Flush();
+	
+	// Resize swapchain
+	DX::getInstance()->getSwapChain()->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+	
+	// Update render target, depth stencil and viewport
+	g_graphicResources.updateRenderTarget();
+	
+	// Update render target, depth stencil and viewport for shadow mapping, bloom and menu
+	if (g_shadowMapping) delete g_shadowMapping;
+	g_shadowMapping = new ShadowMapping();
+	
+	if (g_bloom) delete g_bloom;
+	g_bloom = new Bloom();
+	
+	if (g_menu) delete g_menu;
+	g_menu = new Menu();
+	
+	if (g_lightCulling) delete g_lightCulling;
+	g_lightCulling = new LightCulling();
+	g_lightCulling->initialize();
+	g_lightCulling->computeFrustum();
+}
+
+void setFullScreen(bool wantFullscreen)
+{
+	//if (wantFullscreen)
+	//{
+	//	m_swapChain->ResizeBuffers(0, 1920, 1080, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+	//	m_swapChain->SetFullscreenState(true, NULL);
+	//}
+	//else
+	//	m_swapChain->SetFullscreenState(false, NULL);
+}
+
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	MSG msg = { 0 };
 	HWND wndHandle = g_graphicResources.initializeResources(hInstance); // Initialize resources and return window handler
-	g_lightCulling.initialize();
-	g_lightCulling.computeFrustum();
 	createRenderResources(); // Creates instances of graphics classes etc.
+	//g_lightCulling->initialize();
+	//g_lightCulling->computeFrustum();
 	g_transparency.initialize();
 
 	if (wndHandle)
@@ -329,7 +382,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		
+
 		g_Clock = new Clock();
 		g_Game = new Game();
 		g_gameState = new GameState(g_Game);
@@ -356,6 +409,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		Graph::getInstance()->createVertexBuffer();
 
+		changeResolution(1920, 1080);
+
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
@@ -370,7 +425,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			else
 			{
 				//// UPDATE ////
-
 				if (g_Game->update(g_Clock->getDeltaTime() * 1.5f))
 				{
 					msg.message = WM_QUIT;
@@ -393,8 +447,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 
-					g_lightCulling.updateSubresource();
-					g_lightCulling.cullLights();
+					g_lightCulling->updateSubresource();
+					g_lightCulling->cullLights();
 
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 
@@ -452,7 +506,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (g_Game->isActive(stateType::e_gameState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
-					
+
 					g_Game->draw(renderPass::e_opaque);
 
 					billboardRender();
@@ -530,8 +584,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_menuAni);
 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
-					g_lightCulling.updateSubresource();
-					g_lightCulling.cullLights();
+					g_lightCulling->updateSubresource();
+					g_lightCulling->cullLights();
 					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
 					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(0, 0, 0xffffffff);
@@ -622,6 +676,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_gameState;
 		delete g_menu;
 		delete g_shadowMapping;
+		delete g_lightCulling;
 		//DX::getInstance()->reportLiveObjects();
 		DX::getInstance()->release();
 		delete DX::getInstance();
