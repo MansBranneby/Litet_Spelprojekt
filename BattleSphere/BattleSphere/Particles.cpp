@@ -198,7 +198,6 @@ void Particles::addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir)
 void Particles::addSniperSmoke(XMVECTOR smokePos, XMVECTOR col, XMVECTOR smokeDir)
 {
 	XMVECTOR dir = XMVector3Normalize(smokeDir);
-	//XMVECTOR smokeCol = { 96.0f / 255.0f, 96.0f / 255.0f, 96.0f / 255.0f, 0 };
 	XMVECTOR smokeCol = { 56.0f / 255.0f, 56.0f / 255.0f, 56.0f / 255.0f, 0 };
 	XMVECTOR size = { 0.8f, 0.8f, 0.0f, 0.0f };
 	XMVECTOR gravDir = { 0.0f, 0.2f, 0.0f, 0.0f };
@@ -210,7 +209,7 @@ void Particles::addSniperSmoke(XMVECTOR smokePos, XMVECTOR col, XMVECTOR smokeDi
 	addParticles(smokePos + dir * 2.25f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
 	addParticles(smokePos + dir * 3.0f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
 	addParticles(smokePos + dir * 3.4f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
-	addParticles(smokePos, col, size, 50, 70.0f, 0.09f, 0.09f, dir, gravDir);
+	//addParticles(smokePos, col, size, 50, 70.0f, 0.09f, 0.09f, dir, gravDir);
 }
 
 void Particles::addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float robVel)

@@ -222,8 +222,15 @@ void GameState::handleInputs(Game* game, float dt)
 								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(j, 0.5f);
+									m_input->setVibration(j, 1.0f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
+
+									int resourceIndex = m_robots[j]->getResourceIndex();
+									if (resourceIndex != -1)
+									{
+										m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+										m_resources[resourceIndex]->setBlocked(false);
+									}
 								}
 							}
 						}
@@ -255,8 +262,15 @@ void GameState::handleInputs(Game* game, float dt)
 								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(j, 0.5f);
+									m_input->setVibration(j, 1.0f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
+
+									int resourceIndex = m_robots[j]->getResourceIndex();
+									if (resourceIndex != -1)
+									{
+										m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
+										m_resources[resourceIndex]->setBlocked(false);
+									}
 								}
 							}
 						}
