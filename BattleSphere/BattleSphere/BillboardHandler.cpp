@@ -22,6 +22,20 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<ObjectType>
 		}
 	}
 
+	for (int i = 0; i < m_billboards.size(); ++i)
+	{
+		switch (m_billboards[i].getObjectType())
+		{
+			case ObjectType::e_number_billboard:
+				m_numberBillboards.push_back(m_billboards[i]);
+				std::rotate(m_numberBillboards.rbegin(), m_numberBillboards.rbegin() + 1, m_numberBillboards.rend());
+				break;
+			case ObjectType::e_static_billboard:
+				m_staticBillboards.push_back(m_billboards[i]);
+				break;
+		}
+	}
+	
 	//}
 	//// predefined colours
 	//DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
@@ -38,6 +52,21 @@ BillboardHandler::~BillboardHandler()
 
 std::vector<Billboard> BillboardHandler::getBillboards() const
 {
+	return m_billboards;
+}
+
+std::vector<Billboard> BillboardHandler::getBillboardsOfType(ObjectType objectType) const
+{
+	switch (objectType)
+	{
+	case ObjectType::e_number_billboard:
+		return m_numberBillboards;
+		break;
+	case ObjectType::e_static_billboard:
+		return m_staticBillboards;
+		break;
+	}
+
 	return m_billboards;
 }
 

@@ -127,12 +127,13 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
 	// Collidable billboards
-	loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
+	//loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
 
 	// ScoreRoom billboards
 	loadFromFile(ObjectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
-	loadFromFile(ObjectType::e_billboard, "ScoreRoom\\ScoreRoomTVs");
-	loadFromFile(ObjectType::e_billboard, "ScoreRoom\\bigTV");
+	//loadFromFile(ObjectType::e_scene, "ScoreRoom\\ScoreRoomTVs");
+	loadFromFile(ObjectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
+	loadFromFile(ObjectType::e_scene, "ScoreRoom\\ScoreRoom");
 
 	// Background
 	loadFromFile(ObjectType::e_scene, "OnMap\\ChinaTown"); // Later to static
@@ -148,10 +149,6 @@ PreLoader::PreLoader()
 	loadFromFile(ObjectType::e_scene, "Other\\Car");
 	loadFromFile(ObjectType::e_extra, "Other\\CarDBO");
 	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
-
-
-
-
 }
 
 PreLoader::~PreLoader()

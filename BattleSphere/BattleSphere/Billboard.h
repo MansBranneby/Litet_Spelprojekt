@@ -2,9 +2,10 @@
 #include <DirectXMath.h>
 #include "VertexShader.h"
 #include "StructsAndEnums.h"
+#include "GameObject.h"
 
 // Class used to animate billboards
-class Billboard
+class Billboard : public GameObject
 {
 private:
 	// TYPE OF BILLBOARD
