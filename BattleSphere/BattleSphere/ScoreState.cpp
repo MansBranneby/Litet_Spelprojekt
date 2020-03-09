@@ -522,6 +522,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 		}
 
 		objectData test;
+		test.material = game->getRobots()[0]->getData().material;
 		test.pos = { -5.0f, 0.0f, 0.0f };
 		game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
 		game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());

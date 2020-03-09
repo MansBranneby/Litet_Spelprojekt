@@ -131,7 +131,7 @@ PreLoader::PreLoader()
 
 	// ScoreRoom billboards
 	loadFromFile(ObjectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
-	//loadFromFile(ObjectType::e_scene, "ScoreRoom\\ScoreRoomTVs");
+	loadFromFile(ObjectType::e_scene, "ScoreRoom\\ScoreRoomTVs");
 	loadFromFile(ObjectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
 	loadFromFile(ObjectType::e_scene, "ScoreRoom\\ScoreRoom");
 
