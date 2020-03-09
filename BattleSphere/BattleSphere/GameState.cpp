@@ -212,13 +212,15 @@ void GameState::handleInputs(Game* game, float dt)
 
 						// Add particle effect
 						XMVECTOR col = m_robots[i]->getColour();
+						XMVECTOR dir = XMVector3Normalize(end - start);
 						DX::getInstance()->getParticles()->addSniperSmoke(start, col, end - start);
 						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 						for (int j = 0; j < 4; j++)
 						{
 							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
 							{
-								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
+								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
 									m_input->setVibration(j, 0.5f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
@@ -243,13 +245,15 @@ void GameState::handleInputs(Game* game, float dt)
 
 						// Add particle effect
 						XMVECTOR col = m_robots[i]->getColour();
+						XMVECTOR dir = XMVector3Normalize(end - start);
 						DX::getInstance()->getParticles()->addSniperSmoke(start, col, end - start);
 						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 						for (int j = 0; j < 4; j++)
 						{
 							if (i != j && m_robots[j] != nullptr && m_robots[j]->isDrawn())
 							{
-								if (testLineSphere(start, end, m_robots[j]->getPosition(), robotBD.halfWD.x))
+								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
+								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
 									m_input->setVibration(j, 0.5f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
@@ -317,7 +321,7 @@ void GameState::handleInputs(Game* game, float dt)
 							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 							{
 								// Update user interface with new ability
-								m_userInterface->setSlotID(i, m_resources[m_robots[i]->getResourceIndex()]->getType()); 
+								m_userInterface->setSlotID(i, m_resources[m_robots[i]->getResourceIndex()]->getType());
 							}
 							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
@@ -372,7 +376,7 @@ void GameState::handleInputs(Game* game, float dt)
 							//m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon());
 							m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
 						}
-					}	
+					}
 				}
 
 				// TODO: add collision and remove projectile
@@ -569,7 +573,7 @@ GameState::~GameState()
 		delete m_resources[i];
 	for (int i = 0; i < m_nodes.size(); i++)
 		delete m_nodes[i];
-	if (m_dboHandler) 
+	if (m_dboHandler)
 		delete m_dboHandler;
 	if (m_spawnDrone)
 		delete m_spawnDrone;
@@ -591,7 +595,7 @@ void GameState::resume()
 void GameState::firstTimeSetUp(Game* game)
 {
 	m_robots = game->getRobots();
-	
+
 	//// Create user interface (based on number of players) ////
 	int nrOfPlayers = 0;
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -600,7 +604,7 @@ void GameState::firstTimeSetUp(Game* game)
 			nrOfPlayers++;
 	}
 	m_userInterface = new UserInterface(nrOfPlayers);  // Create user interface
-	
+
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -757,7 +761,7 @@ bool GameState::update(Game* game, float dt)
 	{
 		if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 		{
-			
+
 			DX::getInstance()->getParticles()->addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(),
 				ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 1, 5.0f
 			);
@@ -810,7 +814,7 @@ bool GameState::update(Game* game, float dt)
 							}
 						}
 					}
-				ProjectileBank::getInstance()->getList()[i]->explode();
+					ProjectileBank::getInstance()->getList()[i]->explode();
 				}
 			}
 
@@ -857,7 +861,7 @@ bool GameState::update(Game* game, float dt)
 										if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 										{
 											int resourceIndex = m_robots[k]->getResourceIndex();
-											robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1+ ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[k]->getDirection(), -1, false);
+											robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[k]->getDirection(), -1, false);
 											m_input->setVibration(k, 1.0f);
 
 											if (resourceIndex != -1)
@@ -979,21 +983,32 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 		game->getPreLoader()->draw(objectType::e_ground);
 		
+		objectData tempData;
+		tempData.material =
+		{
+			0.1f, 0.1f, 0.1f, 0.0f,
+			0.1f, 0.1f, 0.1f, 0.0f,
+			0.1f, 0.1f, 0.1f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+		};
+
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
+		
 			switch (resType)
 			{
 			case BEYBLADE: // Beyblade
-				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 1);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 1);
 				break;
 
 			case ENERGY:
-				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 2);
+				game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 0, 2);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 2);
 				break;
 
 			case SNIPER:
-				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 3);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 3);
 				break;
 
 			default:
@@ -1012,36 +1027,36 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
 			game->getPreLoader()->draw(objectType::e_static, i);
 
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
-			game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-			for (int i = 0; i < m_nodes.size(); i++)
-			{
-				game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
-			}
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+
 			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
 			{
-				
-				for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-				{
-					if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
-						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
-					else if(ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
+				if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
+				else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
 
-						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-				}
-				
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
 			}
 
+		}
 
-			// Tokyo drift
-			for (int i = 0; i < OBJECT_NR_1; i++)
-			{
-				if (m_dboHandler->isDrawn(i))
-					game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
-			}
+
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
 
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -1051,7 +1066,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 
-		
+
 	}
 	if (pass == renderPass::e_particles)
 	{
@@ -1066,7 +1081,7 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 
 
-	
+
 	// User interface
 	if (pass == renderPass::e_userInterface)
 	{

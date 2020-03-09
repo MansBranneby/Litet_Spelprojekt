@@ -62,10 +62,13 @@ Weapon::Weapon(int type)
 	}
 	else if (type == SNIPER)
 	{
-		m_damage = 30;
-		m_cooldown = 1.8f;
+		//m_damage = 30;
+		//m_cooldown = 1.8f;
+		m_damage = 44;
+		m_cooldown = 2.6f;
 
-		setScale(2.0f, 2.0f, 2.0f);
+		setScale(1.5f, 1.5f, 1.5f);
+		m_relativePos = XMVectorSet(1.6f, 0.5f, 1.2f, 0.0f);
 	}
 	else if (type == BEYBLADE)
 	{
@@ -402,6 +405,7 @@ void Weapon::updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot
 	if (t == -1.0f)
 		t = 400.0f;
 	end = start + dir * t;
+	start += dir * 1.0f;
 	//start = XMVectorSetY(start, 2.0f);
 	//end = XMVectorSetY(end, 2.0f);
 	m_sniperLine[0] = start;
