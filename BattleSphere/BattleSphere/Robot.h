@@ -53,6 +53,7 @@ public:
 	bool isAi();
 	void setAi(bool ai);
 	void setAIGoal(XMVECTOR position, bool update);
+	XMVECTOR getAIRotation();
 	void setPlayerId(int playerId);
 	int getPlayerId();
 	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);

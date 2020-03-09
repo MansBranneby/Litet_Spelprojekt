@@ -56,15 +56,15 @@ using namespace DirectX;
 
 
 // Normal resources
-#define PISTOL 0
-#define RIFLE 1
-#define MOVEMENT 2
-#define SHIELD 3
-#define DASH 4
-#define REFLECT 5
-#define SNIPER 6
-#define BEYBLADE 7
-#define ENERGY 8
+#define PISTOL 0 // 2
+#define RIFLE 1 // 7
+#define MOVEMENT 2 // 3
+#define SHIELD 3 // 1
+#define DASH 4 // 4
+#define REFLECT 5 // 0
+#define SNIPER 6 // 6
+#define BEYBLADE 7 // 5
+#define ENERGY 8 // 8
 
 #define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources

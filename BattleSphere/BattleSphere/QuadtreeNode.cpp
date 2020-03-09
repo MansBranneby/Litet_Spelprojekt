@@ -254,7 +254,7 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end, float height)
 		{
 			for (int i = 0; i < m_children.size(); i++)
 			{
-				collision = m_children[i]->testCollision(start, end);
+				collision = m_children[i]->testCollision(start, end, height);
 				if (collision)
 					return true;
 			}

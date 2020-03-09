@@ -65,6 +65,12 @@ void Robot::setAIGoal(XMVECTOR position, bool update)
 	
 }
 
+XMVECTOR Robot::getAIRotation()
+{
+	return m_ai.getAIRotation(m_currentMission);
+
+}
+
 void Robot::setPlayerId(int playerId)
 {
 	m_playerId = playerId;

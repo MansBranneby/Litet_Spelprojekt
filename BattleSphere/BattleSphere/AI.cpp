@@ -29,6 +29,16 @@ mission AI::update(float dt, float movementSpeed, mission currentMission)
 	return currentMission;
 }
 
+XMVECTOR AI::getAIRotation(mission currentMission)
+{
+	if (1 <= currentMission.index)
+	{
+		XMVECTOR delta = XMVector3Normalize(currentPath[currentMission.index - 1] - currentMission.pos);
+		return delta;
+	}
+	return XMVectorSet(1,0,0,0);
+}
+
 AI::AI()
 {
 }
