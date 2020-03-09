@@ -43,4 +43,5 @@ public:
 	ID3D11SamplerState** getSamplerState();
 	ID3D11BlendState* getBlendState() const;
 	void setViewPortDim(UINT width, UINT height);
+	void releaseDepthStencilViews();
 };

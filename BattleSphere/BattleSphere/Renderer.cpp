@@ -311,7 +311,7 @@ void changeResolution(UINT width, UINT height)
 {
 	// Set directx singleton width and height
 	DX::getInstance()->setWidthAndHeight((float)width, (float)height);
-	
+
 	// Change camera aspect ratio
 	float nearPlane = 0.1f;
 	float farPlane = 500.0f;
@@ -321,15 +321,15 @@ void changeResolution(UINT width, UINT height)
 	ID3D11RenderTargetView* nullViews = nullptr;
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
 	if ((*g_graphicResources.getBackBuffer())) (*g_graphicResources.getBackBuffer())->Release();
-	if (g_graphicResources.getDepthStencilView()) g_graphicResources.getDepthStencilView()->Release();
+	g_graphicResources.releaseDepthStencilViews();
 	DX::getInstance()->getDeviceContext()->Flush();
-	
+
 	// Resize swapchain
 	DX::getInstance()->getSwapChain()->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-	
+
 	// Update render target, depth stencil and viewport
 	g_graphicResources.updateRenderTarget();
-	
+
 	// Update render target, depth stencil and viewport for shadow mapping, bloom and menu
 	if (g_shadowMapping) delete g_shadowMapping;
 	g_shadowMapping = new ShadowMapping();
@@ -677,8 +677,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_menu;
 		delete g_shadowMapping;
 		delete g_lightCulling;
-		//DX::getInstance()->reportLiveObjects();
-		DX::getInstance()->release();
+		Lights::releaseInstance();
+		if (DX::getInstance())
+			DX::getInstance()->release();
 		delete DX::getInstance();
 		DestroyWindow(wndHandle);
 	}

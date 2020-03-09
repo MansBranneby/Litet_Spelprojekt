@@ -131,6 +131,11 @@ VertexShader::VertexShader(LPCWSTR fileName, int type)
 	case 2:
 		createPathInputLayout(&pVS, &errorBlob);
 		break;
+
+	case 3: // Particles need no input layout
+		m_vertexLayout = nullptr;
+		break;
+
 	default:
 		createInputLayout(&pVS, &errorBlob);
 		break;

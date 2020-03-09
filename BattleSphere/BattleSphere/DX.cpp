@@ -179,8 +179,6 @@ void DX::initializeCamAndParticles(float width, float height, float nearPlane, f
 
 void DX::reInitializeCam(float width, float height, float nearPlane, float farPlane)
 {
-	//if (m_camera) delete m_camera;
-	//m_camera = new Camera();
 	m_camera->initialize(width, height, nearPlane, farPlane);
 }
 

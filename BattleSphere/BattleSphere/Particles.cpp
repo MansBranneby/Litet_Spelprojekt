@@ -9,7 +9,7 @@ Particles::Particles()
 {
 	// Create shaders
 	m_computeShaderParticles = ComputeShader(L"ComputeShaderParticles.hlsl");
-	m_vertexShaderParticles = VertexShader(L"VertexShaderParticles.hlsl", 2);
+	m_vertexShaderParticles = VertexShader(L"VertexShaderParticles.hlsl", 3);
 	m_geometryShaderParticles = GeometryShader(L"GeometryShaderParticles.hlsl");
 	m_pixelShaderParticles = PixelShader(L"PixelShaderParticles.hlsl");
 
