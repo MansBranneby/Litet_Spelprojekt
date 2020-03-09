@@ -18,6 +18,7 @@
 		float sizeX, sizeY;
 		float timeLived;
 		float lifeSpan;
+		float gravX, gravY, gravZ;
 		float colorX, colorY, colorZ;
 	};
 
@@ -79,9 +80,17 @@ public:
 	Particles();
 	~Particles();
 
-	void addParticles(XMVECTOR pos, XMVECTOR color, XMVECTOR size, int amount = 200, float velocity = 3.0f, float lifeSpan = 0.0f, float spread = 1.0f, XMVECTOR direction = { 0.0f, 0.0f, 0.0f, 0.0f });
+	void addParticles
+	(
+		XMVECTOR pos, XMVECTOR color, XMVECTOR size, 
+		int amount = 200, float velocity = 3.0f, float lifeSpan = 0.0f, 
+		float spread = 1.0f, XMVECTOR direction = { 0.0f, 0.0f, 0.0f, 0.0f }, 
+		XMVECTOR gravDir = {0.0f, -1.0f, 0.0f, 0.0f}
+	);
 	void addSpark(XMVECTOR impactPos, XMVECTOR projectileDir);
 	void addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir);
+	void addSniperSmoke(XMVECTOR pos, XMVECTOR col, XMVECTOR dir);
+	void addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float robVel);
 	void update(float dT);
 	void draw();
 };

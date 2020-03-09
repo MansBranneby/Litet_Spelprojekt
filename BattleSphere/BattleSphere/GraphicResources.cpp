@@ -8,7 +8,7 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	float height = DX::getInstance()->getHeight();
 	float nearPlane = 0.1f;
 	float farPlane = 500.0f;
-	DX::getInstance()->initializeCam(width, height, nearPlane, farPlane);
+	DX::getInstance()->initializeCamAndParticles(width, height, nearPlane, farPlane);
 
 	createDepthStencil();
 	createBackBuffer();

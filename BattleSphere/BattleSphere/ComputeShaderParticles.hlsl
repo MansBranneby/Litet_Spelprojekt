@@ -10,6 +10,7 @@ struct particle
 	float2 size;
 	float timeLived;
 	float lifeSpan;
+	float3 gravDir;
 	float3 color;
 };
 
@@ -18,7 +19,7 @@ static const uint airResistance = 0.1f;
 particle updateParticle(particle prevParticle)
 {
 	// Update particle position and velocity
-	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + float3(0, -9.82f, 0);
+	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + 9.82f * prevParticle.gravDir;
 	prevParticle.vel += acceleration * dt;
 	prevParticle.pos += prevParticle.vel * dt;
 

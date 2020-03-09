@@ -120,9 +120,14 @@ void GameObject::setEmission(float x, float y, float z, float w)
 	m_material.emission = XMVectorSet(x, y, z, w);
 }
 
-XMVECTOR GameObject::getPosition()
+XMVECTOR const GameObject::getPosition()
 {
 	return m_position;
+}
+
+XMVECTOR const GameObject::getStaticRotation()
+{
+	return m_staticRotation;
 }
 
 objectData const GameObject::getData()

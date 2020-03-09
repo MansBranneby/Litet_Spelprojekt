@@ -5,6 +5,7 @@ struct particle
 	float2 size : SIZE;
 	float timeLived : TIME_LIVED;
 	float lifeSpan : LIFESPAN;
+	float3 gravDir : GRAVITY_DIRECTION;
 	float3 col : COLOR;
 };
 

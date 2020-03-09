@@ -1,4 +1,6 @@
 #include "DX.h"
+#include "Particles.h"
+
 
 DX* DX::m_instance = nullptr;
 
@@ -10,7 +12,8 @@ DX::DX()
 	m_swapChain = nullptr;
 	m_pDSStateEnabled = nullptr;
 	m_pDSStateDisabled = nullptr;
-	//m_camera = nullptr;
+	m_camera = nullptr;
+	m_particles = nullptr;
 }
 
 void DX::createStencilStates()
@@ -72,6 +75,11 @@ DX* DX::getInstance()
 Camera* DX::getCam()
 {
 	return m_camera;
+}
+
+Particles* DX::getParticles()
+{
+	return m_particles;
 }
 
 ID3D11Device* DX::getDevice()
@@ -153,10 +161,13 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	return hr;
 }
 
-void DX::initializeCam(float width, float height, float nearPlane, float farPlane)
+void DX::initializeCamAndParticles(float width, float height, float nearPlane, float farPlane)
 {
 	m_camera = new Camera();
 	m_camera->initialize(width, height, nearPlane, farPlane);
+
+	// Initialize particles
+	m_particles = new Particles;
 }
 
 
@@ -171,6 +182,7 @@ void DX::release()
 {
 	m_swapChain->SetFullscreenState(false, NULL);
 	if (m_camera) delete m_camera;
+	if (m_particles) delete m_particles;
 	getDeviceContext()->Release();
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
