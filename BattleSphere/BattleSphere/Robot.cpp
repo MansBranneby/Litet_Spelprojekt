@@ -5,7 +5,7 @@ Robot::Robot(int playerId)
 	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 20.0f;
-	m_vel = XMVectorSet(0,0,0,0);
+	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
@@ -16,7 +16,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(REFLECT);
+	Weapon* pistol = new Weapon(PISTOL);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -36,6 +36,9 @@ Robot::Robot(int playerId)
 	m_positionHistoryPtr = 0;
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+
+	// Particles
+	m_timeSinceParticles = 0.0f;
 }
 
 void Robot::setPlayerId(int playerId)
@@ -48,7 +51,6 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
-
 bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
 {
 	if (m_currentWeapon[RIGHT] != -1)
@@ -58,10 +60,10 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool del
 
 	if (projIndex != -1 && deleteProjectile)
 	{
-		
+
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 	}
-		
+
 
 
 	if (damage != 0.0f)
@@ -359,7 +361,19 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
 	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
-	
+
+	// Particle engine flame
+	m_timeSinceParticles += dt;
+	if (m_timeSinceParticles > 0.01f)
+	{
+		// Maxvel 0.16
+		m_timeSinceParticles = 0.0f;
+		float rotRadian = XM_PI / 2.0f - XMConvertToRadians(m_currentRotation);
+		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
+		XMVECTOR robPos = getPosition() - lookAt*1.0f;
+		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
+	}
 }
 
 void Robot::move(XMVECTOR dPos)
