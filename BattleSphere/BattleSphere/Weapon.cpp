@@ -42,13 +42,11 @@ Weapon::Weapon(int type)
 	}
 	else if (type == SHIELD)
 	{
-		m_cooldown = 1.0f;
+		m_cooldown = 8.0f;
 		m_duration = 6.0f;
 		m_defense = 0.0f;
 
 		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		//rotate(0, 1, 0, 180);
-		//setScale(-1, 1, -1);
 	}
 	else if (type == DASH)
 	{
@@ -222,8 +220,8 @@ void Weapon::upgrade()
 	{
 		m_cooldown -= 0.5f;
 		m_duration += 0.5f;
-		if (m_cooldown < 8.0f)
-			m_cooldown = 8.0f;
+		if (m_cooldown < 6.0f)
+			m_cooldown = 6.0f;
 		if (m_duration > 8.0)
 			m_duration = 8.0f;
 	}

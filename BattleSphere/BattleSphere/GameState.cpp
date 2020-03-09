@@ -982,9 +982,9 @@ void GameState::draw(Game* game, renderPass pass)
 						od.material.emission = m_robots[i]->getColour();
 
 						if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == REFLECT)
-							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 1, 2, 3);
+							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 1, 2, 4);
 						if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SHIELD)
-							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 1, 1, 4);
+							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 1, 1, 5);
 					}
 				}
 
@@ -1008,7 +1008,7 @@ void GameState::draw(Game* game, renderPass pass)
 					break;
 
 				case SHIELD:
-					game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1, 4);
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1, 5);
 					break;
 
 				default:
@@ -1038,7 +1038,7 @@ void GameState::draw(Game* game, renderPass pass)
 						break;
 
 					case SHIELD:
-						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1, 4);
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1, 5);
 						break;
 
 					default:
@@ -1079,11 +1079,16 @@ void GameState::draw(Game* game, renderPass pass)
 				break;
 
 			case REFLECT:
-				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 4);
+				game->getPreLoader()->setSubModelData(objectType::e_resource, m_resources[i]->getData(), 1, 2, 4);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 4);
 				break;
 
 			case SHIELD:
-				game->getPreLoader()->drawOneMaterial(objectType::e_resource, m_resources[i]->getData(), 4);
+				game->getPreLoader()->setSubModelData(objectType::e_resource, m_resources[i]->getData(), 1, 1, 5);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 5);
+				//tempData.material.emission = XMVectorSet(0, 0, 0, -1);
+				//game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 1, 0, 5);
+				//game->getPreLoader()->drawOneModelAndMat(objectType::e_resource, m_resources[i]->getData(), 1, 5);
 				break;
 
 			default:
@@ -1140,9 +1145,9 @@ void GameState::draw(Game* game, renderPass pass)
 						od.material.emission = XMVectorSet(-1.0f, -1.0f, -1.0f, 0.2f);
 
 						if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == REFLECT)
-							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 0, 0, 3);
-						if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SHIELD)
 							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 0, 0, 4);
+						if (m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(side)]->getType() == SHIELD)
+							game->getPreLoader()->setSubModelData(objectType::e_weapon, od, 0, 0, 5);
 					}
 				}
 
@@ -1152,11 +1157,11 @@ void GameState::draw(Game* game, renderPass pass)
 					switch (wepType)
 					{
 					case REFLECT:
-						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 3);
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 4);
 						break;
 
 					case SHIELD:
-						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 4);
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 5);
 						break;
 
 					default:
@@ -1173,7 +1178,7 @@ void GameState::draw(Game* game, renderPass pass)
 						break;
 						
 					case SHIELD:
-						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 4);
+						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 5);
 						break;
 
 					default:
