@@ -41,6 +41,10 @@ private:
 	// Particles
 	Particles m_particles;
 
+	// Scoreboard
+	float m_scoreTimer;
+	float m_scoreTimerAcceleration;
+
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 

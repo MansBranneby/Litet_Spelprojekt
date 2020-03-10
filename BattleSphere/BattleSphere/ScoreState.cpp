@@ -271,6 +271,10 @@ ScoreState::ScoreState(Game* game)
 	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_static_billboard_score, ObjectType::e_billboard, ObjectType::e_number_billboard};
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
+	// Scoreboard
+	m_scoreTimer = 0.0f;
+	m_scoreTimerAcceleration = 1.1f;
+
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 	m_lights = Lights::getInstance();
@@ -463,7 +467,8 @@ bool ScoreState::update(Game* game, float dt)
 			}
 		}
 	}
-
+	m_scoreTimer += dt + pow(m_scoreTimerAcceleration, m_scoreTimer);
+	
 	return exitGame;
 }
 
@@ -521,19 +526,58 @@ void ScoreState::draw(Game* game, renderPass pass)
 				game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 		}
 
-		objectData test;
-		test.material = game->getRobots()[0]->getData().material;
-		test.pos = { -5.0f, 0.0f, 0.0f };
-		game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
-		game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
+		int score = 0, nrOfDigits = 0, digit = 0, displayedScore = 0;
+		std::vector<int> digits;
+		objectData data;
+		
+		for (int i = 0; i < XUSER_MAX_COUNT; ++i)
+		{
+			if (m_robots[i] != nullptr)
+			{
+				if (m_scoreTimer > 1.0f)
+				{
+					m_scoreTimer = 0.0f;
+					if (m_robots[i]->getScore() < 12)
+						m_robots[i]->addScore(1);
+				}
 
-		test.pos = { 0.0f, 0.0f, 0.0f };
-		game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
-		game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
+				score = m_robots[i]->getScore();
+				while (score > 0)
+				{
+					if (score == 10)
+						int test = 0;
+					nrOfDigits++;
+					digits.push_back(score % 10);
+					score /= 10;
+				}
+
+				data.pos.m128_f32[0] = - ((float)nrOfDigits * 0.5f) * 2.0f;
+				data.material.emission = m_robots[i]->getData().material.emission;
+				for (int j = nrOfDigits - 1; j >= 0; --j)
+				{
+					digit = digits[j];
+				
+					game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
+					game->getPreLoader()->draw(BBNumbers[digit].getObjectType(), BBNumbers[digit].getBillboardData(), BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber(), BBNumbers[digit].getVariant());
+
+					data.pos.m128_f32[0] += 2.0f;
+				}
+			}
+		}
+
+		//objectData test;
+		//test.material = game->getRobots()[0]->getData().material;
+		//test.pos = { -5.0f, 0.0f, 0.0f };
+		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
 		//game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
-		////test.pos = { 35.0f, 40.0f, -60.0f };
-		test.pos = { 5.0f, 0.0f, 0.0f };
-		game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber());
-		game->getPreLoader()->draw(BBNumbers[1].getObjectType(), BBNumbers[1].getBillboardData(), BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber(), BBNumbers[1].getVariant());
+
+		//test.pos = { 0.0f, 0.0f, 0.0f };
+		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
+		//game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
+		////game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
+		//////test.pos = { 35.0f, 40.0f, -60.0f };
+		//test.pos = { 5.0f, 0.0f, 0.0f };
+		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber());
+		//game->getPreLoader()->draw(BBNumbers[1].getObjectType(), BBNumbers[1].getBillboardData(), BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber(), BBNumbers[1].getVariant());
 	}
 }
