@@ -190,6 +190,14 @@ bool Weapon::getReady()
 	return m_ready;
 }
 
+float Weapon::getCD()
+{
+	if (m_cdTime != 0.0f)
+		return (m_cooldown + m_duration - m_cdTime) / (m_cooldown + m_duration);
+	else
+		return 0.0f;
+}
+
 void Weapon::upgrade()
 {
 	if (m_type == RIFLE)

@@ -63,6 +63,7 @@ public:
 
 	bool getActive();
 	bool getReady();
+	float getCD();
 
 	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
 	void getSniperLine(XMVECTOR& start, XMVECTOR& end);

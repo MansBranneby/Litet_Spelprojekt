@@ -7,7 +7,7 @@ void SpawnDrone::loadLists()
 	m_spawns.push_back({ -120, 100 });
 	m_spawns.push_back({ -74, 85 });
 	m_spawns.push_back({ -46, 85 });
-	m_spawns.push_back({ -15, 85 });
+	m_spawns.push_back({ -15, 85 }); 
 	m_spawns.push_back({ 120, 39 });
 	m_spawns.push_back({ -15, 29 });
 	m_spawns.push_back({ 15, 29 });
@@ -240,6 +240,9 @@ bool SpawnDrone::assignMission(Robot** robots)
 			//resource = new Resource(true, spawnIndex, 6, 1.2f);
 		}
 
+		// Set vector for icon warning
+		m_nextSpawnWarning = XMVectorSet((float)resource->getType(), 0.0f, 0.0f, 0.0f);
+
 		// Set resource under drone
 		XMVECTOR pos = m_spawnDroneBody.getPosition();
 		resource->setPosition(XMVectorSet
@@ -262,6 +265,29 @@ bool SpawnDrone::assignMission(Robot** robots)
 	return  false;
 }
 
+bool SpawnDrone::translateDoor(float dt, bool open)
+{
+	if (open)
+	{
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] - dt * 2.0f, 0.0f);
+		if (m_BSPDdoor.getPosition().m128_f32[1] <= BSPD_DOOR_OPEN)
+		{
+			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_OPEN, 0.0f);
+			return true;
+		}
+	}
+	else
+	{
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] + dt * 2.0f, 0.0f);
+		if (m_BSPDdoor.getPosition().m128_f32[1] >= BSPD_DOOR_CLOSED)
+		{
+			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_CLOSED, 0.0f);
+			return true;
+		}
+	}
+	return false;
+}
+
 SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 {
 	m_resources = m_resourcesPtr;
@@ -282,7 +308,15 @@ SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 	m_transportDirection = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_travelTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_travelDirection = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_spawnDroneBody.rotate(0.0f, 1.0f, 0.0f, 150.0f);
+	m_spawnDroneBody.scale(-0.2f, -0.2f, -0.2f);
+	m_spawnDronePropeller[0].scale(-0.2f, -0.2f, -0.2f);
+	m_spawnDronePropeller[1].scale(-0.2f, -0.2f, -0.2f);
+	m_spawnDronePropeller[2].scale(-0.2f, -0.2f, -0.2f);
+	m_spawnDronePropeller[3].scale(-0.2f, -0.2f, -0.2f);
 	m_spawnDroneBody.setPosition(DRONE_START);
+	m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_CLOSED, 0.0f);
+
 	XMVECTOR droneStart = DRONE_START;
 	Lights::getInstance()->setPosition(
 		m_droneLightIndex,
@@ -294,10 +328,14 @@ SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 	m_spawnDronePropeller[1].setPosition(7.0692f, 0.64566f, 4.934334f);
 	m_spawnDronePropeller[2].setPosition(-7.0692f, 0.64566f, -4.934334f);
 	m_spawnDronePropeller[3].setPosition(-7.0692f, 0.64566f, 4.934334f);
+
+	m_nextSpawnWarning = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	m_constantBufferIcons = new ConstantBuffer(&m_nextSpawnWarning, sizeof(XMVECTOR));
 }
 
 SpawnDrone::~SpawnDrone()
 {
+	delete m_constantBufferIcons;
 }
 
 void SpawnDrone::update(Robot** robots, float dT)
@@ -321,89 +359,222 @@ void SpawnDrone::update(Robot** robots, float dT)
 				m_spawnDroneState++;
 		}
 		break;
-
-	case 0: // Set target to rising point
-		XMVECTOR target = m_spawnDroneBody.getPosition();
-		target.m128_f32[1] = TRAVEL_HEIGHT;
+	case 0:
+		if (translateDoor(dT, true))
+			m_spawnDroneState++;
+		break;
+	case 1: // Set to rise spot
+		XMVECTOR target = DRONE_RISE_START;
 		setTravelTarget(target);
-		setRotationTarget(m_transportDestination);
 		m_spawnDroneState++;
 		break;
-	case 1: // Rise 
+	case 2: // Travel to rise spot 
+		translateDoor(dT, false);
+		if (travelAndCheck(dT, false))
+
+			m_spawnDroneState++;
+		break;
+	case 3: // Set target to rising
+		setRotationTarget(m_transportDestination);
+		if (m_transportDestination.m128_f32[0] < 0.0f && m_transportDestination.m128_f32[2] > 30.0f) // Upper left
+		{
+			if (travelAndCheck(dT, false))
+				m_spawnDroneState = 20;
+		}
+		else if (m_transportDestination.m128_f32[0] > 0.0f && m_transportDestination.m128_f32[2] > 0.0f) // Upper right
+		{
+			setRotationTarget(DRONE_MIDPOINT);
+			if (travelAndCheck(dT, false))
+			{
+				m_spawnDroneState = 29;
+				target = DRONE_MIDPOINT;
+				target.m128_f32[1] = TRAVEL_HEIGHT;
+				setTravelTarget(target);
+			}
+		}
+		else
+		{
+			target = m_spawnDroneBody.getPosition();
+			target.m128_f32[1] = TRAVEL_HEIGHT;
+			setTravelTarget(target);
+			m_spawnDroneState++;
+		}
+		break;
+	case 4: // Rise 
+		translateDoor(dT, false);
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 2: // Set target above transport location
+	case 5: // Set target above transport location
 		target = m_transportDestination;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 3: // Travel
+	case 6: // Travel
+		translateDoor(dT, false);
 		if (travelAndCheck(dT, true))
 			m_spawnDroneState++;
 		break;
 
-	case 4: // Set target to decline down to spawn point
+	case 7: // Set target to decline down to spawn point
 		target = m_transportDestination;
 		target.m128_f32[1] -= RESOURCE_OFFSET;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 5: // Decline 
+	case 8: // Decline 
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 6: // Leave resource
+	case 9: // Leave resource
 		(*m_resources)[m_heldResourceIndex]->setPosition(m_transportDestination);
 		(*m_resources)[m_heldResourceIndex]->setBlocked(false);
 		m_heldResourceIndex = -1;
+		m_nextSpawnWarning = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		m_spawnDroneState++;
 		break;
 
-	case 7: // Set target above transport location, rotate to drone start
+	case 10: // Set target above transport location, rotate to drone start or midpoint
 		target = m_transportDestination;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
-		setRotationTarget(DRONE_START);
+		if (m_transportDestination.m128_f32[0] > 0.0f && m_transportDestination.m128_f32[2] > 0.0f)
+		{
+			setRotationTarget(DRONE_MIDPOINT);
+			m_spawnDroneState = 30;
+		}
+		else
+			setRotationTarget(DRONE_RISE_START);
 		m_spawnDroneState++;
 		break;
 
-	case 8: // Rise 
+	case 11: // Rise 
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 9: // Set target above drone start
-		target = DRONE_START;
+	case 12: // Set target above drone rise start
+		target = DRONE_RISE_START;
 		target.m128_f32[1] = TRAVEL_HEIGHT;
 		setTravelTarget(target);
 		m_spawnDroneState++;
 		break;
 
-	case 10: // Travel
+	case 13: // Travel
 		if (travelAndCheck(dT, true))
 			m_spawnDroneState++;
 		break;
 
-	case 11: // Set target to decline down to drone start  
-		setTravelTarget(DRONE_START);
+	case 14: // Set target to decline down to drone rise start  
+		setRotationTarget(-DRONE_START);
+		setTravelTarget(DRONE_RISE_START);
 		m_spawnDroneState++;
 		break;
 
-	case 12: // Decline
+	case 15: // Decline
 		if (travelAndCheck(dT, false))
 			m_spawnDroneState++;
 		break;
 
-	case 13: // Reset switch
+	case 16: // Set target to BSPD building
+		setTravelTarget(DRONE_START);
 		m_spawnDroneState++;
+		break;
+
+	case 17: // Open door and then travel to start
+		if (translateDoor(dT, true))
+		{
+			if (travelAndCheck(dT, false))
+				m_spawnDroneState++;
+		}
+		break;
+	case 18:
+		if (translateDoor(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 19: // Reset switch
+		//m_spawnDroneState++;
 		m_spawnDroneState = -1;
 		Sound::getInstance()->stop(soundAmbient::e_drone);
+		break;
+
+	case 20: // Set travel (without rise)
+		target = m_transportDestination;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+
+	case 21: // Travel (without rise)
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 22: // Leave (without rise)
+		(*m_resources)[m_heldResourceIndex]->setPosition(m_transportDestination);
+		(*m_resources)[m_heldResourceIndex]->setBlocked(false);
+		m_heldResourceIndex = -1;
+		m_nextSpawnWarning = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		m_spawnDroneState++;
+		break;
+
+	case 23: // Set rotate to rise start
+		setRotationTarget(DRONE_RISE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 24: // Rotate to rise start
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+
+	case 25:
+		setTravelTarget(DRONE_RISE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 26:
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 27:
+		setRotationTarget(-DRONE_START);
+		m_spawnDroneState++;
+		break;
+
+	case 28:
+		translateDoor(dT, true);
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState = 16;
+		break;
+
+	case 29: // Rise to mid point 
+		translateDoor(dT, false);
+		setRotationTarget(m_transportDestination);
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState = 5;
+		break;
+
+	case 30: // Rise 
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState++;
+		break;
+
+	case 31: // Travel to midpoint
+		target = DRONE_MIDPOINT;
+		target.m128_f32[1] = TRAVEL_HEIGHT;
+		setTravelTarget(target);
+		m_spawnDroneState++;
+		break;
+
+	case 32: 
+		if (travelAndCheck(dT, false))
+			m_spawnDroneState = 14;
 		break;
 	}
 }
@@ -439,8 +610,32 @@ objectData SpawnDrone::getData(int model)
 		return m_spawnDronePropeller[3].getData();
 		break;
 
+	case 4:
+		return m_BSPDdoor.getData();
+		break;
 	default:
 		return m_spawnDroneBody.getData();
 		break;
+	}
+}
+
+void SpawnDrone::setConstantBuffer(bool on)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	if (on)
+	{
+		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferIcons->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &m_nextSpawnWarning, sizeof(XMVECTOR));
+		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferIcons->getConstantBuffer(), 0);
+
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(6, 1, m_constantBufferIcons->getConstantBuffer());
+	}
+	else
+	{
+		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferIcons->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferIcons->getConstantBuffer(), 0);
+
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(6, 1, m_constantBufferIcons->getConstantBuffer());
 	}
 }
