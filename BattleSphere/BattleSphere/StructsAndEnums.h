@@ -74,6 +74,8 @@ using namespace DirectX;
 
 enum class ObjectType
 {
+	e_static_billboard_score_platform,
+	e_score_scene,
 	e_number_billboard,
 	e_static_billboard_score,
 	e_static_billboard,

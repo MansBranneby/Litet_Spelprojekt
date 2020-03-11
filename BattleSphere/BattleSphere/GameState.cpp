@@ -646,7 +646,7 @@ bool GameState::update(Game* game, float dt)
 	if (nrOfPlayersAlive <= 1) // If zero or one person is alive then change to scorestate 
 	{
 		if (winner != -1)
-			m_robots[winner]->addScore(1); // Award one point to the winning player 
+			//m_robots[winner]->addScore(1); // Award one point to the winning player 
 		// If no one is left alive it's a tie and no points are awarded 
 		setPaused(true); // Pause this state
 		game->changeState(stateType::e_scoreState); // Change state to ScoreState

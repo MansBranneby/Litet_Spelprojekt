@@ -234,6 +234,11 @@ void Robot::addScore(int score)
 	m_score += score;
 }
 
+void Robot::setScore(int score)
+{
+	m_score = score;
+}
+
 void Robot::resetScore()
 {
 	m_score = 0;

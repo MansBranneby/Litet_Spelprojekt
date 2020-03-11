@@ -8,6 +8,7 @@ private:
 	std::vector <Billboard> m_billboards;
 	std::vector <Billboard> m_numberBillboards;
 	std::vector <Billboard> m_staticBillboards;
+	std::vector <Billboard> m_staticBillboardPlatform;
 
 public:
 	BillboardHandler();

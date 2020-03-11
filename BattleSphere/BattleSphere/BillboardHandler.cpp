@@ -33,6 +33,10 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<ObjectType>
 			case ObjectType::e_static_billboard:
 				m_staticBillboards.push_back(m_billboards[i]);
 				break;
+			case ObjectType::e_static_billboard_score_platform:
+				m_staticBillboardPlatform.push_back(m_billboards[i]);
+				break;
+
 		}
 	}
 	
@@ -65,6 +69,9 @@ std::vector<Billboard> BillboardHandler::getBillboardsOfType(ObjectType objectTy
 	case ObjectType::e_static_billboard:
 		return m_staticBillboards;
 		break;
+	case ObjectType::e_static_billboard_score_platform:
+		return m_staticBillboardPlatform;
+		break;
 	}
 
 	return m_billboards;
@@ -90,7 +97,7 @@ void BillboardHandler::updateBillboards(float dt)
 
 void BillboardHandler::setAllStates(int i,float flashSpeed, float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB, DirectX::XMVECTOR velocityUV)
 {
-	m_billboards[i].setAllStates(flashSpeed, colourChangeSpeed, colourA, colourB, velocityUV);
+	m_billboards[i].setAllStates(flashSpeed, colourChangeSpeed, colourA, colourB, velocityUV);	
 }
 
 void BillboardHandler::setNoneState(int i)

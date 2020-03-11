@@ -159,6 +159,133 @@ void ScoreState::updateDynamicCamera(float dT)
 		DX::getInstance()->getCam()->setLookAt(lookAt);
 }
 
+void ScoreState::updateScoreBoard(float dt)
+{
+	if (!m_scoreBoardIsUpdated)
+	{
+		m_robots[1] = new Robot(1);
+		m_robots[2] = new Robot(2);
+		m_robots[3] = new Robot(3);
+		m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
+		m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
+		m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
+		m_robots[1]->setScore(1);
+		m_robots[2]->setScore(3);
+		m_robots[3]->setScore(6);
+
+		for (int i = 0; i < XUSER_MAX_COUNT; ++i)
+		{
+			if (m_robots[i] != nullptr)
+			{
+				m_ranking.push_back(m_robots[i]->getScore());
+				m_playerIDs.push_back(m_robots[i]->getPlayerId());
+			}
+		}
+
+		for (int i = 0; i < int(m_ranking.size()) - 1; ++i)
+		{
+			for (int j = 0; j < int(m_ranking.size()) - 1; ++j)
+			{
+				if (m_ranking[j] < m_ranking[j + 1])
+				{
+					// Order ranking
+					int tempRank = m_ranking[j];
+					m_ranking[j] = m_ranking[j + 1];
+					m_ranking[j + 1] = tempRank;
+
+					// Order the vector
+					int tempPlayerID = m_playerIDs[j];
+					m_playerIDs[j] = m_playerIDs[j + 1];
+					m_playerIDs[j + 1] = tempPlayerID;
+				}
+			}
+		}
+		m_scoreBoardIsUpdated = true;
+	}
+}
+
+bool ScoreState::updateScoreScorePlatforms(Game* game)
+{
+	bool exitGame = false;
+	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
+	DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
+	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
+	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+	for (int i = 0; i < BB.size(); ++i)
+	{
+		if (BB[i].getObjectType() == ObjectType::e_static_billboard_score_platform)
+		{
+			// Test each player against collision mesh
+			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
+			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant()); // collision mesh
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
+			{
+				for (int k = 0; k < colMesh.size(); k += 3)
+				{
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
+
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(ObjectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					{
+						// If collision detected tick up nr of collisions
+						nrOfCollisions++;
+						break;
+					}
+				}
+			}
+
+			if (nrOfCollisions == game->getNrOfPlayers())
+			{
+				if(i == 10)
+					m_billboardHandler.setAllStates(i + 2, 0.1f, 1.0f, cyan, cyan, black);
+				if (i == 12)
+					m_billboardHandler.setAllStates(i + 2, 0.1f, 1.0f, cyan, cyan, black);
+				if (i == 14)
+					m_billboardHandler.setAllStates(10, 0.1f, 1.0f, cyan, cyan, black);
+
+				if (m_input->isPressed(0, XINPUT_GAMEPAD_A))
+				{
+					switch (i)
+					{
+					case 10:
+						exitGame = true;
+						break;
+					case 12:
+						m_scoreBoardIsUpdated = false;
+						m_ranking.clear();
+						m_playerIDs.clear();
+						setPaused(true); // Pause this state
+						game->changeState(stateType::e_gameState); // Change state to ScoreState
+						break;
+					case 14:
+						m_scoreBoardIsUpdated = false;
+						m_ranking.clear();
+						m_playerIDs.clear();
+						setPaused(true); // Pause this state
+						game->changeState(stateType::e_mainMenu); // Change state to ScoreState
+						break;
+					}
+				}
+				break;
+			}
+			else
+			{
+				m_billboardHandler.setNoneState(i);
+			}
+		}
+	}
+
+	return exitGame;
+}
+
 void ScoreState::handleMovement(Game* game, float dt, int id)
 {
 	// Save velocity for collision
@@ -268,10 +395,11 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_static_billboard_score, ObjectType::e_billboard, ObjectType::e_number_billboard};
+	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_billboard, ObjectType::e_number_billboard, ObjectType::e_static_billboard_score_platform };
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard
+	m_scoreBoardIsUpdated = false;
 	m_scoreTimer = 0.0f;
 	m_scoreTimerAcceleration = 1.1f;
 
@@ -406,69 +534,14 @@ bool ScoreState::update(Game* game, float dt)
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
-	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
-	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
-	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
-	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-	for (int i = 0; i < BB.size(); ++i)
-	{	
-		if (BB[i].getObjectType() == ObjectType::e_static_billboard_score)
-		{
-			if (i == 1.0f)
-				float test = 10.0f;
-			// Test each player against collision mesh
-			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
-			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant()); // collision mesh
-			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
-			{
-				for (int k = 0; k < colMesh.size(); k += 3)
-				{
-					// Get indices
-					unsigned int ind1 = k + 1;
-					unsigned int ind2 = k + 2;
+	// Update scoreboard
+	updateScoreBoard(dt);
 
-					// Get vertices
-					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
-					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
-					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
-
-					// Test collision between player and collision mesh
-					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(ObjectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
-					{
-						// If collision detected tick up nr of collisions
-						nrOfCollisions++;
-						break;
-					}
-				}
-			}
-			if (nrOfCollisions == game->getNrOfPlayers())
-			{
-				m_billboardHandler.setAllStates(i, 0.1f, 1.0f, cyan, cyan, cyan);
-				if (m_input->isPressed(0, XINPUT_GAMEPAD_A))
-				{
-					switch (i)
-					{
-					case 0:
-						exitGame = true;
-						break;
-					case 1:
-						break;
-					case 2:
-						setPaused(true); // Pause this state
-						game->changeState(stateType::e_mainMenu); // Change state to ScoreState
-						break;
-					}
-				}
-				break;
-			}
-			else
-			{
-				m_billboardHandler.setNoneState(i);
-			}
-		}
-	}
-	m_scoreTimer += dt + pow(m_scoreTimerAcceleration, m_scoreTimer);
+	// Update platforms
+	exitGame = updateScoreScorePlatforms(game);
 	
+	m_scoreTimer += dt;
+
 	return exitGame;
 }
 
@@ -486,10 +559,8 @@ void ScoreState::draw(Game* game, renderPass pass)
 				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
 				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 				game->getPreLoader()->draw(ObjectType::e_robot);
-			
 			}
 		}
-
 	}
 	else if (pass == renderPass::e_transparent)
 	{
@@ -513,10 +584,15 @@ void ScoreState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
 			game->getPreLoader()->draw(ObjectType::e_scene, i);
 
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_score_scene); i++)
+			game->getPreLoader()->draw(ObjectType::e_score_scene, i);
+
 		m_particles.draw();
 	}
 	else if (pass == renderPass::e_billboard)
 	{
+	
+
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 		std::vector<Billboard> BBNumbers = m_billboardHandler.getBillboardsOfType(ObjectType::e_number_billboard);
 
@@ -526,43 +602,38 @@ void ScoreState::draw(Game* game, renderPass pass)
 				game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 		}
 
-		int score = 0, nrOfDigits = 0, digit = 0, displayedScore = 0;
+		int score = 0, digit = 0, displayedScore = 0;
+		float distX = 2.0f, distY = 4.0f;
+
 		std::vector<int> digits;
 		objectData data;
-		
-		for (int i = 0; i < XUSER_MAX_COUNT; ++i)
+		data.pos.m128_f32[1] = game->getNrOfPlayers() * 3.0f;
+		for (int i = 0; i < m_playerIDs.size(); ++i)
 		{
-			if (m_robots[i] != nullptr)
+			int playerID = m_playerIDs[i];
+			score = m_robots[playerID]->getScore();
+			do 
 			{
-				if (m_scoreTimer > 1.0f)
-				{
-					m_scoreTimer = 0.0f;
-					if (m_robots[i]->getScore() < 12)
-						m_robots[i]->addScore(1);
-				}
+				if (score == 10)
+					int test = 0;
+				digits.push_back(score % 10);
+				score /= 10;
+			} while (score > 0);
 
-				score = m_robots[i]->getScore();
-				while (score > 0)
-				{
-					if (score == 10)
-						int test = 0;
-					nrOfDigits++;
-					digits.push_back(score % 10);
-					score /= 10;
-				}
-
-				data.pos.m128_f32[0] = - ((float)nrOfDigits * 0.5f) * 2.0f;
-				data.material.emission = m_robots[i]->getData().material.emission;
-				for (int j = nrOfDigits - 1; j >= 0; --j)
-				{
-					digit = digits[j];
+			data.pos.m128_f32[0] = -(float)digits.size() * 0.5f * 2.0f;
+			data.material.emission = m_robots[playerID]->getData().material.emission;
+			for (int j = int(digits.size()) - 1; j >= 0; --j)
+			{
+				digit = digits[j];
 				
-					game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
-					game->getPreLoader()->draw(BBNumbers[digit].getObjectType(), BBNumbers[digit].getBillboardData(), BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber(), BBNumbers[digit].getVariant());
+				game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
+				game->getPreLoader()->draw(BBNumbers[digit].getObjectType(), BBNumbers[digit].getBillboardData(), BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber(), BBNumbers[digit].getVariant());
 
-					data.pos.m128_f32[0] += 2.0f;
-				}
+				data.pos.m128_f32[0] += 2.0f;
 			}
+		
+			data.pos.m128_f32[1] -= 4.0f;
+			digits.clear();	
 		}
 
 		//objectData test;
