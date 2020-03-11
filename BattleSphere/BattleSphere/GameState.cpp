@@ -1151,6 +1151,26 @@ void GameState::draw(Game* game, renderPass pass)
 				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 		}
 
+		// Projectiles
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+			{
+				if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
+				else if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
+				{
+					objectData xd = ProjectileBank::getInstance()->getList()[i]->getData();
+					xd.material.ambient = XMVectorSet(-1,-1,-1, 3.0f);
+					xd.material.emission = XMVectorSet(-1, -1, -1, 0.15f);
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 1, 2);
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, xd, 0, 2);
+				}
+				else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
+			}
+		}
+
 		// Robot stuff
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -1213,25 +1233,10 @@ void GameState::draw(Game* game, renderPass pass)
 				}
 			}
 
-			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-			{
-
-				for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-				{
-					if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
-						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
-					else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
-
-						game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-				}
-
-			}
-
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				m_lineShots.draw(i);
 			}
-
 		}
 	}
 }

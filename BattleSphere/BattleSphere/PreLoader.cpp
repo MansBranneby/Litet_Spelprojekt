@@ -124,6 +124,7 @@ PreLoader::PreLoader()
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
 	loadFromFile(objectType::e_projectile, "projectile", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "untitled", "1mesh1mat");
+	loadFromFile(objectType::e_projectile, "ball", "1mesh1mat");
 
 
 	// On map (with collision)
