@@ -494,9 +494,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					float sunColorCoeff = (XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 					float moonColorCoeff = (XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 
-					sunColor[0] = 200 * pow(sunColorCoeff, 0.1f) / 255;
-					sunColor[1] = 0 * pow(sunColorCoeff, 0.35f) / 255;
-					sunColor[2] = 76 * pow(sunColorCoeff, 0.8f) / 255;
+					sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
+					sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
+					sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
 
 					moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
 					moonColor[1] = 50 * pow(moonColorCoeff * 0.6f, 0.2f) / 255;	// 0.5f för lila
