@@ -56,6 +56,9 @@ private:
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 
+	// Quit Game
+	bool m_quitGame;
+
 public:
 	GameState(Game* game);
 	virtual ~GameState();
