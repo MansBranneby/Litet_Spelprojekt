@@ -30,6 +30,7 @@ class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
+	UI_Element* m_botElements[4];
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	

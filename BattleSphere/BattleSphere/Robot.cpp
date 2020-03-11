@@ -86,7 +86,7 @@ void Robot::updateAIWeapon(bool seePlayer)
 	}
 	int highestR = -1, highestL = -1;
 	int indexR = -1, indexL = -1;
-	for (int k = 0; k < getWeapons().size(); k++)
+	for (int k = 0; k < (int)getWeapons().size(); k++)
 	{
 		int tier = tierList[getWeapons()[k]->getType()];
 		//int tierR = tierListL[getWeapons()[k]->getType()];
@@ -112,7 +112,7 @@ void Robot::updateAIWeapon(bool seePlayer)
 		}
 
 	}
-	for (int k = 0; k < getWeapons().size(); k++)
+	for (int k = 0; k < (int)getWeapons().size(); k++)
 	{
 		if (getCurrentWeapon(RIGHT) != -1)
 		{
@@ -130,6 +130,7 @@ void Robot::updateAIWeapon(bool seePlayer)
 		}
 
 	}
+	
 }
 
 void Robot::setAi(bool ai)
@@ -401,8 +402,7 @@ void Robot::resetScore()
 }
 
 void Robot::addWeapon(int type)
-{
-	Weapon* weapon = new Weapon(type);
+{	Weapon* weapon = new Weapon(type);
 	m_weapons.push_back(weapon);
 	if (m_weapons.size() == 3)
 		m_nextW = 2;
@@ -462,8 +462,9 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 	if (m_currentMission.index != 0)
 	{
 		m_currentMission = m_ai.update(dt, getVelocity(), m_currentMission);
-		setPosition(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f));
 		
+		
+		move(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f) - getPosition());
 	}
 	
 	GameObject::update();

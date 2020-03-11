@@ -340,7 +340,7 @@ void GameState::handleInputs(Game* game, float dt)
 								break;
 							}
 						}
-						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+						if (collision) //&& m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
 							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 							{
@@ -358,12 +358,15 @@ void GameState::handleInputs(Game* game, float dt)
 								}
 							}
 
+
 							m_spawnDrone->ifHeldDecreaseResourceIndex();
 
 							delete m_resources[m_robots[i]->getResourceIndex()];
 							m_resources.erase(m_resources.begin() + m_robots[i]->getResourceIndex());
 							m_robots[i]->removeResource();
 							break;
+
+
 						}
 					}
 				}
@@ -419,7 +422,7 @@ void GameState::handleInputs(Game* game, float dt)
 
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_X))
 				{
-					m_robots[i]->upgradeWeapon(RIFLE);
+					//	m_robots[i]->upgradeWeapon(RIFLE);
 				}
 			}
 
@@ -630,7 +633,13 @@ void GameState::firstTimeSetUp(Game* game)
 			nrOfPlayers++;
 	}
 	m_userInterface = new UserInterface(nrOfPlayers);  // Create user interface
-
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+		{
+ 			m_userInterface->addPlayer(m_robots[i]->getRobotID());
+		}
+	}
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -770,7 +779,8 @@ bool GameState::update(Game* game, float dt)
 					}
 
 				}
-				m_robots[j]->setAIGoal(Graph::getInstance()->getNodePos(closestNode), m_updateMission);
+				if(closestNode != -1)
+					m_robots[j]->setAIGoal(Graph::getInstance()->getNodePos(closestNode), m_updateMission);
 			}
 			else
 			{
@@ -849,9 +859,14 @@ bool GameState::update(Game* game, float dt)
 			XMVECTOR start = XMVectorSet(0, 0, 0, 0);
 			XMVECTOR end = XMVectorSet(0, 0, 0, 0);
 			m_robots[j]->updateAIWeapon(findPlayer);
+			//update ui
+
+
 			if (m_robots[j]->getCurrentWeapon(LEFT) != -1)
 			{
-				int type = type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType();
+				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType();
+				m_userInterface->setSlotID(m_robots[j]->getRobotID(), type, LEFT, m_robots[j]->getNextWeapon(), m_robots[j]->getNextNextWeapon());
+
 				if (findPlayer || type == MOVEMENT || type == DASH)
 				{
 					if (m_robots[j]->getCurrentWeapon(LEFT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
@@ -874,15 +889,17 @@ bool GameState::update(Game* game, float dt)
 					}
 					m_robots[j]->useWeapon(LEFT, dt);
 				}
-				
+
 			}
 
 			if (m_robots[j]->getCurrentWeapon(RIGHT) != -1)
 			{
 				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType();
+
+				m_userInterface->setSlotID(m_robots[j]->getRobotID(), type, RIGHT, m_robots[j]->getNextWeapon(), m_robots[j]->getNextNextWeapon());
 				if (findPlayer || type == MOVEMENT || type == DASH)
 				{
-					
+
 					if (m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
 						m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getReady())
 					{
@@ -907,7 +924,7 @@ bool GameState::update(Game* game, float dt)
 
 
 		}
-		
+
 	}
 	m_updateMission = false;
 
@@ -1243,6 +1260,11 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
 	{
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -1361,11 +1383,7 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
-		}
-
+		
 		// Tokyo drift
 		for (int i = 0; i < OBJECT_NR_1; i++)
 		{

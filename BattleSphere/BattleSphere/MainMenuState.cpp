@@ -43,7 +43,12 @@ MainMenuState::MainMenuState()
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 232.0f, -400.0f, 302.0f, 47.0f));
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 696.0f, -400.0f, 302.0f, 47.0f));
 
-	m_uiElements[2]->setAnimated(true);
+	
+	m_botElements[0] = new UI_Element(L"Textures\\MainMenu\\BOT.png", false, -696.0f, -400.0f, 145.0f, 47.0f);
+	m_botElements[1] = new UI_Element(L"Textures\\MainMenu\\BOT.png", false, -232.0f, -400.0f, 145.0f, 47.0f);
+	m_botElements[2] = new UI_Element(L"Textures\\MainMenu\\BOT.png", false, 232.0f, -400.0f, 145.0f, 47.0f);
+	m_botElements[3] = new UI_Element(L"Textures\\MainMenu\\BOT.png", false, 696.0f, -400.0f, 145.0f, 47.0f);
+
 	//Lights::getInstance()->addPointLight(0, 0, -10, 50, 1, 1, 1, 10);
 }
 
@@ -52,6 +57,10 @@ MainMenuState::~MainMenuState()
 	for (int i = 0; i < m_uiElements.size(); i++)
 	{
 		delete m_uiElements[i];
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		delete m_botElements[i];
 	}
 }
 
@@ -185,6 +194,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 			{
 				m_readyState[robotNr] = 0;
 				game->getRobots()[i]->setAi(false);
+				//m_botElements[robotNr]->setDrawn(false);
+				m_botElements[robotNr]->fadeOut(0.1f, 0.0f);
 			}
 			switch (m_readyState[robotNr])
 			{
@@ -282,6 +293,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[robNrPlus9]->setDrawn(false);
 				m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
+				m_botElements[robotNr]->setDrawn(true);
+				m_botElements[robotNr]->fadeIn(0.1f, 0.0f);
 				game->getRobots()[k]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
 				changeColour(game, k, true);
 				m_readyState[robotNr] = 2;
@@ -317,6 +330,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[robNrPlus9]->setDrawn(true);
 				m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 				m_readyState[robotNr] = 0;
+				//m_botElements[robotNr]->setDrawn(false);
+				m_botElements[robotNr]->fadeOut(0.1f, 0.0f);
 			}
 		}
 	}
@@ -403,7 +418,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		}
 
 	}
-	if (startGame && nrOfPlayers > 0) // TODO: Change to nrOfPlayers > 0 for debug and testing
+	if (startGame && nrOfPlayers > 3) // TODO: Change to nrOfPlayers > 0 for debug and testing
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -436,6 +451,12 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 	m_uiElements[14]->updateElement(dt);
 	m_uiElements[15]->updateElement(dt);
 	m_uiElements[16]->updateElement(dt);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_botElements[i]->updateElement(dt);
+	}
+	DX::getInstance()->getParticles()->update(dt);
 }
 
 void MainMenuState::u_options(Game* game, float dt)
@@ -598,6 +619,7 @@ bool MainMenuState::update(Game* game, float dt)
 
 void MainMenuState::draw(Game* game, renderPass pass)
 {
+	
 	if (pass == renderPass::e_menu)
 	{
 		for (int i = 0; i < m_uiElements.size(); i++)
@@ -605,7 +627,14 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			if (m_uiElements[i]->isDrawn() && i != 2 && i != 3 && i != 4)
 				m_uiElements[i]->draw();
 		}
+		for (int i = 0; i < ARRAYSIZE(m_botElements); i++)
+		{
+			if (m_botElements[i]->isDrawn())
+				m_botElements[i]->draw();
+		}
+		
 	}
+	
 	else if (pass == renderPass::e_menuAni)
 	{
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[2]->getConstantBuffer()->getConstantBuffer());
@@ -630,4 +659,5 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			}
 		}
 	}
+	
 }

@@ -18,13 +18,13 @@ private:
 	XMVECTOR m_playerColours[4];
 	int m_slotID[16]; // index for ability type
 	float m_slotPos[16]; // array for icon positions
-
+	bool m_drawPlayer[4];
 	void setElementPos();
 
 public:
 	UserInterface(int nrOfPlayers);
 	~UserInterface();
-
+	void addPlayer(int playerIndex);
 	void setPlayerColours(int playerIndex, XMVECTOR colour);
 	void setSlotID(int playerIndex, int abilityType);
 	void setSlotID(int playerIndex, int abilityType, int side, int newIndex);
