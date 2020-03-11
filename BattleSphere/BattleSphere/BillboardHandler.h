@@ -12,11 +12,11 @@ private:
 
 public:
 	BillboardHandler();
-	BillboardHandler(PreLoader* preLoader, std::vector<ObjectType> objectTypes);
+	BillboardHandler(PreLoader* preLoader, std::vector<objectType> objectTypes);
 	~BillboardHandler();
 
 	std::vector <Billboard> getBillboards() const;
-	std::vector <Billboard> getBillboardsOfType(ObjectType objectType) const;
+	std::vector <Billboard> getBillboardsOfType(objectType objectType) const;
 	int getNrOfBillboards() const;
 	BillboardData getBillboardData(int i) const;
 

@@ -27,15 +27,15 @@ public:
 	PreLoader();
 	~PreLoader();
 
-	objectData getBVObjectData(ObjectType type, int modelNr, int variant = 0) const;
-	boundingData getBoundingData(ObjectType type, int modelNr, int variant = 0) const;
-	std::vector<XMFLOAT3> getCollisionMesh(ObjectType type, int modelNr, int variant = 0) const;
-	std::vector<XMFLOAT3> getCollisionMesh(ObjectType type, objectData data, int modelNr, int variant = 0) const;
-	std::vector<XMFLOAT3> getCollisionMesh(ObjectType type, objectData data, objectData relativeData, int modelNr, int variant = 0) const;
-	BillboardData getSubModelBillboardData(ObjectType type, int variant, int modelNr, int subModelNr);
-	int getNrOfVariants(ObjectType type) const;
-	int getNrOfModels(ObjectType type, int variant) const;
-	int getNrOfSubModels(ObjectType type, int variant, int modelNr) const;
+	objectData getBVObjectData(objectType type, int modelNr, int variant = 0) const;
+	boundingData getBoundingData(objectType type, int modelNr, int variant = 0) const;
+	std::vector<XMFLOAT3> getCollisionMesh(objectType type, int modelNr, int variant = 0) const;
+	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, int modelNr, int variant = 0) const;
+	std::vector<XMFLOAT3> getCollisionMesh(objectType type, objectData data, objectData relativeData, int modelNr, int variant = 0) const;
+	BillboardData getSubModelBillboardData(objectType type, int variant, int modelNr, int subModelNr);
+	int getNrOfVariants(objectType type) const;
+	int getNrOfModels(objectType type, int variant) const;
+	int getNrOfSubModels(objectType type, int variant, int modelNr) const;
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 

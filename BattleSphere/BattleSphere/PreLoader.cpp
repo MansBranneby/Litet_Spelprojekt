@@ -151,10 +151,10 @@ PreLoader::PreLoader()
 	//loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
 
 	// ScoreRoom billboards
-	loadFromFile(ObjectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
-	loadFromFile(ObjectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
-	loadFromFile(ObjectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
-	loadFromFile(ObjectType::e_score_scene, "ScoreRoom\\ScoreRoom");
+	loadFromFile(objectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
+	loadFromFile(objectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
+	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
+	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
 	//ObjectType::e_static_billboard_score
 
 	// Background
@@ -232,7 +232,7 @@ int PreLoader::getNrOfModels(objectType type, int variant) const
 	return m_nrOfmodels[(int)type][variant];
 }
 
-int PreLoader::getNrOfSubModels(ObjectType type, int variant, int modelNr) const
+int PreLoader::getNrOfSubModels(objectType type, int variant, int modelNr) const
 {
 	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
 }

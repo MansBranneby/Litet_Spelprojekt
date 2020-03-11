@@ -51,10 +51,9 @@ public:
 
 	void setPlayerId(int playerId);
 	int getPlayerId();
-	XMVECTOR getColour();
-	bool damagePlayer(int damage, XMVECTOR projDir, int projIndex);
-	void setHealth(int health);
-	int getHealth();
+	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);
+	void setHealth(float health);
+	float getHealth();
 	void setVelocity(float velocity);
 	float getVelocity();
 	void setCurrentRot(float deg);

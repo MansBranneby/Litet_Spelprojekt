@@ -4,7 +4,7 @@ BillboardHandler::BillboardHandler()
 {
 }
 
-BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<ObjectType> objectTypes)
+BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<objectType> objectTypes)
 {
 	for(int i = 0; i < objectTypes.size(); ++i)
 	{
@@ -26,14 +26,14 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<ObjectType>
 	{
 		switch (m_billboards[i].getObjectType())
 		{
-			case ObjectType::e_number_billboard:
+			case objectType::e_number_billboard:
 				m_numberBillboards.push_back(m_billboards[i]);
 				std::rotate(m_numberBillboards.rbegin(), m_numberBillboards.rbegin() + 1, m_numberBillboards.rend());
 				break;
-			case ObjectType::e_static_billboard:
+			case objectType::e_static_billboard:
 				m_staticBillboards.push_back(m_billboards[i]);
 				break;
-			case ObjectType::e_static_billboard_score_platform:
+			case objectType::e_static_billboard_score_platform:
 				m_staticBillboardPlatform.push_back(m_billboards[i]);
 				break;
 
@@ -59,17 +59,17 @@ std::vector<Billboard> BillboardHandler::getBillboards() const
 	return m_billboards;
 }
 
-std::vector<Billboard> BillboardHandler::getBillboardsOfType(ObjectType objectType) const
+std::vector<Billboard> BillboardHandler::getBillboardsOfType(objectType objectType) const
 {
 	switch (objectType)
 	{
-	case ObjectType::e_number_billboard:
+	case objectType::e_number_billboard:
 		return m_numberBillboards;
 		break;
-	case ObjectType::e_static_billboard:
+	case objectType::e_static_billboard:
 		return m_staticBillboards;
 		break;
-	case ObjectType::e_static_billboard_score_platform:
+	case objectType::e_static_billboard_score_platform:
 		return m_staticBillboardPlatform;
 		break;
 	}

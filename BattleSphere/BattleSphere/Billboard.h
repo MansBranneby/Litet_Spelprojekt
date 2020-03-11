@@ -12,7 +12,7 @@ private:
 	BillboardState m_state; // Indicates what type this billboard is, eg flasing, interpolating or translating (FIT)
 
 	// Billboard knows its own objectType, variant, modelNr and submodelNr
-	ObjectType m_objectType;
+	objectType m_objectType;
 	int m_variant;
 	int m_modelNr;
 	int m_subModelNr;
@@ -40,7 +40,7 @@ private:
 public:
 	Billboard();
 	Billboard(int variant, int modelNr, int subModelNr);
-	Billboard(ObjectType objectType, int variant, int modelNr, int subModelNr, BillboardData billboardData);
+	Billboard(objectType objectType, int variant, int modelNr, int subModelNr, BillboardData billboardData);
 
 	void setState(BillboardState state); 
 	void setFlashState(float flashSpeed); // Initialize flash state
@@ -54,7 +54,7 @@ public:
 	void setColourChangeSpeed(float colourChangeSpeed);
 	void setVelocityUV(DirectX::XMVECTOR velocityUV);
 
-	ObjectType getObjectType() const;
+	objectType getObjectType() const;
 	int getVariant() const;
 	int getModelNr() const;
 	int getSubModelNumber() const;

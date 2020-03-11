@@ -502,7 +502,7 @@ GameState::GameState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_billboard, ObjectType::e_static_billboard};
+	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_static_billboard};
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
@@ -1129,7 +1129,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 		game->getPreLoader()->draw(objectType::e_ground);
-		
+
 		objectData tempData;
 		tempData.material =
 		{
@@ -1142,7 +1142,7 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
-		
+
 			switch (resType)
 			{
 			case BEYBLADE: // Beyblade
@@ -1227,7 +1227,7 @@ void GameState::draw(Game* game, renderPass pass)
 				else if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 				{
 					objectData xd = ProjectileBank::getInstance()->getList()[i]->getData();
-					xd.material.ambient = XMVectorSet(-1,-1,-1, 3.0f);
+					xd.material.ambient = XMVectorSet(-1, -1, -1, 3.0f);
 					xd.material.emission = XMVectorSet(-1, -1, -1, 0.15f);
 					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 1, 2);
 					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, xd, 0, 2);
@@ -1288,19 +1288,10 @@ void GameState::draw(Game* game, renderPass pass)
 					case REFLECT:
 						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 4);
 						break;
-						
+
 					case SHIELD:
 						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 5);
 						break;
-		m_particles.draw();
-	}
-	else if (pass == renderPass::e_billboard)
-	{
-		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-		//std::vector<Billboard> staticBB = m_billboardHandler.getStaticBillboards();
-
-		for (int i = 0; i < BB.size(); ++i)
-			game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 
 					default:
 						break;

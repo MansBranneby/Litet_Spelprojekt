@@ -214,7 +214,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 	for (int i = 0; i < BB.size(); ++i)
 	{
-		if (BB[i].getObjectType() == ObjectType::e_static_billboard_score_platform)
+		if (BB[i].getObjectType() == objectType::e_static_billboard_score_platform)
 		{
 			// Test each player against collision mesh
 			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
@@ -233,7 +233,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
 
 					// Test collision between player and collision mesh
-					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(ObjectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
 					{
 						// If collision detected tick up nr of collisions
 						nrOfCollisions++;
@@ -340,7 +340,7 @@ void ScoreState::handleInputs(Game* game, float dt)
 
 			// COLLISION PLAYER VS STATIC OBJECTS
 			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(ObjectType::e_robot, 1, 0);
+			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
 			robotBD.pos = m_robots[i]->getPosition();
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
@@ -395,7 +395,7 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<ObjectType> billboardObjectTypes = {ObjectType::e_billboard, ObjectType::e_number_billboard, ObjectType::e_static_billboard_score_platform };
+	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard
@@ -504,6 +504,10 @@ void ScoreState::resume()
 {
 }
 
+void ScoreState::firstTimeSetUp(Game* game)
+{
+}
+
 void ScoreState::handleInput(Game* game)
 {
 }
@@ -556,36 +560,36 @@ void ScoreState::draw(Game* game, renderPass pass)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(ObjectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
-				game->getPreLoader()->draw(ObjectType::e_robot);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->draw(objectType::e_robot);
 			}
 		}
 	}
 	else if (pass == renderPass::e_transparent)
 	{
 		//Static
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_static); i++)
-			game->getPreLoader()->draw(ObjectType::e_static, i);
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
+			game->getPreLoader()->draw(objectType::e_static, i);
 
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(), 0);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(ObjectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
 	
 		// Tokyo drift
 		for (int i = 0; i < OBJECT_NR_1; i++)
 		{
 			if (m_dboHandler->isDrawn(i))
-				game->getPreLoader()->draw(ObjectType::e_extra, m_dboHandler->getData(i));
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
 		}
 		// Scene (Background objects without collision)
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_scene); i++)
-			game->getPreLoader()->draw(ObjectType::e_scene, i);
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+			game->getPreLoader()->draw(objectType::e_scene, i);
 
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(ObjectType::e_score_scene); i++)
-			game->getPreLoader()->draw(ObjectType::e_score_scene, i);
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_score_scene); i++)
+			game->getPreLoader()->draw(objectType::e_score_scene, i);
 
 		m_particles.draw();
 	}
@@ -594,11 +598,11 @@ void ScoreState::draw(Game* game, renderPass pass)
 	
 
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-		std::vector<Billboard> BBNumbers = m_billboardHandler.getBillboardsOfType(ObjectType::e_number_billboard);
+		std::vector<Billboard> BBNumbers = m_billboardHandler.getBillboardsOfType(objectType::e_number_billboard);
 
 		for (int i = 0; i < BB.size(); ++i)
 		{
-			if(BB[i].getObjectType() != ObjectType::e_number_billboard)
+			if(BB[i].getObjectType() != objectType::e_number_billboard)
 				game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 		}
 
@@ -626,7 +630,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 			{
 				digit = digits[j];
 				
-				game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
+				game->getPreLoader()->setSubModelData(objectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
 				game->getPreLoader()->draw(BBNumbers[digit].getObjectType(), BBNumbers[digit].getBillboardData(), BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber(), BBNumbers[digit].getVariant());
 
 				data.pos.m128_f32[0] += 2.0f;
