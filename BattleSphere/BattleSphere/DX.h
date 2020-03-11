@@ -28,6 +28,10 @@ private:
 	float m_width = 1920.0f;
 	float m_height = 1080.0f;
 
+	// Delta time
+	float m_dt = 1.0f;
+	float m_timer;
+
 	// Camera
 	Camera* m_camera;
 
@@ -50,9 +54,14 @@ public:
 	float getWidth();
 	float getHeight();
 
+	void setDeltaTime(float dt, float time = -1.0f);
+	float getDeltaTime();
+
 	HRESULT createDirect3DContext(HWND wndHandle);
 	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
 	void reportLiveObjects();
+
+	void update(float dt);
 
 	void release();
 };

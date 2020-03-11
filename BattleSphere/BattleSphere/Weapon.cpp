@@ -28,22 +28,22 @@ Weapon::Weapon(int type)
 	{
 		m_damage = 8;
 		m_recoil = 0.4f;
-		m_cooldown = 0.2f;
+		m_cooldown = 0.15f;
 
 		setScale(0.8f, 0.8f, 0.8f);
 	}
 	else if (type == MOVEMENT)
 	{
-		m_cooldown = 10.0f;
-		m_duration = 4.0f;
+		m_cooldown = 8.0f;
+		m_duration = 3.0f;
 		m_speed = 1.5f;
 
 		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == SHIELD)
 	{
-		m_cooldown = 8.0f;
-		m_duration = 6.0f;
+		m_cooldown = 7.0f;
+		m_duration = 4.0f;
 		m_defense = 0.0f;
 
 		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -58,8 +58,8 @@ Weapon::Weapon(int type)
 	}
 	else if (type == REFLECT)
 	{
-		m_cooldown = 10.0f;
-		m_duration = 4.0f;
+		m_cooldown = 8.0f;
+		m_duration = 3.0f;
 		m_defense = 0.0f;
 
 		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -69,7 +69,7 @@ Weapon::Weapon(int type)
 		//m_damage = 30;
 		//m_cooldown = 1.8f;
 		m_damage = 44;
-		m_cooldown = 2.6f;
+		m_cooldown = 1.8f;
 
 		setScale(1.5f, 1.5f, 1.5f);
 		m_relativePos = XMVectorSet(1.6f, 0.5f, 1.2f, 0.0f);
@@ -89,7 +89,7 @@ Weapon::Weapon(int type)
 	else if (m_type == ENERGY)
 	{
 		m_damage = 20;
-		m_cooldown = 2.5f;
+		m_cooldown = 1.5f;
 		m_recoil = 0.0f;
 		m_blastRange = 20;
 

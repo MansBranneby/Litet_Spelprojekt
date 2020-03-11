@@ -797,12 +797,9 @@ bool GameState::update(Game* game, float dt)
 	{
 		if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 		{
-
 			DX::getInstance()->getParticles()->addParticles(ProjectileBank::getInstance()->getList()[i]->getPosition(),
 				ProjectileBank::getInstance()->getList()[i]->getData().material.diffuse, XMVectorSet(1.3f, 1.3f, 0, 0), 1, 5.0f
 			);
-
-
 		}
 
 		boundingData projectileBD = game->getPreLoader()->getBoundingData(objectType::e_projectile, 0, 0);
@@ -886,31 +883,31 @@ bool GameState::update(Game* game, float dt)
 						{
 							if (!ProjectileBank::getInstance()->getList()[i]->isExploding())
 							{
-
-
-								m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false);
-								for (int k = 0; k < XUSER_MAX_COUNT; k++)
+								if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false))
 								{
-									if (robots[k] != nullptr && robots[k]->isDrawn())
+									for (int k = 0; k < XUSER_MAX_COUNT; k++)
 									{
-										float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
-										if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
+										if (robots[k] != nullptr && robots[k]->isDrawn())
 										{
-											int resourceIndex = m_robots[k]->getResourceIndex();
-											robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[k]->getDirection(), -1, false);
-											m_input->setVibration(k, 1.0f);
-
-											if (resourceIndex != -1)
+											float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
+											if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 											{
-												m_resources[resourceIndex]->setPosition(m_robots[k]->getPosition());
-												m_resources[resourceIndex]->setBlocked(false);
+												int resourceIndex = m_robots[k]->getResourceIndex();
+												robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
+												m_input->setVibration(k, 1.0f);
+
+												if (resourceIndex != -1)
+												{
+													m_resources[resourceIndex]->setPosition(m_robots[k]->getPosition());
+													m_resources[resourceIndex]->setBlocked(false);
+												}
+
 											}
-
 										}
-									}
 
-								}
+									}
 								ProjectileBank::getInstance()->getList()[i]->explode();
+								}
 							}
 
 						}

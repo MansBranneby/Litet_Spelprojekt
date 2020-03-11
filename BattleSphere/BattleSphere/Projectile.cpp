@@ -18,18 +18,18 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 
 	if (type == PISTOL)
 	{
-		m_velocity = 40.0f;
+		m_velocity = 75.0f;
 		setScale(0.35f, 0.35f, 0.35f);
 	}
 
 	else if (type == RIFLE)
 	{
-		m_velocity = 80.0f;
+		m_velocity = 150.0f;
 		setScale(0.35f, 0.35f, 0.35f);
 	}
 	else if (type == ENERGY)
 	{
-		m_velocity = 20.0f;
+		m_velocity = 40.0f;
 		setScale(2.0f, 2.0f, 2.0f);
 		m_material.emission = XMVectorSet(0, 0, 0, -1);
 		m_material.specular = XMVectorSet(0, 0, 0, -1);
@@ -40,7 +40,10 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 
 void Projectile::setDirection(XMVECTOR relPos, XMVECTOR colour, int owner)
 {
-	m_material.emission = colour;
+	if (m_type == ENERGY)
+		m_material.diffuse = colour;
+	else
+		m_material.emission = colour;
 	m_owner = owner;
 
 	m_direction = getPosition() - relPos;

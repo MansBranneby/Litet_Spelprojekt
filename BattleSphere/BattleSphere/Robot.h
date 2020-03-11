@@ -45,6 +45,7 @@ private:
 	float m_timeSinceParticles;
 
 	void addWeapon(int type);
+	void deathAnimation();
 public:
 	Robot(int playerId);
 

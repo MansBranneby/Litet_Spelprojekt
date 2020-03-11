@@ -371,7 +371,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			{
 				//// UPDATE ////
 
-				if (g_Game->update(g_Clock->getDeltaTime() * 2.0f))
+				DX::getInstance()->update(g_Clock->getDeltaTime());
+
+				if (g_Game->update(g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime()))
 				{
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);
@@ -466,7 +468,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
-							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());
+							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
 					}
@@ -482,7 +484,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_userInterface);
 
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime();
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
