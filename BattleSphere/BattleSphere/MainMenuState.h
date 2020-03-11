@@ -30,6 +30,7 @@ class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
+	std::vector<UI_Element*> m_optionElements;
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	
@@ -40,6 +41,7 @@ private:
 
 	bool handleInputs(Game* game, float dt);
 	void changeColour(Game* game, int i, bool dir);
+	void adjustElementsForScreen();
 
 public:
 	MainMenuState();

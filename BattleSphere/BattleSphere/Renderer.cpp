@@ -431,7 +431,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		Graph::getInstance()->createVertexBuffer();
 
-		DX::getInstance()->setScreen(false, 100, 200);
+		//DX::getInstance()->setScreen(false, 100, 200);
 
 		while (WM_QUIT != msg.message)
 		{

@@ -108,9 +108,13 @@ UI_Element::UI_Element(std::wstring fileName, bool isDrawn, float posX, float po
 	//m_type = type;
 
 	m_posX = posX;
+	m_truePosX = posX / 1920.0f;
 	m_posY = posY;
+	m_truePosY = posY / 1080.0f;
 	m_sizeX = sizeX;
+	m_trueSizeX = sizeX / 1920.0f;
 	m_sizeY = sizeY;
+	m_trueSizeY = sizeY / 1080.0f;
 
 	m_destinationX = m_posX;
 	m_destinationY = m_posY;
@@ -148,6 +152,16 @@ UI_Element::~UI_Element()
 	m_vertexBuffer->Release();
 	m_elementSRV->Release();
 	delete m_animation;
+}
+
+void UI_Element::adjustForScreen()
+{
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+	m_posX = m_truePosX * width;
+	m_posY = m_truePosY * height;
+	m_sizeX = m_trueSizeX * width;
+	m_sizeY = m_trueSizeY * height;
 }
 
 void UI_Element::updateElement(float dt)
