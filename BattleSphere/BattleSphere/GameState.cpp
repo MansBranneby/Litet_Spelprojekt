@@ -162,8 +162,8 @@ void GameState::bspdLightUpdate(float dt)
 {
 	m_BSPDtimer += dt * 0.5f;
 	float angle = sin(m_BSPDtimer);
-	Lights::getInstance()->setDirection(m_BSPDLightIndex[0], angle * 0.5, -1.0f, 0.0f);
-	Lights::getInstance()->setDirection(m_BSPDLightIndex[1], -angle * 0.3, -1.0f, 0.0f);
+	Lights::getInstance()->setDirection(m_BSPDLightIndex[0], angle * 0.5f, -1.0f, 0.0f);
+	Lights::getInstance()->setDirection(m_BSPDLightIndex[1], -angle * 0.3f, -1.0f, 0.0f);
 }
 
 void GameState::handleMovement(Game* game, float dt, int id)
@@ -1084,7 +1084,7 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				int size = m_robots[i]->getWeapons().size();
+				int size = (int)m_robots[i]->getWeapons().size();
 				for (int j = 0; j < size; j++)
 				{
 					m_userInterface->drawAbility(i, m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());

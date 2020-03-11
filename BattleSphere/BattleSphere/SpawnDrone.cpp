@@ -242,7 +242,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 		}
 
 		// Set vector for icon warning
-		m_nextSpawnWarning = XMVectorSet(resource->getType(), 0.0f, 0.0f, 0.0f);
+		m_nextSpawnWarning = XMVectorSet((float)resource->getType(), 0.0f, 0.0f, 0.0f);
 
 		// Set resource under drone
 		XMVECTOR pos = m_spawnDroneBody.getPosition();

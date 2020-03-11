@@ -206,37 +206,36 @@ void UserInterface::setSlotID(int playerIndex, int abilityType)
 		}
 	}
 }
-
-void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
-{
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
-	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
-
-	int nrOfSlots = 0;
-	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
-	{
-		if (m_slotID[playerIndex * 4 + i] != -1)
-			nrOfSlots++;
-	}
-	switch (nrOfSlots)
-	{
-	case 3:
-		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
-		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = oldIndex;
-		break;
-	default: // newIndex != -1 and number of abilities > slots
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = newIndex;
-		break;
-	}
-}
+//
+//void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
+//{
+//	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
+//	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
+//
+//	int nrOfSlots = 0;
+//	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
+//	{
+//		if (m_slotID[playerIndex * 4 + i] != -1)
+//			nrOfSlots++;
+//	}
+//	switch (nrOfSlots)
+//	{
+//	case 3:
+//		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
+//		break;
+//	case 4:
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = oldIndex;
+//		break;
+//	default: // newIndex != -1 and number of abilities > slots
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = newIndex;
+//		break;
+//	}
+//}
 
 void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext)
 {
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
 	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
 
 	int nrOfSlots = 0;
@@ -249,10 +248,6 @@ void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int ne
 	{
 	case 3:
 		m_slotID[playerIndex * 4 + 2] = next; // Replace new with old
-		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = next;
-		m_slotID[playerIndex * 4 + 3] = nextNext;
 		break;
 	default: // newIndex != -1 and number of abilities > slots
 		m_slotID[playerIndex * 4 + 2] = next;
