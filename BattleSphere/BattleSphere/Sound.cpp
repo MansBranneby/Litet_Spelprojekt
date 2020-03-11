@@ -26,13 +26,24 @@ Sound::Sound()
 	m_effect[(int)soundEffect::e_turnin] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/turnin.wav");
 	m_effect[(int)soundEffect::e_damage] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/damage.wav");
 	m_effect[(int)soundEffect::e_impact] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/impact.wav");
-	
+	m_effect[(int)soundEffect::e_sawcut] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/SawbladeHit.wav");
+	m_effect[(int)soundEffect::e_sniper] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
+	m_effect[(int)soundEffect::e_energy] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/energygun2.wav");
+	m_effect[(int)soundEffect::e_explosion] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/explosion.wav");
+	m_effect[(int)soundEffect::e_death] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/death.wav");
+
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
 	m_ambient[(int)soundAmbient::e_shield] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/shield.wav");
 	m_ambientInstances[(int)soundAmbient::e_background] = m_ambient[(int)soundAmbient::e_background]->CreateInstance();
 	m_ambientInstances[(int)soundAmbient::e_drone] = m_ambient[(int)soundAmbient::e_drone]->CreateInstance(SoundEffectInstance_Use3D);
 	m_ambientInstances[(int)soundAmbient::e_shield] = m_ambient[(int)soundAmbient::e_shield]->CreateInstance(SoundEffectInstance_Use3D);
+
+	m_music[(int)soundMusic::e_menu] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/menuSong.wav");
+	m_music[(int)soundMusic::e_game] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/gameSong.wav");
+	m_musicInstances[(int)soundMusic::e_menu] = m_music[(int)soundMusic::e_menu]->CreateInstance();
+	m_musicInstances[(int)soundMusic::e_game] = m_music[(int)soundMusic::e_game]->CreateInstance();
+
 
 	m_index = 0;
 }
@@ -115,6 +126,11 @@ void Sound::stop(soundAmbient sound)
 	m_ambientInstances[(int)sound]->Stop(true);
 }
 
+void Sound::stop(soundMusic sound)
+{
+	m_musicInstances[(int)sound]->Stop(true);
+}
+
 void Sound::update(float dt)
 {
 	m_listenerPos = DX::getInstance()->getCam()->getLookAt();
@@ -151,4 +167,6 @@ void Sound::release()
 		m_audEngine->Suspend();
 	}
 	m_ambientInstances[0].reset();
+	m_musicInstances[0].reset();
+	m_musicInstances[1].reset();
 }

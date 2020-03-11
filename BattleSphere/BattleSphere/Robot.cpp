@@ -4,7 +4,8 @@ Robot::Robot(int playerId)
 {
 	m_playerId = playerId;
 	m_health = 100;
-	m_velocity = 20.0f;
+	m_velocity = 45.0f;
+	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
@@ -13,7 +14,9 @@ Robot::Robot(int playerId)
 	m_nextnextW = -1;
 	m_score = 0;
 	m_resource = -1;
-	Weapon* pistol = new Weapon(PISTOL);
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	Weapon* pistol = new Weapon(ENERGY);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -24,13 +27,18 @@ Robot::Robot(int playerId)
 	//setScale(2.2f, 2.2f, 2.2f);
 	// Raise player
 	setPosition(XMVECTOR{ 10.0f, 1.0f, 0.0f });
+	m_vel = XMVectorSet(0, 0, 0, 0);
+
 	m_lightIndex = Lights::getInstance()->addPointLight(0, 0, 0, 10, 1, 1, 1, 10);
 	// Position history
-	m_positionHistorySize = 0; 
+	m_positionHistorySize = 0;
 	m_positionHistoryCap = 100;
-	m_positionHistoryPtr = 0;	
+	m_positionHistoryPtr = 0;
 	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
 	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+
+	// Particles
+	m_timeSinceParticles = 0.0f;
 }
 
 void Robot::setPlayerId(int playerId)
@@ -43,49 +51,46 @@ int Robot::getPlayerId()
 	return m_playerId;
 }
 
-XMVECTOR Robot::getColour()
+bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
 {
-	return m_colour;
-}
-
-
-bool Robot::damagePlayer(int damage, XMVECTOR projDir, int projIndex)
-{
-	float dmg = (float)damage;
 	if (m_currentWeapon[RIGHT] != -1)
-		dmg *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 	if (m_currentWeapon[LEFT] != -1)
-		dmg *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		damage *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
 
-	if (projIndex != -1)
-		ProjectileBank::getInstance()->removeProjectile(projIndex);
-
-	if (dmg != 0.0f)
+	if (projIndex != -1 && deleteProjectile)
 	{
-		Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
-		m_health -= (int)floorf(dmg);
+		ProjectileBank::getInstance()->removeProjectile(projIndex);
+	}
+
+	if (damage != 0.0f)
+	{
+		if (playSound)
+			Sound::getInstance()->play(soundEffect::e_damage, getPosition(), 0.3f);
+		m_health -= damage;
 		if (m_health < 0)
 		{
 			m_health = 0;
 			setDrawn(false);
+			deathAnimation();
 		}
-		m_material.emission = m_colour * (float)m_health / 100.0f;
+		m_material.emission = m_colour * m_health / 100.0f;
 		removeResource();
 		return true;
 	}
-	else
+	else if (playSound)
 		Sound::getInstance()->play(soundEffect::e_impact, getPosition(), 0.05f);
 	return false;
 }
 
-void Robot::setHealth(int health)
+void Robot::setHealth(float health)
 {
 	setDrawn(true);
 	m_health = health;
 	m_material.emission = m_colour;
 }
 
-int Robot::getHealth()
+float Robot::getHealth()
 {
 	return m_health;
 }
@@ -135,6 +140,16 @@ void Robot::setColour(float x, float y, float z)
 	m_material.emission = m_colour = XMVectorSet(x, y, z, -1);
 }
 
+XMVECTOR Robot::getColour()
+{
+	return m_colour;
+}
+
+void Robot::getSniperLine(int side, XMVECTOR& start, XMVECTOR& end)
+{
+	m_weapons[m_currentWeapon[side]]->getSniperLine(start, end);
+}
+
 void Robot::useWeapon(int side, float dt)
 {
 	if (m_currentWeapon[side] != -1)
@@ -143,12 +158,13 @@ void Robot::useWeapon(int side, float dt)
 		m_weapons[m_currentWeapon[side]]->speedUp(getPosition());
 		m_weapons[m_currentWeapon[side]]->shield();
 		m_weapons[m_currentWeapon[side]]->reflect();
+		m_weapons[m_currentWeapon[side]]->spin(dt);
 	}
 }
 
 int Robot::changeWeapon(int side)
 {
-	if (m_weapons.size() > 2) 
+	if (m_weapons.size() > 2)
 	{
 		//m_currentWeapon[side] = (m_currentWeapon[side] + 1) % (int)m_weapons.size();
 		//if (m_currentWeapon[side] == m_currentWeapon[(side + 1) % 2])
@@ -195,10 +211,37 @@ int Robot::changeWeapon(int side)
 
 		//m_currentWeapon[side] = (m_weaponPointer + 1) % (int)m_weapons.size(); // Change to next weapon
 		//m_weaponPointer = m_currentWeapon[side]; // Update weapon pointer
+		XMVECTOR relPos = m_weapons[m_currentWeapon[side]]->getRelativePos();
+
 		if (side == RIGHT)
-			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(XMVectorSet(1.9f, 1.4f, 0.2f, 0.0f));
+		{
+			if (XMVectorGetX(relPos) < 0)
+				relPos = XMVectorSetX(relPos, XMVectorGetX(relPos) * -1);
+			m_weapons[m_currentWeapon[RIGHT]]->setRelativePos(relPos);
+
+			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
+				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
+			{
+				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 0, 1, 180);
+			}
+		}
 		else
-			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSet(-1.9f, 1.4f, 0.2f, 0.0f));
+		{
+			if (XMVectorGetX(relPos) > 0)
+				relPos = XMVectorSetX(relPos, XMVectorGetX(relPos) * -1);
+			m_weapons[m_currentWeapon[LEFT]]->setRelativePos(relPos);
+
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
+				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
+			{
+				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+			}
+		}
+
 		m_ready = false;
 		return m_weapons[m_currentWeapon[side]]->getType();
 	}
@@ -266,9 +309,27 @@ void Robot::addWeapon(int type)
 		m_currentWeapon[LEFT] = 0;
 		m_currentWeapon[RIGHT] = 1;
 		//m_weaponPointer = 1;
-		weapon->setRelativePos(XMVectorSet(-1.4f, 0.4f, 0.2f, 0.0f));
+
+		XMVECTOR relPos = m_weapons[m_currentWeapon[LEFT]]->getRelativePos();
+		m_weapons[m_currentWeapon[LEFT]]->setRelativePos(XMVectorSetX(relPos, XMVectorGetX(relPos) * -1));
+
+		if (type == REFLECT)
+			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+		if (type == SHIELD)
+		{
+			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+		}
 	}
 	//m_weapons.push_back(weapon);
+}
+
+void Robot::deathAnimation()
+{
+	DX::getInstance()->getParticles()->addParticles(getPosition(), m_colour, XMVectorSet(1.8f, 1.8f, 0, 0),
+		4000, 20, 1, 10, XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0));
+	Sound::getInstance()->play(soundEffect::e_death, getPosition(), 0.6f);
+	DX::getInstance()->setDeltaTime(0.15f, 2.0f);
 }
 
 bool Robot::upgradeWeapon(int type)
@@ -300,7 +361,7 @@ void Robot::removeResource()
 	m_resource = -1;
 }
 
-void Robot::update(float dt)
+void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 {
 	GameObject::update();
 	XMVECTOR position = GameObject::getPosition();
@@ -312,12 +373,29 @@ void Robot::update(float dt)
 	{
 		m_weapons[i]->updateTime(dt, getPosition());
 	}
+	if (m_currentWeapon[RIGHT] != -1 && m_weapons[m_currentWeapon[RIGHT]]->getType() == SNIPER)
+		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
+	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
+		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
+
+	// Particle engine flame
+	m_timeSinceParticles += dt;
+	if (m_timeSinceParticles > 0.01f)
+	{
+		// Maxvel 0.16
+		m_timeSinceParticles = 0.0f;
+		float rotRadian = XM_PI / 2.0f - XMConvertToRadians(m_currentRotation);
+		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
+		XMVECTOR robPos = getPosition() - lookAt*1.0f;
+		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
+	}
 }
 
 void Robot::move(XMVECTOR dPos)
 {
 	GameObject::move(dPos);
-	
+
 	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
 	);
@@ -337,7 +415,7 @@ void Robot::storePositionInHistory(DirectX::XMVECTOR position)
 		// size is less than cap
 		m_positionHistory[m_positionHistoryPtr] = position; // insert at historyPtr
 		m_positionHistoryPtr++;								// step historyPtr
-		m_positionHistorySize++;							// increase size
+		m_positionHistorySize++;							// increase sizePos
 	}
 	else
 	{

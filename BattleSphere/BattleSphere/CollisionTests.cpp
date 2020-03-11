@@ -280,3 +280,55 @@ bool testLineTriangle(XMVECTOR start, XMVECTOR end, XMVECTOR triPos[3])
 		return true;
 	return false;
 }
+
+float testRayTriangle(XMVECTOR origin, XMVECTOR dir, XMVECTOR triPos[3])
+{
+	const float EPSILON = 0.000001f;
+	XMVECTOR edge1, edge2, h, s, q;
+	float a, f, u, v;
+	dir = XMVector3Normalize(dir);
+
+	edge1 = triPos[1] - triPos[0];
+	edge2 = triPos[2] - triPos[0];
+	h = XMVector3Cross(dir, edge2);// Triangle pointing tward us
+	a = XMVectorGetX(XMVector3Dot(edge1, h));
+	if (a > -EPSILON && a < EPSILON)
+		return -1.0f;
+
+	f = 1.0f / a;
+	s = origin - triPos[0];
+	u = f * XMVectorGetX(XMVector3Dot(s, h));
+	if (u < 0.0f || u > 1.0f)
+		return -1.0f;
+
+	q = XMVector3Cross(s, edge1);// Triangle pointing away from us
+	v = f * XMVectorGetX(XMVector3Dot(dir, q));
+	if (v < 0.0f || u + v > 1.0f)
+		return -1.0f;
+
+	float t = f * XMVectorGetX(XMVector3Dot(edge2, q));
+	if (t > EPSILON)
+		return t;
+	return -1.0f;
+}
+
+bool testLineSphere(XMVECTOR start, XMVECTOR end, XMVECTOR spherePos, float radius)
+{
+	float maxT = XMVectorGetX(XMVector3Length(end - start));
+	XMVECTOR dir = XMVector3Normalize(end - start);
+
+	XMVECTOR sphereToStart = start - spherePos;
+	float b = XMVectorGetX(XMVector3Dot(sphereToStart, dir));
+	float c = XMVectorGetX(XMVector3Dot(sphereToStart, sphereToStart)) - radius * radius;
+	if (c > 0.0f && b > 0.0f)
+		return false;
+
+	float discr = b * b - c;
+	if (discr < 0.0f)
+		return false;
+
+	float t = -b - sqrt(discr);
+	if (t < 0.0f || t > maxT)
+		return false;
+	return true;
+}

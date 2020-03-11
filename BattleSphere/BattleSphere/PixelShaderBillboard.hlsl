@@ -61,6 +61,11 @@ cbuffer PS_CONSTANT_BUFFER : register (b5)
 	float4 colourB;
 };
 
+cbuffer PS_CONSTANT_BUFFER : register (b6)
+{
+	float4 iconWarning;
+}
+
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
@@ -165,6 +170,14 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
 	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 
+	// ICON WARNING
+	if (iconWarning.x != -1.0f)
+	{
+		float2 uv = float2(input.tex.x + 0.1111f * iconWarning.x, input.tex.y);
+		Kd = txModel.Sample(sampAni, uv).xyz;
+		Ke = Kd;
+	}
+
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
 	float3 V = normalize(float3(cameraPos.x, cameraPos.y, cameraPos.z) - input.posWC); // Vector towards camera
@@ -258,55 +271,57 @@ float4 PS_main(PS_IN input) : SV_Target
 	}
 
 	// BILLBOARD EFFECTS
-	switch (billboardState)
+	if (iconWarning.x == -1.0f)
 	{
-	case 0: // Flash
-		fragmentCol *= flashFactor;
-		break;
-	case 1: // Interpolate
-		// w value decides if default colour or colourA and colourB should be used
-		fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
-		break;
-	case 2: // Translate
+		switch (billboardState)
 		{
-			float4 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy);
-			if (modelTexture.w > 0.0f)
-				fragmentCol = modelTexture;
-		}
-		break;
-	case 3: // Flash and interpolate
-		// w value decides if default colour or colourA and colourB should be used
-		fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
-		fragmentCol *= flashFactor;
-		break;
-	case 4: // Flash and translate
-		{
-			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-			modelTexture *= flashFactor;
-		}
-		break; 
-	case 5: // Interpolate and translate
-		{
-			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-			fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
-			fragmentCol += (modelTexture * 0.5f);
-		}
-		break;
-	case 6: // Flash, interpolate and translate
-		{
-			// Translate
-			float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-
-			// Flash
-			modelTexture *= flashFactor;
-		
+		case 0: // Flash
+			fragmentCol *= flashFactor;
+			break;
+		case 1: // Interpolate
 			// w value decides if default colour or colourA and colourB should be used
 			fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+			break;
+		case 2: // Translate
+			{
+				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+				fragmentCol += (modelTexture * 0.5f);
+			}
+			break;
+		case 3: // Flash and interpolate
+			// w value decides if default colour or colourA and colourB should be used
+			fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+			fragmentCol *= flashFactor;
+			break;
+		case 4: // Flash and translate
+			{
+				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+				modelTexture *= flashFactor;
+			}
+			break; 
+		case 5: // Interpolate and translate
+			{
+				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+				fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+				fragmentCol += (modelTexture * 0.5f);
+			}
+			break;
+		case 6: // Flash, interpolate and translate
+			{
+				// Translate
+				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
 
-			// Add texture onto fragmentCol
-			fragmentCol += (modelTexture * 0.5f);
+				// Flash
+				modelTexture *= flashFactor;
+		
+				// w value decides if default colour or colourA and colourB should be used
+				fragmentCol = (colourA.w != 0.0f || colourB.w != 0.0f) ? changeColour(input.posWC, colourA.xyz, colourB.xyz) : changeColour(input.posWC, fragmentCol * 0.3f, fragmentCol);
+
+				// Add texture onto fragmentCol
+				fragmentCol += (modelTexture * 0.5f);
+			}
+			break;
 		}
-		break;
 	}
 
 	return float4(fragmentCol , KeIn.w);

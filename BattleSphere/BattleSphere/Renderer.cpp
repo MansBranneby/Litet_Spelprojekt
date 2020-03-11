@@ -36,6 +36,9 @@
 #include "Transparency.h"
 #include "Menu.h"
 
+//TODO: REMOVE
+float g_abc = 0;
+
 using namespace DirectX;
 
 GraphicResources g_graphicResources;
@@ -184,6 +187,23 @@ void createRenderResources()
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 }
 
+void setUserInterfacePipeline()
+{
+	//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
+	DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+	DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xffffffff);
+
+	DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera(false)->getConstantBufferVP()->getConstantBuffer());
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
+
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_menu->getVertexShader()->getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(2)->getPixelShader(), nullptr, 0);
+}
+
 void downsample()
 {
 	g_bloom->setRenderTarget(nullptr, renderPass::e_downSample);
@@ -238,7 +258,7 @@ void shadowRender()
 	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_shadowMapping->getVertexShader().getvertexLayout());
 
-	g_Game->draw();
+	g_Game->draw(renderPass::e_shadow);
 }
 
 void billboardRender()
@@ -355,7 +375,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			{
 				//// UPDATE ////
 
-				if (g_Game->update(g_Clock->getDeltaTime()))
+				DX::getInstance()->update(g_Clock->getDeltaTime());
+
+				if (g_Game->update(g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime()))
 				{
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);
@@ -384,10 +406,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 					g_bloom->clearRenderTarget();
-
 					// BLOOM
 					g_bloom->setRenderTarget(g_graphicResources.getDepthStencilView(), renderPass::e_scene);
 
+					g_Game->draw(renderPass::e_particles);
 					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->GSSetConstantBuffers(0, 1, DX::getInstance()->getCam()->getConstantBufferVP()->getConstantBuffer());
 					DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(1, 1, DX::getInstance()->getCam()->getConstantBufferPosition()->getConstantBuffer());
@@ -450,18 +472,23 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
-							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());
+							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
 					}
 
+					// Bloom
 					downsample();
-
 					g_bloom->run();
 
 					finalRender();
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
+					// User interface
+					setUserInterfacePipeline();
+					g_Game->draw(renderPass::e_userInterface);
+
+
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime();
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
@@ -474,7 +501,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					float moonColorCoeff = (XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 
 					sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
-					sunColor[1] = 235 * pow(sunColorCoeff, 0.35f) / 255;
+					sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
 					sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
 
 					moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
@@ -546,7 +573,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				//ImGui::ColorPicker4("Pick a color", moonColor);
 				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
 				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
-
 				/*ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
 				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
 				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/

@@ -9,6 +9,7 @@
 #include "ProjectileBank.h"
 #include "StructsAndEnums.h"
 #include "Sound.h"
+#include "QuadtreeNode.h"
 
 using namespace DirectX;
 
@@ -16,7 +17,8 @@ class Weapon : public GameObject
 {
 private:
 	XMVECTOR m_relativePos;
-	int m_damage;
+	XMVECTOR m_sniperLine[2];
+	float m_damage;
 	int m_type;
 	float m_recoil;
 	float m_currentRecoil;
@@ -25,6 +27,13 @@ private:
 	float m_defense;
 	float m_currentDefense;
 
+	bool m_spinning;
+	float m_scale;
+	float m_range;
+	float m_spinPerSec;
+	float m_maxSpinPerSec;
+
+	float m_blastRange;
 	bool m_ready;
 	float m_cooldown;
 	float m_duration;
@@ -39,16 +48,27 @@ public:
 	bool speedUp(XMVECTOR robotPos);
 	bool shield();
 	bool reflect();
+	bool spin(float dt);
 
 	void setRelativePos(XMVECTOR pos);
 	XMVECTOR getRelativePos();
 	int getType();
-	int getDamage();
+	float getDamage();
+	float getSpinPerSec();
+	float getSpinTime();
+	float getSpinDPS();
+	float getRange();
 	float getRecoil();
 	float getSpeed();
-	bool getActive();
-	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
 
+	bool getActive();
+	bool getReady();
+	float getCD();
+
+	float getDefense(int robotId, XMVECTOR projDir, XMVECTOR robotPos, XMVECTOR robotColour, float robotRot, int& projIndex);
+	void getSniperLine(XMVECTOR& start, XMVECTOR& end);
+
+	void updateSniperShot(XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	bool updateTime(float dt, XMVECTOR robotPos);
 
 	void release();

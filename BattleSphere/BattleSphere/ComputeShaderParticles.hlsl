@@ -8,6 +8,9 @@ struct particle
 	float3 pos;
 	float3 vel;
 	float2 size;
+	float timeLived;
+	float lifeSpan;
+	float3 gravDir;
 	float3 color;
 };
 
@@ -15,9 +18,14 @@ static const uint airResistance = 0.1f;
 
 particle updateParticle(particle prevParticle)
 {
-	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + float3(0, -9.82f, 0);
+	// Update particle position and velocity
+	float3 acceleration = -pow(prevParticle.vel, 2) * airResistance + 9.82f * prevParticle.gravDir;
 	prevParticle.vel += acceleration * dt;
 	prevParticle.pos += prevParticle.vel * dt;
+
+	// Update particle time lived
+	prevParticle.timeLived += dt;
+
 	return prevParticle;
 };
 
@@ -51,7 +59,7 @@ void CS_main(uint3 dTID : SV_DispatchThreadID)
 			particle p = updateParticle(prev[i]);
 		
 			// If particle is above yLimit, forward it to updated buffer
-			if (p.pos.y > yLimit)
+			if (p.pos.y > yLimit && (p.lifeSpan == 0 || p.timeLived < p.lifeSpan))
 			{
 				// Update amount of particles in updated param buffer
 				uint outIdx;

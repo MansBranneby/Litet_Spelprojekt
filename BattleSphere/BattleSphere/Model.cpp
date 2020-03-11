@@ -534,14 +534,19 @@ void Model::setObjectData(objectData data, int modelNr)
 	updateSubResource();
 }
 
-void Model::setObjectData(objectData data, objectData relativeData, int modelNr)
+void Model::setObjectData(objectData data, objectData relativeData, int modelNr, bool leftMaterial)
 {
 	setPosition(data.pos, relativeData.pos);
 	setStaticRotation(data.staticRotation, relativeData.staticRotation);
 	setRotation(data.rotation, relativeData.rotation);
 	setScale(data.scale, relativeData.scale);
 	if (modelNr != -1)
-		m_subModels[modelNr].updateMaterialInfo(data.material);
+	{
+		if (leftMaterial)
+			m_subModels[modelNr].updateMaterialInfo(data.material);
+		else
+			m_subModels[modelNr].updateMaterialInfo(relativeData.material);
+	}
 	updateRelSubResource();
 }
 
@@ -705,7 +710,7 @@ void Model::loadModel(std::ifstream& in)
 	computeOBB(); // Calculate information for bounding volume data
 }
 
-void Model::loadModel(std::ifstream& in, ObjectType type)
+void Model::loadModel(std::ifstream& in, objectType type)
 {
 	std::string line;
 	std::istringstream inputStream;
@@ -783,7 +788,7 @@ void Model::loadModel(std::ifstream& in, ObjectType type)
 		//// Diffuse texture
 		std::getline(in, line);
 		std::string textureString = line.substr(0, line.find("{"));
-		if (!textureString.empty() && *textureString.rbegin() == ' ')
+		if (!textureString.empty() && *textureString.rbegin() == '\r')
 			textureString.erase(textureString.length() - 1, 1);
 		inputStream.str(textureString);
 		tempSRV = createTexture(inputStream.str()); // Create texture
@@ -864,7 +869,6 @@ ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
 	{
 		std::wstring wFileName(fileName.length(), L' ');
 		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
-
 		HRESULT hr = CoInitialize(NULL);
 		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &tempSRV);
 

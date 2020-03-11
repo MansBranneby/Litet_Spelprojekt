@@ -14,6 +14,7 @@
 #include "State.h"
 #include "QuadtreeNode.h"
 #include "Graph.h"
+#include "Robot.h"
 
 using namespace DirectX;
 

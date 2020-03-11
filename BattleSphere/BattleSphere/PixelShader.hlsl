@@ -129,6 +129,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
 	float shadowCoeff = sum / 25.0;
 	
+	
+	
 	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	
@@ -224,13 +226,16 @@ float4 PS_main(PS_IN input) : SV_Target
 					float3 projPos = worldPos - dot(up, worldPos - light.Position.xyz) * up; //Project the world position on to the light direction and light right vector plane
 					spotIntensity2 = dot(normalize(projPos - light.Position.xyz), normalize(light.Direction)); //Calculate angle between vector towards the point and the lights direction
 					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f); // Maximum cos angle
-					float maxCos = lerp(cosa, 1, 0.5f);
-					spotIntensity2 = smoothstep(cosa, maxCos, spotIntensity2); //Smoothstep between max angle and minimum angle
+					float maxCos = 1;
+					spotIntensity2 = (spotIntensity2 - cosa) / (maxCos - cosa);
+					spotIntensity2 = pow(abs(spotIntensity2), 1.5f);
+					//return float4(spotIntensity2, spotIntensity2, spotIntensity2, 1.0f);
 					worldPos = projPos;
-
+					
 					
 					float d2 = distance(light.Position.xyz, worldPos);
 					attenuation2 = DoAttenuation(light, d2) * 0.6f;
+					
 				}
 				else 
 				{
@@ -263,47 +268,57 @@ float4 PS_main(PS_IN input) : SV_Target
 		
 		
 		
-
-
-		// Illumination models //
-		switch (KaIn.w)
+		if (light.Type < 4)
 		{
-		case 0: // Constant colour (diffuse)
-			fragmentCol = Kd;
-			break;
-		case 1: // Lambertian shading (diffuse, ambient)
-			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
-			break;
-		case 2: // "Phong" (diffuse, ambient, specular)
-			fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
+			// Illumination models //
+			switch (KaIn.w)
+			{
+			case 0: // Constant colour (diffuse)
+				fragmentCol = Kd;
+				break;
+			case 1: // Lambertian shading (diffuse, ambient)
+				fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol;
+				break;
+			case 2: // "Phong" (diffuse, ambient, specular)
+				fragmentCol += (Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol);
 
-			break;
-		case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
-			fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
-			break;
-		default:
-			fragmentCol = float3(1.0f, 1.0f, 1.0f);
-			break;
-		};
+				break;
+			case 3: // "Phong" (diffuse, ambient, specular) + ray tracing (not implemented)
+				fragmentCol += Kd * max(dot(normal, L), 0.0f) * (float3)lightCol + LKs * pow(max(dot(R, V), 0.0f), Ns) * (float3)lightCol;
+				break;
+			default:
+				fragmentCol = float3(1.0f, 1.0f, 1.0f);
+				break;
+			};
+		}
+		else {
+			fragmentCol += lightCol.xyz * 0.3f;
+		}
+		
 	}
 
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		fragmentCol = Ke;
-	float3 ndcSpace = float3(0,0,0);
-	ndcSpace.x = input.pos.x / 1920; // 0 - 1
-	ndcSpace.x = ndcSpace.x * 2 - 1;
-	ndcSpace.y = -input.pos.y / 1080; // 0 - 1
-
-	ndcSpace.y = (ndcSpace.y * 2 + 1);
-	ndcSpace.z = input.pos.z;
-	float aspectRatio = 9.0f / 16.0f;
-	for (int j = 0; j < 4; j++)
+	if (KeIn.w > 0.8f)
 	{
-		float2 dist = playerPosition[j].xy - ndcSpace.xy;
 
-		dist.y *= aspectRatio;
-		if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z && input.posWC.y > 0.2f)
-			return float4(fragmentCol, 0.3f);
+		float3 ndcSpace = float3(0,0,0);
+		ndcSpace.x = input.pos.x / 1920; // 0 - 1
+		ndcSpace.x = ndcSpace.x * 2 - 1;
+		ndcSpace.y = -input.pos.y / 1080; // 0 - 1
+
+		ndcSpace.y = (ndcSpace.y * 2 + 1);
+		ndcSpace.z = input.pos.z;
+		float aspectRatio = 9.0f / 16.0f;
+		for (int j = 0; j < 4; j++)
+		{
+			float2 dist = playerPosition[j].xy - ndcSpace.xy;
+
+			dist.y *= aspectRatio;
+			if (length(dist) < playerPosition[j].w * 4 && ndcSpace.z < playerPosition[j].z)
+				return float4(fragmentCol, 0.3f);
+		}
+
 	}
 
 	return float4(fragmentCol , KeIn.w);

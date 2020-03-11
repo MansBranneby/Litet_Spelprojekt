@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Weapon.h"
 #include "Resource.h"
+#include "Particles.h"
 
 #define LEFT 0
 #define RIGHT 1
@@ -19,7 +20,7 @@ class Robot : public GameObject
 private:
 	int m_playerId;
 	XMVECTOR m_colour;
-	int m_health;
+	float m_health;
 	float m_velocity;
 	float m_currentRotation;
 	std::vector<Weapon*> m_weapons;
@@ -40,7 +41,11 @@ private:
 	// Velocity
 	DirectX::XMVECTOR m_vel;
 
+	// Particles
+	float m_timeSinceParticles;
+
 	void addWeapon(int type);
+	void deathAnimation();
 public:
 	Robot(int playerId);
 
@@ -56,6 +61,8 @@ public:
 	float getCurrentRot();
 	bool isReady(float dt);
 	void setColour(float x, float y, float z);
+	XMVECTOR getColour();
+	void getSniperLine(int side, XMVECTOR &start, XMVECTOR &end);
 
 	void useWeapon(int side, float dt);
 	int changeWeapon(int side);
@@ -76,7 +83,7 @@ public:
 
 	int m_lightIndex;
 
-	void update(float dt);
+	void update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end);
 	void move(XMVECTOR dPos);
 
 	// History of positions

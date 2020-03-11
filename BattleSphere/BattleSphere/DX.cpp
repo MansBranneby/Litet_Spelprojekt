@@ -1,4 +1,6 @@
 #include "DX.h"
+#include "Particles.h"
+
 
 DX* DX::m_instance = nullptr;
 
@@ -10,7 +12,8 @@ DX::DX()
 	m_swapChain = nullptr;
 	m_pDSStateEnabled = nullptr;
 	m_pDSStateDisabled = nullptr;
-	//m_camera = nullptr;
+	m_camera = nullptr;
+	m_particles = nullptr;
 }
 
 void DX::createStencilStates()
@@ -74,6 +77,11 @@ Camera* DX::getCam()
 	return m_camera;
 }
 
+Particles* DX::getParticles()
+{
+	return m_particles;
+}
+
 ID3D11Device* DX::getDevice()
 {
 	return m_device;
@@ -107,6 +115,17 @@ float DX::getWidth()
 float DX::getHeight()
 {
 	return m_height;
+}
+
+void DX::setDeltaTime(float dt, float time)
+{
+	m_timer = time;
+	m_dt = dt;
+}
+
+float DX::getDeltaTime()
+{
+	return m_dt;
 }
 
 HRESULT DX::createDirect3DContext(HWND wndHandle)
@@ -153,10 +172,13 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	return hr;
 }
 
-void DX::initializeCam(float width, float height, float nearPlane, float farPlane)
+void DX::initializeCamAndParticles(float width, float height, float nearPlane, float farPlane)
 {
 	m_camera = new Camera();
 	m_camera->initialize(width, height, nearPlane, farPlane);
+
+	// Initialize particles
+	m_particles = new Particles;
 }
 
 
@@ -165,16 +187,41 @@ void DX::reportLiveObjects()
 	m_debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
 }
 
+void DX::update(float dt)
+{
+	if (m_timer > 0.5f)
+		m_timer -= dt;
+	else if (m_timer > 0.0f && m_timer != -1.0f)
+	{
+		m_timer -= dt;
+		if (m_dt < 1.0f)
+		{
+			m_dt = (1.0f - m_dt) * (1.0f - m_timer * 2);
+		}
+		/*
+		else if (m_dt > 1.0f)
+		{
+			m_dt = 1 - (1.0f - m_dt) * (1.0f - m_timer * 2);
+		}
+		*/
+	}
+	else if (m_timer <= 0.0f && m_timer != -1.0f)
+	{
+		m_dt = 1.0f;
+		m_timer = -1.0f;
+	}
+}
 
 
 void DX::release()
 {
 	m_swapChain->SetFullscreenState(false, NULL);
 	if (m_camera) delete m_camera;
+	if (m_particles) delete m_particles;
 	getDeviceContext()->Release();
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
 	m_pDSStateEnabled->Release();
-	m_debug->Release();
+	if(m_debug)	m_debug->Release();
 	getDevice()->Release();
 }

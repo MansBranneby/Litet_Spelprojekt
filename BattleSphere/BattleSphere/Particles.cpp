@@ -90,10 +90,12 @@ Particles::~Particles()
 	}
 }
 
-void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, XMVECTOR direction)
+void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, int amount, float velocity, float lifeSpan, float spread, XMVECTOR direction, XMVECTOR gravDir)
 {
 	int nrToAdd = (amount > MAX_ADD || amount <= 0) ? MAX_ADD : amount;
-	bool dirGiven = XMVector3Equal(direction, XMVectorSet(0, 0, 0, 0)) ? false : true;
+	bool dirGiven = XMVector3Equal(direction, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)) ? false : true;
+	if (XMVector3Equal(gravDir, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)))
+		gravDir = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
 
 	if (dirGiven) // If direction was given, randomize nrToAdd velocity vectors after direction
 	{
@@ -129,8 +131,8 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 		{
 			XMVECTOR randomZVec = XMVector3Normalize(XMVectorSet
 			(
-				randF(),
-				randF(),
+				randF() * spread,
+				randF() * spread,
 				1,
 				0
 			));
@@ -142,6 +144,8 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
 				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
 				size.m128_f32[0], size.m128_f32[1],
+				0.0f, lifeSpan,
+				gravDir.m128_f32[0], gravDir.m128_f32[1], gravDir.m128_f32[2],
 				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
 			};
 			m_particleToAdd.push_back(p);
@@ -165,6 +169,8 @@ void Particles::addParticles(XMVECTOR position, XMVECTOR color, XMVECTOR size, i
 				position.m128_f32[0], position.m128_f32[1], position.m128_f32[2],
 				vel.m128_f32[0], vel.m128_f32[1], vel.m128_f32[2],
 				size.m128_f32[0], size.m128_f32[1],
+				0.0f, lifeSpan,
+				gravDir.m128_f32[0], gravDir.m128_f32[1], gravDir.m128_f32[2],
 				color.m128_f32[0], color.m128_f32[1], color.m128_f32[2]
 			};
 			m_particleToAdd.push_back(p);
@@ -178,7 +184,53 @@ void Particles::addSpark(XMVECTOR impactPos, XMVECTOR projectileDir)
 	XMVECTOR dir = XMVector3Normalize(-projectileDir);
 	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
 	XMVECTOR size = { 0.5f, 0.15f, 0.0f, 0.0f };
-	addParticles(impactPos, col, size, 10, 5.0f, dir);
+	addParticles(impactPos, col, size, 20, 25.0f, 0.35f, 1.0f, dir);
+}
+
+void Particles::addCutSpark(XMVECTOR cutPos, XMVECTOR sparkDir)
+{
+	XMVECTOR dir = XMVector3Normalize(sparkDir);
+	XMVECTOR col = { 243.0f / 255.0f, 185.0f / 255.0f, 70.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.8f, 0.15f, 0.0f, 0.0f };
+	addParticles(cutPos, col, size, 100, 45.0f, 0.5f, 0.2f, dir);
+}
+
+void Particles::addSniperSmoke(XMVECTOR smokePos, XMVECTOR col, XMVECTOR smokeDir)
+{
+	XMVECTOR dir = XMVector3Normalize(smokeDir);
+	XMVECTOR smokeCol = { 56.0f / 255.0f, 56.0f / 255.0f, 56.0f / 255.0f, 0 };
+	XMVECTOR size = { 0.8f, 0.8f, 0.0f, 0.0f };
+	XMVECTOR gravDir = { 0.0f, 0.2f, 0.0f, 0.0f };
+	XMVECTOR zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float lifeSpan = 2.5f;
+	float vel = 1.2f;
+	addParticles(smokePos + dir * 0.75f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 1.5f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 2.25f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 3.0f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
+	addParticles(smokePos + dir * 3.4f, smokeCol, size, 20, vel, lifeSpan, 1.0f, zero, gravDir);
+	//addParticles(smokePos, col, size, 50, 70.0f, 0.09f, 0.09f, dir, gravDir);
+}
+
+void Particles::addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float robVel)
+{
+	XMVECTOR newDir = XMVector3Normalize(dir);
+	XMVECTOR size = { 0.6f, 0.9f, 0.0f, 0.0f };
+	float speed = (robVel > 8.0f) ? robVel : 8.0f;
+	float lifeSpan = 0.04f;
+	float spread = 0.85f;
+	if (robVel > 160.0) // Dash
+	{ 
+		size = XMVectorSet(2.0f, 2.0f, 0.0f, 0.0f);
+		lifeSpan *= 4.0f;
+		spread = 0.3f;
+	}
+	else if (robVel > 50.0f) // Movement boost
+	{
+		lifeSpan *= 3.0f;
+		spread = 1.5f;
+	}
+	addParticles(pos, col, size, 15, speed, lifeSpan, spread, newDir);
 }
 
 void Particles::update(float dT)
