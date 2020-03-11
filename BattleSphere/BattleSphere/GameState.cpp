@@ -345,7 +345,7 @@ void GameState::handleInputs(Game* game, float dt)
 							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 							{
 								// Update user interface with new ability
-								m_userInterface->setSlotID(i, m_resources[m_robots[i]->getResourceIndex()]->getType());
+								m_userInterface->setSlotID(m_robots[i]->getRobotID(), m_resources[m_robots[i]->getResourceIndex()]->getType());
 							}
 							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
@@ -387,7 +387,7 @@ void GameState::handleInputs(Game* game, float dt)
 						if (type != -1)
 						{
 							//m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon());
-							m_userInterface->setSlotID(i, type, RIGHT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
+							m_userInterface->setSlotID(m_robots[i]->getRobotID(), type, RIGHT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
 						}
 					}
 
@@ -397,7 +397,7 @@ void GameState::handleInputs(Game* game, float dt)
 						if (type != -1)
 						{
 							//m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon());
-							m_userInterface->setSlotID(i, type, LEFT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
+							m_userInterface->setSlotID(m_robots[i]->getRobotID(), type, LEFT, m_robots[i]->getNextWeapon(), m_robots[i]->getNextNextWeapon());
 						}
 					}
 				}
@@ -635,7 +635,7 @@ void GameState::firstTimeSetUp(Game* game)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			m_userInterface->setPlayerColours(i, m_robots[i]->getColour());
+			m_userInterface->setPlayerColours(m_robots[i]->getRobotID(), m_robots[i]->getColour());
 			m_lineShots.setColour(i, m_robots[i]->getColour());
 		}
 	}
@@ -698,7 +698,7 @@ bool GameState::update(Game* game, float dt)
 	m_billboardHandler.updateBillboards(dt);
 	for (int j = 0; j < 4; j++)
 	{
-		if (m_robots[j] != nullptr && m_robots[j]->isAi())
+		if (m_robots[j] != nullptr && m_robots[j]->isDrawn() && m_robots[j]->isAi())
 		{
 			XMVECTOR closestDelta = m_robots[j]->getAIRotation();
 			float closestDistance = 10000;

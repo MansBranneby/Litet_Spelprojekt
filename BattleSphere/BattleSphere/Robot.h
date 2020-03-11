@@ -22,7 +22,7 @@ private:
 	AI m_ai;
 	mission m_currentMission;
 	bool m_isAi;
-
+	int m_robotID;
 
 	int m_playerId;
 	XMVECTOR m_colour;
@@ -60,6 +60,8 @@ public:
 	void setAIGoal(XMVECTOR position, bool update);
 	XMVECTOR getAIRotation();
 	void setPlayerId(int playerId);
+	void setRobotID(int id);
+	int getRobotID();
 	int getPlayerId();
 	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);
 	void setHealth(float health);

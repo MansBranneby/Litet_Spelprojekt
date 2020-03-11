@@ -2,6 +2,7 @@
 
 Robot::Robot(int playerId)
 {
+	m_robotID = -1;
 	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 20.0f;
@@ -159,6 +160,16 @@ XMVECTOR Robot::getAIRotation()
 void Robot::setPlayerId(int playerId)
 {
 	m_playerId = playerId;
+}
+
+void Robot::setRobotID(int id)
+{
+	m_robotID = id;
+}
+
+int Robot::getRobotID()
+{
+	return m_robotID;
 }
 
 int Robot::getPlayerId()

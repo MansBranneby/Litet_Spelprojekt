@@ -190,11 +190,12 @@ void MainMenuState::hi_robotSelection(Game* game)
 			{
 			case 0:
 				game->getRobots()[i]->setDrawn(true);
+				game->getRobots()[i]->setRobotID(robotNr);
 				m_uiElements[robNrPlus9]->setDrawn(false);
 				m_uiElements[robNrPlus13]->setDrawn(true); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
 				game->getRobots()[i]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
-				changeColour(game, robotNr, true);
+				changeColour(game, i, true);
 				m_readyState[robotNr]++;
 				break;
 			case 1:
@@ -215,6 +216,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 			{
 			case 1:
 				game->getRobots()[i]->setDrawn(false);
+				game->getRobots()[i]->setRobotID(-1);
 				m_uiElements[robNrPlus9]->setDrawn(true);
 				m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 				m_readyState[robotNr]--;
@@ -234,14 +236,14 @@ void MainMenuState::hi_robotSelection(Game* game)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, robotNr, true);
+			changeColour(game, i, true);
 		}
 		//Left
 		if (game->getInput()->getThumbLX(i) < -0.4f && m_readyState[robotNr] == 1 && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.3f, 0.5f);
 			game->getInput()->setBlocked(i, true);
-			changeColour(game, robotNr, false);
+			changeColour(game, i, false);
 		}
 
 	}
@@ -255,11 +257,13 @@ void MainMenuState::hi_robotSelection(Game* game)
 			int robotNr = -1;
 			int robNrPlus9 = -1;
 			int robNrPlus13 = -1;
+			int k;
 			for (int j = 0; j < XUSER_MAX_COUNT && robotNr == -1; j++)
 			{
 				if (game->getPlayerIdIndex(j) == -1)
 				{
 					robotNr = game->setPlayerIdIndex(j);
+					k = j;
 					break;
 				}
 			}
@@ -268,17 +272,18 @@ void MainMenuState::hi_robotSelection(Game* game)
 			{
 				robNrPlus9 = robotNr + 9;
 				robNrPlus13 = robotNr + 13;
-				if (game->getRobots()[robotNr] == nullptr)
+				if (game->getRobots()[k] == nullptr)
 				{
-					game->getRobots()[robotNr] = new Robot(robotNr);
+					game->getRobots()[k] = new Robot(robotNr);
 				}
-				game->getRobots()[robotNr]->setDrawn(true);
-				game->getRobots()[robotNr]->setAi(true);
+				game->getRobots()[k]->setDrawn(true);
+				game->getRobots()[k]->setAi(true);
+				game->getRobots()[k]->setRobotID(robotNr);
 				m_uiElements[robNrPlus9]->setDrawn(false);
 				m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
-				game->getRobots()[robotNr]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
-				changeColour(game, robotNr, true);
+				game->getRobots()[k]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
+				changeColour(game, k, true);
 				m_readyState[robotNr] = 2;
 			}
 			
@@ -289,23 +294,26 @@ void MainMenuState::hi_robotSelection(Game* game)
 			int robotNr = -1;
 			int robNrPlus9 = -1;
 			int robNrPlus13 = -1;
-			for (int j = XUSER_MAX_COUNT - 1; j >= 0 && robotNr == -1; j--)
+			int k = -1;
+			for (int j = XUSER_MAX_COUNT - 1; j >= 0 && k == -1; j--)
 			{
-				if (game->getPlayerIdIndex(j) != -1 && game->getRobots()[j]->isAi())
+				robotNr = game->getPlayerIdIndex(j);
+				if (robotNr != -1 && game->getRobots()[j]->isAi())
 				{
 					game->leavePlayerIdIndex(j);
-					robotNr = j;
+					k = j;
 					break;
 				}
 				
 				
 			}
-			if (robotNr != -1)
+			if (k != -1)
 			{
 				robNrPlus9 = robotNr + 9;
 				robNrPlus13 = robotNr + 13;
-				game->getRobots()[robotNr]->setDrawn(false);
-				game->getRobots()[robotNr]->setAi(false);
+				game->getRobots()[k]->setDrawn(false);
+				game->getRobots()[k]->setAi(false);
+				game->getRobots()[k]->setRobotID(-1);
 				m_uiElements[robNrPlus9]->setDrawn(true);
 				m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 				m_readyState[robotNr] = 0;
