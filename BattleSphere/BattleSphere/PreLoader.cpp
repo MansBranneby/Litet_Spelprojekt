@@ -149,21 +149,22 @@ PreLoader::PreLoader()
 
 	// Billboards
 	loadFromFile(objectType::e_billboard, "TestTower");
-	loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	//loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
 	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
+	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
 	loadFromFile(objectType::e_ground, "Background\\Ground");
-	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
-	//loadFromFile(objectType::e_scene, "Background\\Background"); // Background plane
 	loadFromFile(objectType::e_scene, "Background\\SSB");
 	loadFromFile(objectType::e_scene, "Background\\BBScenery");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
-	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
+	
+	loadFromFile(objectType::e_BSPD_Door, "Background\\BSPDDoor");
+	loadFromFile(objectType::e_BSPD_Screen, "Background\\BSPDScreen");
 }
 
 PreLoader::~PreLoader()

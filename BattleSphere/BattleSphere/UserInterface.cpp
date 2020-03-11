@@ -206,37 +206,36 @@ void UserInterface::setSlotID(int playerIndex, int abilityType)
 		}
 	}
 }
-
-void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
-{
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
-	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
-
-	int nrOfSlots = 0;
-	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
-	{
-		if (m_slotID[playerIndex * 4 + i] != -1)
-			nrOfSlots++;
-	}
-	switch (nrOfSlots)
-	{
-	case 3:
-		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
-		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = oldIndex;
-		break;
-	default: // newIndex != -1 and number of abilities > slots
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = newIndex;
-		break;
-	}
-}
+//
+//void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
+//{
+//	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
+//	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
+//
+//	int nrOfSlots = 0;
+//	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
+//	{
+//		if (m_slotID[playerIndex * 4 + i] != -1)
+//			nrOfSlots++;
+//	}
+//	switch (nrOfSlots)
+//	{
+//	case 3:
+//		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
+//		break;
+//	case 4:
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = oldIndex;
+//		break;
+//	default: // newIndex != -1 and number of abilities > slots
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = newIndex;
+//		break;
+//	}
+//}
 
 void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext)
 {
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
 	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
 
 	int nrOfSlots = 0;
@@ -249,10 +248,6 @@ void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int ne
 	{
 	case 3:
 		m_slotID[playerIndex * 4 + 2] = next; // Replace new with old
-		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = next;
-		m_slotID[playerIndex * 4 + 3] = nextNext;
 		break;
 	default: // newIndex != -1 and number of abilities > slots
 		m_slotID[playerIndex * 4 + 2] = next;
@@ -278,13 +273,26 @@ void UserInterface::draw()
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
 		m_elements[i]->draw();
 	}
-	for (int i = 0; i < 36; i++)
-	{
-		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
-		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+	//for (int i = 0; i < 36; i++)
+	//{
+	//	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	//	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+	//	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
-		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
-		m_elements[i]->draw();
-	}
+	//	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	//	m_elements[i]->draw();
+	//}
+}
+
+void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	int elementIndex = playerIndex * 9 + abilityType;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, cd), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	m_elements[elementIndex]->draw();
 }

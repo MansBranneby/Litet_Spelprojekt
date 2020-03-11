@@ -159,6 +159,14 @@ void GameState::updateDynamicCamera(float dT)
 	}
 }
 
+void GameState::bspdLightUpdate(float dt)
+{
+	m_BSPDtimer += dt * 0.5f;
+	float angle = sin(m_BSPDtimer);
+	Lights::getInstance()->setDirection(m_BSPDLightIndex[0], angle * 0.5f, -1.0f, 0.0f);
+	Lights::getInstance()->setDirection(m_BSPDLightIndex[1], -angle * 0.3f, -1.0f, 0.0f);
+}
+
 void GameState::handleMovement(Game* game, float dt, int id)
 {
 	// Limit robot look at vector
@@ -486,6 +494,7 @@ GameState::GameState(Game* game)
 	m_type = stateType::e_gameState;
 	m_input = nullptr;
 	m_robots = nullptr;
+	m_BSPDtimer = 0.0f;
 
 	// Spawn preset nodes and initialize spawning drone
 	m_spawnDrone = new SpawnDrone(&m_resources);
@@ -519,12 +528,20 @@ GameState::GameState(Game* game)
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
 
+	index = m_lights->addVolumetricSpotLight(-255.0f, 18.0f, 168.0f, 170.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 20.0f, 4.0f); // BSPD
+	m_lights->addAreaLight(-229.0f, 18.0f, 174.0f, 60.0f, 0.0f, 0.5f, 1.0f, 50);
+
+	m_BSPDLightIndex[0] = m_lights->addVolumetricSpotLight(-52.0f, 59.0f, 133.0f, 70.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 7.0f, 2.0f); // BSPD
+	m_BSPDLightIndex[1] = m_lights->addVolumetricSpotLight(-101.0f, 59.0f, 110.0f, 70.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 7.0f, 2.0f);
+
 	// Skyscrapers
 	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
 	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
 	m_lights->addAreaLight(35, 20, 77, 60, 0.5f, 0.0f, 0.8f, 25);
 	m_lights->addAreaLight(172, 20, 71, 50, 0.5f, 0.0f, 0.8f, 25);
 	m_lights->addAreaLight(10, 20, 80, 55, 0.0f, 0.6f, 0.8f, 23);
+
+	m_lights->addAreaLight(-87.0f, 13.0f, 145.0f, 20.0f	, 0.0f, 0.5f, 1.0f, 23);
 
 	// Right tunnels
 	m_lights->addAreaLight(238, 8, 31, 60, 1.0f, 1.0f, 1.0f, 25);
@@ -537,8 +554,13 @@ GameState::GameState(Game* game)
 	m_lights->addAreaLight(32, -30, 69, 50, 0.2f, 0.7f, 1.0f, 10);
 	m_lights->addAreaLight(-20, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
 	m_lights->addAreaLight(-100, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
+	m_lights->addAreaLight(-53, -30, 135, 50, 0.2f, 0.7f, 1.0f, 10);
+	m_lights->addAreaLight(-82, -30, 135, 50, 0.2f, 0.7f, 1.0f, 10);
 
 	m_lights->addAreaLight(-125, 18, -9.4f, 50, 0.06f, 0.9f, 0.9f, 10); // Golden duck
+
+	m_lights->addAreaLight(-84, 5.0f, -30.0f, 15.0f, 0.8f, 0.1f, 0.0f, 10); // China town
+	m_lights->addAreaLight(-50, 5.0f, -30.0f, 15.0f, 0.8f, 0.1f, 0.0f, 10);
 
 	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
 	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
@@ -925,6 +947,9 @@ bool GameState::update(Game* game, float dt)
 		m_nodes[i]->updateTime(dt);
 	}
 
+	// Blade runner lights
+	bspdLightUpdate(dt);
+
 	// Update user interface
 	m_userInterface->update();
 
@@ -948,6 +973,10 @@ void GameState::draw(Game* game, renderPass pass)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 
+		m_spawnDrone->setConstantBuffer(true);
+		game->getPreLoader()->draw(objectType::e_BSPD_Screen);
+		m_spawnDrone->setConstantBuffer(false);
+
 		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
 			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
@@ -955,7 +984,19 @@ void GameState::draw(Game* game, renderPass pass)
 	// User interface
 	if (pass == renderPass::e_userInterface)
 	{
-		m_userInterface->draw();
+		m_userInterface->draw(); // Draw player box
+
+		for (int i = 0; i < XUSER_MAX_COUNT; i++) // Draw ability icons
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				int size = (int)m_robots[i]->getWeapons().size();
+				for (int j = 0; j < size; j++)
+				{
+					m_userInterface->drawAbility(i, m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+				}
+			}
+		}
 	}
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
@@ -1129,6 +1170,8 @@ void GameState::draw(Game* game, renderPass pass)
 		// Scene (Background objects without collision)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
 			game->getPreLoader()->draw(objectType::e_scene, i);
+
+		game->getPreLoader()->draw(objectType::e_BSPD_Door, m_spawnDrone->getData(4));
 
 		//Static
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)

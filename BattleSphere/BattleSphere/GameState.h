@@ -13,6 +13,7 @@
 #include "LineShots.h"
 #include "BillboardHandler.h"
 #include "UserInterface.h"
+#include <math.h>
 
 class GameState : public State 
 {
@@ -24,6 +25,8 @@ private:
 	std::vector<Node*> m_nodes;
 	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
+	int m_BSPDLightIndex[2];
+	float m_BSPDtimer;
 	Transparency m_transparency;
 	LineShots m_lineShots;
 	UserInterface* m_userInterface;
@@ -40,6 +43,9 @@ private:
 	XMVECTOR m_fOVPlanes[4]; // Bottom, Left, Top, Right
 	void updateDynamicCamera(float dT);
 	bool m_devZoomOut;
+
+	// BSPD lights
+	void bspdLightUpdate(float dt);
 
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
