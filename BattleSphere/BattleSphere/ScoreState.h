@@ -39,16 +39,11 @@ private:
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
 
-	// Particles
-	Particles m_particles;
-
 	// Scoreboard
-	bool m_scoreBoardIsUpdated;
 	std::vector<int> m_ranking;
 	std::vector<int> m_playerIDs;
 	float m_scoreTimer;
 	float m_scoreTimerAcceleration;
-	void updateScoreBoard(float dt);
 	bool updateScoreScorePlatforms(Game* game);
 
 

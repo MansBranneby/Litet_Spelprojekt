@@ -22,186 +22,6 @@ void ScoreState::spawnNodes()
 
 void ScoreState::updateDynamicCamera(float dT)
 {
-	//// Calculate number of players
-	//int nrOfPlayers = 0;
-	//for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	//{
-	//	if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-	//		nrOfPlayers++;
-	//}
-
-	//if (nrOfPlayers >= 1)
-	//{
-	//	// Get new look at and get min and max of x and z
-	//	XMVECTOR oldCamLookAt = DX::getInstance()->getCam()->getLookAt();
-	//	XMVECTOR oldCamPos = DX::getInstance()->getCam()->getPosition();
-	//	XMVECTOR newLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	//	XMVECTOR robPos;
-	//	float minX = 2000;
-	//	float maxX = -2000;
-	//	float minZ = 2000;
-	//	float maxZ = -2000;
-	//	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	//	{
-	//		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-	//		{
-	//			robPos = m_robots[i]->getPosition();
-	//			newLookAt += robPos;
-	//			robPos = XMVector3Normalize(m_robots[i]->getPosition() - oldCamPos);
-
-	//			if (minX > robPos.m128_f32[0])
-	//				minX = robPos.m128_f32[0];
-
-	//			if (maxX < robPos.m128_f32[0])
-	//				maxX = robPos.m128_f32[0];
-
-	//			if (minZ > robPos.m128_f32[2])
-	//				minZ = robPos.m128_f32[2];
-
-	//			if (maxZ < robPos.m128_f32[2])
-	//				maxZ = robPos.m128_f32[2];
-	//		}
-	//	}
-
-	//	// Set look at between players and move it upp the z-axis slightly
-	//	newLookAt /= (float)nrOfPlayers;
-	//	newLookAt.m128_f32[3] -= 100.0f;
-
-	//	// Calculate biggest distance
-	//	float xDifference = maxX - minX;
-	//	float zDifference = maxZ - minZ;
-	//	float biggestDifference;
-	//	if (xDifference > zDifference)
-	//		biggestDifference = xDifference;
-	//	else
-	//		biggestDifference = zDifference;
-
-	//	// Set new camera position and look at
-
-	//	XMVECTOR newPos;
-	//	if (m_zoomingOutToStart) // If zooming out, have harder criteria to zoom in again
-	//	{
-	//		if (MINIMUM_CAM_DISTANCE + biggestDifference * 250.0f < MAXIMUM_CAM_DISTANCE)
-	//		{
-	//			newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
-	//			if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
-	//			{
-	//				float difference = -105.0f - newPos.m128_f32[2];
-	//				newPos.m128_f32[2] += difference;
-	//				newLookAt.m128_f32[2] += difference;
-	//			}
-	//			m_zoomingOutToStart = false;
-	//		}
-	//	}
-	//	else // If not zooming out
-	//	{
-	//		if (MINIMUM_CAM_DISTANCE + biggestDifference * 120.0f < MAXIMUM_CAM_DISTANCE)
-	//		{
-	//			newPos = newLookAt + m_vecToCam * (MINIMUM_CAM_DISTANCE + biggestDifference * 50.0f);
-	//			if (newPos.m128_f32[2] < -105.0f) // Limit camera movement in z-axis
-	//			{
-	//				float difference = -105.0f - newPos.m128_f32[2];
-	//				newPos.m128_f32[2] += difference;
-	//				newLookAt.m128_f32[2] += difference;
-	//			}
-	//		}
-	//		else
-	//		{
-	//			m_zoomingOutToStart = true;
-	//			newPos = m_camStartPos;
-	//			newLookAt = m_camStartLookAt;
-	//		}
-	//	}
-
-	//	// Project each robot onto FOV planes and find smallest distances
-	//	float closest = INFINITY;
-	//	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	//	{
-	//		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
-	//		{
-	//			robPos = m_robots[i]->getPosition();
-	//			XMVECTOR camToBot = XMVector3Normalize(robPos - oldCamPos);
-	//			for (int plane = 0; plane < 4; plane++) // Bottom, left, top, right
-	//			{
-	//				// Project
-	//				float distance = XMVector3Dot(camToBot, m_fOVPlanes[plane]).m128_f32[0];
-
-	//				if (distance < closest)
-	//					closest = distance;
-	//			}
-	//		}
-	//	}
-
-	//	float changeSpeed = dT * CHANGE_SPEED;
-	//	if (closest < 0.01f) // Limit closest to avoid zero and negative speeds
-	//		closest = 0.01f;
-
-	//	if (m_zoomingOutToStart || m_devZoomOut) // If zooming out to start pos is true, set the position and look at, also increase speeds
-	//	{
-	//		changeSpeed *= 2.0f;
-	//		newPos = m_camStartPos;
-	//		newLookAt = m_camStartLookAt;
-	//	}
-	//	else if (closest < 0.6f) // Change "changeSpeed" according to how close a player is to a camera plane
-	//	{
-	//		changeSpeed *= 0.8f / closest;
-	//		newPos += m_vecToCam * (biggestDifference * 90.0f);
-	//	}
-
-	//	XMVECTOR vecToNewCamPos = newPos - oldCamPos;
-	//	XMVECTOR vecToNewCamLookAt = newLookAt - oldCamLookAt;
-		DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
-		DirectX::XMVECTOR camPos{ 35.0f, 25.0f, -130.0f };
-	//	//DX::getInstance()->getCam()->movePosAndLook(vecToNewCamPos * changeSpeed, vecToNewCamLookAt * changeSpeed);
-		//DX::getInstance()->getCam()->movePosAndLook({ 0.0f, 0.0f, -10.0f }, { 0.0f, 0.0f, 0.0f });
-	//}
-		DX::getInstance()->getCam()->setCameraPosition(camPos);
-		DX::getInstance()->getCam()->setLookAt(lookAt);
-}
-
-void ScoreState::updateScoreBoard(float dt)
-{
-	if (!m_scoreBoardIsUpdated)
-	{
-		m_robots[1] = new Robot(1);
-		m_robots[2] = new Robot(2);
-		m_robots[3] = new Robot(3);
-		m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
-		m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
-		m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
-		m_robots[1]->setScore(1);
-		m_robots[2]->setScore(3);
-		m_robots[3]->setScore(6);
-
-		for (int i = 0; i < XUSER_MAX_COUNT; ++i)
-		{
-			if (m_robots[i] != nullptr)
-			{
-				m_ranking.push_back(m_robots[i]->getScore());
-				m_playerIDs.push_back(m_robots[i]->getPlayerId());
-			}
-		}
-
-		for (int i = 0; i < int(m_ranking.size()) - 1; ++i)
-		{
-			for (int j = 0; j < int(m_ranking.size()) - 1; ++j)
-			{
-				if (m_ranking[j] < m_ranking[j + 1])
-				{
-					// Order ranking
-					int tempRank = m_ranking[j];
-					m_ranking[j] = m_ranking[j + 1];
-					m_ranking[j + 1] = tempRank;
-
-					// Order the vector
-					int tempPlayerID = m_playerIDs[j];
-					m_playerIDs[j] = m_playerIDs[j + 1];
-					m_playerIDs[j + 1] = tempPlayerID;
-				}
-			}
-		}
-		m_scoreBoardIsUpdated = true;
-	}
 }
 
 bool ScoreState::updateScoreScorePlatforms(Game* game)
@@ -259,14 +79,12 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						exitGame = true;
 						break;
 					case 12:
-						m_scoreBoardIsUpdated = false;
 						m_ranking.clear();
 						m_playerIDs.clear();
 						setPaused(true); // Pause this state
 						game->changeState(stateType::e_gameState); // Change state to ScoreState
 						break;
 					case 14:
-						m_scoreBoardIsUpdated = false;
 						m_ranking.clear();
 						m_playerIDs.clear();
 						setPaused(true); // Pause this state
@@ -399,7 +217,6 @@ ScoreState::ScoreState(Game* game)
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard
-	m_scoreBoardIsUpdated = false;
 	m_scoreTimer = 0.0f;
 	m_scoreTimerAcceleration = 1.1f;
 
@@ -506,6 +323,51 @@ void ScoreState::resume()
 
 void ScoreState::firstTimeSetUp(Game* game)
 {
+	m_input = game->getInput();
+	m_robots = game->getRobots();
+	m_robots[1] = new Robot(1);
+	m_robots[2] = new Robot(2);
+	m_robots[3] = new Robot(3);
+	m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
+	m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
+	m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
+	m_robots[1]->setScore(10);
+	m_robots[2]->setScore(17);
+	m_robots[3]->setScore(27);
+
+	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
+	{
+		if (m_robots[i] != nullptr)
+		{
+			m_ranking.push_back(m_robots[i]->getScore());
+			m_playerIDs.push_back(m_robots[i]->getPlayerId());
+		}
+	}
+
+	for (int i = 0; i < int(m_ranking.size()) - 1; ++i)
+	{
+		for (int j = 0; j < int(m_ranking.size()) - 1; ++j)
+		{
+			int index = j + 1;
+			if (m_ranking[j] < m_ranking[index])
+			{
+				// Order ranking
+				int tempRank = m_ranking[j];
+				m_ranking[j] = m_ranking[index];
+				m_ranking[index] = tempRank;
+
+				// Order the vector
+				int tempPlayerID = m_playerIDs[j];
+				m_playerIDs[j] = m_playerIDs[index];
+				m_playerIDs[index] = tempPlayerID;
+			}
+		}
+	}
+
+	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
+	DirectX::XMVECTOR camPos{ 35.0f, 25.0f, -130.0f };
+	DX::getInstance()->getCam()->setCameraPosition(camPos);
+	DX::getInstance()->getCam()->setLookAt(lookAt);
 }
 
 void ScoreState::handleInput(Game* game)
@@ -515,8 +377,7 @@ void ScoreState::handleInput(Game* game)
 bool ScoreState::update(Game* game, float dt)
 {
 	bool exitGame = false;
-	m_input = game->getInput();
-	m_robots = game->getRobots();
+
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
 
@@ -529,17 +390,11 @@ bool ScoreState::update(Game* game, float dt)
 	// Update spawning drone
 	m_spawnDrone->update(m_robots, dt);
 
-	// Update particles
-	m_particles.update(dt);
-
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
 
 	//Dynamic background objects
 	m_dboHandler->update(dt);
-
-	// Update scoreboard
-	updateScoreBoard(dt);
 
 	// Update platforms
 	exitGame = updateScoreScorePlatforms(game);
@@ -551,9 +406,6 @@ bool ScoreState::update(Game* game, float dt)
 
 void ScoreState::draw(Game* game, renderPass pass)
 {
-	m_input = game->getInput();
-	m_robots = game->getRobots();
-
 	if (pass == renderPass::e_opaque)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -561,10 +413,11 @@ void ScoreState::draw(Game* game, renderPass pass)
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
-				//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 				game->getPreLoader()->draw(objectType::e_robot);
 			}
 		}
+
+		game->getPreLoader()->draw(objectType::e_ground);
 	}
 	else if (pass == renderPass::e_transparent)
 	{
@@ -590,13 +443,9 @@ void ScoreState::draw(Game* game, renderPass pass)
 
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_score_scene); i++)
 			game->getPreLoader()->draw(objectType::e_score_scene, i);
-
-		m_particles.draw();
 	}
 	else if (pass == renderPass::e_billboard)
 	{
-	
-
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 		std::vector<Billboard> BBNumbers = m_billboardHandler.getBillboardsOfType(objectType::e_number_billboard);
 
@@ -625,7 +474,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 			} while (score > 0);
 
 			data.pos.m128_f32[0] = -(float)digits.size() * 0.5f * 2.0f;
-			data.material.emission = m_robots[playerID]->getData().material.emission * 0.5f;
+			data.material.emission = m_robots[playerID]->getData().material.emission;
 			for (int j = int(digits.size()) - 1; j >= 0; --j)
 			{
 				digit = digits[j];
@@ -639,20 +488,5 @@ void ScoreState::draw(Game* game, renderPass pass)
 			data.pos.m128_f32[1] -= 4.0f;
 			digits.clear();	
 		}
-
-		//objectData test;
-		//test.material = game->getRobots()[0]->getData().material;
-		//test.pos = { -5.0f, 0.0f, 0.0f };
-		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
-		//game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
-
-		//test.pos = { 0.0f, 0.0f, 0.0f };
-		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber());
-		//game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
-		////game->getPreLoader()->draw(BBNumbers[0].getObjectType(), BBNumbers[0].getBillboardData(), BBNumbers[0].getModelNr(), BBNumbers[0].getSubModelNumber(), BBNumbers[0].getVariant());
-		//////test.pos = { 35.0f, 40.0f, -60.0f };
-		//test.pos = { 5.0f, 0.0f, 0.0f };
-		//game->getPreLoader()->setSubModelData(ObjectType::e_number_billboard, test, BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber());
-		//game->getPreLoader()->draw(BBNumbers[1].getObjectType(), BBNumbers[1].getBillboardData(), BBNumbers[1].getModelNr(), BBNumbers[1].getSubModelNumber(), BBNumbers[1].getVariant());
 	}
 }
