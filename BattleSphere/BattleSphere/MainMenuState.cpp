@@ -173,6 +173,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(i))
 		{
 			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
+			
 			if (robotNr == -1)
 			{
 				robotNr = game->setPlayerIdIndex(i);
@@ -258,8 +259,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 			{
 				if (game->getPlayerIdIndex(j) == -1)
 				{
-					game->setPlayerIdIndex(j);
-					robotNr = j;
+					robotNr = game->setPlayerIdIndex(j);
 					break;
 				}
 			}

@@ -872,7 +872,9 @@ bool GameState::update(Game* game, float dt)
 							}
 						}
 					}
+					m_robots[j]->useWeapon(LEFT, dt);
 				}
+				
 			}
 
 			if (m_robots[j]->getCurrentWeapon(RIGHT) != -1)
@@ -880,7 +882,7 @@ bool GameState::update(Game* game, float dt)
 				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType();
 				if (findPlayer || type == MOVEMENT || type == DASH)
 				{
-					m_robots[j]->useWeapon(LEFT, dt);
+					
 					if (m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
 						m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getReady())
 					{
