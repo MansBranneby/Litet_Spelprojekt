@@ -973,6 +973,10 @@ void GameState::draw(Game* game, renderPass pass)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 
+		m_spawnDrone->setConstantBuffer(true);
+		game->getPreLoader()->draw(objectType::e_BSPD_Screen);
+		m_spawnDrone->setConstantBuffer(false);
+
 		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
 			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
@@ -980,7 +984,19 @@ void GameState::draw(Game* game, renderPass pass)
 	// User interface
 	if (pass == renderPass::e_userInterface)
 	{
-		m_userInterface->draw();
+		m_userInterface->draw(); // Draw player box
+
+		for (int i = 0; i < XUSER_MAX_COUNT; i++) // Draw ability icons
+		{
+			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+			{
+				int size = (int)m_robots[i]->getWeapons().size();
+				for (int j = 0; j < size; j++)
+				{
+					m_userInterface->drawAbility(i, m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+				}
+			}
+		}
 	}
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
