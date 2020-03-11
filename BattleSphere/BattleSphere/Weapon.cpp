@@ -38,7 +38,7 @@ Weapon::Weapon(int type)
 		m_duration = 4.0f;
 		m_speed = 1.5f;
 
-		setScale(0.1f, 0.8f, 0.1f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == SHIELD)
 	{
@@ -54,7 +54,7 @@ Weapon::Weapon(int type)
 		m_duration = 0.15f;
 		m_speed = 5.0f;
 
-		setScale(0.2f, 1.6f, 0.2f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == REFLECT)
 	{

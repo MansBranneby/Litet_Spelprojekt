@@ -1052,6 +1052,14 @@ void GameState::draw(Game* game, renderPass pass)
 					game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 1, 5);
 					break;
 
+				case MOVEMENT:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 1, 6, false);
+					break;
+
+				case DASH:
+					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData(), 0, 1, 7, false);
+					break;
+
 				default:
 					game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(RIGHT)]->getData(), m_robots[i]->getData());
 					break;
@@ -1080,6 +1088,14 @@ void GameState::draw(Game* game, renderPass pass)
 
 					case SHIELD:
 						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 1, 5);
+						break;
+
+					case MOVEMENT:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 1, 6, false);
+						break;
+
+					case DASH:
+						game->getPreLoader()->draw(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 1, 7, false);
 						break;
 
 					default:
@@ -1130,6 +1146,16 @@ void GameState::draw(Game* game, renderPass pass)
 				//tempData.material.emission = XMVectorSet(0, 0, 0, -1);
 				//game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 1, 0, 5);
 				//game->getPreLoader()->drawOneModelAndMat(objectType::e_resource, m_resources[i]->getData(), 1, 5);
+				break;
+
+			case MOVEMENT:
+				game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 0, 1, 6);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 6);
+				break;
+
+			case DASH:
+				game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 0, 1, 7);
+				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 7);
 				break;
 
 			default:
