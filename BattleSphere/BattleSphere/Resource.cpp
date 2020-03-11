@@ -88,8 +88,8 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	}
 	else if (type == MOVEMENT)
 	{
-		m_originalScale = XMVectorSet(0.1f * scale, 0.8f * scale, 0.1f * scale, 1.0f);
-		setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.0f;
+		setRotation(XMVectorSet(0.0, 0.0, 1.0, 40));
 	}
 	else if (type == SHIELD)
 	{
@@ -98,8 +98,8 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	}
 	else if (type == DASH)
 	{
-		m_originalScale = XMVectorSet(0.2f * scale, 1.6f * scale, 0.2f * scale, 1.0f);
-		setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.0f;
+		//setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
 	}
 	else if (type == REFLECT)
 	{
