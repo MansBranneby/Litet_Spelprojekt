@@ -29,6 +29,8 @@ private:
 	void setRasterizerState();
 	void setSamplerState();
 	void createBlendState();
+	void resizeBuffers();
+
 public:
 
 	// Member functions

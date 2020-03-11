@@ -19,6 +19,33 @@
 #pragma comment (lib, "d3dcompiler.lib")
 
 ////
+//320x480
+//320x568
+//360x640
+//480x800
+//720x1280
+//768x1024
+//800x600
+//1024x768
+//1152x864
+//1280x600
+//1280x720
+//1280x768
+//1280x800
+//1280x960
+//1280x1024
+//1360x768
+//1366x768
+//1400x1050
+//1440x900
+//1600x900
+//1680x1050
+//1920x1080
+//1920x1200
+//2160x3840
+//2560x1440
+//4320x7680
+
 #include "GraphicResources.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
@@ -34,6 +61,7 @@
 #include "ShadowMapping.h"
 #include "Transparency.h"
 #include "Menu.h"
+#include <system_error>
 
 //TODO: REMOVE
 float g_abc = 0;
@@ -307,15 +335,20 @@ void finalRender()
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(1, 1, &nullRTV);
 }
 
-void changeResolution(UINT width, UINT height)
+void setScreen()
 {
-	// Set directx singleton width and height
-	DX::getInstance()->setWidthAndHeight((float)width, (float)height);
+	if (DX::getInstance()->fullScreenIsSet())
+		DX::getInstance()->getSwapChain()->SetFullscreenState(true, nullptr);
+	else
+		DX::getInstance()->getSwapChain()->SetFullscreenState(false, nullptr);
+
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
 
 	// Change camera aspect ratio
 	float nearPlane = 0.1f;
 	float farPlane = 500.0f;
-	DX::getInstance()->reInitializeCam((float)width, (float)height, nearPlane, farPlane);
+	DX::getInstance()->reInitializeCam(width, height, nearPlane, farPlane);
 
 	// Clear backbuffer views
 	ID3D11RenderTargetView* nullViews = nullptr;
@@ -325,7 +358,7 @@ void changeResolution(UINT width, UINT height)
 	DX::getInstance()->getDeviceContext()->Flush();
 
 	// Resize swapchain
-	DX::getInstance()->getSwapChain()->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+	DX::getInstance()->getSwapChain()->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
 	// Update render target, depth stencil and viewport
 	g_graphicResources.updateRenderTarget();
@@ -333,28 +366,17 @@ void changeResolution(UINT width, UINT height)
 	// Update render target, depth stencil and viewport for shadow mapping, bloom and menu
 	if (g_shadowMapping) delete g_shadowMapping;
 	g_shadowMapping = new ShadowMapping();
-	
+
 	if (g_bloom) delete g_bloom;
 	g_bloom = new Bloom();
-	
+
 	if (g_menu) delete g_menu;
 	g_menu = new Menu();
-	
+
 	if (g_lightCulling) delete g_lightCulling;
 	g_lightCulling = new LightCulling();
 	g_lightCulling->initialize();
 	g_lightCulling->computeFrustum();
-}
-
-void setFullScreen(bool wantFullscreen)
-{
-	//if (wantFullscreen)
-	//{
-	//	m_swapChain->ResizeBuffers(0, 1920, 1080, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-	//	m_swapChain->SetFullscreenState(true, NULL);
-	//}
-	//else
-	//	m_swapChain->SetFullscreenState(false, NULL);
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -409,11 +431,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		Graph::getInstance()->createVertexBuffer();
 
-		changeResolution(1920, 1080);
+		DX::getInstance()->setScreen(false, 100, 200);
 
 		while (WM_QUIT != msg.message)
 		{
-			g_Clock->calcDeltaTime();
+			if (DX::getInstance()->screenChanged())
+				setScreen();
+
+				g_Clock->calcDeltaTime();
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
 			{
 				if (msg.wParam == VK_ESCAPE)

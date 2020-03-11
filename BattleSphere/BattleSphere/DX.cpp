@@ -117,6 +117,11 @@ float DX::getHeight()
 	return m_height;
 }
 
+bool DX::fullScreenIsSet()
+{
+	return m_fullscreen;
+}
+
 void DX::setWidthAndHeight(float width, float height)
 {
 	m_width = width;
@@ -141,7 +146,7 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	scd.OutputWindow = wndHandle;                           // the window to be used
 	scd.SampleDesc.Count = 1;                               // how many multisamples
 	scd.Windowed = true;                                    // windowed/full-screen mode
-	//scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Enable alt enter switching
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 
@@ -186,6 +191,27 @@ void DX::reInitializeCam(float width, float height, float nearPlane, float farPl
 void DX::reportLiveObjects()
 {
 	m_debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+}
+
+bool DX::screenChanged()
+{
+	bool tempScreenChange = false;
+	if (m_screenChange)
+	{
+		m_screenChange = false;
+		tempScreenChange = true;
+	}
+	return tempScreenChange;
+}
+
+void DX::setScreen(bool fullscreen, float width, float height)
+{
+	m_screenChange = true;
+	m_fullscreen = fullscreen;
+	if (width >= 10)
+		m_width = width;
+	if (height >= 10)
+		m_height = height;
 }
 
 void DX::release()

@@ -17,6 +17,17 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	setSamplerState();
 	setViewPort();
 
+	IDXGIDevice* pDXGIDevice;
+	DX::getInstance()->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice);
+	IDXGIAdapter* pDXGIAdapter;
+	pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&pDXGIAdapter);
+	IDXGIFactory* pIDXGIFactory;
+	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pIDXGIFactory);
+	pIDXGIFactory->MakeWindowAssociation(wndHandle, DXGI_MWA_NO_ALT_ENTER);
+	pDXGIDevice->Release();
+	pDXGIAdapter->Release();
+	pIDXGIFactory->Release();
+
 	return wndHandle;
 }
 
@@ -25,6 +36,22 @@ void GraphicResources::updateRenderTarget()
 	createBackBuffer();
 	setViewPort();
 	createDepthStencil();
+}
+
+void GraphicResources::resizeBuffers()
+{
+	DX::getInstance()->getDeviceContext()->ClearState();
+	DX::getInstance()->getDeviceContext()->Flush();
+
+	ID3D11RenderTargetView* nullViews = nullptr;
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
+	if (m_backbufferRTV)
+		m_backbufferRTV->Release();
+	releaseDepthStencilViews();
+
+	DX::getInstance()->getSwapChain()->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+	updateRenderTarget();
 }
 
 HWND GraphicResources::initWindow(HINSTANCE hInstance)
@@ -69,7 +96,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	//// check if IMGUI can handle the message (when we click INSIDE ImGui
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
 		return true;
-
 	switch (message)
 	{
 	case WM_DESTROY:
@@ -238,7 +264,6 @@ GraphicResources::~GraphicResources()
 		m_samplerState->Release();
 	if (m_depthSRV)
 		m_depthSRV->Release();
-
 }
 
 void GraphicResources::bindDepthStencilState()
