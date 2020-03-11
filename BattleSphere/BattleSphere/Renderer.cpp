@@ -334,11 +334,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		
 		g_Clock = new Clock();
 		g_Game = new Game();
-		g_scoreState = new ScoreState(g_Game);
 		g_gameState = new GameState(g_Game);
+		g_scoreState = new ScoreState(g_Game);
 		g_mainMenuState = new MainMenuState();
-		g_Game->pushState(g_scoreState);
 		g_Game->pushState(g_gameState);
+		g_Game->pushState(g_scoreState);
 		g_Game->pushState(g_mainMenuState);
 		g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
 		//g_Game->changeState(stateType::e_gameState); // Set initial state for the game

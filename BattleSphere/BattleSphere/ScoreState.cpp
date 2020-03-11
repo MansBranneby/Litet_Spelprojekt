@@ -560,8 +560,8 @@ void ScoreState::draw(Game* game, renderPass pass)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 1, 0);
-				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
+				//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);
 				game->getPreLoader()->draw(objectType::e_robot);
 			}
 		}
@@ -625,7 +625,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 			} while (score > 0);
 
 			data.pos.m128_f32[0] = -(float)digits.size() * 0.5f * 2.0f;
-			data.material.emission = m_robots[playerID]->getData().material.emission;
+			data.material.emission = m_robots[playerID]->getData().material.emission * 0.5f;
 			for (int j = int(digits.size()) - 1; j >= 0; --j)
 			{
 				digit = digits[j];
