@@ -364,6 +364,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				if (msg.wParam == VK_ESCAPE)
 					msg.message = WM_QUIT;
 
+				if (msg.message == WM_NCLBUTTONDOWN)
+					msg.message = WM_QUIT;
+
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
