@@ -35,7 +35,9 @@ public:
 
 	void update();
 	bool updateCountDown(float dt);
-	void updateQuitGame(int dir);
+	void updateQuitGame(float dt);
+	void setQuitGame(bool quitGame);
+	void quitGameHI(int dir);
 	void draw();
 	void drawAbility(int playerIndex, int abilityType, float cd);
 	void drawQuitGame();

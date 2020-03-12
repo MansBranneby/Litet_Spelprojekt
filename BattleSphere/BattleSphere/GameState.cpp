@@ -196,6 +196,13 @@ void GameState::handleMovement(Game* game, float dt, int id)
 
 void GameState::handleInputs(Game* game, float dt)
 {
+	// Unblock player inputs
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && game->getInput()->getThumbLX(i) < 0.2f && game->getInput()->getThumbLX(i) > -0.2f)
+			game->getInput()->setBlocked(i, false);
+	}
+
 	if (!m_quitGame)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -510,10 +517,17 @@ void GameState::handleInputs(Game* game, float dt)
 			if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && !m_userInterface->getQuitGame())
 			{
 				m_quitGame = false;
+				m_userInterface->setQuitGame(true);
 			}
-			if (game->getInput()->getThumbLY(i) > 0.2f)
+			if (game->getInput()->getThumbLX(i) > 0.2f && !game->getInput()->isBlocked(i))
 			{
-
+				m_userInterface->quitGameHI(RIGHT);
+				game->getInput()->setBlocked(i, true);
+			}
+			if (game->getInput()->getThumbLX(i) < -0.2f && !game->getInput()->isBlocked(i))
+			{
+				m_userInterface->quitGameHI(LEFT);
+				game->getInput()->setBlocked(i, true);
 			}
 		}
 	}
@@ -694,9 +708,12 @@ void GameState::handleInput(Game* game)
 
 bool GameState::update(Game* game, float dt)
 {
+	if (m_quitGame)
+		m_userInterface->updateQuitGame(dt);
 	// Countdown
 	if (m_userInterface->updateCountDown(dt) || m_quitGame)
 		dt = 0.0f;
+
 
 	m_input = game->getInput();
 	m_robots = game->getRobots();

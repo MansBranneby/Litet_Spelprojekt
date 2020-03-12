@@ -267,6 +267,12 @@ void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, 
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
+void UI_Element::setAbsDestinationX(float posX, float speed, float acceleration, float delay, float rest)
+{
+	m_destinationX = posX;
+	m_animation->setAnimationData(speed, acceleration, delay, rest);
+}
+
 void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest)
 {
 	m_destinationY += deltaY;

@@ -24,12 +24,13 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_1.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
 	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_2.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
 	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_3.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
+	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_GO!.png", false, 0.0f, 0.0f, 674.0f, 400.0f));
 
 	// Quit Game
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
-	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, 0.0f, -100.0f, 124.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -200.0f, -100.0f, 124.0f, 66.0f));
 
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		m_quitGameElements[i]->setDrawn(false);
@@ -286,9 +287,9 @@ bool UserInterface::updateCountDown(float dt)
 {
 	m_countDownTimer += dt;
 
-	if (m_countDownTimer >= 3.0f)
+	if (m_countDownTimer >= 4.0f)
 	{
-		m_countDownElements[0]->setDrawn(false);
+		m_countDownElements[3]->setDrawn(false);
 		return false;
 	}
 	else
@@ -316,7 +317,7 @@ bool UserInterface::updateCountDown(float dt)
 			m_countDownElements[1]->updateElement(dt);
 			m_countDownElements[2]->setDrawn(false);
 		}
-		if (m_countDownTimer > 2.0f)
+		if (m_countDownTimer > 2.0f && m_countDownTimer < 3.0f)
 		{
 			if (!m_countDownElements[0]->isDrawn())
 			{
@@ -328,13 +329,76 @@ bool UserInterface::updateCountDown(float dt)
 			m_countDownElements[0]->updateElement(dt);
 			m_countDownElements[1]->setDrawn(false);
 		}
+		if (m_countDownTimer > 3.0f)
+		{
+			if (!m_countDownElements[3]->isDrawn())
+			{
+				m_countDownElements[3]->fadeIn(0.8f, 0.0f);
+				m_countDownElements[3]->fadeOut(0.1f, 0.9f);
+				m_countDownElements[3]->setDrawn(true);
+			}
+			m_countDownElements[3]->setPos(0.0f, 0.0f, (m_countDownTimer - 3.0f));
+			m_countDownElements[3]->updateElement(dt);
+			m_countDownElements[0]->setDrawn(false);
+		}
 		return true;
 	}
 }
 
-void UserInterface::updateQuitGame(int dir)
+void UserInterface::updateQuitGame(float dt)
 {
-	/*if ()*/
+	m_quitGameElements[2]->updateElement(dt);
+	m_quitGameElements[3]->updateElement(dt);
+}
+
+void UserInterface::setQuitGame(bool quitGame)
+{
+	m_quitGame = quitGame;
+	m_quitGameElements[2]->setPos(0.0f, -100.0f);
+	m_quitGameElements[3]->setPos(-200.0f, -100.0f);
+	m_quitGameElements[2]->setAbsDestinationX(0.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
+	m_quitGameElements[3]->setAbsDestinationX(-200.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
+}
+
+void UserInterface::quitGameHI(int dir)
+{
+	if (m_quitGameElements[2]->isReady() && m_quitGameElements[3]->isReady())
+	{
+		if (dir) // Right
+		{
+			if (m_quitGame) // Yes
+			{
+				m_quitGameElements[3]->setPos(-200.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGame = false;
+			}
+			else
+			{
+				m_quitGameElements[2]->setPos(-200.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGame = true;
+			}
+		}
+		else
+		{
+			if (m_quitGame) // Yes
+			{
+				m_quitGameElements[3]->setPos(200.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(-200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGame = false;
+			}
+			else
+			{
+				m_quitGameElements[2]->setPos(200.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(-200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGame = true;
+			}
+		}
+	}
 }
 
 void UserInterface::draw()
@@ -376,13 +440,27 @@ void UserInterface::drawQuitGame()
 {
 	m_quitGameElements[0]->setDrawn(true);
 	m_quitGameElements[1]->setDrawn(true);
-	if (m_quitGame)
-		m_quitGameElements[2]->setDrawn(true);
-	else
-		m_quitGameElements[3]->setDrawn(true);
+	m_quitGameElements[2]->setDrawn(true);
+	m_quitGameElements[3]->setDrawn(true);
+	//if (m_quitGame)
+	//else
+	
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
-	for (int i = 0; i < m_quitGameElements.size(); i++)
-		m_quitGameElements[i]->draw();
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	
+	m_quitGameElements[0]->draw();
+	m_quitGameElements[1]->draw();
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(DX::getInstance()->getWidth(), 0.0f, 0.0f, -1.0f), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+
+	m_quitGameElements[2]->draw();
+	m_quitGameElements[3]->draw();
 }
 
 bool UserInterface::getQuitGame()
