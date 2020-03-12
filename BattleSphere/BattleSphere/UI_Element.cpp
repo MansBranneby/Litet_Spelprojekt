@@ -255,13 +255,13 @@ void UI_Element::setPos(float posX, float posY)
 
 void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationX += deltaX;
+	m_destinationX += deltaX * DX::getInstance()->getWidth() / 1920.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
 void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationY += deltaY;
+	m_destinationY += deltaY * DX::getInstance()->getHeight() / 1080.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 

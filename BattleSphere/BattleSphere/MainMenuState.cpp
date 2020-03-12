@@ -5,6 +5,7 @@ MainMenuState::MainMenuState()
 	m_type = stateType::e_mainMenu;
 	m_menuState = MenuState::e_mainMenu;
 	m_activeMenu = ActiveMainMenu::e_startGame;
+	m_optionsMenu = ActiveOptionsMenu::e_resolution;
 
 	m_availableColours[0] = 1;
 	m_availableColours[1] = 1;
@@ -48,6 +49,11 @@ MainMenuState::MainMenuState()
 
 	// Options
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_background.png", false, 0.0f, 0.0f, 1920.0f, 1080.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_selection.png", false, 300.0f, 0.0f, 390.0f, 34.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_off.png", false, 300.0f, -144.0f, 117.0f, 42.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -144.0f, 79.0f, 42.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_apply.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_applyG.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
 }
 
 MainMenuState::~MainMenuState()
@@ -81,17 +87,27 @@ bool MainMenuState::hi_mainMenu(Game* game)
 			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 			game->getInput()->setBlocked(j, true);
 			m_menuState = MenuState::e_optionsMenu;
+			m_optionsMenu = ActiveOptionsMenu::e_resolution;
+			
 
 			for (int i = 1; i < 8; i++) // Hide main menu
 			{
 				m_uiElements[i]->fadeOut(0.5f, 0.0f);
 			}
 
-			for (int i = 0; i < 1; i++) // S
-			{
-				m_optionElements[i]->setDrawn(true);
-				m_optionElements[i]->fadeIn(1.0f, 1.0f);
-			}
+
+				m_optionElements[0]->setDrawn(true);
+				m_optionElements[0]->fadeIn(1.0f, 1.0f);
+				m_optionElements[1]->setDrawn(true);
+				m_optionElements[1]->fadeIn(1.0f, 1.0f);
+				m_optionElements[2]->setDrawn(true);
+				m_optionElements[2]->fadeIn(1.0f, 1.0f);
+				m_optionElements[3]->setDrawn(true);
+				m_optionElements[3]->fadeOut(0.0f, 1.0f);
+				m_optionElements[4]->setDrawn(true);
+				m_optionElements[4]->fadeIn(1.0f, 1.0f);
+				m_optionElements[5]->setDrawn(true);
+				m_optionElements[5]->fadeOut(0.0f, 1.0f);
 		}
 
 		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_startGame)
@@ -311,18 +327,66 @@ void MainMenuState::hi_options(Game* game)
 {
 	for (int j = 0; j < XUSER_MAX_COUNT; j++)
 	{
-		if (game->getInput()->getThumbLY(j) > -0.2f && game->getInput()->getThumbLY(j) < 0.2f) // Set input to ready if no input is detected
+		if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_resolution)
 		{
-			m_uiElements[1]->setSelectionTimer(0.0f);
-
-			game->getInput()->setBlocked(j, false);
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->setDestinationY(-144.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionsMenu = ActiveOptionsMenu::e_fullscreen;
+			game->getInput()->setBlocked(j, true);
 		}
 
-		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(j) && game->getPlayerIdIndex(j) != -1)
+		else if (m_optionElements[1]->isReady() && m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_fullscreen)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->setDestinationY(144.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionsMenu = ActiveOptionsMenu::e_resolution;
+			game->getInput()->setBlocked(j, true);
+		}
+
+		else if (m_optionElements[1]->isReady() && m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_fullscreen)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->setDestinationY(-144.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionsMenu = ActiveOptionsMenu::e_music;
+			game->getInput()->setBlocked(j, true);
+		}
+
+		else if (m_optionElements[1]->isReady() && m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_music)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->setDestinationY(144.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionsMenu = ActiveOptionsMenu::e_fullscreen;
+			game->getInput()->setBlocked(j, true);
+		}
+
+		else if (m_optionElements[1]->isReady() && m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_music)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->fadeOut(0.2f, 0.0f);
+			m_optionElements[1]->setDestinationY(-87.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionElements[5]->fadeIn(0.3f, 0.0f);
+			m_optionElements[4]->fadeOut(0.3f, 0.3f);
+			m_optionsMenu = ActiveOptionsMenu::e_apply;
+			game->getInput()->setBlocked(j, true);
+		}
+
+		else if (m_optionElements[1]->isReady() && m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_apply)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_optionElements[1]->fadeIn(0.2f, 0.0f);
+			m_optionElements[1]->setDestinationY(87.0f, SELECTIONSPEED, 1.0f, 0.0f, 5.8f);
+			m_optionElements[4]->fadeIn(0.3f, 0.0f);
+			m_optionElements[5]->fadeOut(0.3f, 0.3f);
+			m_optionsMenu = ActiveOptionsMenu::e_music;
+			game->getInput()->setBlocked(j, true);
+		}
+
+		else if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(j) && game->getPlayerIdIndex(j) != -1)
 		{
 			Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 			game->getInput()->setBlocked(j, true);
 			m_menuState = MenuState::e_mainMenu;
+			game->getInput()->setBlocked(j, true);
 		}
 	}
 }
@@ -399,6 +463,8 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 
 void MainMenuState::u_options(Game* game, float dt)
 {
+	for (int i = 1; i < m_uiElements.size(); i++)
+		m_uiElements[i]->updateElement(dt);
 	for (int i = 0; i < m_optionElements.size(); i++)
 		m_optionElements[i]->updateElement(dt);
 }
@@ -427,6 +493,7 @@ bool MainMenuState::handleInputs(Game* game, float dt)
 		hi_robotSelection(game);
 		break;
 	case MenuState::e_optionsMenu:
+		hi_options(game);
 		break;
 	default:
 		break;

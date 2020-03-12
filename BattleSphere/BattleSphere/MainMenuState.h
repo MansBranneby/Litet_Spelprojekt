@@ -26,6 +26,14 @@ enum class ActiveMainMenu
 	e_quit
 };
 
+enum class ActiveOptionsMenu
+{
+	e_resolution,
+	e_fullscreen,
+	e_music,
+	e_apply
+};
+
 class MainMenuState : public State
 {
 private:
@@ -33,6 +41,7 @@ private:
 	std::vector<UI_Element*> m_optionElements;
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
+	ActiveOptionsMenu m_optionsMenu;
 	
 	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
