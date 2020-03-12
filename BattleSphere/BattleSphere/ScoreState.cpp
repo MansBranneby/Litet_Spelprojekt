@@ -30,7 +30,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
 	DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
 	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
-	float intensity = 1 / (game->getNrOfPlayers() * 2.0f);
+	float intensity = 1 / (game->getNrOfPlayers());
 	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
 	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 	for (int i = 0; i < BB.size(); ++i)
@@ -39,6 +39,8 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 		{
 			// Test each player against collision mesh
 			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
+			int nrOfReadyPlayers = 0; 
+			bool hasCollided = false;
 			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant()); // collision mesh
 			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
 			{
@@ -56,23 +58,37 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 					// Test collision between player and collision mesh
 					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
 					{
-						// If collision detected tick up nr of collisions
-						nrOfCollisions++;
-						break;
+						nrOfCollisions++; // If collision detected tick up nr of collisions
+						hasCollided = true;
+						if (m_input->isPressed(j, XINPUT_GAMEPAD_A)) // press A to get ready
+							m_readyPlayers[j] = true; // This player is ready
+
+						break; // Collision found so we jump out of collision checking loop (k-loop)
 					}
 				}
-			}
 
-			if (nrOfCollisions == game->getNrOfPlayers())
+				if(!hasCollided) // No collision found
+					m_readyPlayers[j] = false; // This player did not collide with any of the platforms and can therefore not be ready
+
+				hasCollided = false; // Reset bool for the next player
+			}
+			
+			// If one or more collisions has been detected with platform it will be lit up
+			if (nrOfCollisions >= 1)
 			{
 				if(i == 10)
 					m_billboardHandler.setAllStates(12, 0.1f, 0.1f, cyan, cyan * nrOfCollisions * intensity, black);
-				if (i == 12)
+				else if (i == 12)
 					m_billboardHandler.setAllStates(10, 0.1f, 1.0f, cyan, cyan, black);
-				if (i == 14)
+				else if (i == 14)
 					m_billboardHandler.setAllStates(14, 0.1f, 1.0f, cyan, cyan, black);
 
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
+				// Check amount of ready players
+				for (int j = 0; j < m_readyPlayers.size(); ++j)
+					if (m_readyPlayers[j] == true) nrOfReadyPlayers++;
+
+				// If all players are ready
+				if (nrOfReadyPlayers == game->getNrOfPlayers())
 				{
 					switch (i)
 					{
@@ -93,11 +109,15 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						break;
 					}
 				}
-				break;
 			}
 			else
 			{
-				m_billboardHandler.setNoneState(i);
+				if(i == 10)
+					m_billboardHandler.setNoneState(12);
+				else if (i == 12)
+					m_billboardHandler.setNoneState(10);
+				else if (i == 14)
+					m_billboardHandler.setNoneState(14);
 			}
 		}
 	}
@@ -221,81 +241,6 @@ ScoreState::ScoreState(Game* game)
 	m_scoreTimer = 0.0f;
 	m_scoreTimerAcceleration = 1.1f;
 
-	m_transparency.initialize();
-	m_transparency.bindConstantBuffer();
-	m_lights = Lights::getInstance();
-	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
-	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
-	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
-	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
-	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
-	//m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
-	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
-	//m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
-	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
-	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
-	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
-	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
-	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
-	//m_lights->addAreaLight(33, 10, 67, 50, 0, 0, 1, 15);
-	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
-	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
-	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-
-	// Skyscrapers
-	m_lights->addAreaLight(85, 30, 75, 75, 0.0f, 0.6f, 0.8f, 25);
-	m_lights->addAreaLight(85, 10, 75, 30, 1.0f, 1.0f, 1.0f, 25);
-	m_lights->addAreaLight(35, 20, 77, 60, 0.5f, 0.0f, 0.8f, 25);
-	m_lights->addAreaLight(172, 20, 71, 50, 0.5f, 0.0f, 0.8f, 25);
-	m_lights->addAreaLight(10, 20, 80, 55, 0.0f, 0.6f, 0.8f, 23);
-
-	// Right tunnels
-	m_lights->addAreaLight(238, 8, 31, 60, 1.0f, 1.0f, 1.0f, 25);
-	m_lights->addAreaLight(238, 8, 120, 30, 1.0f, 1.0f, 1.0f, 25);
-	m_lights->addAreaLight(193, 47, 118, 50, 0.2f, 0.7f, 1.0f, 10);
-
-	m_lights->addAreaLight(172, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10); // Under map
-	m_lights->addAreaLight(95, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
-	m_lights->addAreaLight(32, -30, 27, 50, 0.2f, 0.7f, 1.0f, 10);
-	m_lights->addAreaLight(32, -30, 69, 50, 0.2f, 0.7f, 1.0f, 10);
-	m_lights->addAreaLight(-20, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
-	m_lights->addAreaLight(-100, -30, 85, 50, 0.2f, 0.7f, 1.0f, 10);
-
-	m_lights->addAreaLight(-125, 18, -9.4f, 50, 0.06f, 0.9f, 0.9f, 10); // Golden duck
-
-	m_lights->addAreaLight(22.0f, 3.3f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 1
-	m_lights->addAreaLight(36.0f, 13.0f, 10.0f, 20.0f, 0.8f, 0.12f, 0.0f, 20.0f); // Gas station orange 2
-	m_lights->addAreaLight(46.0f, 4.0f, -6.5f, 12.0f, 0.0f, 1.0f, 0.35f, 15.0f); // Gas station cyan
-	m_lights->addAreaLight(53.0f, 11.8f, 10.0f, 20.0f, 0.8f, 0.8f, 0.8f, 15.0f); // Gas station white
-	index = m_lights->addSpotLight(47.5f, 14.7f, -0.34f, 20.0f, -0.0f, -0.9f, -0.3f, 0.8f, 0.8f, 0.8f, 30.0f, 5.0f); // Gas station spotlight
-	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
-
-	// Initialize dynamic camera
-	m_zoomingOutToStart = false;
-	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
-	m_camStartPos = DX::getInstance()->getCam()->getPosition();
-	m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
-	float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
-	float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
-	m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
-	m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
-	m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
-	m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
-
-	// Rotate plane according to look at
-	float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
-	for (int i = 0; i < 4; i++)
-		m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
-
-	m_fOVPlanes[0].m128_f32[2] *= -1;
-	m_fOVPlanes[1].m128_f32[2] *= -1;
-	m_fOVPlanes[2].m128_f32[2] *= -1;
-	m_fOVPlanes[3].m128_f32[2] *= -1;
-
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
 }
@@ -328,35 +273,42 @@ void ScoreState::firstTimeSetUp(Game* game)
 	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
 	lookAt = { 45.0f, 120.0f, -260.0f };
 	DirectX::XMVECTOR camPos{ 35.0f, 25.0f, -130.0f };
-	camPos = { 45.0f, 140.0f, -330.0f };
+	camPos = { 45.0f, 130.0f, -330.0f };
 	DX::getInstance()->getCam()->setCameraPosition(camPos);
 	DX::getInstance()->getCam()->setLookAt(lookAt);
 
 	// Initialize robots
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	m_robots[1] = new Robot(1);
-	m_robots[2] = new Robot(2);
-	m_robots[3] = new Robot(3);
+	//m_robots[1] = new Robot(1);
+	//m_robots[2] = new Robot(2);
+	//m_robots[3] = new Robot(3);
+	//m_robots[0]->setDrawn(true);
+	//m_robots[1]->setDrawn(true);
 	m_robots[0]->storePositionInHistory({ 45.0f, 102.0f, -300.0f });
 	m_robots[0]->setPosition({ 45.0f, 102.0f, -300.0f });
-	m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
-	m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
-	m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
-	m_robots[1]->setScore(10);
-	m_robots[2]->setScore(17);
-	m_robots[3]->setScore(27);
+	m_robots[1]->storePositionInHistory({ 60.6f, 102.0f, -265.0f });
+	m_robots[1]->setPosition({ 60.6f, 102.0f, -265.0f });
+	//m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
+	//m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
+	//m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
+	//m_robots[1]->setScore(10);
+	//m_robots[2]->setScore(17);
+	//m_robots[3]->setScore(27);
 
-	// Calculate ranking based of player scores
+	game->updatePlayerStatus();
+	// Get player scores, IDs and initalize their readiness
 	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
 	{
 		if (m_robots[i] != nullptr)
 		{
 			m_ranking.push_back(m_robots[i]->getScore());
 			m_playerIDs.push_back(m_robots[i]->getPlayerId());
+			m_readyPlayers.push_back(false);
 		}
 	}
 
+	// Calculate ranking based of player scores
 	for (int i = 0; i < int(m_ranking.size()) - 1; ++i)
 	{
 		for (int j = 0; j < int(m_ranking.size()) - 1; ++j)
@@ -468,7 +420,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 
 		std::vector<int> digits;
 		objectData data;
-		data.pos.m128_f32[1] = game->getNrOfPlayers() * 3.0f;
+		data.pos.m128_f32[1] = game->getNrOfPlayers();
 		for (int i = 0; i < m_playerIDs.size(); ++i)
 		{
 			int playerID = m_playerIDs[i];

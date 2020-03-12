@@ -40,6 +40,7 @@ private:
 	DBOHandler* m_dboHandler;
 
 	// Scoreboard
+	std::vector<bool> m_readyPlayers;
 	std::vector<int> m_ranking;
 	std::vector<int> m_playerIDs;
 	float m_scoreTimer;
