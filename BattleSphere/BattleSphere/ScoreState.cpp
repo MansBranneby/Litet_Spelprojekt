@@ -30,18 +30,21 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
 	DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
 	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
-	float intensity = 1 / (game->getNrOfPlayers());
-	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
+	float intensity = 1.0f / float(game->getNrOfPlayers());
 	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+
+	// Test each player against collision mesh
+	int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
+	int nrOfReadyPlayers = 0; 
+	bool hasCollided = false;
+
 	for (int i = 0; i < BB.size(); ++i)
 	{
 		if (BB[i].getObjectType() == objectType::e_static_billboard_score_platform)
 		{
-			// Test each player against collision mesh
-			int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
-			int nrOfReadyPlayers = 0; 
-			bool hasCollided = false;
-			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant()); // collision mesh
+			hasCollided = false;
+			// Get collision mesh
+			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
 			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
 			{
 				for (int k = 0; k < colMesh.size(); k += 3)
@@ -58,68 +61,94 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 					// Test collision between player and collision mesh
 					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
 					{
-						nrOfCollisions++; // If collision detected tick up nr of collisions
 						hasCollided = true;
-						if (m_input->isPressed(j, XINPUT_GAMEPAD_A)) // press A to get ready
-							m_readyPlayers[j] = true; // This player is ready
-
-						break; // Collision found so we jump out of collision checking loop (k-loop)
+						nrOfCollisions++; // If collision detected tick up nr of collisions
+						break; // Collision found so we jump out
 					}
 				}
-
-				if(!hasCollided) // No collision found
-					m_readyPlayers[j] = false; // This player did not collide with any of the platforms and can therefore not be ready
-
-				hasCollided = false; // Reset bool for the next player
 			}
-			
-			// If one or more collisions has been detected with platform it will be lit up
-			if (nrOfCollisions >= 1)
+			if (hasCollided)
 			{
-				if(i == 10)
-					m_billboardHandler.setAllStates(12, 0.1f, 0.1f, cyan, cyan * nrOfCollisions * intensity, black);
-				else if (i == 12)
-					m_billboardHandler.setAllStates(10, 0.1f, 1.0f, cyan, cyan, black);
-				else if (i == 14)
-					m_billboardHandler.setAllStates(14, 0.1f, 1.0f, cyan, cyan, black);
-
-				// Check amount of ready players
-				for (int j = 0; j < m_readyPlayers.size(); ++j)
-					if (m_readyPlayers[j] == true) nrOfReadyPlayers++;
-
-				// If all players are ready
-				if (nrOfReadyPlayers == game->getNrOfPlayers())
-				{
-					switch (i)
-					{
-					case 10:
-						exitGame = true;
-						break;
-					case 12:
-						m_ranking.clear();
-						m_playerIDs.clear();
-						setPaused(true); // Pause this state
-						game->changeState(stateType::e_mainMenu); // Change state to mainMenu
-						break;
-					case 14:
-						m_ranking.clear();
-						m_playerIDs.clear();
-						setPaused(true); // Pause this state
-						game->changeState(stateType::e_gameState); // Change state to gameState
-						break;
-					}
-				}
+				objectData data;
+				data.material.emission = cyan;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 			}
 			else
 			{
-				if(i == 10)
-					m_billboardHandler.setNoneState(12);
-				else if (i == 12)
-					m_billboardHandler.setNoneState(10);
-				else if (i == 14)
-					m_billboardHandler.setNoneState(14);
+				objectData data;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 			}
 		}
+	}
+
+	for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
+	{
+		for (int j = 0; j < BB.size() && !hasCollided; ++j)
+		{
+			if (BB[j].getObjectType() == objectType::e_static_billboard_score_platform)
+			{
+				// Get collision mesh
+				std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[j].getObjectType(), BB[j].getModelNr(), BB[j].getVariant());
+				for (int k = 0; k < colMesh.size(); k += 3)
+				{
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
+
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					{
+		
+						hasCollided = true;
+						if (m_input->isPressed(i, XINPUT_GAMEPAD_A)) // press A to get ready
+							m_readyPlayers[i] = true; // This player is ready
+
+						break; // Collision found so we jump out
+					}
+				}
+
+				// If one or more collisions have been detected with platform it will be lit up
+				if (hasCollided)
+				{
+					// Check amount of ready players
+					for (int k = 0; k < m_readyPlayers.size(); ++k)
+						if (m_readyPlayers[k] == true) nrOfReadyPlayers++;
+
+					// If all players are ready
+					if (nrOfReadyPlayers == game->getNrOfPlayers())
+					{
+						switch (j)
+						{
+						case 10:
+							m_ranking.clear();
+							m_playerIDs.clear();
+							setPaused(true); // Pause this state
+							game->changeState(stateType::e_mainMenu); // Change state to mainMenu
+							break;
+						case 12:
+							exitGame = true;
+							break;
+						case 14:
+							m_ranking.clear();
+							m_playerIDs.clear();
+							setPaused(true); // Pause this state
+							game->changeState(stateType::e_gameState); // Change state to gameState
+							break;
+						}
+					}
+				}
+
+			}
+		}
+		if (!hasCollided) // No collision found
+			m_readyPlayers[i] = false; // This player did not collide with any of the platforms and can therefore not be ready
+
+		hasCollided = false; // Reset bool for the next player
 	}
 
 	return exitGame;
@@ -280,21 +309,21 @@ void ScoreState::firstTimeSetUp(Game* game)
 	// Initialize robots
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	//m_robots[1] = new Robot(1);
-	//m_robots[2] = new Robot(2);
-	//m_robots[3] = new Robot(3);
-	//m_robots[0]->setDrawn(true);
-	//m_robots[1]->setDrawn(true);
+	m_robots[1] = new Robot(1);
+	m_robots[2] = new Robot(2);
+	m_robots[3] = new Robot(3);
+	m_robots[0]->setDrawn(true);
+	m_robots[1]->setDrawn(true);
 	m_robots[0]->storePositionInHistory({ 45.0f, 102.0f, -300.0f });
 	m_robots[0]->setPosition({ 45.0f, 102.0f, -300.0f });
 	m_robots[1]->storePositionInHistory({ 60.6f, 102.0f, -265.0f });
 	m_robots[1]->setPosition({ 60.6f, 102.0f, -265.0f });
-	//m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
-	//m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
-	//m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
-	//m_robots[1]->setScore(10);
-	//m_robots[2]->setScore(17);
-	//m_robots[3]->setScore(27);
+	m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
+	m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
+	m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
+	m_robots[1]->setScore(10);
+	m_robots[2]->setScore(17);
+	m_robots[3]->setScore(27);
 
 	game->updatePlayerStatus();
 	// Get player scores, IDs and initalize their readiness
@@ -420,7 +449,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 
 		std::vector<int> digits;
 		objectData data;
-		data.pos.m128_f32[1] = game->getNrOfPlayers();
+		data.pos.m128_f32[1] = (float)game->getNrOfPlayers();
 		for (int i = 0; i < m_playerIDs.size(); ++i)
 		{
 			int playerID = m_playerIDs[i];
