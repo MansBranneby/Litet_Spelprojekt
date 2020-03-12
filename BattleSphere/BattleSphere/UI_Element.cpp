@@ -172,7 +172,7 @@ void UI_Element::updateElement(float dt)
 	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
 	{
 
-		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt) && !m_animation->isResting();
+		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_truePosX, m_truePosY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt) && !m_animation->isResting();
 
 		updateVertexBuffer();
 	}
@@ -223,8 +223,10 @@ void UI_Element::setPos(float posX, float posY, float scale)
 	{
 		float width = DX::getInstance()->getWidth();
 		float height = DX::getInstance()->getHeight();
-		m_posX = posX / 1920.0f * width;
-		m_posY = posY / 1080.0f * height;
+		m_truePosX = posX / 1920.0f;
+		m_truePosY = posY / 1080.0f;
+		m_posX = m_truePosX * width;
+		m_posY = m_truePosY * height;
 
 		float left, right, top, bottom;
 		left = m_posX - m_sizeX * scale / 2.0f;
@@ -260,8 +262,13 @@ void UI_Element::setPos(float posX, float posY, float scale)
 void UI_Element::setScale(float scale)
 {
 	//XMMATRIX scaleM = XMMatrixScaling(scale, scale, scale);
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+
 	float posX = m_posX;
 	float posY = m_posY;
+	m_sizeX = m_trueSizeX * scale * width;
+	m_sizeY = m_trueSizeY * scale * height;
 
 	setPos(0.0f, 0.0f);
 

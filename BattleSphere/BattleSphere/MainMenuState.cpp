@@ -57,15 +57,21 @@ MainMenuState::MainMenuState()
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_applyG.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
 
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_800x600.png", false, 300.0f, 0.0f, 244.0f, 42.0f));
+	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1366x768.png", false, 300.0f, 0.0f, 260.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1920x1080.png", false, 300.0f, 0.0f, 275.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_2560x1440.png", false, 300.0f, 0.0f, 309.0f, 42.0f));
+	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_3840x2160.png", false, 300.0f, 0.0f, 301.0f, 42.0f));
+	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_7680x4320.png", false, 300.0f, 0.0f, 323.0f, 42.0f));
 
 	m_resolutions.push_back({ 800.0f, 600.0f });
+	m_resolutions.push_back({ 1366.0f, 768.0f });
 	m_resolutions.push_back({ 1920.0f, 1080.0f });
 	m_resolutions.push_back({ 2560.0f, 1440.0f });
+	m_resolutions.push_back({ 3840.0f, 2160.0f });
+	m_resolutions.push_back({ 7680.0f, 4320.0f });
 
 	m_fullscreen = false;
-	m_selectedResIndex = 1;
+	m_selectedResIndex = 2;
 	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
 	{
 		m_resolutionElements[i]->setDrawn(true);
@@ -115,6 +121,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 				m_uiElements[i]->fadeOut(0.5f, 0.0f);
 			}
 
+			game->getInput()->setBlocked(j, true);
 
 			m_optionElements[0]->setDrawn(true);
 			m_optionElements[0]->fadeIn(0.5f, 0.5f);
@@ -449,7 +456,7 @@ void MainMenuState::hi_options(Game* game)
 			m_optionsMenu = ActiveOptionsMenu::e_music;
 		}
 
-		else if (m_optionElements[1]->isReady() && game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_optionsMenu == ActiveOptionsMenu::e_apply)
+		else if (m_optionElements[1]->isReady() && game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(j) && m_optionsMenu == ActiveOptionsMenu::e_apply)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
 			DX::getInstance()->setScreen
@@ -458,12 +465,8 @@ void MainMenuState::hi_options(Game* game)
 				m_resolutions[m_selectedResIndex].x,
 				m_resolutions[m_selectedResIndex].y
 			);
-			for (int i = 1; i < (int)m_uiElements.size(); i++)
-				m_uiElements[i]->adjustForScreen();
-			for (int i = 0; i < (int)m_optionElements.size(); i++)
-				m_optionElements[i]->adjustForScreen();
-			for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-				m_resolutionElements[i]->adjustForScreen();
+			
+			adjustElementsForScreen();
 		}
 
 		else if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(j))
@@ -694,6 +697,8 @@ void MainMenuState::adjustElementsForScreen()
 		m_uiElements[i]->adjustForScreen();
 	for (int i = 0; i < (int)m_optionElements.size(); i++)
 		m_optionElements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
+		m_resolutionElements[i]->adjustForScreen();
 }
 
 void MainMenuState::firstTimeSetUp(Game* game)
