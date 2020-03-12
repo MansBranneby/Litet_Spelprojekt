@@ -30,7 +30,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
-	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -200.0f, -100.0f, 124.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -250.0f, -100.0f, 124.0f, 66.0f));
 
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		m_quitGameElements[i]->setDrawn(false);
@@ -355,9 +355,9 @@ void UserInterface::setQuitGame(bool quitGame)
 {
 	m_quitGame = quitGame;
 	m_quitGameElements[2]->setPos(0.0f, -100.0f);
-	m_quitGameElements[3]->setPos(-200.0f, -100.0f);
+	m_quitGameElements[3]->setPos(-250.0f, -100.0f);
 	m_quitGameElements[2]->setAbsDestinationX(0.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
-	m_quitGameElements[3]->setAbsDestinationX(-200.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
+	m_quitGameElements[3]->setAbsDestinationX(-250.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
 }
 
 void UserInterface::quitGameHI(int dir)
@@ -368,16 +368,16 @@ void UserInterface::quitGameHI(int dir)
 		{
 			if (m_quitGame) // Yes
 			{
-				m_quitGameElements[3]->setPos(-200.0f, -100.0f);
-				m_quitGameElements[2]->setAbsDestinationX(200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setPos(-250.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(250.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGameElements[3]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGame = false;
 			}
 			else
 			{
-				m_quitGameElements[2]->setPos(-200.0f, -100.0f);
+				m_quitGameElements[2]->setPos(-250.0f, -100.0f);
 				m_quitGameElements[2]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
-				m_quitGameElements[3]->setAbsDestinationX(200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(250.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGame = true;
 			}
 		}
@@ -385,16 +385,16 @@ void UserInterface::quitGameHI(int dir)
 		{
 			if (m_quitGame) // Yes
 			{
-				m_quitGameElements[3]->setPos(200.0f, -100.0f);
-				m_quitGameElements[2]->setAbsDestinationX(-200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setPos(250.0f, -100.0f);
+				m_quitGameElements[2]->setAbsDestinationX(-250.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGameElements[3]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGame = false;
 			}
 			else
 			{
-				m_quitGameElements[2]->setPos(200.0f, -100.0f);
+				m_quitGameElements[2]->setPos(250.0f, -100.0f);
 				m_quitGameElements[2]->setAbsDestinationX(0.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
-				m_quitGameElements[3]->setAbsDestinationX(-200.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
+				m_quitGameElements[3]->setAbsDestinationX(-250.0f, 1000.0f, 2.0f, 0.0f, 0.0f);
 				m_quitGame = true;
 			}
 		}
