@@ -277,9 +277,19 @@ void Robot::addScore(int score)
 	m_score += score;
 }
 
+void Robot::setScore(int score)
+{
+	m_score = score;
+}
+
 void Robot::resetScore()
 {
 	m_score = 0;
+}
+
+int Robot::getScore() const
+{
+	return m_score;
 }
 
 void Robot::addWeapon(int type)

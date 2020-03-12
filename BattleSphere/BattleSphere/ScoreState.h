@@ -9,15 +9,11 @@
 #include "SpawnDrone.h"
 #include "Particles.h"
 #include "Sound.h"
-#include "Node.h"
-#include "LineShots.h"
 #include "BillboardHandler.h"
-#include "UserInterface.h"
-#include <math.h>
+#include "Node.h"
 
-class GameState : public State 
+class ScoreState : public State
 {
-	
 private:
 	Input* m_input;
 	Robot** m_robots;
@@ -25,11 +21,7 @@ private:
 	std::vector<Node*> m_nodes;
 	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
-	int m_BSPDLightIndex[2];
-	float m_BSPDtimer;
 	Transparency m_transparency;
-	LineShots m_lineShots;
-	UserInterface* m_userInterface;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;
@@ -44,28 +36,29 @@ private:
 	void updateDynamicCamera(float dT);
 	bool m_devZoomOut;
 
-	// BSPD lights
-	void bspdLightUpdate(float dt);
-
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
 
-	// Sound
-	float m_sawInterval;
+	// Scoreboard
+	std::vector<int> m_ranking;
+	std::vector<int> m_playerIDs;
+	float m_scoreTimer;
+	float m_scoreTimerAcceleration;
+	bool updateScoreScorePlatforms(Game* game);
+
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
 
 public:
-	GameState(Game* game);
-	~GameState();
+	ScoreState(Game* game);
+	~ScoreState();
 
 	void pause();
 	void resume();
-	
+
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
 	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
-

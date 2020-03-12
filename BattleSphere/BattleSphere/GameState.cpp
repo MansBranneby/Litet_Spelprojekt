@@ -479,7 +479,8 @@ void GameState::handleInputs(Game* game, float dt)
 					newPos += collisionInfo.m_normal;
 				else break;
 			}
-
+			// TODO GLENN
+			//newPos = { 165.0f, 46.0f, 135.0f };
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
 		}
@@ -501,7 +502,8 @@ GameState::GameState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	m_billboardHandler = BillboardHandler(game->getPreLoader());
+	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_static_billboard};
+	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 	//m_billboardHandler = BillboardHandler();
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
@@ -960,6 +962,30 @@ bool GameState::update(Game* game, float dt)
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
+	//// Check if there's only one player alive
+	//// If so then add to that player's score and change to ScoreState
+	//int nrOfPlayersAlive = 0, winner = -1;
+	//for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	//{
+	//	// Check for nullptr so as to not crash the game when checking for isDrawn
+	//	if (m_robots[i] != nullptr)
+	//	{
+	//		if (m_robots[i]->isDrawn()) // isDrawn indicates whether the player is dead or alive
+	//		{
+	//			winner = i; // Keep track of the winner
+	//			nrOfPlayersAlive++; // Count how many players are alive
+	//		}
+	//	}
+	//}
+	//if (nrOfPlayersAlive <= 1) // If zero or one person is alive then change to scorestate 
+	//{
+	//	if (winner != -1)
+	//		m_robots[winner]->addScore(1); // Award one point to the winning player 
+	//	// If no one is left alive it's a tie and no points are awarded 
+	//	setPaused(true); // Pause this state
+	//	game->changeState(stateType::e_scoreState); // Change state to ScoreState
+	//}
+
 	return 0;
 }
 
@@ -1110,7 +1136,7 @@ void GameState::draw(Game* game, renderPass pass)
 			}
 		}
 		game->getPreLoader()->draw(objectType::e_ground);
-		
+
 		objectData tempData;
 		tempData.material =
 		{
@@ -1123,7 +1149,7 @@ void GameState::draw(Game* game, renderPass pass)
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
-		
+
 			switch (resType)
 			{
 			case BEYBLADE: // Beyblade
@@ -1208,7 +1234,7 @@ void GameState::draw(Game* game, renderPass pass)
 				else if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
 				{
 					objectData xd = ProjectileBank::getInstance()->getList()[i]->getData();
-					xd.material.ambient = XMVectorSet(-1,-1,-1, 3.0f);
+					xd.material.ambient = XMVectorSet(-1, -1, -1, 3.0f);
 					xd.material.emission = XMVectorSet(-1, -1, -1, 0.15f);
 					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 1, 2);
 					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, xd, 0, 2);
@@ -1269,7 +1295,7 @@ void GameState::draw(Game* game, renderPass pass)
 					case REFLECT:
 						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 4);
 						break;
-						
+
 					case SHIELD:
 						game->getPreLoader()->drawOneModelAndMat(objectType::e_weapon, weapons[m_robots[i]->getCurrentWeapon(LEFT)]->getData(), m_robots[i]->getData(), 0, 5);
 						break;

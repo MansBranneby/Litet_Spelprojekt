@@ -77,6 +77,11 @@ using namespace DirectX;
 #define OBJECT_TYPES 9 // Nr of object types
 enum class objectType
 {
+	e_static_billboard_score_platform,
+	e_score_scene,
+	e_number_billboard,
+	e_static_billboard_score,
+	e_static_billboard,
 	e_extra,
 	e_drone,
 	e_weapon,
@@ -113,6 +118,7 @@ enum class stateType
 {
 	e_gameState,
 	e_mainMenu,
+	e_scoreState,
 	e_default
 };
 

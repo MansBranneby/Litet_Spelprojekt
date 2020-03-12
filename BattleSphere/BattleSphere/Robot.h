@@ -72,7 +72,9 @@ public:
 	bool upgradeWeapon(int type);
 
 	void addScore(int score);
+	void setScore(int score);
 	void resetScore();
+	int getScore() const;
 
 	void setResourceIndex(int index);
 	int getResourceIndex();

@@ -185,6 +185,7 @@
     <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ScoreState.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpawnDrone.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="ProjectileBank.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="ScoreState.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpawnDrone.h" />

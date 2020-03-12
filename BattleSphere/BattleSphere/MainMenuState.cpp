@@ -69,7 +69,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 			game->getInput()->setBlocked(j, false);
 		}
 
-		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_startGame)
+		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(j) && m_activeMenu == ActiveMainMenu::e_startGame)
 		{
 			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 			game->getInput()->setBlocked(j, true);
@@ -331,6 +331,10 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[i]);
 			}
 		}
+
+		m_menuState = MenuState::e_mainMenu;
+		m_activeMenu = ActiveMainMenu::e_startGame;
+
 		setPaused(true);
 		game->changeState(stateType::e_gameState);
 	}
@@ -479,6 +483,15 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 
 void MainMenuState::firstTimeSetUp(Game* game)
 {
+	// Show Main Menu
+	for (int i = 0; i < 8; i++)
+	{
+		m_uiElements[i]->setDrawn(true);
+		if (i != 0)
+			m_uiElements[i]->fadeIn(1.0f, 0.0f);
+	}
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		game->getInput()->setBlocked(i, true);
 }
 
 void MainMenuState::handleInput(Game* game)
