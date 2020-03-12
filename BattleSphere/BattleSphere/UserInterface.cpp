@@ -2,7 +2,7 @@
 
 void UserInterface::setElementPos()
 {
-	for (int i = 0; i < 36; i++)
+	for (int i = 0; i < NR_OF_ICON_ELEMENTS; i++)
 		m_elements[i]->setDrawn(false);
 	for (int i = 0; i < m_nrOfPlayers; i++) // Iterate players
 	{
@@ -19,6 +19,23 @@ void UserInterface::setElementPos()
 
 UserInterface::UserInterface(int nrOfPlayers)
 {
+	// Countdown
+	m_countDownTimer = 0.0f;
+	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_1.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
+	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_2.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
+	m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_3.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
+
+	// Quit Game
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, 0.0f, -100.0f, 124.0f, 66.0f));
+
+	for (int i = 0; i < m_quitGameElements.size(); i++)
+		m_quitGameElements[i]->setDrawn(false);
+
+	m_quitGame = true;
+
 	// PLAYER 1
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -60,7 +77,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 
-	for (int i = 0; i < 16; i++) // No abilities selected or in queue
+	for (int i = 0; i < NR_OF_ICON_SLOTS; i++) // No abilities selected or in queue
 		m_slotID[i] = -1;
 	//nrOfPlayers = 4;
 	switch (nrOfPlayers)
@@ -187,6 +204,10 @@ UserInterface::~UserInterface()
 {
 	for (int i = 0; i < m_elements.size(); i++)
 		delete m_elements[i];
+	for (int i = 0; i < m_countDownElements.size(); i++)
+		delete m_countDownElements[i];
+	for (int i = 0; i < m_quitGameElements.size(); i++)
+		delete m_quitGameElements[i];
 	delete m_constantBufferColours;
 }
 
@@ -206,37 +227,36 @@ void UserInterface::setSlotID(int playerIndex, int abilityType)
 		}
 	}
 }
-
-void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
-{
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
-	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
-
-	int nrOfSlots = 0;
-	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
-	{
-		if (m_slotID[playerIndex * 4 + i] != -1)
-			nrOfSlots++;
-	}
-	switch (nrOfSlots)
-	{
-	case 3:
-		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
-		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = oldIndex;
-		break;
-	default: // newIndex != -1 and number of abilities > slots
-		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
-		m_slotID[playerIndex * 4 + 3] = newIndex;
-		break;
-	}
-}
+//
+//void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int newIndex)
+//{
+//	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
+//	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
+//
+//	int nrOfSlots = 0;
+//	for (int i = 0; i < 4; i++) // Calculate whitch replacement to use
+//	{
+//		if (m_slotID[playerIndex * 4 + i] != -1)
+//			nrOfSlots++;
+//	}
+//	switch (nrOfSlots)
+//	{
+//	case 3:
+//		m_slotID[playerIndex * 4 + 2] = oldIndex; // Replace new with old
+//		break;
+//	case 4:
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = oldIndex;
+//		break;
+//	default: // newIndex != -1 and number of abilities > slots
+//		m_slotID[playerIndex * 4 + 2] = m_slotID[playerIndex * 4 + 3];
+//		m_slotID[playerIndex * 4 + 3] = newIndex;
+//		break;
+//	}
+//}
 
 void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext)
 {
-	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
 	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
 
 	int nrOfSlots = 0;
@@ -250,10 +270,6 @@ void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int ne
 	case 3:
 		m_slotID[playerIndex * 4 + 2] = next; // Replace new with old
 		break;
-	case 4:
-		m_slotID[playerIndex * 4 + 2] = next;
-		m_slotID[playerIndex * 4 + 3] = nextNext;
-		break;
 	default: // newIndex != -1 and number of abilities > slots
 		m_slotID[playerIndex * 4 + 2] = next;
 		m_slotID[playerIndex * 4 + 3] = nextNext;
@@ -266,25 +282,110 @@ void UserInterface::update()
 	setElementPos();
 }
 
+bool UserInterface::updateCountDown(float dt)
+{
+	m_countDownTimer += dt;
+
+	if (m_countDownTimer >= 3.0f)
+	{
+		m_countDownElements[0]->setDrawn(false);
+		return false;
+	}
+	else
+	{
+		if (m_countDownTimer < 1.0f)
+		{
+			if (!m_countDownElements[2]->isDrawn())
+			{
+				m_countDownElements[2]->fadeIn(0.8f, 0.0f);
+				m_countDownElements[2]->fadeOut(0.1f, 0.9f);
+				m_countDownElements[2]->setDrawn(true);
+			}
+			m_countDownElements[2]->setPos(0.0f, 0.0f, m_countDownTimer);
+			m_countDownElements[2]->updateElement(dt);
+		}
+		if (m_countDownTimer > 1.0f && m_countDownTimer < 2.0f)
+		{
+			if (!m_countDownElements[1]->isDrawn())
+			{
+				m_countDownElements[1]->fadeIn(0.8f, 0.0f);
+				m_countDownElements[1]->fadeOut(0.1f, 0.9f);
+				m_countDownElements[1]->setDrawn(true);
+			}
+			m_countDownElements[1]->setPos(0.0f, 0.0f, m_countDownTimer - 1.0f);
+			m_countDownElements[1]->updateElement(dt);
+			m_countDownElements[2]->setDrawn(false);
+		}
+		if (m_countDownTimer > 2.0f)
+		{
+			if (!m_countDownElements[0]->isDrawn())
+			{
+				m_countDownElements[0]->fadeIn(0.8f, 0.0f);
+				m_countDownElements[0]->fadeOut(0.1f, 0.9f);
+				m_countDownElements[0]->setDrawn(true);
+			}
+			m_countDownElements[0]->setPos(0.0f, 0.0f, m_countDownTimer - 2.0f);
+			m_countDownElements[0]->updateElement(dt);
+			m_countDownElements[1]->setDrawn(false);
+		}
+		return true;
+	}
+}
+
+void UserInterface::updateQuitGame(int dir)
+{
+	/*if ()*/
+}
+
 void UserInterface::draw()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	for (int i = 36; i < m_nrOfPlayers + 36; i++)
+	for (int i = NR_OF_ICON_ELEMENTS; i < m_nrOfPlayers + NR_OF_ICON_ELEMENTS; i++)
 	{
 		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &m_playerColours[i - 36], sizeof(XMVECTOR));
+		memcpy(mappedMemory.pData, &m_playerColours[i - NR_OF_ICON_ELEMENTS], sizeof(XMVECTOR));
 		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
 		m_elements[i]->draw();
 	}
-	for (int i = 0; i < 36; i++)
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+	for (int i = 0; i < m_countDownElements.size(); i++)
 	{
-		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
-		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
-
-		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
-		m_elements[i]->draw();
+		if (m_countDownElements[i]->isDrawn())
+			m_countDownElements[i]->draw();
 	}
+}
+
+void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	int elementIndex = playerIndex * 9 + abilityType;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, cd), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	m_elements[elementIndex]->draw();
+}
+
+void UserInterface::drawQuitGame()
+{
+	m_quitGameElements[0]->setDrawn(true);
+	m_quitGameElements[1]->setDrawn(true);
+	if (m_quitGame)
+		m_quitGameElements[2]->setDrawn(true);
+	else
+		m_quitGameElements[3]->setDrawn(true);
+
+	for (int i = 0; i < m_quitGameElements.size(); i++)
+		m_quitGameElements[i]->draw();
+}
+
+bool UserInterface::getQuitGame()
+{
+	return m_quitGame;
 }

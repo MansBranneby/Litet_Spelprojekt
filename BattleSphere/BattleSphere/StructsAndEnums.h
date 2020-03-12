@@ -29,11 +29,15 @@ using namespace DirectX;
 #define ROTATION_SPEED 60.0f
 #define FAST_TRAVEL_SPEED 35.0f
 #define SLOW_TRAVEL_SPEED 14.0f
-#define DRONE_START XMVectorSet(46.0f, 15.0f, -46.5f, -1)
+#define DRONE_START XMVectorSet(-88.0f, 13.0f, 145.0f, -1)
+#define DRONE_RISE_START XMVectorSet(-75.0f, 13.0f, 120.0f, -1)
+#define DRONE_MIDPOINT XMVectorSet(-15.0f, 13.0f, 50.0f, -1)
+#define BSPD_DOOR_CLOSED 0.0f
+#define BSPD_DOOR_OPEN -13.0f
 //#define DRONE_START XMVectorSet(66.0f, 5.0f, 46.5f, -1)
 #define RESOURCE_OFFSET -8.0f
 #define LIGHT_OFFSET 0.0f
-#define ROTATION_THRESHOLD 0.006f // Radian difference bias
+#define ROTATION_THRESHOLD 0.06f // Radian difference bias
 #define TRAVEL_THRESHOLD 0.3f
 #define TRAVEL_HEIGHT 50.0f
 
@@ -66,6 +70,10 @@ using namespace DirectX;
 #define BEYBLADE 7
 #define ENERGY 8
 
+// UI
+#define NR_OF_ICON_SLOTS 16
+#define NR_OF_ICON_ELEMENTS 36
+
 #define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
@@ -84,6 +92,8 @@ enum class objectType
 	e_ground,
 	e_static,
 	e_billboard,
+	e_BSPD_Door,
+	e_BSPD_Screen,
 	e_nrOfEnums
 };
 

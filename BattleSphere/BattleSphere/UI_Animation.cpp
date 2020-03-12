@@ -92,8 +92,11 @@ bool UI_Animation::translateElement(vertex* vertexList, float* posX, float* posY
 	else // Resting...
 	{
 		m_rest -= dt;
-		if (m_rest < 0.0f)
+		if (m_rest <= 0.0f)
+		{ 
+			m_rest = 0.0f;
 			isReady = true;
+		}
 	}
 
 	return isReady;
@@ -148,15 +151,18 @@ void UI_Animation::animateElement(vertex* vertexList, float dt)
 	//		vertexList[5].v = m_texV;
 	//	}
 	//}
-	m_animationData.m128_f32[0] += dt;
-	if (m_animationData.m128_f32[0] >= XM_PI * 2)
-		m_animationData.m128_f32[0] = 0.0f;
-	//m_constantBufferAniData->updateBuffer(&m_animationData, sizeof(XMVECTOR));
-	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+	if (m_isAnimated)
+	{
+		m_animationData.m128_f32[0] += dt;
+		if (m_animationData.m128_f32[0] >= XM_PI * 2)
+			m_animationData.m128_f32[0] = 0.0f;
+		//m_constantBufferAniData->updateBuffer(&m_animationData, sizeof(XMVECTOR));
+		D3D11_MAPPED_SUBRESOURCE mappedMemory;
 
-	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferAniData->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &m_animationData, sizeof(XMVECTOR));
-	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferAniData->getConstantBuffer(), 0);
+		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferAniData->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+		memcpy(mappedMemory.pData, &m_animationData, sizeof(XMVECTOR));
+		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferAniData->getConstantBuffer(), 0);
+	}
 }
 
 bool UI_Animation::fadeElement(vertex* vertexList, float dt)
@@ -258,6 +264,11 @@ bool UI_Animation::isFadeOut()
 bool UI_Animation::isFadeIn()
 {
 	return m_fadeIn;
+}
+
+bool UI_Animation::isResting()
+{
+	return !(m_rest == 0.0f);
 }
 
 void UI_Animation::setFadeOut(float fadeOut, float delay)

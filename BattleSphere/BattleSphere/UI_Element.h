@@ -60,7 +60,8 @@ public:
 
 	float getPosX();
 	float getPosY();
-	void setPos(float posX, float posY); // Not tested
+	void setPos(float posX, float posY, float scale = 1.0f); // Not tested
+	void setScale(float scale);
 	void setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest);
 	void setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest);
 	void fadeOut(float fadeTime, float delay);
@@ -73,6 +74,7 @@ public:
 	bool isDrawn();
 	bool isReady();
 	void setSelectionTimer(float time);
+	bool isResting();
 
 	ConstantBuffer* getConstantBuffer();
 };

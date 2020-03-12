@@ -38,15 +38,15 @@ Weapon::Weapon(int type)
 		m_duration = 4.0f;
 		m_speed = 1.5f;
 
-		setScale(0.1f, 0.8f, 0.1f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == SHIELD)
 	{
-		m_cooldown = 10.0f;
+		m_cooldown = 8.0f;
 		m_duration = 6.0f;
 		m_defense = 0.0f;
 
-		setScale(0.8f, 0.8f, 0.1f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == DASH)
 	{
@@ -54,7 +54,7 @@ Weapon::Weapon(int type)
 		m_duration = 0.15f;
 		m_speed = 5.0f;
 
-		setScale(0.2f, 1.6f, 0.2f);
+		m_relativePos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 	else if (type == REFLECT)
 	{
@@ -190,6 +190,14 @@ bool Weapon::getReady()
 	return m_ready;
 }
 
+float Weapon::getCD()
+{
+	if (m_cdTime != 0.0f)
+		return (m_cooldown + m_duration - m_cdTime) / (m_cooldown + m_duration);
+	else
+		return 0.0f;
+}
+
 void Weapon::upgrade()
 {
 	if (m_type == RIFLE)
@@ -220,8 +228,8 @@ void Weapon::upgrade()
 	{
 		m_cooldown -= 0.5f;
 		m_duration += 0.5f;
-		if (m_cooldown < 8.0f)
-			m_cooldown = 8.0f;
+		if (m_cooldown < 6.0f)
+			m_cooldown = 6.0f;
 		if (m_duration > 8.0)
 			m_duration = 8.0f;
 	}
