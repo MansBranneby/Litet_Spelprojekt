@@ -70,6 +70,10 @@ using namespace DirectX;
 #define BEYBLADE 7
 #define ENERGY 8
 
+// UI
+#define NR_OF_ICON_SLOTS 16
+#define NR_OF_ICON_ELEMENTS 36
+
 #define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
