@@ -359,12 +359,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
-			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				if (msg.wParam == VK_ESCAPE)
-					msg.message = WM_QUIT;
-
-				if (msg.message == WM_NCLBUTTONDOWN)
 					msg.message = WM_QUIT;
 
 				TranslateMessage(&msg);

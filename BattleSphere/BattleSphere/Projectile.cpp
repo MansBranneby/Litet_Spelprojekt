@@ -4,7 +4,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 {
 	setPosition(pos);
 	setRotation(rot);
-	m_direction = dir;
+	m_direction = XMVector3Normalize(dir);
 	m_type = type;
 	m_damage = damage;
 	m_velocity = 0.0f;
