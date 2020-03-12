@@ -156,14 +156,14 @@ void UI_Element::updateElement(float dt)
 	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
 	{
 
-		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt);
+		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt) && !m_animation->isResting();
 
 		updateVertexBuffer();
 	}
 	if (m_animation->isAnimated()) // Spritesheet or fading
 	{
 		m_animation->animateElement(m_vertexList, dt);
-		m_isReady = m_animation->fadeElement(m_vertexList, dt);
+		m_isReady = m_animation->fadeElement(m_vertexList, dt) && !m_animation->isResting();
 		updateVertexBuffer();
 	}
 }
@@ -329,6 +329,11 @@ bool UI_Element::isReady()
 void UI_Element::setSelectionTimer(float time)
 {
 	m_selectionTimer = time;
+}
+
+bool UI_Element::isResting()
+{
+	return m_animation->isResting();
 }
 
 ConstantBuffer* UI_Element::getConstantBuffer()

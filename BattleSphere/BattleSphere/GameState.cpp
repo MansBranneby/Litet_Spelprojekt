@@ -507,7 +507,14 @@ void GameState::handleInputs(Game* game, float dt)
 				setPaused(true);
 				game->changeState(stateType::e_mainMenu);
 			}
-			
+			if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && !m_userInterface->getQuitGame())
+			{
+				m_quitGame = false;
+			}
+			if (game->getInput()->getThumbLY(i) > 0.2f)
+			{
+
+			}
 		}
 	}
 }
@@ -660,6 +667,7 @@ void GameState::resume()
 void GameState::firstTimeSetUp(Game* game)
 {
 	m_robots = game->getRobots();
+	m_quitGame = false;
 
 	//// Create user interface (based on number of players) ////
 	int nrOfPlayers = 0;

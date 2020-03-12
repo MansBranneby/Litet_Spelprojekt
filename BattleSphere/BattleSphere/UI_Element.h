@@ -73,6 +73,7 @@ public:
 	bool isDrawn();
 	bool isReady();
 	void setSelectionTimer(float time);
+	bool isResting();
 
 	ConstantBuffer* getConstantBuffer();
 };

@@ -332,6 +332,11 @@ bool UserInterface::updateCountDown(float dt)
 	}
 }
 
+void UserInterface::updateQuitGame(int dir)
+{
+	/*if ()*/
+}
+
 void UserInterface::draw()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;

@@ -32,16 +32,17 @@ MainMenuState::MainMenuState()
 	//7
 	//ROBOT SELECTION
 	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_enterBattle.png", false, 0.0f, 100.0f, 748.0f, 66.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_addBot.png", false, 0.0f, 0.0f, 351.0f, 50.0f));
 
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, -696.0f, -400.0f, 297.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, -232.0f, -400.0f, 297.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, 232.0f, -400.0f, 297.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, 696.0f, -400.0f, 297.0f, 47.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, -696.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, -232.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, 232.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_pressA.png", false, 696.0f, -400.0f, 302.0f, 50.0f));
 
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, -696.0f, -400.0f, 302.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, -232.0f, -400.0f, 302.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 232.0f, -400.0f, 302.0f, 47.0f));
-	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 696.0f, -400.0f, 302.0f, 47.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, -696.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, -232.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 232.0f, -400.0f, 302.0f, 50.0f));
+	m_uiElements.push_back(new UI_Element(L"Textures\\MainMenu\\selection_readyA.png", false, 696.0f, -400.0f, 302.0f, 50.0f));
 
 	m_uiElements[2]->setAnimated(true);
 	//Lights::getInstance()->addPointLight(0, 0, -10, 50, 1, 1, 1, 10);
@@ -64,7 +65,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 
 		if (game->getInput()->getThumbLY(j) > -0.2f && game->getInput()->getThumbLY(j) < 0.2f && !game->getInput()->isPressed(j, XINPUT_GAMEPAD_A)) // Set input to ready if no input is detected
 		{
-			m_uiElements[1]->setSelectionTimer(0.0f);
+			//m_uiElements[1]->setSelectionTimer(0.0f);
 			
 			game->getInput()->setBlocked(j, false);
 		}
@@ -98,7 +99,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 				//m_uiElements[i]->setDrawn(false);
 				m_uiElements[i]->fadeOut(0.5f, 0.0f);
 			}
-			for (int i = 8; i < 13; i++) // Show robot selection
+			for (int i = 8; i < 14; i++) // Show robot selection
 			{
 				m_uiElements[i]->setDrawn(true);
 				m_uiElements[i]->fadeIn(1.0f, 1.0f);
@@ -163,8 +164,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		robotNr = game->getPlayerIdIndex(i);
-		int robNrPlus9 = robotNr + 9;
-		int robNrPlus13 = robotNr + 13;
+		int robNrPlus9 = robotNr + 10;
+		int robNrPlus13 = robotNr + 14;
 		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && game->getInput()->getThumbLX(i) < 0.4f && game->getInput()->getThumbLX(i) > -0.4f)
 			game->getInput()->setBlocked(i, false);
 
@@ -175,8 +176,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 			if (robotNr == -1)
 			{
 				robotNr = game->setPlayerIdIndex(i);
-				robNrPlus9 = robotNr + 9;
-				robNrPlus13 = robotNr + 13;
+				robNrPlus9 = robotNr + 10;
+				robNrPlus13 = robotNr + 14;
 			}
 			game->getInput()->setBlocked(i, true);
 			
@@ -240,7 +241,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 
 	}
 
-	for (int i = 9; i < 13; i++)
+	for (int i = 10; i < 14; i++)
 	{
 		if (m_uiElements[i]->getAlpha() == 1.0f && m_uiElements[i]->isReady())
 		{
@@ -272,7 +273,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 					//m_uiElements[i]->setDrawn(false);
 					m_uiElements[i]->fadeIn(0.5f, 0.0f);
 				}
-				for (int i = 8; i < 17; i++) // Show robot selection
+				for (int i = 8; i < 18; i++) // Show robot selection
 				{
 					m_uiElements[i]->fadeOut(0.0f, 0.0f);
 					m_uiElements[i]->setDrawn(false);
@@ -357,6 +358,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 	m_uiElements[14]->updateElement(dt);
 	m_uiElements[15]->updateElement(dt);
 	m_uiElements[16]->updateElement(dt);
+	m_uiElements[17]->updateElement(dt);
 }
 
 void MainMenuState::u_options(Game* game, float dt)
@@ -482,14 +484,32 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 
 void MainMenuState::firstTimeSetUp(Game* game)
 {
-	for (int i = 0; i < 8; i++)
+	// Start at main menu
+	m_menuState = MenuState::e_mainMenu;
+	m_activeMenu = ActiveMainMenu::e_startGame;
+
+	// SET UP ELEMENTS //
+
+	for (int i = 0; i < 8; i++) // Main menu
 	{
 		m_uiElements[i]->setDrawn(true);
 		if (i != 0)
 			m_uiElements[i]->fadeIn(1.0f, 0.0f);
 	}
+	for (int i = 3; i < 5; i++)
+		m_uiElements[i]->setAnimated(false);
+	for (int i = 8; i < 17; i++) // Robot selection
+	{
+		m_uiElements[i]->setDrawn(false);
+		//if (i != 0)
+			//m_uiElements[i]->fadeIn(1.0f, 0.0f); // Fade out?
+	}
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		game->getInput()->setBlocked(i, true);
+
+	// SET UP LOGIC //
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		m_readyState[i] = 0;
 }
 
 void MainMenuState::handleInput(Game* game)

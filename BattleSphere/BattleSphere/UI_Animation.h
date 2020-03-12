@@ -37,6 +37,7 @@ public:
 	void setAnimated(bool isAnimated);
 	bool isFadeOut();
 	bool isFadeIn();
+	bool isResting();
 	void setFadeOut(float fadeOut, float delay);
 	void setFadeIn(float fadeIn, float delay);
 	void setAnimationData(float speed, float acceleration, float delay, float rest);
