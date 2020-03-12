@@ -39,6 +39,11 @@ class MainMenuState : public State
 private:
 	std::vector<UI_Element*> m_uiElements;
 	std::vector<UI_Element*> m_optionElements;
+	std::vector<UI_Element*> m_resolutionElements;
+	std::vector<XMFLOAT2> m_resolutions;
+	bool m_fullscreen;
+	int m_selectedResIndex;
+
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	ActiveOptionsMenu m_optionsMenu;

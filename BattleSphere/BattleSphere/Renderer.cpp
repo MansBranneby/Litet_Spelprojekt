@@ -337,13 +337,26 @@ void finalRender()
 
 void setScreen()
 {
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+
+	// Clear backbuffer views
+	ID3D11RenderTargetView* nullViews = nullptr;
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
+	if ((*g_graphicResources.getBackBuffer())) (*g_graphicResources.getBackBuffer())->Release();
+	g_graphicResources.releaseDepthStencilViews();
+	DX::getInstance()->getDeviceContext()->Flush();
+
+	// Resize swapchain
+	DX::getInstance()->getSwapChain()->ResizeBuffers(0, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+	// Update render target, depth stencil and viewport
+	g_graphicResources.updateRenderTarget();
+
 	if (DX::getInstance()->fullScreenIsSet())
 		DX::getInstance()->getSwapChain()->SetFullscreenState(true, nullptr);
 	else
 		DX::getInstance()->getSwapChain()->SetFullscreenState(false, nullptr);
-
-	float width = DX::getInstance()->getWidth();
-	float height = DX::getInstance()->getHeight();
 
 	// Change camera aspect ratio
 	float nearPlane = 0.1f;
@@ -351,7 +364,6 @@ void setScreen()
 	DX::getInstance()->reInitializeCam(width, height, nearPlane, farPlane);
 
 	// Clear backbuffer views
-	ID3D11RenderTargetView* nullViews = nullptr;
 	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
 	if ((*g_graphicResources.getBackBuffer())) (*g_graphicResources.getBackBuffer())->Release();
 	g_graphicResources.releaseDepthStencilViews();

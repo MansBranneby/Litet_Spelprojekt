@@ -6,7 +6,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 	float left, right, top, bottom, texU, texV, alpha;
 
 	(m_isDrawn ? alpha = 1.0f : alpha = 0.0f);
-	
+
 	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
 	{
 		left = m_posX - m_spriteSizeX / 2.0f;
@@ -28,42 +28,42 @@ void UI_Element::initializeResources(std::wstring fileName)
 		texV = 1.0f;
 	}
 
-		m_vertexList[0] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v0 pos	L T
-			0.0f, 0.0f,			//v0 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[1] =
-		{
-			1.0f, -1.0f, 0.0f,	//v1 pos	R B
-			texU, texV,			//v1 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[2] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v2 pos	L B
-			0.0f, texV,			//v2 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[3] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v3 pos	L T
-			0.0f, 0.0f,			//v3 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[4] =
-		{
-			1.0f, 1.0f, 0.0f,	//v4 pos	R T
-			texU, 0.0f,			//v4 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[5] =
-		{
-			1.0f, -1.0f, 0.0f,	//v5 pos	R B
-			texU, texV,			//v5 tex
-			alpha, 0.0f, 0.0f
-		};	
+	m_vertexList[0] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
+		0.0f, 0.0f,			//v0 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[1] =
+	{
+		1.0f, -1.0f, 0.0f,	//v1 pos	R B
+		texU, texV,			//v1 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[2] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v2 pos	L B
+		0.0f, texV,			//v2 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[3] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
+		0.0f, 0.0f,			//v3 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[4] =
+	{
+		1.0f, 1.0f, 0.0f,	//v4 pos	R T
+		texU, 0.0f,			//v4 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[5] =
+	{
+		1.0f, -1.0f, 0.0f,	//v5 pos	R B
+		texU, texV,			//v5 tex
+		alpha, 0.0f, 0.0f
+	};
 
 	m_vertexList[0].posX = left;
 	m_vertexList[0].posY = top;
@@ -94,7 +94,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 	ZeroMemory(&vertexData, sizeof(vertexData));
 	vertexData.pSysMem = m_vertexList;
 	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	
+
 	std::wstring wName(fileName);
 	const wchar_t* wcName = wName.c_str();
 	HRESULT hr = CoInitialize(NULL);
@@ -115,6 +115,8 @@ UI_Element::UI_Element(std::wstring fileName, bool isDrawn, float posX, float po
 	m_trueSizeX = sizeX / 1920.0f;
 	m_sizeY = sizeY;
 	m_trueSizeY = sizeY / 1080.0f;
+
+	m_visible = isDrawn;
 
 	m_destinationX = m_posX;
 	m_destinationY = m_posY;
@@ -219,8 +221,10 @@ void UI_Element::setPos(float posX, float posY, float scale)
 {
 	if (m_posX != posX || m_posY != posY || scale != 1.0f) // Only update if a change is made
 	{
-		m_posX = posX;
-		m_posY = posY;
+		float width = DX::getInstance()->getWidth();
+		float height = DX::getInstance()->getHeight();
+		m_posX = posX / 1920.0f * width;
+		m_posY = posY / 1080.0f * height;
 
 		float left, right, top, bottom;
 		left = m_posX - m_sizeX * scale / 2.0f;
@@ -271,7 +275,7 @@ void UI_Element::setScale(float scale)
 		m_vertexList[i].posY = temp.m128_f32[1];
 		m_vertexList[i].posZ = temp.m128_f32[2];
 	}
-	
+
 	setPos(posX, posY, scale);
 }
 
@@ -289,24 +293,33 @@ void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, 
 
 void UI_Element::fadeOut(float fadeTime, float delay)
 {
-	if (fadeTime != 0.0f || delay != 0.0f)
-		m_animation->setFadeOut(fadeTime, delay);
-	else
+	if (m_visible)
 	{
-		for (int i = 0; i < 6; i++)
-		{
-			m_vertexList[i].normX = 0.0f;
-			m_alpha = 0.0f;
-			m_animation->setFadeIn(fadeTime, delay);
+		if (fadeTime != 0.0f || delay != 0.0f)
 			m_animation->setFadeOut(fadeTime, delay);
+		else
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				m_vertexList[i].normX = 0.0f;
+				m_alpha = 0.0f;
+				m_animation->setFadeIn(fadeTime, delay);
+				m_animation->setFadeOut(fadeTime, delay);
 
+			}
 		}
+		m_visible = false;
 	}
+
 }
 
 void UI_Element::fadeIn(float fadeTime, float delay)
 {
-	m_animation->setFadeIn(fadeTime, delay);
+	if (!m_visible)
+	{
+		m_animation->setFadeIn(fadeTime, delay);
+		m_visible = true;
+	}
 }
 
 void UI_Element::setAnimated(bool isAnimated)

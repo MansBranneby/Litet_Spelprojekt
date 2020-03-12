@@ -42,6 +42,8 @@ private:
 	bool m_isReady;
 	float m_selectionTimer;
 
+	bool m_visible;
+
 	ID3D11ShaderResourceView* m_elementSRV;
 	//ID3D11Texture2D* m_texture;
 	ID3D11Buffer* m_vertexBuffer;
