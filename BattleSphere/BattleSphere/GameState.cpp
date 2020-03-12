@@ -955,29 +955,29 @@ bool GameState::update(Game* game, float dt)
 	//Dynamic background objects
 	m_dboHandler->update(dt);
 
-	// Check if there's only one player alive
-	// If so then add to that player's score and change to ScoreState
-	int nrOfPlayersAlive = 0, winner = -1;
-	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	{
-		// Check for nullptr so as to not crash the game when checking for isDrawn
-		if (m_robots[i] != nullptr)
-		{
-			if (m_robots[i]->isDrawn()) // isDrawn indicates whether the player is dead or alive
-			{
-				winner = i; // Keep track of the winner
-				nrOfPlayersAlive++; // Count how many players are alive
-			}
-		}
-	}
-	if (nrOfPlayersAlive <= 1) // If zero or one person is alive then change to scorestate 
-	{
-		if (winner != -1)
-			m_robots[winner]->addScore(1); // Award one point to the winning player 
-		// If no one is left alive it's a tie and no points are awarded 
-		setPaused(true); // Pause this state
-		game->changeState(stateType::e_scoreState); // Change state to ScoreState
-	}
+	//// Check if there's only one player alive
+	//// If so then add to that player's score and change to ScoreState
+	//int nrOfPlayersAlive = 0, winner = -1;
+	//for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	//{
+	//	// Check for nullptr so as to not crash the game when checking for isDrawn
+	//	if (m_robots[i] != nullptr)
+	//	{
+	//		if (m_robots[i]->isDrawn()) // isDrawn indicates whether the player is dead or alive
+	//		{
+	//			winner = i; // Keep track of the winner
+	//			nrOfPlayersAlive++; // Count how many players are alive
+	//		}
+	//	}
+	//}
+	//if (nrOfPlayersAlive <= 1) // If zero or one person is alive then change to scorestate 
+	//{
+	//	if (winner != -1)
+	//		m_robots[winner]->addScore(1); // Award one point to the winning player 
+	//	// If no one is left alive it's a tie and no points are awarded 
+	//	setPaused(true); // Pause this state
+	//	game->changeState(stateType::e_scoreState); // Change state to ScoreState
+	//}
 
 	return 0;
 }

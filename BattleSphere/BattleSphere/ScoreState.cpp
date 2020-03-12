@@ -30,6 +30,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
 	DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
 	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float intensity = 1 / (game->getNrOfPlayers() * 2.0f);
 	//m_billboardHandler.setAllStates(3, 0.1f, 1.0f, cyan, cyan, cyan);
 	std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 	for (int i = 0; i < BB.size(); ++i)
@@ -65,13 +66,13 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 			if (nrOfCollisions == game->getNrOfPlayers())
 			{
 				if(i == 10)
-					m_billboardHandler.setAllStates(i + 2, 0.1f, 1.0f, cyan, cyan, black);
+					m_billboardHandler.setAllStates(12, 0.1f, 0.1f, cyan, cyan * nrOfCollisions * intensity, black);
 				if (i == 12)
-					m_billboardHandler.setAllStates(i + 2, 0.1f, 1.0f, cyan, cyan, black);
-				if (i == 14)
 					m_billboardHandler.setAllStates(10, 0.1f, 1.0f, cyan, cyan, black);
+				if (i == 14)
+					m_billboardHandler.setAllStates(14, 0.1f, 1.0f, cyan, cyan, black);
 
-				if (m_input->isPressed(0, XINPUT_GAMEPAD_A))
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
 				{
 					switch (i)
 					{
@@ -82,13 +83,13 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						m_ranking.clear();
 						m_playerIDs.clear();
 						setPaused(true); // Pause this state
-						game->changeState(stateType::e_gameState); // Change state to ScoreState
+						game->changeState(stateType::e_mainMenu); // Change state to mainMenu
 						break;
 					case 14:
 						m_ranking.clear();
 						m_playerIDs.clear();
 						setPaused(true); // Pause this state
-						game->changeState(stateType::e_mainMenu); // Change state to ScoreState
+						game->changeState(stateType::e_gameState); // Change state to gameState
 						break;
 					}
 				}
@@ -323,11 +324,22 @@ void ScoreState::resume()
 
 void ScoreState::firstTimeSetUp(Game* game)
 {
+	// Set camera position and lookAt
+	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
+	lookAt = { 45.0f, 120.0f, -260.0f };
+	DirectX::XMVECTOR camPos{ 35.0f, 25.0f, -130.0f };
+	camPos = { 45.0f, 140.0f, -330.0f };
+	DX::getInstance()->getCam()->setCameraPosition(camPos);
+	DX::getInstance()->getCam()->setLookAt(lookAt);
+
+	// Initialize robots
 	m_input = game->getInput();
 	m_robots = game->getRobots();
 	m_robots[1] = new Robot(1);
 	m_robots[2] = new Robot(2);
 	m_robots[3] = new Robot(3);
+	m_robots[0]->storePositionInHistory({ 45.0f, 102.0f, -300.0f });
+	m_robots[0]->setPosition({ 45.0f, 102.0f, -300.0f });
 	m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
 	m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
 	m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
@@ -335,6 +347,7 @@ void ScoreState::firstTimeSetUp(Game* game)
 	m_robots[2]->setScore(17);
 	m_robots[3]->setScore(27);
 
+	// Calculate ranking based of player scores
 	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
 	{
 		if (m_robots[i] != nullptr)
@@ -363,11 +376,6 @@ void ScoreState::firstTimeSetUp(Game* game)
 			}
 		}
 	}
-
-	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
-	DirectX::XMVECTOR camPos{ 35.0f, 25.0f, -130.0f };
-	DX::getInstance()->getCam()->setCameraPosition(camPos);
-	DX::getInstance()->getCam()->setLookAt(lookAt);
 }
 
 void ScoreState::handleInput(Game* game)
