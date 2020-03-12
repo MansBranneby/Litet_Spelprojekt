@@ -148,7 +148,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
 	// Collidable billboards
-	//loadFromFile(ObjectType::e_static_billboard, "Background\\SS", "SSColl");
+	//loadFromFile(objectType::e_static_billboard, "TestTower", "BSTowerColl");
 
 	// ScoreRoom billboards
 	loadFromFile(objectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");

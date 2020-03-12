@@ -223,12 +223,13 @@ ScoreState::ScoreState(Game* game)
 
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
+	/*
 	m_lights = Lights::getInstance();
 	int index = m_lights->addPointLight(-10, 25, 0, 55, 1, 0.5f, 0.125f, 1);
 	m_lights->setColor(index, float(255) / 255, float(0) / 255, float(97) / 255);
 	index = m_lights->addSpotLight(-2.5f, 11.67f, -67, 17, -0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
 	index = m_lights->addSpotLight(2.5f, 11.67f, -67, 17, 0.33f, -1, 0.0f, 1.0f, 1.0f, 0.0f, 27, 20);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	//index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 70.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
 	//m_lights->addAreaLight(78, 18, 70, 50, 1, 0.5f, 0, 25);
@@ -237,7 +238,7 @@ ScoreState::ScoreState(Game* game)
 	//m_lights->addAreaLight(178, 10, 67, 50, 1, 1, 0, 20);
 	//m_lights->addAreaLight(150, 10, 55, 17, 1, 0, 0, 20);
 	//m_lights->addAreaLight(-119, 3, 99, 17, 1, 0.6f, 0, 10);
-	index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
+	//index = m_lights->addVolumetricSpotLight(133.0f, 38.0f, -29.0f, 90.0f, -0.6f, -0.8f, -0.3f, 0.15f, 0.97f, 1.0f, 20.0f, 13.0f); // Headlights construction
 	//m_lights->addAreaLight(-52, 11.67f, -72, 17, 1, 1, 0, 5);
 	//m_lights->addAreaLight(46, 8, -60, 17, 1, 0, 1, 5);
 	//m_lights->addAreaLight(-5, 18, 75, 33, 0, 1, 1, 10);
@@ -273,7 +274,7 @@ ScoreState::ScoreState(Game* game)
 	m_lights->addAreaLight(53.0f, 11.8f, 10.0f, 20.0f, 0.8f, 0.8f, 0.8f, 15.0f); // Gas station white
 	index = m_lights->addSpotLight(47.5f, 14.7f, -0.34f, 20.0f, -0.0f, -0.9f, -0.3f, 0.8f, 0.8f, 0.8f, 30.0f, 5.0f); // Gas station spotlight
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
-
+	*/
 	// Initialize dynamic camera
 	m_zoomingOutToStart = false;
 	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
