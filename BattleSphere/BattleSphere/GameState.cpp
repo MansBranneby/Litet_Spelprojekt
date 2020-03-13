@@ -781,8 +781,8 @@ void GameState::firstTimeSetUp(Game* game)
 		m_robots[i]->setPosition(ROBOT_START_POS[i]);
 		m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
 	}*/
-
-	//m_robots[0]->setPosition(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
+	m_robots[0]->storePositionInHistory(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
+	m_robots[0]->setPosition(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
 
 
 

@@ -41,9 +41,10 @@ private:
 
 	// Scoreboard
 	bool m_hasChosen;
-	std::vector<bool> m_readyPlayers;
+	std::vector<int> m_readyPlayers;
 	std::vector<int> m_ranking;
 	std::vector<int> m_playerIDs;
+	std::vector<int> m_collidedPlatforms;
 	float m_scoreTimer;
 	float m_scoreTimerAcceleration;
 	bool updateScoreScorePlatforms(Game* game);

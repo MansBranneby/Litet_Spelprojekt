@@ -33,50 +33,49 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 		DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
 		float intensity = 1.0f / float(game->getNrOfPlayers());
-		//std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 		std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score_platform);
 		// Test each player against collision mesh
 		bool hasCollided = false;
 
-		for (int i = 0; i < BB.size(); ++i)
-		{
-			hasCollided = false;
-			// Get collision mesh
-			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
-			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
-			{
-				for (int k = 0; k < colMesh.size(); k += 3)
-				{
-					// Get indices
-					unsigned int ind1 = k + 1;
-					unsigned int ind2 = k + 2;
+		//for (int i = 0; i < BB.size(); ++i)
+		//{
+		//	hasCollided = false;
+		//	// Get collision mesh
+		//	std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
+		//	for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
+		//	{
+		//		for (int k = 0; k < colMesh.size(); k += 3)
+		//		{
+		//			// Get indices
+		//			unsigned int ind1 = k + 1;
+		//			unsigned int ind2 = k + 2;
 
-					// Get vertices
-					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
-					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
-					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+		//			// Get vertices
+		//			DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+		//			DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+		//			DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
 
-					// Test collision between player and collision mesh
-					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
-					{
-						hasCollided = true;
-						break; // Collision found so we jump out
-					}
-				}
-			}
-			if (hasCollided)
-			{
-				/*objectData data;
-				data.material.emission = cyan * 0.25f;
-				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-			}
-			else
-			{
-				/*objectData data;
-				data.material.emission = black;
-				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-			}
-		}
+		//			// Test collision between player and collision mesh
+		//			if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+		//			{
+		//				hasCollided = true;
+		//				break; // Collision found so we jump out
+		//			}
+		//		}
+		//	}
+		//	if (hasCollided)
+		//	{
+		//		/*objectData data;
+		//		data.material.emission = cyan * 0.25f;
+		//		game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
+		//	}
+		//	else
+		//	{
+		//		/*objectData data;
+		//		data.material.emission = black;
+		//		game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
+		//	}
+		//}
 
 
 		for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
@@ -102,7 +101,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 
 						hasCollided = true;
 						if (m_input->isPressed(i, XINPUT_GAMEPAD_A)) // press A to get ready
-							m_readyPlayers[i] = true; // This player is ready
+							m_readyPlayers[i] = j; // This player is ready
 
 						break; // Collision found so we jump out
 					}
@@ -113,38 +112,54 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 				if (hasCollided)
 				{
 					// Check amount of ready players
-					for (int k = 0; k < m_readyPlayers.size(); ++k)
-						if (m_readyPlayers[k] == true) nrOfReadyPlayers++;
+					if (m_readyPlayers.size() == 1)
+					{
+						for(int k = 0; k < m_readyPlayers.size(); ++k)
+							if(m_readyPlayers[k] != -1) nrOfReadyPlayers++;
+					}
+					else
+					{
+						for (int k = 1; k < m_readyPlayers.size(); ++k)
+						{
+							if (m_readyPlayers[0] == m_readyPlayers[k] && m_readyPlayers[0] != -1)
+								nrOfReadyPlayers++;
+						}
+						nrOfReadyPlayers++;
+					}
 
 					// If all players are ready
+				
 					if (nrOfReadyPlayers == game->getNrOfPlayers())
 					{
-						switch (j)
+						switch (m_readyPlayers[0])
 						{
-						case 0:
+						case 1:
 							m_ranking.clear();
 							m_playerIDs.clear();
 							m_hasChosen = true;
-							setPaused(true); // Pause this state
+							//setPaused(true); // Pause this state
 							game->changeState(stateType::e_mainMenu); // Change state to mainMenu
+							return false;
 							break;
-						case 2:
+						case 3:
 							m_hasChosen = true;
 							exitGame = true;
+							return true;
 							break;
-						case 4:
+						case 5:
 							m_hasChosen = true;
 							m_ranking.clear();
 							m_playerIDs.clear();
 							//setPaused(true); // Pause this state
 							game->changeState(stateType::e_gameState); // Change state to gameState
+							return false;
 							break;
 						}
 					}
 				}
 			}
 			if (!hasCollided) // No collision found
-				m_readyPlayers[i] = false; // This player did not collide with any of the platforms and can therefore not be ready
+				m_readyPlayers[i] = -1; // This player did not collide with any of the platforms and can therefore not be ready
 
 			hasCollided = false; // Reset bool for the next player
 		}
@@ -239,8 +254,6 @@ void ScoreState::handleInputs(Game* game, float dt)
 					newPos += collisionInfo.m_normal;
 				else break;
 			}
-			// TODO GLENN
-			//newPos = { 165.0f, 46.0f, 135.0f };
 			m_robots[i]->setPosition(newPos);
 			m_robots[i]->storePositionInHistory(newPos);
 		}
@@ -309,8 +322,6 @@ ScoreState::~ScoreState()
 		delete m_dboHandler;
 	if (m_spawnDrone)
 		delete m_spawnDrone;
-
-
 }
 
 void ScoreState::pause()
@@ -323,6 +334,8 @@ void ScoreState::resume()
 
 void ScoreState::firstTimeSetUp(Game* game)
 {
+	m_hasChosen = false;
+
 	// Set camera position and lookAt
 	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
 	lookAt = { 45.0f, 120.0f, -260.0f };
@@ -344,15 +357,16 @@ void ScoreState::firstTimeSetUp(Game* game)
 			m_ranking.push_back(m_robots[i]->getScore());
 			m_playerIDs.push_back(m_robots[i]->getPlayerId());
 			m_readyPlayers.push_back(false);
+			m_collidedPlatforms.push_back(-1);
 		}
 	}
 
-	DirectX::XMVECTOR spawnPos = { 45.0f - (m_ranking.size() * 2.0f), 102.0f, -300.0f };
+	DirectX::XMVECTOR spawnPos = { 44.569f, 102.0f, -300.0f };
+	
 	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
 	{
 		if (m_robots[i] != nullptr)
 		{
-			spawnPos.m128_f32[0] += i * 4.0f;
 			m_robots[i]->storePositionInHistory(spawnPos);
 			m_robots[i]->setPosition(spawnPos);
 			m_robots[i]->setDrawn(true);
