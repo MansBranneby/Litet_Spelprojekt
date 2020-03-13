@@ -55,4 +55,5 @@ void ProjectileBank::release()
 	{
 		delete m_projectiles[i];
 	}
+	m_projectiles.clear();
 }

@@ -62,6 +62,141 @@ void Graph::setColour(int index, XMVECTOR colour)
 	m_colour[index] = colour;
 }
 
+std::vector<XMVECTOR> Graph::calculateAIPath(XMVECTOR startPos, XMVECTOR goal)
+{
+	struct node
+	{
+		int index;
+		int source;
+		float f, g;
+	};
+
+	std::vector<node> open;
+	std::vector<node> closed;
+	float shortestDistance = 10000.0f;
+	int startNode = -1;
+	float heuristic = XMVectorGetX(XMVector3Length(goal - startPos));
+	XMFLOAT2 playerPos, goalPos;
+	playerPos.x = startPos.m128_f32[0];
+	playerPos.y = startPos.m128_f32[2];
+	goalPos.x = goal.m128_f32[0];
+	goalPos.y = goal.m128_f32[2];
+	for (int i = 0; i < m_nodes.size(); i++)
+	{
+
+		float currDist = XMVectorGetX(XMVector3Length(m_nodes[i].pos - startPos));
+		if (currDist < shortestDistance)
+		{
+			XMFLOAT2 nodePos;
+			nodePos.x = m_nodes[i].pos.m128_f32[0];
+			nodePos.y = m_nodes[i].pos.m128_f32[2];
+			if (!m_quadtree->testCollision(playerPos, nodePos))
+			{
+				shortestDistance = currDist;
+				startNode = i;
+			}
+
+		}
+	}
+	if (startNode == -1)
+	{
+		return std::vector<XMVECTOR>();
+	}
+
+	open.push_back({ startNode, -1, 0, 0 });
+
+	while (open.size() > 0)
+	{
+		float lowestF = 100000;
+		int q = 0;
+		//Find the element with the lowest f value
+		for (int i = 0; i < open.size(); i++)
+		{
+			if (open[i].f < lowestF)
+			{
+				//you are the one
+				lowestF = open[i].f;
+				q = i;
+			}
+		}
+		//Are we the goal????
+		XMVECTOR right = XMVector3Cross(XMVector3Normalize(goal - m_nodes[open[q].index].pos), XMVectorSet(0, 1, 0, 0));
+		XMVECTOR pos1, pos2;
+		pos1 = m_nodes[open[q].index].pos + right * 2;
+		pos2 = m_nodes[open[q].index].pos - right * 2;
+		XMFLOAT2 currNodePos1, currNodePos2;
+		currNodePos1.x = pos1.m128_f32[0];
+		currNodePos1.y = pos1.m128_f32[2];
+
+		currNodePos2.x = pos2.m128_f32[0];
+		currNodePos2.y = pos2.m128_f32[2];
+
+		//XMStoreFloat2(&right, XMVector2Cross(XMLoadFloat2(&currNodePos - goalPos), XMVectorSet(0, 1, 0, 0)));
+		if (!m_quadtree->testCollision(currNodePos1, goalPos) && !m_quadtree->testCollision(currNodePos2, goalPos))
+		{
+			std::vector<XMVECTOR> path;
+			node currentNode = open[q];
+			path.push_back(goal);
+			while (currentNode.source != -1)
+			{
+				path.push_back(m_nodes[currentNode.index].pos);
+				currentNode = closed[currentNode.source];
+			}
+			path.push_back(m_nodes[startNode].pos);
+			for (int i = 0; i < path.size(); i++)
+			{
+				XMFLOAT2 nodePos;
+				nodePos.x = path[i].m128_f32[0];
+				nodePos.y = path[i].m128_f32[2];
+				if (!m_quadtree->testCollision(playerPos, nodePos))
+				{
+					path.erase(path.begin() + (i + 1), path.end());
+					break;
+				}
+			}
+			path.push_back(startPos);
+			return path;
+		}
+
+
+		//Add the children
+		for (int i = 0; i < m_nodes[open[q].index].neighbours.size(); i++)
+		{
+			node nod;
+			nod.source = (int)closed.size();
+			nod.index = m_nodes[open[q].index].neighbours[i];
+			nod.g = open[q].g + m_nodes[open[q].index].neighbourDistance[i];
+			nod.f = nod.g + XMVectorGetX(XMVector3Length(m_nodes[nod.index].pos - startPos));;
+
+			bool add = true;
+			for (int j = 0; j < closed.size(); j++)
+			{
+				if (nod.index == closed[j].index)
+				{
+					add = false;
+				}
+			}
+			for (int j = 0; j < open.size(); j++)
+			{
+				if (nod.index == open[j].index)
+				{
+					if (nod.g > open[j].g)
+						add = false;
+				}
+			}
+			if (add)
+			{
+				open.push_back(nod);
+			}
+
+		}
+		closed.push_back(open[q]);
+		open.erase(open.begin() + q);
+
+	}
+	return std::vector<XMVECTOR>();
+}
+
 Graph::Graph()
 {
 	for (int i = 0; i < 39; i++)
@@ -73,7 +208,7 @@ Graph::Graph()
 	m_nodes[1].pos = XMVectorSet(100.6f, 0.0f, -20.0f, 0.0f);
 	m_nodes[2].pos = XMVectorSet(-82.7f, 0.0f, -96.5f, 0.0f);
 	m_nodes[3].pos = XMVectorSet(-116.4f, 0.0f, -9.4f, 0.0f);
-	m_nodes[4].pos = XMVectorSet(156.0f, 0.0f, 13.0f, 0.0f);
+	m_nodes[4].pos = XMVectorSet(151.0f, 0.0f, -7.0f, 0.0f);
 	m_nodes[5].pos = XMVectorSet(156.0f, 0.0f, 50.0f, 0.0f);
 	m_nodes[6].pos = XMVectorSet(106.0f, 0.0f, -58.0f, 0.0f);
 	m_nodes[7].pos = XMVectorSet(122.0f, 0.0f, -78.0f, 0.0f);
@@ -393,6 +528,11 @@ void Graph::draw(int index)
 	}
 	
 
+}
+
+XMVECTOR Graph::getNodePos(int index)
+{
+	return m_nodes[m_goal[index]].pos;
 }
 
 void Graph::release()

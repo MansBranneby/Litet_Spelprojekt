@@ -50,9 +50,11 @@ public:
 	bool getActive(int index);
 	void setQuadtree(QuadtreeNode* qtn);
 	void setColour(int index, XMVECTOR colour);
+	std::vector<XMVECTOR> calculateAIPath(XMVECTOR startPos, XMVECTOR goal);
 	std::vector<XMVECTOR> calculateShortestPath(int index, XMVECTOR startPos, int goal);
 	void setShortestPath(int index, std::vector<XMVECTOR>* path);
 	void draw(int index);
+	XMVECTOR getNodePos(int index);
 
 	void release();
 };

@@ -30,6 +30,8 @@ class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
+	UI_Element* m_botElements[4];
+	UI_Element* m_startElement;
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	
@@ -40,7 +42,7 @@ private:
 
 	bool handleInputs(Game* game, float dt);
 	void changeColour(Game* game, int i, bool dir);
-
+	void leaveColour(int robotNr);
 public:
 	MainMenuState();
 	virtual ~MainMenuState();
@@ -55,6 +57,7 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
