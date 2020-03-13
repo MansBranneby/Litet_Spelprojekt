@@ -482,7 +482,7 @@ bool GameState::handleInputs(Game* game, float dt)
 				XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 				XMVECTOR newPos = m_robots[i]->getPosition();
 				float l = XMVectorGetX(XMVector3Length(v));
-				float d = robotBD.halfWD.x * 2.0f;
+				float d = robotBD.halfWD.x * 0.5f;
 
 				// if robot moved further than its diameter
 				if (d < l)
@@ -1428,7 +1428,7 @@ void GameState::draw(Game* game, renderPass pass)
 					int size = (int)m_robots[i]->getWeapons().size();
 					for (int j = 0; j < size; j++)
 					{
-						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE)
+						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE) // TODO: fix this bugg
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
 						m_userInterface->drawHealthbar(m_robots[i]->getRobotID(), m_robots[i]->getHealth() / 100.0f);
 					}
