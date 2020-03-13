@@ -137,7 +137,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 							m_ranking.clear();
 							m_playerIDs.clear();
 							m_hasChosen = true;
-							//setPaused(true); // Pause this state
+							setPaused(true); // Pause this state
 							game->changeState(stateType::e_mainMenu); // Change state to mainMenu
 							return false;
 							break;
@@ -150,7 +150,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 							m_hasChosen = true;
 							m_ranking.clear();
 							m_playerIDs.clear();
-							//setPaused(true); // Pause this state
+							setPaused(true); // Pause this state
 							game->changeState(stateType::e_gameState); // Change state to gameState
 							return false;
 							break;
