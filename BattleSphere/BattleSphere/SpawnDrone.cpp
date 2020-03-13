@@ -23,12 +23,12 @@ void SpawnDrone::loadLists()
 	m_spawns.push_back({ 40, -16 });
 	m_spawns.push_back({ 56, -5 });
 	m_spawns.push_back({ 113, -56 });
-	m_spawns.push_back({ 109, -98 });
-	m_spawns.push_back({ 75, -98 });
-	m_spawns.push_back({ 40, -98 });
-	m_spawns.push_back({ 5, -98 });
-	m_spawns.push_back({ -30, -98 });
-	m_spawns.push_back({ -65, -98 });
+	m_spawns.push_back({ 109, -85 });
+	m_spawns.push_back({ 75, -85 });
+	m_spawns.push_back({ 40, -85 });
+	m_spawns.push_back({ 5, -85 });
+	m_spawns.push_back({ -30, -85 });
+	m_spawns.push_back({ -65, -85 });
 	m_spawns.push_back({ 44, -65 });
 	m_spawns.push_back({ -61, -70 });
 	m_spawns.push_back({ -39, -70 });

@@ -55,9 +55,9 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 	case e_FreewayL:
 		m_nrOfCurves = 5;
 		// Curve 1
-		m_weights.push_back(XMVectorSet(200.0f, 18.0f, 5.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(187.0f, 18.0f, 5.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(174.0f, 18.0f, 5.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(250.0f, 18.0f, 5.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(220.0f, 18.0f, 5.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(190.0f, 18.0f, 5.0f, 1.0f));
 		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 5.0f, 1.0f));
 		// Curve 2
 		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 5.0f, 1.0f));
@@ -105,9 +105,9 @@ DBGObj::DBGObj(Animation animation, bool tokyoDriver, float speed)
 		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 16.0f, 1.0f));
 		// Curve 1
 		m_weights.push_back(XMVectorSet(162.0f, 18.0f, 16.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(174.0f, 18.0f, 16.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(187.0f, 18.0f, 16.0f, 1.0f));
-		m_weights.push_back(XMVectorSet(200.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(190.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(220.0f, 18.0f, 16.0f, 1.0f));
+		m_weights.push_back(XMVectorSet(250.0f, 18.0f, 16.0f, 1.0f));
 		break;
 		m_nrOfCurves = 0;
 		break;

@@ -48,8 +48,13 @@ private:
 	// BSPD lights
 	void bspdLightUpdate(float dt);
 
+	bool m_updateMission;
+
 	// Dynamic background objects
 	DBOHandler* m_dboHandler;
+
+	// Particles
+	Particles m_particles;
 
 	// Sound
 	float m_sawInterval;

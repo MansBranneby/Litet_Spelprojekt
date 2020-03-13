@@ -127,7 +127,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	for (y = -1.0; y <= 1.0; y += 0.5)
 		for (x = -1.0; x <= 1.0; x += 0.5) 
 			sum += (txShadowMap.Sample(sampAni, shadowMapTex + float2(dx*x, dy*y)).r + ep < depth) ? 0.0f : 1.0f;
-	float shadowCoeff = sum / 25.0;
+	float shadowCoeff = 1;//sum / 25.0;
 	
 	
 	
@@ -145,6 +145,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	fragmentCol = Ia * Kd; // * Ia
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
+		
 	
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
@@ -285,6 +286,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		fragmentCol = Ke;
+
 	if (KeIn.w > 0.8f)
 	{
 

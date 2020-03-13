@@ -9,6 +9,7 @@
 #include "Weapon.h"
 #include "Resource.h"
 #include "Particles.h"
+#include "AI.h"
 
 #define LEFT 0
 #define RIGHT 1
@@ -18,6 +19,11 @@ using namespace DirectX;
 class Robot : public GameObject
 {
 private:
+	AI m_ai;
+	mission m_currentMission;
+	bool m_isAi;
+	int m_robotID;
+
 	int m_playerId;
 	XMVECTOR m_colour;
 	float m_health;
@@ -48,8 +54,15 @@ private:
 	void deathAnimation();
 public:
 	Robot(int playerId);
-
+	//Robot(QuadtreeNode* qtn); Add
+	bool isAi();
+	void updateAIWeapon(bool seePlayer);
+	void setAi(bool ai);
+	void setAIGoal(XMVECTOR position, bool update);
+	XMVECTOR getAIRotation();
 	void setPlayerId(int playerId);
+	void setRobotID(int id);
+	int getRobotID();
 	int getPlayerId();
 	bool damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile = true, bool playSound = true);
 	void setHealth(float health);

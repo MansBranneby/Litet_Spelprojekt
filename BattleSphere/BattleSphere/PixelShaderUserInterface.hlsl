@@ -19,7 +19,7 @@ float4 PS_main(VS_OUT input) : SV_Target
 	static const float PI = 3.14159265f;
 	float4 elementColour = elementTex.Sample(sampAni, input.tex).xyzw;
 	
-	if (colour.w == -1.0f)
+	if (colour.w == -1.0f && colour.x > 1.0f)
 	{
 		if (input.pos.x > colour.x / 2.0f + colour.x / 15.0f)
 			elementColour.w = 0.0f;
@@ -75,22 +75,6 @@ float4 PS_main(VS_OUT input) : SV_Target
 				else
 					elementColour.xyz = elementColour.xyz * 0.2f;
 			}
-
-			/*
-			if (u > 0.0f)
-			{
-				uvAngle = atan2(u, -v);
-				if (uvAngle < cdAngle)
-					elementColour.xyz = elementColour.xyz * 0.2f;
-
-			}
-			else
-			{
-				uvAngle = atan2(u, v);
-				if (uvAngle < cdAngle)
-					elementColour.xyz = elementColour.xyz * 0.2f;
-
-			}*/
 		}
 	}
 	
