@@ -32,5 +32,6 @@ public:
 
 	void update();
 	void draw();
+	void drawAbility(int playerIndex, int abilityType, float cd);
 };
 

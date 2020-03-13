@@ -108,16 +108,23 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_weapon, "GamePlay\\energy");
 	loadFromFile(objectType::e_weapon, "GamePlay\\Railgun");
 	loadFromFile(objectType::e_weapon, "GamePlay\\reflect");
+	loadFromFile(objectType::e_weapon, "GamePlay\\shield");
+	loadFromFile(objectType::e_weapon, "GamePlay\\movement");
+	loadFromFile(objectType::e_weapon, "GamePlay\\dash");
 	loadFromFile(objectType::e_resource, "GamePlay\\Weapon1");
 	loadFromFile(objectType::e_resource, "GamePlay\\Beyblade3");
 	loadFromFile(objectType::e_resource, "GamePlay\\energy");
 	loadFromFile(objectType::e_resource, "GamePlay\\Railgun");
 	loadFromFile(objectType::e_resource, "GamePlay\\reflect");
+	loadFromFile(objectType::e_resource, "GamePlay\\shield");
+	loadFromFile(objectType::e_resource, "GamePlay\\movement");
+	loadFromFile(objectType::e_resource, "GamePlay\\dash");
 	loadFromFile(objectType::e_robot, "GamePlay\\BattleFish", "BattleSphere");
 	loadFromFile(objectType::e_node, "OnMap\\Nodes", "NodesColl");
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
 	loadFromFile(objectType::e_projectile, "projectile", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "untitled", "1mesh1mat");
+	loadFromFile(objectType::e_projectile, "ball", "1mesh1mat");
 
 
 	// On map (with collision)
@@ -142,21 +149,22 @@ PreLoader::PreLoader()
 
 	// Billboards
 	loadFromFile(objectType::e_billboard, "TestTower");
-	loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	//loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
 
 	// Background
 	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
+	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
 	loadFromFile(objectType::e_ground, "Background\\Ground");
-	//loadFromFile(objectType::e_scene, "Background\\RoadPaint"); // Maybe bad looking?
 	loadFromFile(objectType::e_scene, "Background\\Apartment2");
-	//loadFromFile(objectType::e_scene, "Background\\Background"); // Background plane
 	loadFromFile(objectType::e_scene, "Background\\SSB");
 	loadFromFile(objectType::e_scene, "Background\\BBScenery");
 	loadFromFile(objectType::e_scene, "Background\\Freeway");
 	loadFromFile(objectType::e_scene, "Other\\Car");
 	loadFromFile(objectType::e_extra, "Other\\CarDBO");
-	//loadFromFile(objectType::e_extra, "1mesh1mat"); // Delete
+	
+	loadFromFile(objectType::e_BSPD_Door, "Background\\BSPDDoor");
+	loadFromFile(objectType::e_BSPD_Screen, "Background\\BSPDScreen");
 }
 
 PreLoader::~PreLoader()

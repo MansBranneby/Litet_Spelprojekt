@@ -371,7 +371,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			{
 				//// UPDATE ////
 
-				if (g_Game->update(g_Clock->getDeltaTime() * 1.5f))
+				DX::getInstance()->update(g_Clock->getDeltaTime());
+
+				if (g_Game->update(g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime()))
 				{
 					msg.message = WM_QUIT;
 					DispatchMessage(&msg);
@@ -466,7 +468,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
-							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime());
+							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
 					}
@@ -482,7 +484,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_userInterface);
 
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime();
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime();
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
@@ -495,7 +497,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					float moonColorCoeff = (XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 
 					sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
-					sunColor[1] = 235 * pow(sunColorCoeff, 0.35f) / 255;
+					sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
 					sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
 
 					moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila

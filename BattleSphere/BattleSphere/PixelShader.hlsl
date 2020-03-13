@@ -229,7 +229,7 @@ float4 PS_main(PS_IN input) : SV_Target
 					float cosa = cos(light.SpotlightAngle * 3.14f / 180.0f); // Maximum cos angle
 					float maxCos = 1;
 					spotIntensity2 = (spotIntensity2 - cosa) / (maxCos - cosa);
-					spotIntensity2 = pow(spotIntensity2, 1.5f);
+					spotIntensity2 = pow(abs(spotIntensity2), 1.5f);
 					//return float4(spotIntensity2, spotIntensity2, spotIntensity2, 1.0f);
 					worldPos = projPos;
 					

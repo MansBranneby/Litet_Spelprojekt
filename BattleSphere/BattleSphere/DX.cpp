@@ -117,6 +117,17 @@ float DX::getHeight()
 	return m_height;
 }
 
+void DX::setDeltaTime(float dt, float time)
+{
+	m_timer = time;
+	m_dt = dt;
+}
+
+float DX::getDeltaTime()
+{
+	return m_dt;
+}
+
 HRESULT DX::createDirect3DContext(HWND wndHandle)
 {
 	// create a struct to hold information about the swap chain
@@ -176,6 +187,30 @@ void DX::reportLiveObjects()
 	m_debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
 }
 
+void DX::update(float dt)
+{
+	if (m_timer > 0.5f)
+		m_timer -= dt;
+	else if (m_timer > 0.0f && m_timer != -1.0f)
+	{
+		m_timer -= dt;
+		if (m_dt < 1.0f)
+		{
+			m_dt = (1.0f - m_dt) * (1.0f - m_timer * 2);
+		}
+		/*
+		else if (m_dt > 1.0f)
+		{
+			m_dt = 1 - (1.0f - m_dt) * (1.0f - m_timer * 2);
+		}
+		*/
+	}
+	else if (m_timer <= 0.0f && m_timer != -1.0f)
+	{
+		m_dt = 1.0f;
+		m_timer = -1.0f;
+	}
+}
 
 
 void DX::release()

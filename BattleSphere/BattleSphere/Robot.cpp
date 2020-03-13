@@ -8,7 +8,7 @@ Robot::Robot(int playerId)
 	m_robotID = -1;
 	m_playerId = playerId;
 	m_health = 100;
-	m_velocity = 20.0f;
+	m_velocity = 45.0f;
 	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
@@ -20,7 +20,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(PISTOL);
+	Weapon* pistol = new Weapon(ENERGY);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -190,11 +190,8 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool del
 
 	if (projIndex != -1 && deleteProjectile)
 	{
-		
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 	}
-		
-
 
 	if (damage != 0.0f)
 	{
@@ -205,6 +202,7 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool del
 		{
 			m_health = 0;
 			setDrawn(false);
+			deathAnimation();
 		}
 		m_material.emission = m_colour * m_health / 100.0f;
 		removeResource();
@@ -353,6 +351,11 @@ int Robot::changeWeapon(int side)
 
 			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
 				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[RIGHT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[RIGHT]]->getData().rotation) > 90.0f)
+			{
+				m_weapons[m_currentWeapon[RIGHT]]->rotate(0, 0, 1, 180);
+			}
 		}
 		else
 		{
@@ -362,6 +365,11 @@ int Robot::changeWeapon(int side)
 
 			if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
 				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+			if (m_weapons[m_currentWeapon[LEFT]]->getType() == SHIELD && XMVectorGetW(m_weapons[m_currentWeapon[LEFT]]->getData().rotation) < 90.0f)
+			{
+				m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+			}
 		}
 
 		m_ready = false;
@@ -426,8 +434,21 @@ void Robot::addWeapon(int type)
 
 		if (type == REFLECT)
 			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 1, 0, 180);
+
+		if (type == SHIELD)
+		{
+			m_weapons[m_currentWeapon[LEFT]]->rotate(0, 0, 1, 180);
+		}
 	}
 	//m_weapons.push_back(weapon);
+}
+
+void Robot::deathAnimation()
+{
+	DX::getInstance()->getParticles()->addParticles(getPosition(), m_colour, XMVectorSet(1.8f, 1.8f, 0, 0),
+		4000, 20, 1, 10, XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0));
+	Sound::getInstance()->play(soundEffect::e_death, getPosition(), 0.6f);
+	DX::getInstance()->setDeltaTime(0.15f, 2.0f);
 }
 
 bool Robot::upgradeWeapon(int type)

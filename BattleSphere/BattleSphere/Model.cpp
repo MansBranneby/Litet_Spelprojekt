@@ -788,7 +788,7 @@ void Model::loadModel(std::ifstream& in, objectType type)
 		//// Diffuse texture
 		std::getline(in, line);
 		std::string textureString = line.substr(0, line.find("{"));
-		if (!textureString.empty() && *textureString.rbegin() == ' ')
+		if (!textureString.empty() && *textureString.rbegin() == '\r')
 			textureString.erase(textureString.length() - 1, 1);
 		inputStream.str(textureString);
 		tempSRV = createTexture(inputStream.str()); // Create texture
@@ -869,7 +869,6 @@ ID3D11ShaderResourceView* Model::createTexture(std::string fileName)
 	{
 		std::wstring wFileName(fileName.length(), L' ');
 		std::copy(fileName.begin(), fileName.end(), wFileName.begin());
-
 		HRESULT hr = CoInitialize(NULL);
 		hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), wFileName.c_str(), NULL, &tempSRV);
 
