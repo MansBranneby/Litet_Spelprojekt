@@ -198,7 +198,7 @@ void GameState::handleMovement(Game* game, float dt, int id)
 		m_resources[m_robots[id]->getResourceIndex()]->setPosition(m_robots[id]->getPosition() + XMVectorSet(0.0f, 1.5f, 0.0f, 0.0f));
 }
 
-void GameState::handleInputs(Game* game, float dt)
+bool GameState::handleInputs(Game* game, float dt)
 {
 	// Unblock player inputs
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -518,8 +518,9 @@ void GameState::handleInputs(Game* game, float dt)
 			}
 			if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && m_userInterface->getQuitGame())
 			{
-				setPaused(true);
+				//setPaused(true);
 				game->changeState(stateType::e_mainMenu);
+				return true;
 			}
 			if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && !m_userInterface->getQuitGame())
 			{
@@ -538,6 +539,7 @@ void GameState::handleInputs(Game* game, float dt)
 			}
 		}
 	}
+	return false;
 }
 
 GameState::GameState(Game* game)
@@ -675,7 +677,8 @@ GameState::~GameState()
 
 
 	// User interface
-	delete m_userInterface;
+	if(m_userInterface)
+		delete m_userInterface;
 }
 
 void GameState::pause()
@@ -684,6 +687,52 @@ void GameState::pause()
 
 void GameState::resume()
 {
+}
+
+void GameState::reset()
+{
+	// Delete first
+	for (int i = 0; i < m_resources.size(); i++)
+		delete m_resources[i];
+	m_resources.clear();
+	for (int i = 0; i < m_nodes.size(); i++)
+		delete m_nodes[i];
+	m_nodes.clear();
+	if (m_spawnDrone)
+		delete m_spawnDrone;
+
+	delete m_userInterface;
+	m_userInterface = nullptr;
+
+	// Add again
+	m_devZoomOut = false;
+	m_BSPDtimer = 0.0f;
+
+	// Spawn preset nodes and initialize spawning drone
+	m_spawnDrone = new SpawnDrone(&m_resources);
+	spawnNodes();
+
+	// Initialize dynamic camera
+	m_zoomingOutToStart = false;
+	DX::getInstance()->getCam()->setCameraPosition(m_camStartPos);
+	DX::getInstance()->getCam()->setLookAt(m_camStartLookAt);
+	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
+	float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
+	float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
+	m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
+	m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
+	m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
+	m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
+
+	// Rotate plane according to look at
+	float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
+	for (int i = 0; i < 4; i++)
+		m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
+
+	m_fOVPlanes[0].m128_f32[2] *= -1;
+	m_fOVPlanes[1].m128_f32[2] *= -1;
+	m_fOVPlanes[2].m128_f32[2] *= -1;
+	m_fOVPlanes[3].m128_f32[2] *= -1;
 }
 
 void GameState::firstTimeSetUp(Game* game)
@@ -760,7 +809,8 @@ bool GameState::update(Game* game, float dt)
 
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	handleInputs(game, dt);
+	if (handleInputs(game, dt))
+		return 0;
 	game->updatePlayerStatus();
 	m_robots[3];
 	// Update sounds

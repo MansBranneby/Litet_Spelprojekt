@@ -134,7 +134,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						hasChosen = true;
 						m_ranking.clear();
 						m_playerIDs.clear();
-						setPaused(true); // Pause this state
+						//setPaused(true); // Pause this state
 						game->changeState(stateType::e_gameState); // Change state to gameState
 						break;
 					}

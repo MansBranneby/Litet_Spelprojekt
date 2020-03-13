@@ -585,6 +585,39 @@ DirectX::XMVECTOR Robot::getVel() const
 	return m_vel;
 }
 
+void Robot::reset()
+{
+	m_health = 100;
+	m_vel = XMVectorSet(0, 0, 0, 0);
+	m_currentRotation = 0.0;
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	m_nextW = -1;
+	m_nextnextW = -1;
+	m_resource = -1;
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	Weapon* pistol = new Weapon(PISTOL);
+	m_weapons.push_back(pistol);
+	m_ready = true;
+	m_time = 0;
+	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
+	m_material.diffuse = XMVectorSet(0.0, 0.0, 0.0, -1);
+	m_material.emission = XMVectorSet(0.0, 0.0, 0.0, -1);
+	m_colour = XMVectorSet(1.0, 1.0, 1.0, -1);
+	m_vel = XMVectorSet(0, 0, 0, 0);
+
+	// Position history
+	m_positionHistorySize = 0;
+	m_positionHistoryCap = 100;
+	m_positionHistoryPtr = 0;
+	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
+	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+
+	// Particles
+	m_timeSinceParticles = 0.0f;
+}
+
 void Robot::release()
 {
 	// TODO realease resource?
@@ -592,6 +625,7 @@ void Robot::release()
 	{
 		delete m_weapons[i];
 	}
+	m_weapons.clear();
 
 	delete[] m_positionHistory;
 }

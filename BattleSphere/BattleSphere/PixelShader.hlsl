@@ -167,7 +167,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		case 1:
 			//Directional light
-
+			//return float4(shadowCoeff, 0, 0, 1);
 			L = normalize(-Lights[LightIndex[i]].Direction.xyz);
 			
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
@@ -179,14 +179,7 @@ float4 PS_main(PS_IN input) : SV_Target
 			float attenuation = DoAttenuation(light, d);
 	
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - input.posWC); // Vector towards light
-			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-			
-
-
-		
-			
-			
-			
+			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface	
 			lightCol = light.color * attenuation * spotIntensity * light.Intensity;
 
 			
@@ -256,13 +249,6 @@ float4 PS_main(PS_IN input) : SV_Target
 
 			L = normalize(float3(lightPos.x, lightPos.y, lightPos.z) - worldPos); // Vector towards light
 			R = normalize(2 * dot(normal, L) * normal - L); // Reflection of light on surface
-
-
-
-			//return float4(1, 1, 1, 1);
-
-
-
 			lightCol = Lights[LightIndex[i]].color * max(attenuation1 * spotIntensity1, attenuation2 * spotIntensity2) * light.Intensity; //Choose between ground and volumetric light depending on which has the most impact
 			break;
 		}
