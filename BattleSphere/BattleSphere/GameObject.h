@@ -54,6 +54,7 @@ public:
 
 	XMVECTOR const getPosition();
 	XMVECTOR const getStaticRotation();
+	XMVECTOR const getRotation();
 	objectData const getData();
 
 	bool isDrawn();

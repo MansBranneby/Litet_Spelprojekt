@@ -47,8 +47,8 @@ private:
 	std::vector<int> m_collidedPlatforms;
 	float m_scoreTimer;
 	float m_scoreTimerAcceleration;
-	bool updateScoreScorePlatforms(Game* game);
-
+	bool updatePlatforms(Game* game, float dt);
+	float m_rotation;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);

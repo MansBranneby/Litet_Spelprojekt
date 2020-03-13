@@ -24,8 +24,9 @@ void ScoreState::updateDynamicCamera(float dT)
 {
 }
 
-bool ScoreState::updateScoreScorePlatforms(Game* game)
+bool ScoreState::updatePlatforms(Game* game, float dt)
 {
+
 	bool exitGame = false;
 	if (!m_hasChosen)
 	{
@@ -76,8 +77,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 		//		game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
 		//	}
 		//}
-
-
+		
 		for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
 		{
 			for (int j = 0; j < BB.size(); ++j)
@@ -111,6 +111,28 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 				int nrOfReadyPlayers = 0;
 				if (hasCollided)
 				{
+					objectData data;
+					m_rotation += dt;
+					data.pos = { 30.0f, 100, -280 };
+					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
+					game->getPreLoader()->drawOneModel(BB[7].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
+
+					data.pos = { 45.0f, 100, -280 };
+					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
+					game->getPreLoader()->drawOneModel(BB[7].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
+
+					data.pos = { 60.0f, 100, -280 };
+					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
+					game->getPreLoader()->drawOneModel(BB[6].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
+
+
+					if (j == 1 || j == 3 || j == 5)
+					{
+						objectData data;
+						data.material.emission = cyan * intensity;
+						game->getPreLoader()->setSubModelData(BB[j].getObjectType(), data, BB[j].getModelNr(), BB[j].getSubModelNumber(), BB[j].getVariant());
+					}
+
 					// Check amount of ready players
 					if (m_readyPlayers.size() == 1)
 					{
@@ -123,13 +145,8 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 					{
 						for (int k = 1; k < m_readyPlayers.size(); ++k)
 						{
-							if (m_readyPlayers[0] == m_readyPlayers[k] && m_readyPlayers[0] != -1)
-							{
-								objectData data;
-								data.material.emission = cyan * intensity * k;
-								game->getPreLoader()->setSubModelData(BB[j].getObjectType(), data, BB[j].getModelNr(), BB[j].getSubModelNumber(), BB[j].getVariant());
+							if (m_readyPlayers[0] == m_readyPlayers[k] && m_readyPlayers[0] != -1)	
 								nrOfReadyPlayers++;
-							}
 						}
 						nrOfReadyPlayers++;
 					}
@@ -430,7 +447,7 @@ bool ScoreState::update(Game* game, float dt)
 	m_dboHandler->update(dt);
 
 	// Update platforms
-	exitGame = updateScoreScorePlatforms(game);
+	exitGame = updatePlatforms(game, dt);
 
 	m_scoreTimer += dt;
 

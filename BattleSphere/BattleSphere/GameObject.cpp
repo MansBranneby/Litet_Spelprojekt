@@ -130,6 +130,11 @@ XMVECTOR const GameObject::getStaticRotation()
 	return m_staticRotation;
 }
 
+XMVECTOR const GameObject::getRotation()
+{
+	return m_rotation;
+}
+
 objectData const GameObject::getData()
 {
 	objectData temp = { m_position, m_staticRotation, m_rotation, m_scale, m_material };

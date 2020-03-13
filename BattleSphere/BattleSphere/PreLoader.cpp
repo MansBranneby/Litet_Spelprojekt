@@ -157,7 +157,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
 	//ObjectType::e_static_billboard_score
-
+	loadFromFile(objectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomTestPlatform", "ScoreRoomPlatformsColl");
 	// Background
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
