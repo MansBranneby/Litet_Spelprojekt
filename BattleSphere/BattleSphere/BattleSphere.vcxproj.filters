@@ -475,6 +475,9 @@
     <FxCompile Include="PixelShaderUserInterface.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
+    <FxCompile Include="PixelShaderLoadingScreen.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -187,6 +187,30 @@ void createRenderResources()
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 }
 
+void loadingScreen()
+{
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), NULL);
+	DX::getInstance()->getDeviceContext()->VSSetShader(&g_vertexShaderFinalRender.getVertexShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->HSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(3)->getPixelShader(), nullptr, 0);
+
+	UINT32 vertexSize = sizeof(PosCol);
+	UINT32 offset = 0;
+
+	DX::getInstance()->getDeviceContext()->IASetVertexBuffers(0, 1, &g_vertexBufferFSQuad, &vertexSize, &offset);
+	DX::getInstance()->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	DX::getInstance()->getDeviceContext()->IASetInputLayout(&g_vertexShaderFinalRender.getvertexLayout());
+	DX::getInstance()->getDeviceContext()->PSSetSamplers(0, 1, g_graphicResources.getSamplerState());
+
+	g_menu->setLoadingScreenSRV();
+
+	DX::getInstance()->getDeviceContext()->Draw(6, 0);
+	DX::getInstance()->getSwapChain()->Present(0, 0);
+	g_Game = new Game();
+}
+
 void setUserInterfacePipeline()
 {
 	//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
@@ -331,9 +355,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		setupTestTriangle();
 
-		
+		loadingScreen();
+
 		g_Clock = new Clock();
-		g_Game = new Game();
+		
 		g_gameState = new GameState(g_Game);
 		g_scoreState = new ScoreState(g_Game);
 		g_mainMenuState = new MainMenuState();
