@@ -469,9 +469,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					for (int i = 0; i < XUSER_MAX_COUNT; i++)
 					{
-						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
+							DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
@@ -534,7 +534,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(1)->getPixelShader(), nullptr, 0);
 					g_Game->draw(renderPass::e_menuAni);
-
+					
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
@@ -557,7 +557,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
 					g_Game->draw(renderPass::e_menuScene);
-
+					DX::getInstance()->getParticles()->draw();
 					//finalRender();
 
 					ID3D11ShaderResourceView* nullRTV = { NULL };

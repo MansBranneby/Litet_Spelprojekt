@@ -6,14 +6,17 @@ void UserInterface::setElementPos()
 		m_elements[i]->setDrawn(false);
 	for (int i = 0; i < m_nrOfPlayers; i++) // Iterate players
 	{
-		for (int j = 0; j < 4; j++) // Iterate icon slots
-		{
-			if (m_slotID[i * 4 + j] != -1)
+		
+			for (int j = 0; j < 4; j++) // Iterate icon slots
 			{
-				m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -508.0f);
-				m_elements[i * 9 + m_slotID[i * 4 + j]]->setDrawn(true);
+				if (m_slotID[i * 4 + j] != -1)
+				{
+					m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -508.0f);
+					m_elements[i * 9 + m_slotID[i * 4 + j]]->setDrawn(true);
+				}
 			}
-		}
+		
+		
 	}
 }
 
@@ -37,6 +40,10 @@ UserInterface::UserInterface(int nrOfPlayers)
 
 	m_quitGame = true;
 
+	for (int i = 0; i < 4; i++)
+	{
+		m_drawPlayer[i] = false;
+	}
 	// PLAYER 1
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -212,13 +219,33 @@ UserInterface::~UserInterface()
 	delete m_constantBufferColours;
 }
 
+void UserInterface::addPlayer(int playerIndex)
+{
+	m_drawPlayer[playerIndex] = true;
+}
+
 void UserInterface::setPlayerColours(int playerIndex, XMVECTOR colour)
 {
+	//Find actual playerIndex
+	
+
+	int reduction = 0;
+	for (int i = 0; i < playerIndex; i++)
+	{
+		if (!m_drawPlayer[i]) reduction++;
+	}
+	playerIndex -= reduction;
 	m_playerColours[playerIndex] = colour;
 }
 
 void UserInterface::setSlotID(int playerIndex, int abilityType)
 {
+	int reduction = 0;
+	for (int i = 0; i < playerIndex; i++)
+	{
+		if (!m_drawPlayer[i]) reduction++;
+	}
+	playerIndex -= reduction;
 	for (int i = 0; i < 4; i++) // Iterate slots
 	{
 		if (m_slotID[playerIndex * 4 + i] == -1) // No ability on slot
@@ -258,6 +285,13 @@ void UserInterface::setSlotID(int playerIndex, int abilityType)
 
 void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext)
 {
+	int reduction = 0;
+	for (int i = 0; i < playerIndex; i++)
+	{
+		if (!m_drawPlayer[i]) reduction++;
+	}
+	playerIndex -= reduction;
+	int oldIndex = m_slotID[playerIndex * 4 + side]; // Save old index
 	m_slotID[playerIndex * 4 + side] = abilityType; // Replace with new
 
 	int nrOfSlots = 0;
@@ -410,8 +444,10 @@ void UserInterface::draw()
 		memcpy(mappedMemory.pData, &m_playerColours[i - NR_OF_ICON_ELEMENTS], sizeof(XMVECTOR));
 		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
-		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
-		m_elements[i]->draw();
+			DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+			m_elements[i]->draw();
+		
+		
 	}
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
