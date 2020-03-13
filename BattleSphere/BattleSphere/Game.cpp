@@ -25,6 +25,11 @@ int Game::getPlayerIdIndex(int id)
 	return returnValue;
 }
 
+int Game::getNrOfPlayers() const
+{
+	return m_nrOfPlayers;
+}
+
 void Game::leavePlayerIdIndex(int id)
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)

@@ -70,6 +70,10 @@ using namespace DirectX;
 #define BEYBLADE 7 // 5
 #define ENERGY 8 // 8
 
+// UI
+#define NR_OF_ICON_SLOTS 16
+#define NR_OF_ICON_ELEMENTS 36
+
 #define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
@@ -77,6 +81,11 @@ using namespace DirectX;
 #define OBJECT_TYPES 9 // Nr of object types
 enum class objectType
 {
+	e_static_billboard_score_platform,
+	e_score_scene,
+	e_number_billboard,
+	e_static_billboard_score,
+	e_static_billboard,
 	e_extra,
 	e_drone,
 	e_weapon,
@@ -113,6 +122,7 @@ enum class stateType
 {
 	e_gameState,
 	e_mainMenu,
+	e_scoreState,
 	e_default
 };
 

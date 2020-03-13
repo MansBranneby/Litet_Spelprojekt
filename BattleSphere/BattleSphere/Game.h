@@ -46,6 +46,7 @@ public:
 	int getPlayerId(int robotNr);
 	int setPlayerIdIndex(int id);
 	int getPlayerIdIndex(int id);
+	int getNrOfPlayers() const;
 	void leavePlayerIdIndex(int id);
 	void updatePlayerStatus();
 	Robot** getRobots();

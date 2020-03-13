@@ -29,6 +29,7 @@
 #include "Game.h"
 #include "Camera.h"
 #include "LightCulling.h"
+#include "ScoreState.h"
 #include "GameState.h"
 #include "MainMenuState.h"
 #include "ShadowMapping.h"
@@ -62,6 +63,7 @@ LightCulling g_lightCulling;
 
 Transparency g_transparency;
 ShadowMapping* g_shadowMapping;
+ScoreState* g_scoreState;
 GameState* g_gameState;
 MainMenuState* g_mainMenuState;
 
@@ -333,8 +335,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		g_Clock = new Clock();
 		g_Game = new Game();
 		g_gameState = new GameState(g_Game);
+		g_scoreState = new ScoreState(g_Game);
 		g_mainMenuState = new MainMenuState();
 		g_Game->pushState(g_gameState);
+		g_Game->pushState(g_scoreState);
 		g_Game->pushState(g_mainMenuState);
 		g_Game->changeState(stateType::e_mainMenu); // Set initial state for the game
 		//g_Game->changeState(stateType::e_gameState); // Set initial state for the game
@@ -359,7 +363,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		while (WM_QUIT != msg.message)
 		{
 			g_Clock->calcDeltaTime();
-			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				if (msg.wParam == VK_ESCAPE)
 					msg.message = WM_QUIT;
@@ -384,7 +388,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				UINT32 vertexSize = sizeof(PosCol);
 				UINT32 offset = 0;
 
-				if (g_Game->isActive(stateType::e_gameState))
+				if (g_Game->isActive(stateType::e_gameState) || g_Game->isActive(stateType::e_scoreState))
 				{
 					// SHADOW MAPPING
 					ID3D11ShaderResourceView* nullSRV = nullptr;
@@ -451,7 +455,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				//// RENDER ////
 
-				if (g_Game->isActive(stateType::e_gameState))
+				if (g_Game->isActive(stateType::e_gameState) ||g_Game->isActive(stateType::e_scoreState))
 				{
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(nullptr, NULL, 0xFFFFFFFF);
 					
@@ -465,9 +469,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					for (int i = 0; i < XUSER_MAX_COUNT; i++)
 					{
-						DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 						if (Graph::getInstance()->getActive(i))
 						{
+							DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
@@ -622,6 +626,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_constantBufferMaterials;
 		delete g_mainMenuState;
 		delete g_gameState;
+		delete g_scoreState;
 		delete g_menu;
 		delete g_shadowMapping;
 		//DX::getInstance()->reportLiveObjects();

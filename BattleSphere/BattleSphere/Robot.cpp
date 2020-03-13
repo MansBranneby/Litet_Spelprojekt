@@ -406,9 +406,19 @@ void Robot::addScore(int score)
 	m_score += score;
 }
 
+void Robot::setScore(int score)
+{
+	m_score = score;
+}
+
 void Robot::resetScore()
 {
 	m_score = 0;
+}
+
+int Robot::getScore() const
+{
+	return m_score;
 }
 
 void Robot::addWeapon(int type)
@@ -502,7 +512,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
 	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
-
+	/*
 	// Particle engine flame
 	m_timeSinceParticles += dt;
 	if (m_timeSinceParticles > 0.01f)
@@ -515,6 +525,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
 		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
 	}
+	*/
 }
 
 void Robot::move(XMVECTOR dPos)

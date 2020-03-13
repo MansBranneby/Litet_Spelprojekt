@@ -2,15 +2,17 @@
 #include <DirectXMath.h>
 #include "VertexShader.h"
 #include "StructsAndEnums.h"
+#include "GameObject.h"
 
 // Class used to animate billboards
-class Billboard
+class Billboard : public GameObject
 {
 private:
 	// TYPE OF BILLBOARD
 	BillboardState m_state; // Indicates what type this billboard is, eg flasing, interpolating or translating (FIT)
 
-	// Billboard knows its own variant, modelNr and submodelNr
+	// Billboard knows its own objectType, variant, modelNr and submodelNr
+	objectType m_objectType;
 	int m_variant;
 	int m_modelNr;
 	int m_subModelNr;
@@ -38,7 +40,7 @@ private:
 public:
 	Billboard();
 	Billboard(int variant, int modelNr, int subModelNr);
-	Billboard(int variant, int modelNr, int subModelNr, BillboardData billboardData);
+	Billboard(objectType objectType, int variant, int modelNr, int subModelNr, BillboardData billboardData);
 
 	void setState(BillboardState state); 
 	void setFlashState(float flashSpeed); // Initialize flash state
@@ -52,6 +54,7 @@ public:
 	void setColourChangeSpeed(float colourChangeSpeed);
 	void setVelocityUV(DirectX::XMVECTOR velocityUV);
 
+	objectType getObjectType() const;
 	int getVariant() const;
 	int getModelNr() const;
 	int getSubModelNumber() const;

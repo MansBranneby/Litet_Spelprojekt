@@ -10,5 +10,6 @@ CollisionInfo testSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR bPos, f
 CollisionInfo testMovingSphereSphere(DirectX::XMVECTOR aPos, DirectX::XMVECTOR bPos, float aRad, float bRad, DirectX::XMVECTOR aVel, DirectX::XMVECTOR bVel);
 bool testLineLine(XMVECTOR startL1, XMVECTOR endL1, XMVECTOR startL2, XMVECTOR endL2);
 bool testLineTriangle(XMVECTOR start, XMVECTOR end, XMVECTOR triPos[3]);
+float testLineTriangleT(XMVECTOR start, XMVECTOR end, XMVECTOR triPos[3]);
 float testRayTriangle(XMVECTOR origin, XMVECTOR dir, XMVECTOR triPos[3]);
 bool testLineSphere(XMVECTOR start, XMVECTOR end, XMVECTOR spherePos, float radius);

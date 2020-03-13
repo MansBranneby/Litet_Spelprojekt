@@ -94,7 +94,7 @@ void UI_Element::initializeResources(std::wstring fileName)
 	ZeroMemory(&vertexData, sizeof(vertexData));
 	vertexData.pSysMem = m_vertexList;
 	DX::getInstance()->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	
+
 	std::wstring wName(fileName);
 	const wchar_t* wcName = wName.c_str();
 	HRESULT hr = CoInitialize(NULL);
@@ -156,14 +156,14 @@ void UI_Element::updateElement(float dt)
 	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
 	{
 
-		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt);
+		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt) && !m_animation->isResting();
 
 		updateVertexBuffer();
 	}
 	if (m_animation->isAnimated()) // Spritesheet or fading
 	{
 		m_animation->animateElement(m_vertexList, dt);
-		m_isReady = m_animation->fadeElement(m_vertexList, dt);
+		m_isReady = m_animation->fadeElement(m_vertexList, dt) && !m_animation->isResting();
 		updateVertexBuffer();
 	}
 }
@@ -201,18 +201,18 @@ float UI_Element::getPosY()
 	return m_posY;
 }
 
-void UI_Element::setPos(float posX, float posY)
+void UI_Element::setPos(float posX, float posY, float scale)
 {
-	if (m_posX != posX || m_posY != posY) // Only update if a change is made
+	if (m_posX != posX || m_posY != posY || scale != 1.0f) // Only update if a change is made
 	{
 		m_posX = posX;
 		m_posY = posY;
 
 		float left, right, top, bottom;
-		left = m_posX - m_sizeX / 2.0f;
-		right = left + m_sizeX;
-		top = m_posY + m_sizeY / 2.0f;
-		bottom = top - m_sizeY;
+		left = m_posX - m_sizeX * scale / 2.0f;
+		right = left + m_sizeX * scale;
+		top = m_posY + m_sizeY * scale / 2.0f;
+		bottom = top - m_sizeY * scale;
 
 		m_vertexList[0].posX = left;
 		m_vertexList[0].posY = top;
@@ -239,9 +239,37 @@ void UI_Element::setPos(float posX, float posY)
 	}
 }
 
+void UI_Element::setScale(float scale)
+{
+	//XMMATRIX scaleM = XMMatrixScaling(scale, scale, scale);
+	float posX = m_posX;
+	float posY = m_posY;
+
+	setPos(0.0f, 0.0f);
+
+	XMVECTOR temp;
+
+	for (int i = 0; i < 6; i++)
+	{
+		temp = XMVectorScale(XMVectorSet(m_vertexList[i].posX, m_vertexList[i].posY, m_vertexList[i].posZ, 1.0f), scale);
+		//temp = XMVectorSet(m_vertexList[i].posX, m_vertexList[i].posY, m_vertexList[i].posZ, 1.0f) * scaleM;
+		m_vertexList[i].posX = temp.m128_f32[0];
+		m_vertexList[i].posY = temp.m128_f32[1];
+		m_vertexList[i].posZ = temp.m128_f32[2];
+	}
+	
+	setPos(posX, posY, scale);
+}
+
 void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest)
 {
 	m_destinationX += deltaX;
+	m_animation->setAnimationData(speed, acceleration, delay, rest);
+}
+
+void UI_Element::setAbsDestinationX(float posX, float speed, float acceleration, float delay, float rest)
+{
+	m_destinationX = posX;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
@@ -307,6 +335,11 @@ bool UI_Element::isReady()
 void UI_Element::setSelectionTimer(float time)
 {
 	m_selectionTimer = time;
+}
+
+bool UI_Element::isResting()
+{
+	return m_animation->isResting();
 }
 
 ConstantBuffer* UI_Element::getConstantBuffer()
