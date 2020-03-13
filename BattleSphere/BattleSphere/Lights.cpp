@@ -41,6 +41,15 @@ Lights* Lights::getInstance()
 	return m_instance;
 }
 
+void Lights::releaseInstance()
+{
+	if (m_instance != NULL)
+	{
+		delete m_instance;
+		m_instance = NULL;
+	}
+}
+
 LightData* Lights::getLights()
 {
 	return m_lights;

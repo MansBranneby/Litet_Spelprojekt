@@ -26,14 +26,32 @@ enum class ActiveMainMenu
 	e_quit
 };
 
+enum class ActiveOptionsMenu
+{
+	e_resolution,
+	e_fullscreen,
+	e_music,
+	e_apply
+};
+
 class MainMenuState : public State
 {
 private:
 	std::vector<UI_Element*> m_uiElements;
+	std::vector<UI_Element*> m_optionElements;
+	std::vector<UI_Element*> m_resolutionElements;
+	std::vector<XMFLOAT2> m_resolutions;
+	bool m_fullscreen;
+	bool m_musicOn;
+	int m_selectedResIndex;
+	bool m_originalFullscreenSetting;
+	XMFLOAT2 m_originalResolutionSetting;
+
 	UI_Element* m_botElements[4];
 	UI_Element* m_startElement;
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
+	ActiveOptionsMenu m_optionsMenu;
 	
 	int m_readyState[XUSER_MAX_COUNT];
 	float m_selectionTimer;
@@ -42,6 +60,8 @@ private:
 
 	bool handleInputs(Game* game, float dt);
 	void changeColour(Game* game, int i, bool dir);
+	void adjustElementsForScreen();
+
 	void leaveColour(int robotNr);
 public:
 	MainMenuState();
