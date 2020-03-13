@@ -381,7 +381,7 @@ void GameState::handleInputs(Game* game, float dt)
 					{
 						m_devZoomOut = true;
 					}
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && m_devZoomOut)
+					else if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && m_devZoomOut)
 					{
 						m_devZoomOut = false;
 					}
@@ -1260,53 +1260,6 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
 	{
-		// Scene (Background objects without collision)
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
-			game->getPreLoader()->draw(objectType::e_scene, i);
-
-		game->getPreLoader()->draw(objectType::e_BSPD_Door, m_spawnDrone->getData(4));
-
-		//Static
-		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
-			game->getPreLoader()->draw(objectType::e_static, i);
-
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
-		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
-		}
-
-		// Tokyo drift
-		for (int i = 0; i < OBJECT_NR_1; i++)
-		{
-			if (m_dboHandler->isDrawn(i))
-				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
-		}
-
-		// Projectiles
-		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-		{
-			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
-			{
-				if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
-					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
-				else if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
-				{
-					objectData xd = ProjectileBank::getInstance()->getList()[i]->getData();
-					xd.material.ambient = XMVectorSet(-1, -1, -1, 3.0f);
-					xd.material.emission = XMVectorSet(-1, -1, -1, 0.15f);
-					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 1, 2);
-					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, xd, 0, 2);
-				}
-				else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
-					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
-			}
-		}
-
 		// Robot stuff
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -1372,6 +1325,53 @@ void GameState::draw(Game* game, renderPass pass)
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
 				m_lineShots.draw(i);
+			}
+		}
+
+		// Scene (Background objects without collision)
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
+			game->getPreLoader()->draw(objectType::e_scene, i);
+
+		game->getPreLoader()->draw(objectType::e_BSPD_Door, m_spawnDrone->getData(4));
+
+		//Static
+		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_static); i++)
+			game->getPreLoader()->draw(objectType::e_static, i);
+
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(), 0);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(0), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
+		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+
+		// Tokyo drift
+		for (int i = 0; i < OBJECT_NR_1; i++)
+		{
+			if (m_dboHandler->isDrawn(i))
+				game->getPreLoader()->draw(objectType::e_extra, m_dboHandler->getData(i));
+		}
+
+		// Projectiles
+		for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+		{
+			for (int i = 0; i < ProjectileBank::getInstance()->getList().size(); i++)
+			{
+				if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && ProjectileBank::getInstance()->getList()[i]->isExploding() && pass != renderPass::e_shadow)
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 0, 1);
+				else if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY && !ProjectileBank::getInstance()->getList()[i]->isExploding())
+				{
+					objectData xd = ProjectileBank::getInstance()->getList()[i]->getData();
+					xd.material.ambient = XMVectorSet(-1, -1, -1, 3.0f);
+					xd.material.emission = XMVectorSet(-1, -1, -1, 0.15f);
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 1, 2);
+					game->getPreLoader()->drawOneModelAndMat(objectType::e_projectile, xd, 0, 2);
+				}
+				else if (ProjectileBank::getInstance()->getList()[i]->getType() != ENERGY || pass != renderPass::e_shadow)
+					game->getPreLoader()->draw(objectType::e_projectile, ProjectileBank::getInstance()->getList()[i]->getData(), 0, 1);
 			}
 		}
 	}
