@@ -56,6 +56,7 @@ public:
 	~UI_Element();
 
 	void adjustForScreen();
+	void updateVertexList();
 	void updateElement(float dt);
 	void updateVertexBuffer();
 	void draw();

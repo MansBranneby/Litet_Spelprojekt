@@ -55,6 +55,8 @@ MainMenuState::MainMenuState()
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -144.0f, 79.0f, 42.0f));
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_apply.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_applyG.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_off.png", false, 300.0f, -288.0f, 117.0f, 42.0f));
+	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -288.0f, 79.0f, 42.0f));
 
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_800x600.png", false, 300.0f, 0.0f, 244.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1366x768.png", false, 300.0f, 0.0f, 260.0f, 42.0f));
@@ -70,8 +72,10 @@ MainMenuState::MainMenuState()
 	m_resolutions.push_back({ 3840.0f, 2160.0f });
 	m_resolutions.push_back({ 7680.0f, 4320.0f });
 
-	m_fullscreen = false;
+	m_originalFullscreenSetting = m_fullscreen = false;
+	m_musicOn = true;
 	m_selectedResIndex = 2;
+	m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
 	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
 	{
 		m_resolutionElements[i]->setDrawn(true);
@@ -133,6 +137,10 @@ bool MainMenuState::hi_mainMenu(Game* game)
 			m_optionElements[4]->setDrawn(true);
 			m_optionElements[4]->fadeIn(0.5f, 0.5f);
 			m_optionElements[5]->setDrawn(true);
+			m_optionElements[6]->setDrawn(true);
+			m_optionElements[6]->fadeOut(0.0f, 0.0f);
+			m_optionElements[7]->setDrawn(true);
+			m_optionElements[7]->fadeIn(0.5f, 0.5f);
 
 			m_resolutionElements[m_selectedResIndex]->fadeIn(0.5f, 0.5f);
 
@@ -436,6 +444,29 @@ void MainMenuState::hi_options(Game* game)
 			m_optionsMenu = ActiveOptionsMenu::e_fullscreen;
 		}
 
+		else if (
+			m_optionElements[1]->isReady() &&
+			m_optionElements[6]->isReady() &&
+			m_optionElements[7]->isReady() &&
+			!game->getInput()->isBlocked(j) &&
+			abs(game->getInput()->getThumbLX(j)) > 0.4f &&
+			m_optionsMenu == ActiveOptionsMenu::e_music
+			)
+		{
+			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
+			m_musicOn = !m_musicOn;
+			if (m_musicOn)
+			{
+				m_optionElements[6]->fadeOut(0.15f, 0.0f);
+				m_optionElements[7]->fadeIn(0.15f, 0.15f);
+			}
+			else
+			{
+				m_optionElements[7]->fadeOut(0.15f, 0.0f);
+				m_optionElements[6]->fadeIn(0.15f, 0.15f);
+			}
+		}
+
 		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_music)
 		{
 			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
@@ -458,15 +489,47 @@ void MainMenuState::hi_options(Game* game)
 
 		else if (m_optionElements[1]->isReady() && game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(j) && m_optionsMenu == ActiveOptionsMenu::e_apply)
 		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			DX::getInstance()->setScreen
-			(
-				m_fullscreen, 
-				m_resolutions[m_selectedResIndex].x,
-				m_resolutions[m_selectedResIndex].y
-			);
-			
-			adjustElementsForScreen();
+			game->getInput()->setBlocked(j, true);
+			bool musicChanged = false;
+			bool resolutionChanged = false;
+
+			if (m_musicOn != Sound::getInstance()->musicIsOn())
+			{
+				if (m_musicOn)
+				{
+					Sound::getInstance()->toggleMusic();
+					Sound::getInstance()->play(soundMusic::e_game, 0.01f);
+				}
+				else
+				{
+					Sound::getInstance()->toggleMusic();
+					Sound::getInstance()->stop(soundMusic::e_game);
+					Sound::getInstance()->stop(soundMusic::e_menu);
+				}
+				musicChanged = true;
+			}
+
+			if (
+				m_fullscreen != m_originalFullscreenSetting ||
+				m_originalResolutionSetting.x != m_resolutions[m_selectedResIndex].x ||
+				m_originalResolutionSetting.y != m_resolutions[m_selectedResIndex].y
+				)
+			{
+				DX::getInstance()->setScreen
+				(
+					m_fullscreen,
+					m_resolutions[m_selectedResIndex].x,
+					m_resolutions[m_selectedResIndex].y
+				);
+
+				adjustElementsForScreen();
+				resolutionChanged = true;
+				m_originalFullscreenSetting = m_fullscreen;
+				m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
+			}
+
+			if (musicChanged || resolutionChanged)
+				Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 		}
 
 		else if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(j))
@@ -565,7 +628,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 
 void MainMenuState::u_options(Game* game, float dt)
 {
-	for (int i = 1; i < (int)m_uiElements.size(); i++)
+	for (int i = 0; i < (int)m_uiElements.size(); i++)
 		m_uiElements[i]->updateElement(dt);
 	for (int i = 0; i < (int)m_optionElements.size(); i++)
 		m_optionElements[i]->updateElement(dt);

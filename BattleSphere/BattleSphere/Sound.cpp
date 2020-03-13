@@ -6,9 +6,9 @@ Sound::Sound()
 {
 	// TODO: ADD SUSPEND AND RESUME
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
-	#endif
+#endif
 	m_audEngine = std::make_unique<AudioEngine>(eflags);
 
 	m_listener.SetPosition(XMVectorSet(0, 0, 0, 0));
@@ -45,6 +45,7 @@ Sound::Sound()
 
 
 	m_index = 0;
+	m_musicOn = true;
 }
 
 Sound* Sound::getInstance()
@@ -64,11 +65,14 @@ void Sound::play(soundUI sound, float volume, float pitch, float pan)
 
 void Sound::play(soundMusic sound, float volume, float pitch, float pan)
 {
-	m_musicInstances[(int)sound]->SetVolume(volume);
-	m_musicInstances[(int)sound]->SetPitch(pitch);
-	m_musicInstances[(int)sound]->SetPan(pan);
+	if (m_musicOn)
+	{
+		m_musicInstances[(int)sound]->SetVolume(volume);
+		m_musicInstances[(int)sound]->SetPitch(pitch);
+		m_musicInstances[(int)sound]->SetPan(pan);
 
-	m_musicInstances[(int)sound]->Play(true);
+		m_musicInstances[(int)sound]->Play(true);
+	}
 }
 
 void Sound::play(soundAmbient sound, float volume, float pitch, float pan)
@@ -89,7 +93,7 @@ void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float falloff, 
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, falloff));
-		//emitter.SetPosition(pos);
+	//emitter.SetPosition(pos);
 
 	m_ambientInstances[(int)sound]->SetVolume(volume);
 	m_ambientInstances[(int)sound]->SetPitch(pitch);
@@ -108,7 +112,7 @@ void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, flo
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.4f));
-		//m_emitter.SetPosition(pos);
+	//m_emitter.SetPosition(pos);
 
 	m_effectInstances[m_index]->SetVolume(volume);
 	m_effectInstances[m_index]->SetPitch(pitch);
@@ -127,7 +131,20 @@ void Sound::stop(soundAmbient sound)
 
 void Sound::stop(soundMusic sound)
 {
-	m_musicInstances[(int)sound]->Stop(true);
+	if (!m_musicOn)
+	{
+		m_musicInstances[(int)sound]->Stop(true);
+	}
+}
+
+void Sound::toggleMusic()
+{
+	m_musicOn = !m_musicOn;
+}
+
+bool Sound::musicIsOn()
+{
+	return m_musicOn;
 }
 
 void Sound::update(float dt)

@@ -233,9 +233,9 @@ void GameState::handleInputs(Game* game, float dt)
 									if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 									{
 										m_input->setVibration(j, 1.0f);
+										int resourceIndex = m_robots[j]->getResourceIndex();
 										m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
 
-										int resourceIndex = m_robots[j]->getResourceIndex();
 										if (resourceIndex != -1)
 										{
 											m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
@@ -273,9 +273,9 @@ void GameState::handleInputs(Game* game, float dt)
 									if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 									{
 										m_input->setVibration(j, 1.0f);
+										int resourceIndex = m_robots[j]->getResourceIndex();
 										m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
 
-										int resourceIndex = m_robots[j]->getResourceIndex();
 										if (resourceIndex != -1)
 										{
 											m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());

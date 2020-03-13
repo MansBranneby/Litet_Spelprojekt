@@ -42,7 +42,10 @@ private:
 	std::vector<UI_Element*> m_resolutionElements;
 	std::vector<XMFLOAT2> m_resolutions;
 	bool m_fullscreen;
+	bool m_musicOn;
 	int m_selectedResIndex;
+	bool m_originalFullscreenSetting;
+	XMFLOAT2 m_originalResolutionSetting;
 
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;

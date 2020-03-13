@@ -63,6 +63,8 @@ private:
 	Sound();
 	static Sound* m_instance;
 
+	bool m_musicOn;
+
 	std::unique_ptr<AudioEngine> m_audEngine;
 
 	XMVECTOR m_listenerPos;
@@ -90,6 +92,9 @@ public:
 
 	void stop(soundAmbient sound);
 	void stop(soundMusic sound);
+
+	void toggleMusic();
+	bool musicIsOn();
 
 	void update(float dt);
 
