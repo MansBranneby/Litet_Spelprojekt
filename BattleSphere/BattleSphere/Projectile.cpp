@@ -29,7 +29,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	}
 	else if (type == ENERGY)
 	{
-		m_velocity = 40.0f;
+		m_velocity = 60.0f;
 		setScale(2.0f, 2.0f, 2.0f);
 		m_material.emission = XMVectorSet(0, 0, 0, -1);
 		m_material.specular = XMVectorSet(0, 0, 0, -1);
