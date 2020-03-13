@@ -2,6 +2,10 @@
 
 void Menu::initializeResources()
 {
+	HRESULT hr = CoInitialize(NULL);
+	hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), L"Textures\\loadingScreen.png", NULL, &m_loadingScreenSRV);
+	if (FAILED(hr))
+		MessageBox(NULL, L"Error in m_loadingScreenSRV", L"Error", MB_OK | MB_ICONERROR);
 }
 
 Menu::Menu()
@@ -14,6 +18,7 @@ Menu::Menu()
 	m_pixelShader = new PixelShader(L"PixelShaderMenu.hlsl");
 	m_pixelShaderAni = new PixelShader(L"PixelShaderUIAni.hlsl");
 	m_pixelShaderUI = new PixelShader(L"PixelShaderUserInterface.hlsl");
+	m_pixelShaderLoadingScreen = new PixelShader(L"PixelShaderLoadingScreen.hlsl");
 
 	initializeResources();
 }
@@ -27,12 +32,15 @@ Menu::~Menu()
 	m_pixelShader->release();
 	m_pixelShaderAni->release();
 	m_pixelShaderUI->release();
-//	m_depthState->Release();
+	m_pixelShaderLoadingScreen->release();
+	
+	m_loadingScreenSRV->Release();
 
 	delete m_vertexShader;
 	delete m_pixelShader;
 	delete m_pixelShaderAni;
 	delete m_pixelShaderUI;
+	delete m_pixelShaderLoadingScreen;
 }
 
 //ID3D11DepthStencilState* Menu::getDepthStencilState()
@@ -59,6 +67,13 @@ PixelShader* Menu::getPixelShader(int index)
 		return m_pixelShader;
 	else if (index == 1)
 		return m_pixelShaderAni;
-	else
+	else if (index == 2)
 		return m_pixelShaderUI;
+	else
+		return m_pixelShaderLoadingScreen;
+}
+
+void Menu::setLoadingScreenSRV()
+{
+	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &m_loadingScreenSRV);
 }
