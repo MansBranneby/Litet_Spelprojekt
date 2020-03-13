@@ -4,7 +4,7 @@
 #include "ConstantBuffer.h"
 
 #define PLAYER_BG_PAD 110.4f
-#define PLAYER_BG_H 86.0f
+#define PLAYER_BG_H 115.0f
 #define PLAYER_BG_W 342.0f
 #define ICON_PAD 20.0f
 
@@ -14,6 +14,7 @@ private:
 	std::vector<UI_Element*> m_elements;
 	std::vector<UI_Element*> m_countDownElements;
 	std::vector<UI_Element*> m_quitGameElements;
+	std::vector<UI_Element*> m_healthBarElements;
 	int m_nrOfPlayers;
 
 	ConstantBuffer* m_constantBufferColours;
@@ -41,6 +42,7 @@ public:
 	void quitGameHI(int dir);
 	void draw();
 	void drawAbility(int playerIndex, int abilityType, float cd);
+	void drawHealthbar(int playerIndex, float hp);
 	void drawQuitGame();
 
 	bool getQuitGame();
