@@ -72,8 +72,9 @@ void LightCulling::createLightData()
 	/*Create lightgrid texture*/
 	D3D11_TEXTURE2D_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(texDesc));
-	texDesc.Width = (UINT)DX::getInstance()->getWidth() / 32;
-	texDesc.Height = (UINT)DX::getInstance()->getHeight() / 32;
+	
+	texDesc.Width = (UINT)ceilf(DX::getInstance()->getWidth() / 32);
+	texDesc.Height = (UINT)ceilf(DX::getInstance()->getHeight() / 32);
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = DXGI_FORMAT_R32G32_UINT;

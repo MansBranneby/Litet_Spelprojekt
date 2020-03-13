@@ -175,18 +175,22 @@ void GameState::handleMovement(Game* game, float dt, int id)
 		robLookAt = XMVector3Normalize(robLookAt);
 
 	// Save velocity for collision
-	m_robots[id]->setVel(robLookAt *
-		m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
+	if (!m_robots[id]->isAi())
+	{
+		m_robots[id]->setVel(robLookAt *
+			m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
 
 	// Robot and weapon movement
-	m_robots[id]->move(m_robots[id]->getVel());
+		m_robots[id]->move(m_robots[id]->getVel());
 
-	// Rotation
-	if (abs(m_input->getThumbRX(id)) > 0.1f || abs(m_input->getThumbRY(id)) > 0.1f)
-	{
-		m_robots[id]->setCurrentRot(XMConvertToDegrees(atan2(m_input->getThumbRX(id), m_input->getThumbRY(id))));
+		// Rotation
 
-		m_robots[id]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
+		if (abs(m_input->getThumbRX(id)) > 0.1f || abs(m_input->getThumbRY(id)) > 0.1f)
+		{
+			m_robots[id]->setCurrentRot(XMConvertToDegrees(atan2(m_input->getThumbRX(id), m_input->getThumbRY(id))));
+
+			m_robots[id]->setRotation(0, 1, 0, m_robots[id]->getCurrentRot());
+		}
 	}
 
 	// Resource movement
@@ -199,7 +203,7 @@ void GameState::handleInputs(Game* game, float dt)
 	// Unblock player inputs
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && game->getInput()->getThumbLX(i) < 0.2f && game->getInput()->getThumbLX(i) > -0.2f)
+		if (!game->getInput()->isPressed(i, XINPUT_GAMEPAD_A) && !game->getInput()->isPressed(i, XINPUT_GAMEPAD_START) && game->getInput()->getThumbLX(i) < 0.2f && game->getInput()->getThumbLX(i) > -0.2f)
 			game->getInput()->setBlocked(i, false);
 	}
 
@@ -209,14 +213,15 @@ void GameState::handleInputs(Game* game, float dt)
 		{
 			if (game->getRobots()[i] != nullptr)
 			{
-				if (!m_input->refresh(i, dt))
+
+				if (!m_input->refresh(i, dt) && !m_robots[i]->isAi())
 				{
 					m_input->reconnectController(i);
 				}
 				else if (game->getRobots()[i]->isDrawn())
 				{
 					// Use weapon
-					if (m_input->getTriggerR(i) > 0.2)
+					if (m_input->getTriggerR(i) > 0.2 && !m_robots[i]->isAi())
 					{
 						// dumb stuff for sniper
 						XMVECTOR start = XMVectorSet(0, 0, 0, 0);
@@ -239,7 +244,8 @@ void GameState::handleInputs(Game* game, float dt)
 									XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 									if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 									{
-										m_input->setVibration(j, 1.0f);
+										if (!m_robots[j]->isAi())
+											m_input->setVibration(j, 1.0f);
 										m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
 
 										int resourceIndex = m_robots[j]->getResourceIndex();
@@ -253,16 +259,16 @@ void GameState::handleInputs(Game* game, float dt)
 							}
 						}
 
-						m_robots[i]->useWeapon(RIGHT, dt);
-					}
-					if (m_input->getTriggerL(i) > 0.2)
+					m_robots[i]->useWeapon(RIGHT, dt);
+				}
+				if (m_input->getTriggerL(i) > 0.2 && !m_robots[i]->isAi())
+				{
+					// dumb stuff for sniper
+					XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+					XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+					if (m_robots[i]->getCurrentWeapon(LEFT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
+						m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getReady())
 					{
-						// dumb stuff for sniper
-						XMVECTOR start = XMVectorSet(0, 0, 0, 0);
-						XMVECTOR end = XMVectorSet(0, 0, 0, 0);
-						if (m_robots[i]->getCurrentWeapon(LEFT) != -1 && m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
-							m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getReady())
-						{
 
 							m_robots[i]->getSniperLine(LEFT, start, end);
 							m_lineShots.updateLineStatus(i, start, end, true, dt);
@@ -279,7 +285,8 @@ void GameState::handleInputs(Game* game, float dt)
 									XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 									if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 									{
-										m_input->setVibration(j, 1.0f);
+										if (!m_robots[j]->isAi())
+											m_input->setVibration(j, 1.0f);
 										m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
 
 										int resourceIndex = m_robots[j]->getResourceIndex();
@@ -327,34 +334,34 @@ void GameState::handleInputs(Game* game, float dt)
 						}
 					}
 
-					// Turn in resources
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
+				// Turn in resources
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_A) ||  m_robots[i]->isAi())
+				{
+					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
-						for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
+						std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
+						bool collision = false;
+						for (int k = 0; k < cm.size(); k += 3)
 						{
-							std::vector<XMFLOAT3> cm = game->getPreLoader()->getCollisionMesh(objectType::e_node, j);
-							bool collision = false;
-							for (int k = 0; k < cm.size(); k += 3)
+							unsigned int ind1 = k + 1;
+							unsigned int ind2 = k + 2;
+							if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x,
+								XMVECTOR{ cm[k].x, cm[k].y, cm[k].z },
+								XMVECTOR{ cm[ind1].x, cm[ind1].y, cm[ind1].z },
+								XMVECTOR{ cm[ind2].x, cm[ind2].y, cm[ind2].z }).m_colliding)
 							{
-								unsigned int ind1 = k + 1;
-								unsigned int ind2 = k + 2;
-								if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x,
-									XMVECTOR{ cm[k].x, cm[k].y, cm[k].z },
-									XMVECTOR{ cm[ind1].x, cm[ind1].y, cm[ind1].z },
-									XMVECTOR{ cm[ind2].x, cm[ind2].y, cm[ind2].z }).m_colliding)
-								{
-									collision = true;
-									break;
-								}
+								collision = true;
+								break;
 							}
-							if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+						}
+						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+						{
+							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 							{
-								if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
-								{
-									// Update user interface with new ability
-									m_userInterface->setSlotID(i, m_resources[m_robots[i]->getResourceIndex()]->getType());
-								}
-								Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
+								// Update user interface with new ability
+								m_userInterface->setSlotID(m_robots[i]->getRobotID(), m_resources[m_robots[i]->getResourceIndex()]->getType());
+							}
+							Sound::getInstance()->play(soundEffect::e_turnin, m_robots[i]->getPosition(), 0.4f);
 
 								for (int k = 0; k < XUSER_MAX_COUNT; k++)
 								{
@@ -381,7 +388,7 @@ void GameState::handleInputs(Game* game, float dt)
 					{
 						m_devZoomOut = true;
 					}
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && m_devZoomOut)
+					else if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && m_devZoomOut)
 					{
 						m_devZoomOut = false;
 					}
@@ -432,7 +439,7 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 
 				// Quit Game
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_START))
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_START) && !m_input->isBlocked(i))
 				{
 					m_quitGame = true;
 					break;
@@ -692,16 +699,51 @@ void GameState::firstTimeSetUp(Game* game)
 			nrOfPlayers++;
 	}
 	m_userInterface = new UserInterface(nrOfPlayers);  // Create user interface
-
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			m_userInterface->setPlayerColours(i, m_robots[i]->getColour());
+			m_userInterface->addPlayer(m_robots[i]->getRobotID());
+		}
+	}
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+		{
+			m_userInterface->setPlayerColours(m_robots[i]->getRobotID(), m_robots[i]->getColour());
 			m_lineShots.setColour(i, m_robots[i]->getColour());
 		}
 	}
+	//Spawn AI:s
+	const XMVECTOR ROBOT_START_POS[4]
+	{
+		XMVectorSet(-85.0f, 2.0f, 50.0f, 0),
+		XMVectorSet(100.0f, 2.0f, -50.0f, 0),
+		XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
+		XMVectorSet(120.0f, 2.0f, 50.0f, 0)
+	};
+	/*for (int i = 1; i < 4; i++)
+	{
+		m_robots[i] = new Robot(i);
+		m_robots[i]->setColour(1, 0, 0);
+		m_robots[i]->setDrawn(true);
+
+		m_robots[i]->setAi(true);
+		m_robots[i]->setPosition(ROBOT_START_POS[i]);
+		m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
+	}*/
+
+	//m_robots[0]->setPosition(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
+
+
+
+
+
+
 }
+
+
+
 
 void GameState::handleInput(Game* game)
 {
@@ -720,7 +762,7 @@ bool GameState::update(Game* game, float dt)
 	m_robots = game->getRobots();
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
-
+	m_robots[3];
 	// Update sounds
 	Sound::getInstance()->update(dt);
 
@@ -735,6 +777,211 @@ bool GameState::update(Game* game, float dt)
 
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
+	for (int j = 0; j < 4; j++)
+	{
+		if (m_robots[j] != nullptr && m_robots[j]->isDrawn() && m_robots[j]->isAi())
+		{
+			XMVECTOR closestDelta = m_robots[j]->getAIRotation();
+			float closestDistance = 10000;
+			int closestIndex = -1;
+			XMFLOAT2 playerPos;
+
+			playerPos.x = m_robots[j]->getPosition().m128_f32[0];
+			playerPos.y = m_robots[j]->getPosition().m128_f32[2];
+
+			bool findPlayer = false;
+			//Look at closest player
+			for (int i = 0; i < 4; i++)
+			{
+				if (i != j && m_robots[i] != nullptr && m_robots[i]->isDrawn())
+				{
+					XMFLOAT2 opponentPos;
+					opponentPos.x = m_robots[i]->getPosition().m128_f32[0];
+					opponentPos.y = m_robots[i]->getPosition().m128_f32[2];
+					XMVECTOR robotPos = XMVectorSet(playerPos.x, 2.0f, playerPos.y, 0.0f);
+					XMVECTOR delta = m_robots[i]->getPosition() - robotPos;
+					float distance = XMVectorGetX(XMVector3Length(delta));
+					if (distance < closestDistance && !game->getQuadtree()->testCollision(playerPos, opponentPos, 3.4f))
+					{
+						findPlayer = true;
+						closestDistance = distance;
+						closestDelta = delta;
+						closestIndex = i;
+					}
+				}
+			}
+			XMVECTOR norDelta = XMVector3Normalize(closestDelta);
+			float degree = m_robots[j]->getCurrentRot();
+			float newDegree = XMConvertToDegrees(atan2(XMVectorGetX(norDelta), XMVectorGetZ(norDelta)));
+			float difference = abs(newDegree - degree);
+			if (difference > 180)
+			{
+				// We need to add on to one of the values.
+				if (newDegree > degree)
+				{
+					// We'll add it on to start...
+					degree += 360;
+				}
+				else
+				{
+					// Add it on to end.
+					newDegree += 360;
+				}
+			}
+
+			// Interpolate it.
+			float value = (degree + ((newDegree - degree) * 0.3f));
+
+			// Wrap it..
+			float rangeZero = 360;
+			value = fmod(value, rangeZero);
+			m_robots[j]->setCurrentRot(value);
+			m_robots[j]->setRotation(0, 1, 0, value);
+			float closest = 10000;
+			int closestNode = -1;
+			if (m_robots[j]->getResourceIndex() != -1)
+			{
+				for (int i = 0; i < m_nodes.size(); i++)
+				{
+					if (m_nodes[i]->isType(m_resources[m_robots[j]->getResourceIndex()]->getType()) && XMVectorGetX(XMVector3Length(Graph::getInstance()->getNodePos(i) - m_robots[j]->getPosition())) < closest)
+					{
+						closest = XMVectorGetX(XMVector3Length(Graph::getInstance()->getNodePos(i) - m_robots[j]->getPosition()));
+						closestNode = i;
+					}
+				}
+				if (closestNode != -1)
+					m_robots[j]->setAIGoal(Graph::getInstance()->getNodePos(closestNode), m_updateMission);
+			}
+			else
+			{
+				if (closestDistance < 100 &&
+					((m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE) ||
+					(m_robots[j]->getCurrentWeapon(LEFT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)))
+				{
+					m_robots[j]->setAIGoal(m_robots[j]->getPosition() + closestDelta, true);
+				}
+				else if (closestDistance < 100 &&
+					(m_robots[j]->getHealth() < 50 ||
+					(m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == SNIPER) ||
+						(m_robots[j]->getCurrentWeapon(LEFT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType() == SNIPER) ||
+						(m_robots[closestIndex]->getCurrentWeapon(RIGHT) != -1 && m_robots[closestIndex]->getWeapons()[m_robots[closestIndex]->getCurrentWeapon(RIGHT)]->getType() == BEYBLADE) ||
+						(m_robots[closestIndex]->getCurrentWeapon(LEFT) != -1 && m_robots[closestIndex]->getWeapons()[m_robots[closestIndex]->getCurrentWeapon(LEFT)]->getType() == BEYBLADE)
+						))
+				{
+
+					m_robots[j]->setAIGoal(m_robots[j]->getPosition() - XMVector3Normalize(closestDelta) * 15, true);
+				}
+				else if (closestIndex != -1 && m_robots[closestIndex]->getResourceIndex() != -1)
+				{
+					m_robots[j]->setAIGoal(m_robots[closestIndex]->getPosition(), true);
+				}
+				else
+				{
+					int tierList[9] = { 2, 7, 4, 1, 5, 0, 6, 3, 8 };
+					float highestResource = -10000;
+					int highestIndex = -1;
+					for (int i = 0; i < m_resources.size(); i++)
+					{
+						//if (!m_resources[i]->isBlocked())
+						{
+							float distance = XMVectorGetX(XMVector3Length(m_robots[j]->getPosition() - m_resources[i]->getPosition()));
+							if (tierList[m_resources[i]->getType()] / (distance / 30) - (50 * m_resources[i]->isBlocked()) > highestResource)
+							{
+								highestResource = tierList[m_resources[i]->getType()] / (distance / 30) - (50 * m_resources[i]->isBlocked());
+								highestIndex = i;
+							}
+						}
+					}
+					if (highestIndex != -1)
+						m_robots[j]->setAIGoal(m_resources[highestIndex]->getPosition(), m_updateMission);
+					else
+					{
+						/* Hunt player*/
+						float closestPlayer = 10000;
+						int playerIndex = -1;
+						for (int i = 0; i < XUSER_MAX_COUNT; i++)
+						{
+							if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
+							{
+								float distance = XMVectorGetX(XMVector3Length(m_robots[j]->getPosition() - m_robots[i]->getPosition()));
+								if (distance < closestPlayer)
+								{
+									playerIndex = i;
+									closestPlayer = distance;
+								}
+							}
+						}
+						if (playerIndex != -1)
+							m_robots[j]->setAIGoal(m_robots[playerIndex]->getPosition(), m_updateMission);
+					}
+				}
+			}
+			XMVECTOR start = XMVectorSet(0, 0, 0, 0);
+			XMVECTOR end = XMVectorSet(0, 0, 0, 0);
+			m_robots[j]->updateAIWeapon(findPlayer);
+			//update ui
+			if (m_robots[j]->getCurrentWeapon(LEFT) != -1)
+			{
+				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType();
+				m_userInterface->setSlotID(m_robots[j]->getRobotID(), type, LEFT, m_robots[j]->getNextWeapon(), m_robots[j]->getNextNextWeapon());
+
+				if (findPlayer || type == MOVEMENT || type == DASH)
+				{
+					if (m_robots[j]->getCurrentWeapon(LEFT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType() == SNIPER &&
+						m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getReady())
+					{
+						m_robots[j]->getSniperLine(LEFT, start, end);
+						m_lineShots.updateLineStatus(j, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int i = 0; i < 4; i++)
+						{
+							if (i != j && m_robots[i] != nullptr && m_robots[i]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[i]->getPosition(), robotBD.halfWD.x))
+								{
+									if (!m_robots[i]->isAi())
+										m_input->setVibration(i, 0.5f);
+									m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+					m_robots[j]->useWeapon(LEFT, dt);
+				}
+			}
+
+			if (m_robots[j]->getCurrentWeapon(RIGHT) != -1)
+			{
+				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType();
+
+				m_userInterface->setSlotID(m_robots[j]->getRobotID(), type, RIGHT, m_robots[j]->getNextWeapon(), m_robots[j]->getNextNextWeapon());
+				if (findPlayer || type == MOVEMENT || type == DASH)
+				{
+					if (m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
+						m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getReady())
+					{
+						m_robots[j]->getSniperLine(RIGHT, start, end);
+						m_lineShots.updateLineStatus(j, start, end, true, dt);
+						boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+						for (int i = 0; i < 4; i++)
+						{
+							if (i != j && m_robots[i] != nullptr && m_robots[i]->isDrawn())
+							{
+								if (testLineSphere(start, end, m_robots[i]->getPosition(), robotBD.halfWD.x))
+								{
+									if(m_robots[i]->isAi())
+										m_input->setVibration(i, 0.5f);
+									m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
+								}
+							}
+						}
+					}
+					m_robots[j]->useWeapon(RIGHT, dt);
+				}
+			}
+		}
+	}
+	m_updateMission = false;
 
 	// Projectile movement
 	ProjectileBank::getInstance()->moveProjectiles(dt);
@@ -765,6 +1012,8 @@ bool GameState::update(Game* game, float dt)
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
+		else
+			m_transparency.update(XMVectorSet(1000, 0, 1000, 0), XMMatrixIdentity(), XMMatrixIdentity(), i);
 	}
 
 	// Collision melee weapon
@@ -836,9 +1085,11 @@ bool GameState::update(Game* game, float dt)
 							// Set vibration and drop resource
 							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
 							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false, false);
-							m_input->setVibration(otherIdx, 0.5f);
+							if (!m_robots[otherIdx]->isAi())
+								m_input->setVibration(otherIdx, 0.5f);
 							if (resourceIndex != -1)
 							{
+								m_updateMission = true;
 								m_resources[resourceIndex]->setPosition(m_robots[otherIdx]->getPosition());
 								m_resources[resourceIndex]->setBlocked(false);
 							}
@@ -901,7 +1152,8 @@ bool GameState::update(Game* game, float dt)
 							{
 								int resourceIndex = m_robots[k]->getResourceIndex();
 								robots[k]->damagePlayer((ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange()))), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
-								m_input->setVibration(k, 1.0f);
+								if (!robots[k]->isAi())
+									m_input->setVibration(k, 1.0f);
 
 								if (resourceIndex != -1)
 								{
@@ -959,10 +1211,12 @@ bool GameState::update(Game* game, float dt)
 											{
 												int resourceIndex = m_robots[k]->getResourceIndex();
 												robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
-												m_input->setVibration(k, 1.0f);
+												if (!robots[k]->isAi())
+													m_input->setVibration(k, 1.0f);
 
 												if (resourceIndex != -1)
 												{
+													m_updateMission = true;
 													m_resources[resourceIndex]->setPosition(m_robots[k]->getPosition());
 													m_resources[resourceIndex]->setBlocked(false);
 												}
@@ -983,9 +1237,11 @@ bool GameState::update(Game* game, float dt)
 							int resourceIndex = m_robots[j]->getResourceIndex();
 							if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 							{
-								m_input->setVibration(j, 0.5f);
+								if (!robots[j]->isAi())
+									m_input->setVibration(j, 0.5f);
 								if (resourceIndex != -1)
 								{
+									m_updateMission = true;
 									m_resources[resourceIndex]->setPosition(m_robots[j]->getPosition());
 									m_resources[resourceIndex]->setBlocked(false);
 								}
@@ -1006,7 +1262,8 @@ bool GameState::update(Game* game, float dt)
 
 	for (int i = 0; i < m_nodes.size(); i++)
 	{
-		m_nodes[i]->updateTime(dt);
+		if (m_nodes[i]->updateTime(dt))
+			m_updateMission = true;
 	}
 
 	// Blade runner lights
@@ -1081,7 +1338,7 @@ void GameState::draw(Game* game, renderPass pass)
 					int size = (int)m_robots[i]->getWeapons().size();
 					for (int j = 0; j < size; j++)
 					{
-						m_userInterface->drawAbility(i, m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+						m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
 					}
 				}
 			}
@@ -1094,6 +1351,11 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
 	{
+		for (int i = 0; i < m_nodes.size(); i++)
+		{
+			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
+		}
+
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
@@ -1260,6 +1522,7 @@ void GameState::draw(Game* game, renderPass pass)
 
 	if (pass == renderPass::e_transparent || pass == renderPass::e_shadow)
 	{
+		m_transparency.bindConstantBuffer();
 		// Scene (Background objects without collision)
 		for (int i = 0; i < game->getPreLoader()->getNrOfVariants(objectType::e_scene); i++)
 			game->getPreLoader()->draw(objectType::e_scene, i);
@@ -1275,10 +1538,6 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		for (int i = 0; i < m_nodes.size(); i++)
-		{
-			game->getPreLoader()->draw(objectType::e_node, m_nodes[i]->getData(), i, 0);
-		}
 
 		// Tokyo drift
 		for (int i = 0; i < OBJECT_NR_1; i++)

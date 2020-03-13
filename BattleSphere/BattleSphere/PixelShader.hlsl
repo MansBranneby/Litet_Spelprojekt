@@ -145,6 +145,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	fragmentCol = Ia * Kd; // * Ia
 	for (unsigned int i = startOffset; i < startOffset + lightCount; i++)
 	{
+		
 	
 		Light light = Lights[LightIndex[i]];
 		float4 lightPos = light.Position;
@@ -299,6 +300,7 @@ float4 PS_main(PS_IN input) : SV_Target
 
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		fragmentCol = Ke;
+
 	if (KeIn.w > 0.8f)
 	{
 

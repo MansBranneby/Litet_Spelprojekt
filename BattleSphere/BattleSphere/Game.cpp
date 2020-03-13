@@ -46,6 +46,7 @@ void Game::updatePlayerStatus()
 		if (m_robots[i] == nullptr && m_input.getId(i) != -1)
 		{
 			Robot* robot = new Robot(i);
+			robot->setPosition(XMVectorSet(-1000, 0, 0, 1));
 			m_robots[i] = robot;
 			m_nrOfPlayers++;
 		}
@@ -154,6 +155,11 @@ bool Game::isActive(stateType state)
 		}
 	}
 	return false;
+}
+
+int Game::getPlayerId(int robotNr)
+{
+	return m_playerId[robotNr];
 }
 
 void Game::release()

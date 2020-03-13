@@ -137,6 +137,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\Scenery", "SceneryColl");
 	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
 	loadFromFile(objectType::e_static, "OnMap\\ChinaTown", "ChinaTownColl");
+	loadFromFile(objectType::e_static, "OnMap\\Apartment", "ApartmentsColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 	loadFromFile(objectType::e_static, "OnMap\\NodeGoldenDuck", "NodeGoldenDuckColl");
@@ -158,7 +159,6 @@ PreLoader::PreLoader()
 	//ObjectType::e_static_billboard_score
 
 	// Background
-	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
 	loadFromFile(objectType::e_ground, "Background\\Ground");

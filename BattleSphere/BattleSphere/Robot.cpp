@@ -2,6 +2,10 @@
 
 Robot::Robot(int playerId)
 {
+	m_currentMission.index = 0;
+	m_currentMission.pos = getPosition();
+	m_isAi = false;
+	m_robotID = -1;
 	m_playerId = playerId;
 	m_health = 100;
 	m_velocity = 45.0f;
@@ -39,11 +43,136 @@ Robot::Robot(int playerId)
 
 	// Particles
 	m_timeSinceParticles = 0.0f;
+
+	
+	
+}
+
+bool Robot::isAi()
+{
+	return m_isAi;
+}
+
+void Robot::updateAIWeapon(bool seePlayer)
+{
+	///int* tierListR;
+	int tierList[9];
+
+	if (seePlayer)
+	{
+		tierList[0] = 2;
+		tierList[1] = 7;
+		tierList[2] = 3;
+		tierList[3] = 1;
+		tierList[4] = 4;
+		tierList[5] = 0;
+		tierList[6] = 6;
+		tierList[7] = 5;
+		tierList[8] = 8;
+
+		
+		
+	}
+	else {
+		tierList[0] = 2;
+		tierList[1] = 5;
+		tierList[2] = 8;
+		tierList[3] = 1;
+		tierList[4] = 7;
+		tierList[5] = 0;
+		tierList[6] = 4;
+		tierList[7] = 3;
+		tierList[8] = 6;
+
+		
+
+	}
+	int highestR = -1, highestL = -1;
+	int indexR = -1, indexL = -1;
+	for (int k = 0; k < (int)getWeapons().size(); k++)
+	{
+		int tier = tierList[getWeapons()[k]->getType()];
+		//int tierR = tierListL[getWeapons()[k]->getType()];
+		if (tier > highestR)
+		{
+			if (indexR != -1 && highestR > highestL)
+			{
+				highestL = highestR;
+				indexL = indexR;
+				indexR = k;
+				highestR = tier;
+			}
+			else
+			{
+				indexR = k;
+				highestR = tier;
+			}
+		}
+		else if (tier > highestL)
+		{
+			indexL = k;
+			highestL = tier;
+		}
+
+	}
+	for (int k = 0; k < (int)getWeapons().size(); k++)
+	{
+		if (getCurrentWeapon(RIGHT) != -1)
+		{
+			if (getCurrentWeapon(RIGHT) != indexR)
+			{
+				changeWeapon(RIGHT);
+			}
+		}
+		if (getCurrentWeapon(LEFT) != -1)
+		{
+			if (getCurrentWeapon(LEFT) != indexL)
+			{
+				changeWeapon(LEFT);
+			}
+		}
+
+	}
+	
+}
+
+void Robot::setAi(bool ai)
+{
+	m_isAi = ai;
+}
+
+void Robot::setAIGoal(XMVECTOR position, bool update)
+{
+	if (m_currentMission.index == 0 || update)
+	{
+		std::vector<XMVECTOR> a = Graph::getInstance()->calculateAIPath(getPosition(), position);
+		if (a.size() > 0)
+		{
+			m_currentMission = m_ai.setMission(a);
+		}
+	}
+	
+}
+
+XMVECTOR Robot::getAIRotation()
+{
+	return m_ai.getAIRotation(m_currentMission);
+
 }
 
 void Robot::setPlayerId(int playerId)
 {
 	m_playerId = playerId;
+}
+
+void Robot::setRobotID(int id)
+{
+	m_robotID = id;
+}
+
+int Robot::getRobotID()
+{
+	return m_robotID;
 }
 
 int Robot::getPlayerId()
@@ -293,8 +422,7 @@ int Robot::getScore() const
 }
 
 void Robot::addWeapon(int type)
-{
-	Weapon* weapon = new Weapon(type);
+{	Weapon* weapon = new Weapon(type);
 	m_weapons.push_back(weapon);
 	if (m_weapons.size() == 3)
 		m_nextW = 2;
@@ -363,6 +491,13 @@ void Robot::removeResource()
 
 void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 {
+	
+	if (m_currentMission.index != 0)
+	{
+		m_currentMission = m_ai.update(dt, getVelocity(), m_currentMission);
+		move(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f) - getPosition());
+	}
+	
 	GameObject::update();
 	XMVECTOR position = GameObject::getPosition();
 	Lights::getInstance()->setPosition(m_lightIndex, position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]);
@@ -377,7 +512,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		m_weapons[m_currentWeapon[RIGHT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, RIGHT, dt, qtn, start, end);
 	if (m_currentWeapon[LEFT] != -1 && m_weapons[m_currentWeapon[LEFT]]->getType() == SNIPER)
 		m_weapons[m_currentWeapon[LEFT]]->updateSniperShot(getPosition(), m_colour, m_currentRotation, LEFT, dt, qtn, start, end);
-	/*
+	
 	// Particle engine flame
 	m_timeSinceParticles += dt;
 	if (m_timeSinceParticles > 0.01f)
@@ -390,20 +525,22 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
 		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
 	}
-	*/
+	
 }
 
 void Robot::move(XMVECTOR dPos)
 {
 	GameObject::move(dPos);
 
-	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
+	m_weapons[m_currentWeapon[RIGHT]]->setPosition
+	(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
 	);
 
 	if (getCurrentWeapon(LEFT) != -1)
 	{
-		m_weapons[m_currentWeapon[LEFT]]->setPosition(
+		m_weapons[m_currentWeapon[LEFT]]->setPosition
+		(
 			m_weapons[m_currentWeapon[LEFT]]->getRelativePos()
 		);
 	}

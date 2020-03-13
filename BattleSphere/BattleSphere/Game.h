@@ -43,7 +43,7 @@ public:
 	void pushState(State* state);
 	void changeState(stateType state);
 	bool isActive(stateType state);
-	
+	int getPlayerId(int robotNr);
 	int setPlayerIdIndex(int id);
 	int getPlayerIdIndex(int id);
 	int getNrOfPlayers() const;
