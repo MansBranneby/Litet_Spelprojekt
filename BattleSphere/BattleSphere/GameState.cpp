@@ -813,14 +813,21 @@ bool GameState::update(Game* game, float dt)
 		projectileBD.pos = projectile->getData().pos;
 
 		// Test collision
-		CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
+		CollisionInfo collisionInfo;
+		XMVECTOR nextPos = projectile->getPosition() + (projectile->getDirection() * projectile->getVelocity() * dt * 2.0f);
+		//CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
+		XMFLOAT2 start, end;
+		start.x = XMVectorGetX(projectile->getPosition());
+		start.y = XMVectorGetZ(projectile->getPosition());
+		end.x = XMVectorGetX(nextPos);
+		end.y = XMVectorGetZ(nextPos);
+		float t = game->getQuadtree()->testCollisionT(start, end);
 
 		// Remove based on conditions
-		if (collisionInfo.m_colliding)
+		if (t != -1.0f) // collisionInfo.m_colliding && 
 		{
-
-
 			// Collision against static object found, remove projectile
+			projectile->setPosition(projectile->getPosition() + projectile->getDirection() * t);
 
 			if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY)
 			{
