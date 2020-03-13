@@ -375,7 +375,7 @@ void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, 
 
 void UI_Element::setAbsDestinationX(float posX, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationX = posX;
+	m_destinationX = posX * DX::getInstance()->getWidth() / 1920.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
