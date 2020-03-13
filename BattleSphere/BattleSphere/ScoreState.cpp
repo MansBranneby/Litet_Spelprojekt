@@ -27,126 +27,128 @@ void ScoreState::updateDynamicCamera(float dT)
 bool ScoreState::updateScoreScorePlatforms(Game* game)
 {
 	bool exitGame = false;
-	DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
-	DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
-	DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
-	float intensity = 1.0f / float(game->getNrOfPlayers());
-	//std::vector<Billboard> BB = m_billboardHandler.getBillboards();
-	std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score_platform);
-	// Test each player against collision mesh
-	bool hasCollided = false, hasChosen = false;
-
-	for (int i = 0; i < BB.size(); ++i)
+	if (!m_hasChosen)
 	{
-		hasCollided = false;
-		// Get collision mesh
-		std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
-		for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
-		{
-			for (int k = 0; k < colMesh.size(); k += 3)
-			{
-				// Get indices
-				unsigned int ind1 = k + 1;
-				unsigned int ind2 = k + 2;
+		DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
+		DirectX::XMVECTOR red = { 1.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
+		float intensity = 1.0f / float(game->getNrOfPlayers());
+		//std::vector<Billboard> BB = m_billboardHandler.getBillboards();
+		std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score_platform);
+		// Test each player against collision mesh
+		bool hasCollided = false;
 
-				// Get vertices
-				DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
-				DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
-				DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
-
-				// Test collision between player and collision mesh
-				if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
-				{
-					hasCollided = true;
-					break; // Collision found so we jump out
-				}
-			}
-		}
-		if (hasCollided)
+		for (int i = 0; i < BB.size(); ++i)
 		{
-			/*objectData data;
-			data.material.emission = cyan * 0.25f;
-			game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-		}
-		else
-		{
-			/*objectData data;
-			data.material.emission = black;
-			game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-		}
-	}
-
-
-	for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
-	{
-		for (int j = 0; j < BB.size() && !hasChosen; ++j)
-		{
+			hasCollided = false;
 			// Get collision mesh
-			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[j].getObjectType(), BB[j].getModelNr(), BB[j].getVariant());
-			for (int k = 0; k < colMesh.size(); k += 3)
+			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
 			{
-				// Get indices
-				unsigned int ind1 = k + 1;
-				unsigned int ind2 = k + 2;
-
-				// Get vertices
-				DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
-				DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
-				DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
-
-				// Test collision between player and collision mesh
-				if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+				for (int k = 0; k < colMesh.size(); k += 3)
 				{
-		
-					hasCollided = true;
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_A)) // press A to get ready
-						m_readyPlayers[i] = true; // This player is ready
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
 
-					break; // Collision found so we jump out
-				}
-			}
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
 
-			// If one or more collisions have been detected with platform it will be lit up
-			int nrOfReadyPlayers = 0;
-			if (hasCollided)
-			{
-				// Check amount of ready players
-				for (int k = 0; k < m_readyPlayers.size(); ++k)
-					if (m_readyPlayers[k] == true) nrOfReadyPlayers++;
-
-				// If all players are ready
-				if (nrOfReadyPlayers == game->getNrOfPlayers())
-				{
-					switch (j)
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
 					{
-					case 0:
-						m_ranking.clear();
-						m_playerIDs.clear();
-						hasChosen = true;
-						setPaused(true); // Pause this state
-						game->changeState(stateType::e_mainMenu); // Change state to mainMenu
-						break;
-					case 2:
-						hasChosen = true;
-						exitGame = true;
-						break;
-					case 4:
-						hasChosen = true;
-						m_ranking.clear();
-						m_playerIDs.clear();
-						//setPaused(true); // Pause this state
-						game->changeState(stateType::e_gameState); // Change state to gameState
-						break;
+						hasCollided = true;
+						break; // Collision found so we jump out
 					}
 				}
 			}
+			if (hasCollided)
+			{
+				/*objectData data;
+				data.material.emission = cyan * 0.25f;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
+			}
+			else
+			{
+				/*objectData data;
+				data.material.emission = black;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
+			}
 		}
-		if (!hasCollided) // No collision found
-			m_readyPlayers[i] = false; // This player did not collide with any of the platforms and can therefore not be ready
 
-		hasCollided = false; // Reset bool for the next player
+
+		for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
+		{
+			for (int j = 0; j < BB.size(); ++j)
+			{
+				// Get collision mesh
+				std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[j].getObjectType(), BB[j].getModelNr(), BB[j].getVariant());
+				for (int k = 0; k < colMesh.size(); k += 3)
+				{
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
+
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[i]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					{
+
+						hasCollided = true;
+						if (m_input->isPressed(i, XINPUT_GAMEPAD_A)) // press A to get ready
+							m_readyPlayers[i] = true; // This player is ready
+
+						break; // Collision found so we jump out
+					}
+				}
+
+				// If one or more collisions have been detected with platform it will be lit up
+				int nrOfReadyPlayers = 0;
+				if (hasCollided)
+				{
+					// Check amount of ready players
+					for (int k = 0; k < m_readyPlayers.size(); ++k)
+						if (m_readyPlayers[k] == true) nrOfReadyPlayers++;
+
+					// If all players are ready
+					if (nrOfReadyPlayers == game->getNrOfPlayers())
+					{
+						switch (j)
+						{
+						case 0:
+							m_ranking.clear();
+							m_playerIDs.clear();
+							m_hasChosen = true;
+							setPaused(true); // Pause this state
+							game->changeState(stateType::e_mainMenu); // Change state to mainMenu
+							break;
+						case 2:
+							m_hasChosen = true;
+							exitGame = true;
+							break;
+						case 4:
+							m_hasChosen = true;
+							m_ranking.clear();
+							m_playerIDs.clear();
+							//setPaused(true); // Pause this state
+							game->changeState(stateType::e_gameState); // Change state to gameState
+							break;
+						}
+					}
+				}
+			}
+			if (!hasCollided) // No collision found
+				m_readyPlayers[i] = false; // This player did not collide with any of the platforms and can therefore not be ready
+
+			hasCollided = false; // Reset bool for the next player
+		}
 	}
-
 	return exitGame;
 }
 
@@ -265,32 +267,33 @@ ScoreState::ScoreState(Game* game)
 	// Scoreboard
 	m_scoreTimer = 0.0f;
 	m_scoreTimerAcceleration = 1.1f;
+	m_hasChosen = false;
 
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 
 	
-	// Initialize dynamic camera
-	m_zoomingOutToStart = false;
-	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
-	m_camStartPos = DX::getInstance()->getCam()->getPosition();
-	m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
-	float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
-	float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
-	m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
-	m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
-	m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
-	m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
+	//// Initialize dynamic camera
+	//m_zoomingOutToStart = false;
+	//m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
+	//m_camStartPos = DX::getInstance()->getCam()->getPosition();
+	//m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
+	//float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
+	//float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
+	//m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
+	//m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
+	//m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
+	//m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
 
-	// Rotate plane according to look at
-	float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
-	for (int i = 0; i < 4; i++)
-		m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
+	//// Rotate plane according to look at
+	//float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
+	//for (int i = 0; i < 4; i++)
+	//	m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
 
-	m_fOVPlanes[0].m128_f32[2] *= -1;
-	m_fOVPlanes[1].m128_f32[2] *= -1;
-	m_fOVPlanes[2].m128_f32[2] *= -1;
-	m_fOVPlanes[3].m128_f32[2] *= -1;
+	//m_fOVPlanes[0].m128_f32[2] *= -1;
+	//m_fOVPlanes[1].m128_f32[2] *= -1;
+	//m_fOVPlanes[2].m128_f32[2] *= -1;
+	//m_fOVPlanes[3].m128_f32[2] *= -1;
 
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
@@ -331,21 +334,6 @@ void ScoreState::firstTimeSetUp(Game* game)
 	// Initialize robots
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	//m_robots[1] = new Robot(1);
-	//m_robots[2] = new Robot(2);
-	//m_robots[3] = new Robot(3);
-	m_robots[0]->setDrawn(true);
-	//m_robots[1]->setDrawn(true);
-	m_robots[0]->storePositionInHistory({ 45.0f, 102.0f, -300.0f });
-	m_robots[0]->setPosition({ 45.0f, 102.0f, -300.0f });
-	//m_robots[1]->storePositionInHistory({ 60.6f, 102.0f, -265.0f });
-	//m_robots[1]->setPosition({ 60.6f, 102.0f, -265.0f });
-	//m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
-	//m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
-	//m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
-	//m_robots[1]->setScore(10);
-	//m_robots[2]->setScore(17);
-	//m_robots[3]->setScore(27);
 
 	game->updatePlayerStatus();
 	// Get player scores, IDs and initalize their readiness
@@ -356,6 +344,19 @@ void ScoreState::firstTimeSetUp(Game* game)
 			m_ranking.push_back(m_robots[i]->getScore());
 			m_playerIDs.push_back(m_robots[i]->getPlayerId());
 			m_readyPlayers.push_back(false);
+		}
+	}
+
+	DirectX::XMVECTOR spawnPos = { 45.0f - (m_ranking.size() * 2.0f), 102.0f, -300.0f };
+	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
+	{
+		if (m_robots[i] != nullptr)
+		{
+			spawnPos.m128_f32[0] += i * 4.0f;
+			m_robots[i]->storePositionInHistory(spawnPos);
+			m_robots[i]->setPosition(spawnPos);
+			m_robots[i]->setDrawn(true);
+			m_robots[i]->setHealth(100);
 		}
 	}
 
@@ -471,7 +472,7 @@ void ScoreState::draw(Game* game, renderPass pass)
 
 		std::vector<int> digits;
 		objectData data;
-		data.pos.m128_f32[1] = (float)game->getNrOfPlayers();
+		data.pos.m128_f32[1] = (float)m_ranking.size();
 		for (int i = 0; i < m_playerIDs.size(); ++i)
 		{
 			int playerID = m_playerIDs[i];
