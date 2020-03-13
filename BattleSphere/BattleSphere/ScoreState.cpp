@@ -35,7 +35,6 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 
 	// Test each player against collision mesh
 	int nrOfCollisions = 0; // Keep track of number of collisions for each  collision mesh
-	int nrOfReadyPlayers = 0; 
 	bool hasCollided = false;
 
 	for (int i = 0; i < BB.size(); ++i)
@@ -69,21 +68,23 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 			}
 			if (hasCollided)
 			{
-				objectData data;
-				data.material.emission = cyan;
-				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+	/*			objectData data;
+				data.material.emission = cyan * 0.25f;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
 			}
 			else
 			{
-				objectData data;
-				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+				/*objectData data;
+				data.material.emission = black;
+				game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
 			}
 		}
 	}
 
+
 	for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
 	{
-		for (int j = 0; j < BB.size() && !hasCollided; ++j)
+		for (int j = 0; j < BB.size(); ++j)
 		{
 			if (BB[j].getObjectType() == objectType::e_static_billboard_score_platform)
 			{
@@ -113,6 +114,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 				}
 
 				// If one or more collisions have been detected with platform it will be lit up
+				int nrOfReadyPlayers = 0;
 				if (hasCollided)
 				{
 					// Check amount of ready players
@@ -309,21 +311,21 @@ void ScoreState::firstTimeSetUp(Game* game)
 	// Initialize robots
 	m_input = game->getInput();
 	m_robots = game->getRobots();
-	m_robots[1] = new Robot(1);
-	m_robots[2] = new Robot(2);
-	m_robots[3] = new Robot(3);
+	//m_robots[1] = new Robot(1);
+	//m_robots[2] = new Robot(2);
+	//m_robots[3] = new Robot(3);
 	m_robots[0]->setDrawn(true);
-	m_robots[1]->setDrawn(true);
+	//m_robots[1]->setDrawn(true);
 	m_robots[0]->storePositionInHistory({ 45.0f, 102.0f, -300.0f });
 	m_robots[0]->setPosition({ 45.0f, 102.0f, -300.0f });
-	m_robots[1]->storePositionInHistory({ 60.6f, 102.0f, -265.0f });
-	m_robots[1]->setPosition({ 60.6f, 102.0f, -265.0f });
-	m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
-	m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
-	m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
-	m_robots[1]->setScore(10);
-	m_robots[2]->setScore(17);
-	m_robots[3]->setScore(27);
+	//m_robots[1]->storePositionInHistory({ 60.6f, 102.0f, -265.0f });
+	//m_robots[1]->setPosition({ 60.6f, 102.0f, -265.0f });
+	//m_robots[1]->setColour(0.5f, 0.5f, 0.5f);
+	//m_robots[2]->setColour(0.8f, 0.0f, 0.8f);
+	//m_robots[3]->setColour(0.0f, 0.2f, 0.3f);
+	//m_robots[1]->setScore(10);
+	//m_robots[2]->setScore(17);
+	//m_robots[3]->setScore(27);
 
 	game->updatePlayerStatus();
 	// Get player scores, IDs and initalize their readiness
