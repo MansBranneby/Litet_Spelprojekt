@@ -336,7 +336,10 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 		float random = float(rand() % 100 - 50) / 100;
 		projDir += (projPos - robotPos) * random * m_recoil;
 		projDir = XMVectorSetY(projDir, 0.0f);
-		ProjectileBank::getInstance()->addProjectile(projPos-projDir*1.8f, robotColour, projRot, projDir, m_type, (float)m_damage, m_blastRange, robotId);
+		if (m_type != ENERGY) 
+			ProjectileBank::getInstance()->addProjectile(projPos-projDir*1.8f, robotColour, projRot, projDir, m_type, (float)m_damage, m_blastRange, robotId);
+		else
+			ProjectileBank::getInstance()->addProjectile(projPos, robotColour, projRot, projDir, m_type, (float)m_damage, m_blastRange, robotId);
 		if (m_type == PISTOL)
 			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)

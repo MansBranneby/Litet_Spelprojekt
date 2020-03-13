@@ -289,7 +289,7 @@ bool GameState::handleInputs(Game* game, float dt)
 									XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 									if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 									{
-											int resourceIndex = m_robots[j]->getResourceIndex();
+										int resourceIndex = m_robots[j]->getResourceIndex();
 										if (m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1))
 										{
 											if (!m_robots[j]->isAi())
@@ -549,7 +549,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					game->getInput()->setBlocked(i, true);
 				}
 			}
-			
+
 		}
 	}
 	return false;
@@ -1214,7 +1214,6 @@ bool GameState::update(Game* game, float dt)
 		end.x = XMVectorGetX(nextPos);
 		end.y = XMVectorGetZ(nextPos);
 		float t = game->getQuadtree()->testCollisionT(start, end);
-
 		// Remove based on conditions
 		if (t != -1.0f) // collisionInfo.m_colliding && 
 		{
@@ -1287,35 +1286,36 @@ bool GameState::update(Game* game, float dt)
 						{
 							if (!ProjectileBank::getInstance()->getList()[i]->isExploding())
 							{
-								if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false))
+
+
+								for (int k = 0; k < XUSER_MAX_COUNT; k++)
 								{
-									for (int k = 0; k < XUSER_MAX_COUNT; k++)
+									if (robots[k] != nullptr && robots[k]->isDrawn())
 									{
-										if (robots[k] != nullptr && robots[k]->isDrawn())
+										float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
+										if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
 										{
-											float distance = XMVectorGetX(XMVector3Length(ProjectileBank::getInstance()->getList()[i]->getPosition() - robots[k]->getPosition()));
-											if (distance < ProjectileBank::getInstance()->getList()[i]->getBlastRange())
+											int resourceIndex = m_robots[k]->getResourceIndex();
+											if (robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false))
 											{
-												int resourceIndex = m_robots[k]->getResourceIndex();
-												if (robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false))
+												if (!robots[k]->isAi())
+													m_input->setVibration(k, 1.0f);
+
+												if (resourceIndex != -1)
 												{
-													if (!robots[k]->isAi())
-														m_input->setVibration(k, 1.0f);
-
-													if (resourceIndex != -1)
-													{
-														m_updateMission = true;
-														m_resources[resourceIndex]->setPosition(m_robots[k]->getPosition());
-														m_resources[resourceIndex]->setBlocked(false);
-													}
+													m_updateMission = true;
+													m_resources[resourceIndex]->setPosition(m_robots[k]->getPosition());
+													m_resources[resourceIndex]->setBlocked(false);
 												}
-
-
 											}
-										}
 
+
+										}
 									}
 								}
+
+								m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false);
+								
 								ProjectileBank::getInstance()->getList()[i]->explode();
 							}
 

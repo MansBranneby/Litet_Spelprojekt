@@ -8,7 +8,7 @@ Robot::Robot(int playerId)
 	m_robotID = -1;
 	m_playerId = playerId;
 	m_health = 100;
-	m_velocity = 45.0f;
+	m_velocity = 55.0f;
 	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
 	m_currentWeapon[LEFT] = -1;
