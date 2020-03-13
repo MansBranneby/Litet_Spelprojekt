@@ -788,7 +788,6 @@ bool GameState::update(Game* game, float dt)
 
 			// Wrap it..
 			float rangeZero = 360;
-
 			value = fmod(value, rangeZero);
 			m_robots[j]->setCurrentRot(value);
 			m_robots[j]->setRotation(0, 1, 0, value);
@@ -803,7 +802,6 @@ bool GameState::update(Game* game, float dt)
 						closest = XMVectorGetX(XMVector3Length(Graph::getInstance()->getNodePos(i) - m_robots[j]->getPosition()));
 						closestNode = i;
 					}
-
 				}
 				if (closestNode != -1)
 					m_robots[j]->setAIGoal(Graph::getInstance()->getNodePos(closestNode), m_updateMission);
@@ -853,7 +851,6 @@ bool GameState::update(Game* game, float dt)
 					else
 					{
 						/* Hunt player*/
-
 						float closestPlayer = 10000;
 						int playerIndex = -1;
 						for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -864,30 +861,19 @@ bool GameState::update(Game* game, float dt)
 								if (distance < closestPlayer)
 								{
 									playerIndex = i;
-									closestPlayer = playerIndex;
+									closestPlayer = distance;
 								}
 							}
 						}
 						if (playerIndex != -1)
 							m_robots[j]->setAIGoal(m_robots[playerIndex]->getPosition(), m_updateMission);
-
 					}
-
 				}
-
 			}
-
-
-
-
-
-
 			XMVECTOR start = XMVectorSet(0, 0, 0, 0);
 			XMVECTOR end = XMVectorSet(0, 0, 0, 0);
 			m_robots[j]->updateAIWeapon(findPlayer);
 			//update ui
-
-
 			if (m_robots[j]->getCurrentWeapon(LEFT) != -1)
 			{
 				int type = m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getType();
@@ -916,7 +902,6 @@ bool GameState::update(Game* game, float dt)
 					}
 					m_robots[j]->useWeapon(LEFT, dt);
 				}
-
 			}
 
 			if (m_robots[j]->getCurrentWeapon(RIGHT) != -1)
@@ -926,7 +911,6 @@ bool GameState::update(Game* game, float dt)
 				m_userInterface->setSlotID(m_robots[j]->getRobotID(), type, RIGHT, m_robots[j]->getNextWeapon(), m_robots[j]->getNextNextWeapon());
 				if (findPlayer || type == MOVEMENT || type == DASH)
 				{
-
 					if (m_robots[j]->getCurrentWeapon(RIGHT) != -1 && m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getType() == SNIPER &&
 						m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getReady())
 					{
@@ -949,10 +933,7 @@ bool GameState::update(Game* game, float dt)
 					m_robots[j]->useWeapon(RIGHT, dt);
 				}
 			}
-
-
 		}
-
 	}
 	m_updateMission = false;
 
@@ -985,6 +966,8 @@ bool GameState::update(Game* game, float dt)
 			pos.m128_f32[3] = 1;
 			m_transparency.update(pos, DX::getInstance()->getCam()->getViewMatrix(), DX::getInstance()->getCam()->getProjectionMatrix(), i);
 		}
+		else
+			m_transparency.update(XMVectorSet(1000, 0, 1000, 0), XMMatrixIdentity(), XMMatrixIdentity(), i);
 	}
 
 	// Collision melee weapon
@@ -1097,8 +1080,6 @@ bool GameState::update(Game* game, float dt)
 		// Remove based on conditions
 		if (collisionInfo.m_colliding)
 		{
-
-
 			// Collision against static object found, remove projectile
 
 			if (ProjectileBank::getInstance()->getList()[i]->getType() == ENERGY)

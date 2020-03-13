@@ -20,7 +20,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(ENERGY);
+	Weapon* pistol = new Weapon(PISTOL);
 	m_weapons.push_back(pistol);
 	m_ready = true;
 	m_time = 0;
@@ -57,7 +57,7 @@ void Robot::updateAIWeapon(bool seePlayer)
 {
 	///int* tierListR;
 	int tierList[9];
-	int tierListL[9];
+
 	if (seePlayer)
 	{
 		tierList[0] = 2;
@@ -149,7 +149,6 @@ void Robot::setAIGoal(XMVECTOR position, bool update)
 		if (a.size() > 0)
 		{
 			m_currentMission = m_ai.setMission(a);
-
 		}
 	}
 	
@@ -486,8 +485,6 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 	if (m_currentMission.index != 0)
 	{
 		m_currentMission = m_ai.update(dt, getVelocity(), m_currentMission);
-		
-		
 		move(XMVectorSet(XMVectorGetX(m_currentMission.pos), 2.0f, XMVectorGetZ(m_currentMission.pos), 1.0f) - getPosition());
 	}
 	
@@ -524,13 +521,15 @@ void Robot::move(XMVECTOR dPos)
 {
 	GameObject::move(dPos);
 
-	m_weapons[m_currentWeapon[RIGHT]]->setPosition(
+	m_weapons[m_currentWeapon[RIGHT]]->setPosition
+	(
 		m_weapons[m_currentWeapon[RIGHT]]->getRelativePos()
 	);
 
 	if (getCurrentWeapon(LEFT) != -1)
 	{
-		m_weapons[m_currentWeapon[LEFT]]->setPosition(
+		m_weapons[m_currentWeapon[LEFT]]->setPosition
+		(
 			m_weapons[m_currentWeapon[LEFT]]->getRelativePos()
 		);
 	}

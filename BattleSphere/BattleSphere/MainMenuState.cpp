@@ -194,9 +194,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 					robIdx = game->getPlayerId(j); // 0 i = 1
  					if (robIdx == -1 || (game->getRobots()[robIdx] != nullptr && game->getRobots()[robIdx]->isAi()))
 					{
-
-
-
 						/*swap robot details*/
 						int tempIdx = game->getPlayerIdIndex(i);
 						if (tempIdx != -1 && i != j)
@@ -226,10 +223,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 							}
 							else if (robotNr == j)
 							{
-
 								game->getRobots()[i]->setAi(false);
 								m_readyState[robotNr] = 0;
-
 							}
 							else
 							{
@@ -246,10 +241,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 								game->getRobots()[a]->setDrawn(true);
 								tempIdx = game->setPlayerIdIndex(a);
 								game->getRobots()[a]->setRobotID(tempIdx);
-
 							}
-								
-
 						}
 						else
 						{
@@ -260,9 +252,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 								game->getRobots()[robIdx]->setDrawn(false);
 								game->getRobots()[robIdx]->setAi(false);
 							}
-							robotNr = game->setPlayerIdIndex(i);
-							
-							
+							robotNr = game->setPlayerIdIndex(i);						
 						}
 
 						robNrPlus9 = robotNr + 9;
@@ -273,17 +263,9 @@ void MainMenuState::hi_robotSelection(Game* game)
 						//m_botElements[robotNr]->setDrawn(false);
 						m_botElements[robotNr]->fadeOut(0.1f, 0.0f);
 						break;
-					}
-
-
-
-					
+					}				
 				}
-
-
 			}
-
-
 			switch (m_readyState[robotNr])
 			{
 			case 0:
@@ -313,7 +295,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 			switch (m_readyState[robotNr])
 			{
 			case 1:
-
 				game->getRobots()[i]->setDrawn(false);
 				game->getRobots()[i]->setRobotID(-1);
 				m_uiElements[robNrPlus9]->setDrawn(true);
@@ -345,7 +326,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 			game->getInput()->setBlocked(i, true);
 			changeColour(game, i, false);
 		}
-
 
 		//Add bots
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -406,9 +386,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 						k = j;
 						break;
 					}
-
-
 				}
+
 				if (k != -1)
 				{
 					robNrPlus9 = robotNr + 9;
@@ -425,7 +404,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 				}
 			}
 		}
-
 
 		for (int i = 9; i < 13; i++)
 		{
@@ -497,7 +475,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 				game->getInput()->setBlocked(i, true);
 				startGame = true;
 			}
-
 		}
 
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -510,7 +487,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 					startGame = false;
 					start = false;
 				}
-					
 			}
 		}
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -521,9 +497,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 				XMVECTOR x, y; // Just here for the dumb call
 				game->getRobots()[i]->update(dt, game->getQuadtree(), x, y);
 			}
-
 		}
-		if (start)
+		if (start && nrOfPlayers > 1)
 		{
 			m_startElement->setDrawn(true);
 			m_uiElements[8]->setDrawn(false);
@@ -531,9 +506,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		else 
 		{
 			m_startElement->setDrawn(false);
-
-			m_uiElements[8]->setDrawn(true);
-			
+			m_uiElements[8]->setDrawn(true);		
 		}
 		if (startGame && nrOfPlayers > 0) // TODO: Change to nrOfPlayers > 0 for debug and testing
 		{
