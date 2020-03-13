@@ -227,7 +227,8 @@ void GameState::handleInputs(Game* game, float dt)
 								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(j, 1.0f);
+									if (!m_robots[j]->isAi())
+										m_input->setVibration(j, 1.0f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
 
 									int resourceIndex = m_robots[j]->getResourceIndex();
@@ -267,7 +268,8 @@ void GameState::handleInputs(Game* game, float dt)
 								XMVECTOR left = XMVector3Cross(dir, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)) * (robotBD.halfWD.x - 0.51f);
 								if (testLineSphere(start + left, end + left, m_robots[j]->getPosition(), robotBD.halfWD.x) || testLineSphere(start - left, end - left, m_robots[j]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(j, 1.0f);
+									if (!m_robots[j]->isAi())
+										m_input->setVibration(j, 1.0f);
 									m_robots[j]->damagePlayer(m_robots[i]->getWeapons()[m_robots[i]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
 
 									int resourceIndex = m_robots[j]->getResourceIndex();
@@ -321,7 +323,7 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 
 				// Turn in resources
-				//if (m_input->isPressed(i, XINPUT_GAMEPAD_A))
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_A) ||  m_robots[i]->isAi())
 				{
 					for (int j = 0; j < m_nodes.size() && m_robots[i]->getResourceIndex() != -1; j++)
 					{
@@ -340,7 +342,7 @@ void GameState::handleInputs(Game* game, float dt)
 								break;
 							}
 						}
-						if (collision) //&& m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
+						if (collision && m_nodes[j]->isType(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 						{
 							if (!m_robots[i]->upgradeWeapon(m_resources[m_robots[i]->getResourceIndex()]->getType()))
 							{
@@ -411,7 +413,8 @@ void GameState::handleInputs(Game* game, float dt)
 					int resourceIndex = m_robots[i]->getResourceIndex();
 					if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), -1))
 					{
-						m_input->setVibration(i, 0.5f);
+						if (!m_robots[i]->isAi())
+							m_input->setVibration(i, 0.5f);
 						if (resourceIndex != -1)
 						{
 							m_resources[resourceIndex]->setPosition(m_robots[i]->getPosition());
@@ -430,7 +433,8 @@ void GameState::handleInputs(Game* game, float dt)
 			if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
 			{
 				m_robots[i]->setHealth(100);
-				m_input->setVibration(i, 0.0f);
+				if (!m_robots[i]->isAi())
+					m_input->setVibration(i, 0.0f);
 			}
 
 			if (m_robots[i]->getResourceIndex() != -1)
@@ -637,7 +641,7 @@ void GameState::firstTimeSetUp(Game* game)
 	{
 		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
- 			m_userInterface->addPlayer(m_robots[i]->getRobotID());
+			m_userInterface->addPlayer(m_robots[i]->getRobotID());
 		}
 	}
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -779,7 +783,7 @@ bool GameState::update(Game* game, float dt)
 					}
 
 				}
-				if(closestNode != -1)
+				if (closestNode != -1)
 					m_robots[j]->setAIGoal(Graph::getInstance()->getNodePos(closestNode), m_updateMission);
 			}
 			else
@@ -808,7 +812,7 @@ bool GameState::update(Game* game, float dt)
 				else
 				{
 					int tierList[9] = { 2, 7, 4, 1, 5, 0, 6, 3, 8 };
-					float highestResource = -1;
+					float highestResource = -10000;
 					int highestIndex = -1;
 					for (int i = 0; i < m_resources.size(); i++)
 					{
@@ -881,7 +885,8 @@ bool GameState::update(Game* game, float dt)
 							{
 								if (testLineSphere(start, end, m_robots[i]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(i, 0.5f);
+									if (!m_robots[i]->isAi())
+										m_input->setVibration(i, 0.5f);
 									m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(LEFT)]->getDamage(), end - start, -1);
 								}
 							}
@@ -912,7 +917,8 @@ bool GameState::update(Game* game, float dt)
 							{
 								if (testLineSphere(start, end, m_robots[i]->getPosition(), robotBD.halfWD.x))
 								{
-									m_input->setVibration(i, 0.5f);
+									if(m_robots[i]->isAi())
+										m_input->setVibration(i, 0.5f);
 									m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1);
 								}
 							}
@@ -1052,7 +1058,8 @@ bool GameState::update(Game* game, float dt)
 							// Set vibration and drop resource
 							int resourceIndex = m_robots[otherIdx]->getResourceIndex();
 							m_robots[otherIdx]->damagePlayer(beyBladeDamage, dirToVictim, -1, false, false);
-							m_input->setVibration(otherIdx, 0.5f);
+							if (!m_robots[otherIdx]->isAi())
+								m_input->setVibration(otherIdx, 0.5f);
 							if (resourceIndex != -1)
 							{
 								m_updateMission = true;
@@ -1114,7 +1121,8 @@ bool GameState::update(Game* game, float dt)
 							{
 								int resourceIndex = m_robots[k]->getResourceIndex();
 								robots[k]->damagePlayer((ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange()))), ProjectileBank::getInstance()->getList()[i]->getDirection(), -1, false);
-								m_input->setVibration(k, 1.0f);
+								if (!robots[k]->isAi())
+									m_input->setVibration(k, 1.0f);
 
 								if (resourceIndex != -1)
 								{
@@ -1173,7 +1181,8 @@ bool GameState::update(Game* game, float dt)
 										{
 											int resourceIndex = m_robots[k]->getResourceIndex();
 											robots[k]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage() * 0.5f * (1 + ((ProjectileBank::getInstance()->getList()[i]->getBlastRange() - distance) / ProjectileBank::getInstance()->getList()[i]->getBlastRange())), ProjectileBank::getInstance()->getList()[k]->getDirection(), -1, false);
-											m_input->setVibration(k, 1.0f);
+											if (!robots[k]->isAi())
+												m_input->setVibration(k, 1.0f);
 
 											if (resourceIndex != -1)
 											{
@@ -1197,7 +1206,8 @@ bool GameState::update(Game* game, float dt)
 							int resourceIndex = m_robots[j]->getResourceIndex();
 							if (m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i))
 							{
-								m_input->setVibration(j, 0.5f);
+								if (!robots[j]->isAi())
+									m_input->setVibration(j, 0.5f);
 								if (resourceIndex != -1)
 								{
 									m_updateMission = true;
@@ -1383,7 +1393,7 @@ void GameState::draw(Game* game, renderPass pass)
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(1), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(2), m_spawnDrone->getData(), 1);
 		game->getPreLoader()->drawOneModel(objectType::e_drone, m_spawnDrone->getData(3), m_spawnDrone->getData(), 1);
-		
+
 		// Tokyo drift
 		for (int i = 0; i < OBJECT_NR_1; i++)
 		{

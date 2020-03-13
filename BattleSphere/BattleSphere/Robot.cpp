@@ -2,6 +2,9 @@
 
 Robot::Robot(int playerId)
 {
+	m_currentMission.index = 0;
+	m_currentMission.pos = getPosition();
+	m_isAi = false;
 	m_robotID = -1;
 	m_playerId = playerId;
 	m_health = 100;

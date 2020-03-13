@@ -152,6 +152,11 @@ bool Game::isActive(stateType state)
 	return false;
 }
 
+int Game::getPlayerId(int robotNr)
+{
+	return m_playerId[robotNr];
+}
+
 void Game::release()
 {
 	ProjectileBank::getInstance()->release();
