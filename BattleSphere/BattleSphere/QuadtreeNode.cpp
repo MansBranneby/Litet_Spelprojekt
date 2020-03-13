@@ -279,7 +279,7 @@ bool QuadtreeNode::testCollision(XMFLOAT2 start, XMFLOAT2 end, float height)
 	return false;
 }
 
-float QuadtreeNode::testCollisionT(XMFLOAT2 start, XMFLOAT2 end)
+float QuadtreeNode::testCollisionT(XMFLOAT2 start, XMFLOAT2 end, float height)
 {
 
 	XMFLOAT2 point[4];
@@ -327,8 +327,8 @@ float QuadtreeNode::testCollisionT(XMFLOAT2 start, XMFLOAT2 end)
 				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
 				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
 
-				XMVECTOR startReal = { start.x, 1.5f, start.y };
-				XMVECTOR endReal = { end.x, 1.5f, end.y };
+				XMVECTOR startReal = { start.x, height, start.y };
+				XMVECTOR endReal = { end.x, height, end.y };
 
 				float currT = testLineTriangleT(startReal, endReal, triangles);
 				if (currT != -1.0f)
@@ -344,7 +344,7 @@ float QuadtreeNode::testCollisionT(XMFLOAT2 start, XMFLOAT2 end)
 		{
 			for (int i = 0; i < m_children.size(); i++)
 			{
-				float currT = m_children[i]->testCollisionT(start, end);
+				float currT = m_children[i]->testCollisionT(start, end, height);
 				if (currT != -1.0f)
 				{
 					//Check if lowest
