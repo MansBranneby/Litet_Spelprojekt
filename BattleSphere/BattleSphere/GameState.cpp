@@ -439,7 +439,7 @@ void GameState::handleInputs(Game* game, float dt)
 				}
 
 				// Quit Game
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_START))
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_START) && !m_input->isBlocked(i))
 				{
 					m_quitGame = true;
 					break;

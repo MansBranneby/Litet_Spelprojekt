@@ -77,7 +77,7 @@ bool MainMenuState::hi_mainMenu(Game* game)
 		if (game->getInput()->getThumbLY(j) > -0.2f && game->getInput()->getThumbLY(j) < 0.2f && !game->getInput()->isPressed(j, XINPUT_GAMEPAD_A)) // Set input to ready if no input is detected
 		{
 			//m_uiElements[1]->setSelectionTimer(0.0f);
-			
+
 			game->getInput()->setBlocked(j, false);
 		}
 
@@ -448,237 +448,237 @@ void MainMenuState::hi_robotSelection(Game* game)
 	}
 }
 
-	void MainMenuState::hi_options(Game * game)
+void MainMenuState::hi_options(Game* game)
+{
+}
+
+void MainMenuState::u_mainMenu(Game* game, float dt)
+{
+	m_uiElements[2]->updateElement(dt);
+	m_uiElements[3]->updateElement(dt);
+	m_uiElements[4]->updateElement(dt);
+
+	m_uiElements[5]->updateElement(dt);
+	m_uiElements[6]->updateElement(dt);
+	m_uiElements[7]->updateElement(dt);
+}
+
+void MainMenuState::u_robotSelection(Game* game, float dt)
+{
+	bool startGame = false;
+	bool start = true;
+	int nrOfPlayers = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
+		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_START))
+		{
+			game->getInput()->setBlocked(i, true);
+			startGame = true;
+		}
 	}
 
-	void MainMenuState::u_mainMenu(Game * game, float dt)
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		m_uiElements[2]->updateElement(dt);
-		m_uiElements[3]->updateElement(dt);
-		m_uiElements[4]->updateElement(dt);
-
-		m_uiElements[5]->updateElement(dt);
-		m_uiElements[6]->updateElement(dt);
-		m_uiElements[7]->updateElement(dt);
+		if (game->getPlayerIdIndex(i) != -1)
+		{
+			nrOfPlayers++;
+			if (m_readyState[game->getPlayerIdIndex(i)] != 2)
+			{
+				startGame = false;
+				start = false;
+			}
+		}
 	}
-
-	void MainMenuState::u_robotSelection(Game * game, float dt)
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		bool startGame = false;
-		bool start = true;
-		int nrOfPlayers = 0;
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		if (game->getRobots()[i] != nullptr)
 		{
-			if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_START))
-			{
-				game->getInput()->setBlocked(i, true);
-				startGame = true;
-			}
+			game->getRobots()[i]->rotate(0.0f, 1.0f, 0.0f, dt * 20);
+			XMVECTOR x, y; // Just here for the dumb call
+			game->getRobots()[i]->update(dt, game->getQuadtree(), x, y);
 		}
-
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
-		{
-			if (game->getPlayerIdIndex(i) != -1)
-			{
-				nrOfPlayers++;
-				if (m_readyState[game->getPlayerIdIndex(i)] != 2)
-				{
-					startGame = false;
-					start = false;
-				}
-			}
-		}
+	}
+	if (start && nrOfPlayers > 1)
+	{
+		m_startElement->setDrawn(true);
+		m_uiElements[8]->setDrawn(false);
+	}
+	else
+	{
+		m_startElement->setDrawn(false);
+		m_uiElements[8]->setDrawn(true);
+	}
+	if (startGame && nrOfPlayers > 0) // TODO: Change to nrOfPlayers > 0 for debug and testing
+	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			if (game->getRobots()[i] != nullptr)
 			{
-				game->getRobots()[i]->rotate(0.0f, 1.0f, 0.0f, dt * 20);
-				XMVECTOR x, y; // Just here for the dumb call
-				game->getRobots()[i]->update(dt, game->getQuadtree(), x, y);
+				game->getRobots()[i]->setPosition(ROBOT_START_POS[i]);
+				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[i]);
 			}
 		}
-		if (start && nrOfPlayers > 1)
+		setPaused(true);
+		game->changeState(stateType::e_gameState);
+	}
+
+
+	m_uiElements[2]->updateElement(dt);
+	m_uiElements[3]->updateElement(dt);
+	m_uiElements[4]->updateElement(dt);
+
+	m_uiElements[5]->updateElement(dt);
+	m_uiElements[6]->updateElement(dt);
+	m_uiElements[7]->updateElement(dt);
+
+	m_uiElements[8]->updateElement(dt);
+	m_uiElements[9]->updateElement(dt);
+	m_uiElements[10]->updateElement(dt);
+	m_uiElements[11]->updateElement(dt);
+	m_uiElements[12]->updateElement(dt);
+
+	m_uiElements[13]->updateElement(dt);
+	m_uiElements[14]->updateElement(dt);
+	m_uiElements[15]->updateElement(dt);
+	m_uiElements[16]->updateElement(dt);
+	m_uiElements[17]->updateElement(dt);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_botElements[i]->updateElement(dt);
+	}
+	m_startElement->updateElement(dt);
+	DX::getInstance()->getParticles()->update(dt);
+}
+
+void MainMenuState::u_options(Game* game, float dt)
+{
+}
+
+void MainMenuState::pause()
+{
+}
+
+void MainMenuState::resume()
+{
+}
+
+bool MainMenuState::handleInputs(Game* game, float dt)
+{
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		game->getInput()->refresh(i, dt);
+	}
+
+	switch (m_menuState)
+	{
+	case MenuState::e_mainMenu:
+		return hi_mainMenu(game);
+		break;
+	case MenuState::e_robotSelection:
+		hi_robotSelection(game);
+		break;
+	case MenuState::e_optionsMenu:
+		break;
+	default:
+		break;
+	}
+	return 0;
+}
+
+void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
+{
+	// Find colour
+	int myColour = m_robotColour[robotNr];
+	if (dir) // RIGHT
+	{
+		if (myColour == -1)
 		{
-			m_startElement->setDrawn(true);
-			m_uiElements[8]->setDrawn(false);
-		}
-		else 
-		{
-			m_startElement->setDrawn(false);
-			m_uiElements[8]->setDrawn(true);		
-		}
-		if (startGame && nrOfPlayers > 0) // TODO: Change to nrOfPlayers > 0 for debug and testing
-		{
-			for (int i = 0; i < XUSER_MAX_COUNT; i++)
+			myColour = 0;
+			for (int i = 0; i < 4; i++)
 			{
-				if (game->getRobots()[i] != nullptr)
+				if (m_availableColours[(myColour + i) % 5] == 1)
 				{
-					game->getRobots()[i]->setPosition(ROBOT_START_POS[i]);
-					game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[i]);
+					m_availableColours[(myColour + i) % 5] = 0;
+					m_robotColour[robotNr] = (myColour + i) % 5;
+					break;
 				}
 			}
-			setPaused(true);
-			game->changeState(stateType::e_gameState);
 		}
-
-
-		m_uiElements[2]->updateElement(dt);
-		m_uiElements[3]->updateElement(dt);
-		m_uiElements[4]->updateElement(dt);
-
-		m_uiElements[5]->updateElement(dt);
-		m_uiElements[6]->updateElement(dt);
-		m_uiElements[7]->updateElement(dt);
-
-		m_uiElements[8]->updateElement(dt);
-		m_uiElements[9]->updateElement(dt);
-		m_uiElements[10]->updateElement(dt);
-		m_uiElements[11]->updateElement(dt);
-		m_uiElements[12]->updateElement(dt);
-
-		m_uiElements[13]->updateElement(dt);
-		m_uiElements[14]->updateElement(dt);
-		m_uiElements[15]->updateElement(dt);
-		m_uiElements[16]->updateElement(dt);
-		m_uiElements[17]->updateElement(dt);
-
-		for (int i = 0; i < 4; i++)
-		{
-			m_botElements[i]->updateElement(dt);
-		}
-		m_startElement->updateElement(dt);
-		DX::getInstance()->getParticles()->update(dt);
-	}
-
-	void MainMenuState::u_options(Game * game, float dt)
-	{
-	}
-
-	void MainMenuState::pause()
-	{
-	}
-
-	void MainMenuState::resume()
-	{
-	}
-
-	bool MainMenuState::handleInputs(Game * game, float dt)
-	{
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
-		{
-			game->getInput()->refresh(i, dt);
-		}
-
-		switch (m_menuState)
-		{
-		case MenuState::e_mainMenu:
-			return hi_mainMenu(game);
-			break;
-		case MenuState::e_robotSelection:
-			hi_robotSelection(game);
-			break;
-		case MenuState::e_optionsMenu:
-			break;
-		default:
-			break;
-		}
-		return 0;
-	}
-
-	void MainMenuState::changeColour(Game * game, int robotNr, bool dir)
-	{
-		// Find colour
-		int myColour = m_robotColour[robotNr];
-		if (dir) // RIGHT
-		{
-			if (myColour == -1)
-			{
-				myColour = 0;
-				for (int i = 0; i < 4; i++)
-				{
-					if (m_availableColours[(myColour + i) % 5] == 1)
-					{
-						m_availableColours[(myColour + i) % 5] = 0;
-						m_robotColour[robotNr] = (myColour + i) % 5;
-						break;
-					}
-				}
-			}
-			else
-			{
-				for (int i = 1; i < 5; i++)
-				{
-					if (m_availableColours[(myColour + i) % 5] == 1)
-					{
-						m_availableColours[myColour] = 1;
-						m_availableColours[(myColour + i) % 5] = 0;
-						m_robotColour[robotNr] = (myColour + i) % 5;
-						break;
-					}
-				}
-			}
-
-		} // LEFT
 		else
 		{
-			if (myColour == -1)
+			for (int i = 1; i < 5; i++)
 			{
-				myColour = 0;
-				for (int i = 0; i > -4; i--)
+				if (m_availableColours[(myColour + i) % 5] == 1)
 				{
-					int index = (myColour + i) % 5;
-					if (index < 0)
-						index = 5 + index;
-					if (m_availableColours[index] == 1)
-					{
-						m_availableColours[index] = 0;
-						m_robotColour[robotNr] = index;
-						break;
-					}
+					m_availableColours[myColour] = 1;
+					m_availableColours[(myColour + i) % 5] = 0;
+					m_robotColour[robotNr] = (myColour + i) % 5;
+					break;
 				}
 			}
-			else
-			{
-				for (int i = -1; i > -5; i--)
-				{
-					int index = (myColour + i) % 5;
-					if (index < 0)
-						index = 5 + index;
-					if (m_availableColours[index] == 1)
-					{
-						m_availableColours[myColour] = 1;
-						m_availableColours[index] = 0;
-						m_robotColour[robotNr] = index;
-						break;
-					}
-				}
-			}
+		}
 
-		}
-		// Set colour
-		switch (m_robotColour[robotNr])
+	} // LEFT
+	else
+	{
+		if (myColour == -1)
 		{
-		case 0:
-			game->getRobots()[robotNr]->setColour(0.5f, 1.0f, 0.5f);
-			break;
-		case 1:
-			game->getRobots()[robotNr]->setColour(1.0f, 0.5f, 0.0f);
-			break;
-		case 2:
-			game->getRobots()[robotNr]->setColour(1.0f, 0.8f, 1.0f);
-			break;
-		case 3:
-			game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 1.0f);
-			break;
-		case 4:
-			game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 1.0f);
-			break;
-		default:
-			break;
+			myColour = 0;
+			for (int i = 0; i > -4; i--)
+			{
+				int index = (myColour + i) % 5;
+				if (index < 0)
+					index = 5 + index;
+				if (m_availableColours[index] == 1)
+				{
+					m_availableColours[index] = 0;
+					m_robotColour[robotNr] = index;
+					break;
+				}
+			}
 		}
-		Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
+		else
+		{
+			for (int i = -1; i > -5; i--)
+			{
+				int index = (myColour + i) % 5;
+				if (index < 0)
+					index = 5 + index;
+				if (m_availableColours[index] == 1)
+				{
+					m_availableColours[myColour] = 1;
+					m_availableColours[index] = 0;
+					m_robotColour[robotNr] = index;
+					break;
+				}
+			}
+		}
+
 	}
+	// Set colour
+	switch (m_robotColour[robotNr])
+	{
+	case 0:
+		game->getRobots()[robotNr]->setColour(0.5f, 1.0f, 0.5f);
+		break;
+	case 1:
+		game->getRobots()[robotNr]->setColour(1.0f, 0.5f, 0.0f);
+		break;
+	case 2:
+		game->getRobots()[robotNr]->setColour(1.0f, 0.8f, 1.0f);
+		break;
+	case 3:
+		game->getRobots()[robotNr]->setColour(0.0f, 1.0f, 1.0f);
+		break;
+	case 4:
+		game->getRobots()[robotNr]->setColour(1.0f, 0.0f, 1.0f);
+		break;
+	default:
+		break;
+	}
+	Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
+}
 
 void MainMenuState::firstTimeSetUp(Game* game)
 {
@@ -702,97 +702,107 @@ void MainMenuState::firstTimeSetUp(Game* game)
 		//if (i != 0)
 			//m_uiElements[i]->fadeIn(1.0f, 0.0f); // Fade out?
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		m_botElements[i]->setDrawn(false);
+	}
+	m_startElement->setDrawn(false);
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		game->getInput()->setBlocked(i, true);
 
 	// SET UP LOGIC //
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		m_readyState[i] = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		game->leavePlayerIdIndex(i);
+	}
 }
-	void MainMenuState::leaveColour(int robotNr)
-	{
-		m_availableColours[m_robotColour[robotNr]] = 1;
-		m_robotColour[robotNr] = -1;
+void MainMenuState::leaveColour(int robotNr)
+{
+	m_availableColours[m_robotColour[robotNr]] = 1;
+	m_robotColour[robotNr] = -1;
 
+}
+
+
+
+void MainMenuState::handleInput(Game* game)
+{
+}
+
+bool MainMenuState::update(Game* game, float dt)
+{
+	if (handleInputs(game, dt))
+		return 1;
+	game->updatePlayerStatus();
+	m_uiElements[1]->updateElement(dt);
+	//if(m_activeMenu == ActiveMainMenu::e_startGame)
+	//	m_uiElements[2]->updateElement(AnimationType::e_sprite, dt);
+	//if (m_activeMenu == ActiveMainMenu::e_options)
+	//	m_uiElements[3]->updateElement(AnimationType::e_sprite, dt);
+	//if (m_activeMenu == ActiveMainMenu::e_quit)
+	//	m_uiElements[4]->updateElement(AnimationType::e_sprite, dt);
+
+	switch (m_menuState)
+	{
+	case MenuState::e_mainMenu:
+		u_mainMenu(game, dt);
+		break;
+	case MenuState::e_robotSelection:
+		u_robotSelection(game, dt);
+		break;
+	case MenuState::e_optionsMenu:
+		break;
+	default:
+		break;
 	}
+	return 0;
+}
 
+void MainMenuState::draw(Game* game, renderPass pass)
+{
 
-	void MainMenuState::handleInput(Game * game)
+	if (pass == renderPass::e_menu)
 	{
-	}
-
-	bool MainMenuState::update(Game * game, float dt)
-	{
-		if (handleInputs(game, dt))
-			return 1;
-		game->updatePlayerStatus();
-		m_uiElements[1]->updateElement(dt);
-		//if(m_activeMenu == ActiveMainMenu::e_startGame)
-		//	m_uiElements[2]->updateElement(AnimationType::e_sprite, dt);
-		//if (m_activeMenu == ActiveMainMenu::e_options)
-		//	m_uiElements[3]->updateElement(AnimationType::e_sprite, dt);
-		//if (m_activeMenu == ActiveMainMenu::e_quit)
-		//	m_uiElements[4]->updateElement(AnimationType::e_sprite, dt);
-
-		switch (m_menuState)
+		for (int i = 0; i < m_uiElements.size(); i++)
 		{
-		case MenuState::e_mainMenu:
-			u_mainMenu(game, dt);
-			break;
-		case MenuState::e_robotSelection:
-			u_robotSelection(game, dt);
-			break;
-		case MenuState::e_optionsMenu:
-			break;
-		default:
-			break;
+			if (m_uiElements[i]->isDrawn() && i != 2 && i != 3 && i != 4)
+				m_uiElements[i]->draw();
 		}
-		return 0;
+		for (int i = 0; i < ARRAYSIZE(m_botElements); i++)
+		{
+			if (m_botElements[i]->isDrawn())
+				m_botElements[i]->draw();
+		}
+		if (m_startElement->isDrawn())
+			m_startElement->draw();
+
 	}
 
-	void MainMenuState::draw(Game * game, renderPass pass)
+	else if (pass == renderPass::e_menuAni)
 	{
-
-		if (pass == renderPass::e_menu)
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[2]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[2]->draw();
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[3]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[3]->draw();
+		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[4]->getConstantBuffer()->getConstantBuffer());
+		m_uiElements[4]->draw();
+	}
+	else
+	{
+		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			for (int i = 0; i < m_uiElements.size(); i++)
+			if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
 			{
-				if (m_uiElements[i]->isDrawn() && i != 2 && i != 3 && i != 4)
-					m_uiElements[i]->draw();
-			}
-			for (int i = 0; i < ARRAYSIZE(m_botElements); i++)
-			{
-				if (m_botElements[i]->isDrawn())
-					m_botElements[i]->draw();
-			}
-			if(m_startElement->isDrawn())
-				m_startElement->draw();
 
-		}
+				game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
 
-		else if (pass == renderPass::e_menuAni)
-		{
-			DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[2]->getConstantBuffer()->getConstantBuffer());
-			m_uiElements[2]->draw();
-			DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[3]->getConstantBuffer()->getConstantBuffer());
-			m_uiElements[3]->draw();
-			DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_uiElements[4]->getConstantBuffer()->getConstantBuffer());
-			m_uiElements[4]->draw();
-		}
-		else
-		{
-			for (int i = 0; i < XUSER_MAX_COUNT; i++)
-			{
-				if (game->getRobots()[i] != nullptr && game->getRobots()[i]->isDrawn())
-				{
+				//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);*/
 
-					game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 1);
-
-					//game->getPreLoader()->setSubModelData(objectType::e_robot, game->getRobots()[i]->getData(), 0, 6);*/
-
-					game->getPreLoader()->draw(objectType::e_robot);
-				}
+				game->getPreLoader()->draw(objectType::e_robot);
 			}
 		}
-
 	}
+
+}
