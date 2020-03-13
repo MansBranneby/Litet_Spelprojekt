@@ -461,6 +461,12 @@ void UserInterface::draw()
 
 void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
 {
+	int reduction = 0;
+	for (int i = 0; i < playerIndex; i++)
+	{
+		if (!m_drawPlayer[i]) reduction++;
+	}
+	playerIndex -= reduction;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	int elementIndex = playerIndex * 9 + abilityType;
 
