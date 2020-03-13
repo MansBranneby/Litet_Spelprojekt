@@ -36,7 +36,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 		std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score_platform);
 		// Test each player against collision mesh
 		bool hasCollided = false;
-
+		
 		//for (int i = 0; i < BB.size(); ++i)
 		//{
 		//	hasCollided = false;
@@ -233,7 +233,7 @@ void ScoreState::handleInputs(Game* game, float dt)
 			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 			XMVECTOR newPos = m_robots[i]->getPosition();
 			float l = XMVectorGetX(XMVector3Length(v));
-			float d = robotBD.halfWD.x * 2.0f;
+			float d = robotBD.halfWD.x;
 
 			// if robot moved further than its diameter
 			if (d < l)
