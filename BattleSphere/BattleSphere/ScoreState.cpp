@@ -106,7 +106,7 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						break; // Collision found so we jump out
 					}
 				}
-
+				// Change
 				// If one or more collisions have been detected with platform it will be lit up
 				int nrOfReadyPlayers = 0;
 				if (hasCollided)
