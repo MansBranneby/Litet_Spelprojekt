@@ -514,8 +514,8 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		{
 			if (game->getRobots()[i] != nullptr)
 			{
-				game->getRobots()[i]->setPosition(ROBOT_START_POS[i]);
-				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[i]);
+				game->getRobots()[i]->setPosition(ROBOT_START_POS[game->getRobots()[i]->getRobotID()]);
+				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[game->getRobots()[i]->getRobotID()]);
 			}
 		}
 		setPaused(true);

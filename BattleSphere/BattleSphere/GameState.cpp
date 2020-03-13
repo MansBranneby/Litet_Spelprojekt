@@ -1338,7 +1338,7 @@ void GameState::draw(Game* game, renderPass pass)
 					int size = (int)m_robots[i]->getWeapons().size();
 					for (int j = 0; j < size; j++)
 					{
-						m_userInterface->drawAbility(i, m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+						m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
 					}
 				}
 			}
