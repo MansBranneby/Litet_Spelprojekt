@@ -716,6 +716,7 @@ void MainMenuState::firstTimeSetUp(Game* game)
 	}
 	for (int i = 3; i < 5; i++)
 		m_uiElements[i]->setAnimated(false);
+	m_uiElements[2]->setAnimated(true);
 	for (int i = 8; i < 17; i++) // Robot selection
 	{
 		m_uiElements[i]->setDrawn(false);
