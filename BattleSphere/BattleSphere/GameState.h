@@ -13,6 +13,7 @@
 #include "LineShots.h"
 #include "BillboardHandler.h"
 #include "UserInterface.h"
+#include "Game.h"
 #include <math.h>
 
 class GameState : public State 
@@ -54,7 +55,7 @@ private:
 	float m_sawInterval;
 
 	void handleMovement(Game* game, float dt, int id);
-	void handleInputs(Game* game, float dt);
+	bool handleInputs(Game* game, float dt);
 
 	// Quit Game
 	bool m_quitGame;
@@ -65,6 +66,7 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 	
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);

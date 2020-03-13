@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "GameState.h"
+#include "MainMenuState.h"
 
 int Game::setPlayerIdIndex(int id)
 {
@@ -132,7 +134,61 @@ void Game::changeState(stateType state)
 		Sound::getInstance()->play(soundMusic::e_game, 0.01f);
 		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
 	}
+	
+	if (isActive(stateType::e_mainMenu))
+	{
+		if (state == stateType::e_gameState)
+		{
+			for (int i = 0; i < m_states.size(); i++)
+			{
+				if (m_states[i]->getType() == stateType::e_mainMenu)
+				{
+					MainMenuState* s = dynamic_cast<MainMenuState*>(m_states[i]);
+					if (s != nullptr)
+						s->reset();
+					m_states[i]->setPaused(true);
+				}
+			}
+		}
+	}
 
+	if (isActive(stateType::e_gameState))
+	{
+		if (state == stateType::e_mainMenu)
+		{
+			for (int i = 0; i < m_states.size(); i++)
+			{
+				if (m_states[i]->getType() == stateType::e_gameState)
+				{
+					//delete m_states[i];
+					//m_states.erase(m_states.begin() + i);
+					//m_states.push_back(new GameState(this));
+					m_states[i]->setPaused(true);
+					Sound::getInstance()->stop(soundMusic::e_game);
+					Sound::getInstance()->stop(soundAmbient::e_background);
+
+					GameState* s = dynamic_cast<GameState*>(m_states[i]);
+					if (s != nullptr) 
+						s->reset();
+					ProjectileBank::getInstance()->release();
+
+					for (int j = 0; j < XUSER_MAX_COUNT; j++)
+					{
+						if (m_robots[j] != nullptr)
+						{
+							m_robots[j]->release();
+							m_robots[j]->reset();
+
+							//m_playerId[j] = -1;
+							//m_robots[j] = nullptr;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+	
 	for (int i = 0; i < m_states.size(); i++)
 	{
 		if (m_states[i]->getType() == state)
@@ -171,6 +227,11 @@ void Game::release()
 			m_robots[i]->release();
 			delete m_robots[i];
 		}
+	}
+
+	for (int i = 0; i < m_states.size(); i++)
+	{
+		delete m_states[i];
 	}
 
 	delete m_quadtree;

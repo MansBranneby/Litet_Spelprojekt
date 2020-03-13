@@ -336,7 +336,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		m_menuState = MenuState::e_mainMenu;
 		m_activeMenu = ActiveMainMenu::e_startGame;
 
-		setPaused(true);
+		//setPaused(true);
 		game->changeState(stateType::e_gameState);
 
 		m_menuState = MenuState::e_mainMenu;
@@ -375,6 +375,26 @@ void MainMenuState::pause()
 
 void MainMenuState::resume()
 {
+}
+
+void MainMenuState::reset()
+{
+	m_menuState = MenuState::e_mainMenu;
+	m_activeMenu = ActiveMainMenu::e_startGame;
+
+	m_availableColours[0] = 1;
+	m_availableColours[1] = 1;
+	m_availableColours[2] = 1;
+	m_availableColours[3] = 1;
+	m_availableColours[4] = 1;
+
+	m_readyState[0] = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		m_readyState[i] = 0;
+
+	m_selectionTimer = 0.0f;
+
+	m_uiElements[2]->setAnimated(true);
 }
 
 bool MainMenuState::handleInputs(Game* game, float dt)

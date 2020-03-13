@@ -183,7 +183,7 @@ void createRenderResources()
 	g_menu = new Menu();
 	g_shadowMapping = new ShadowMapping();
 	XMVECTOR camPos = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - g_shadowMapping->getCamera()->getPosition());
-	Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
+	g_sunMoonIndex = Lights::getInstance()->addDirectionalLight(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos),
 											(float)238 / 255, (float)220 / 255, (float)165 / 255, 5.0f);
 }
 
@@ -433,6 +433,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
+
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 
 					DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
@@ -500,9 +501,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					float sunColorCoeff = (XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(sunDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 					float moonColorCoeff = (XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) > 0.0f) ? XMVectorGetX(XMVector3Dot(moonDir, XMVectorSet(0, -1, 0, 0))) : 0.0f;
 
-					sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
-					sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
-					sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
+					//sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
+					//sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
+					//sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
+
+					sunColor[0] = 100 * pow(sunColorCoeff * 0.8f, 0.1f) / 255;
+					sunColor[1] = 50 * pow(sunColorCoeff * 0.6f, 0.2f) / 255;
+					sunColor[2] = 100 * pow(sunColorCoeff * 0.8f, 0.1f) / 255;
 
 					moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
 					moonColor[1] = 50 * pow(moonColorCoeff * 0.6f, 0.2f) / 255;	// 0.5f för lila
@@ -530,6 +535,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
+					sunPos = sunStartPos;
+					moonPos = XMVector3Rotate(sunPos, XMVectorSet((float)sin(XM_PI / 2) * 0.5f, 0, (float)sin(XM_PI / 2), (float)cos(XM_PI / 2)));
+					XMVECTOR sunDir = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - sunPos);
+					Lights::getInstance()->setDirection(g_sunMoonIndex, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
+					g_shadowMapping->getCamera()->setPosition(sunStartPos);
+					g_shadowMapping->getCamera()->updateBuffers();
+
 					g_Game->draw(renderPass::e_menu);
 
 					DX::getInstance()->getDeviceContext()->PSSetShader(&g_menu->getPixelShader(1)->getPixelShader(), nullptr, 0);
@@ -538,8 +550,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->RSSetState(g_graphicResources.getRasterizerState());
 					g_lightCulling.updateSubresource();
 					g_lightCulling.cullLights();
+
 					//DX::getInstance()->getDeviceContext()->ClearRenderTargetView(*g_graphicResources.getBackBuffer(), clearColour);
-					//DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_graphicResources.getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+					DX::getInstance()->getDeviceContext()->ClearDepthStencilView(g_shadowMapping->getDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 					DX::getInstance()->getDeviceContext()->OMSetBlendState(0, 0, 0xffffffff);
 					DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, g_graphicResources.getBackBuffer(), g_graphicResources.getDepthStencilView());
 					DX::getInstance()->getDeviceContext()->VSSetConstantBuffers(0, 1, g_menu->getCamera(true)->getConstantBufferVP()->getConstantBuffer());
@@ -560,8 +573,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 					//finalRender();
 
-					ID3D11ShaderResourceView* nullRTV = { NULL };
-					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullRTV);
+					ID3D11ShaderResourceView* nullSRV = { NULL };
+					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullSRV);
 				}
 
 				ImGui_ImplDX11_NewFrame();
@@ -593,7 +606,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 				//realistic colours
 				//sunColor[0] = 255 * pow(sunColorCoeff, 0.1f) / 255;
-				//sunColor[1] = 235 * pow(sunColorCoeff, 0.35f) / 255;
+				//sunColor[1] = 255 * pow(sunColorCoeff, 0.35f) / 255;
 				//sunColor[2] = 215 * pow(sunColorCoeff, 0.8f) / 255;
 				//moonColor[0] = 50 * pow(moonColorCoeff * 0.6f, 0.8f) / 255; //0.05f för lila
 				//moonColor[1] = 50 * pow(moonColorCoeff * 0.6f, 0.2f) / 255;	// 0.5f för lila
@@ -624,9 +637,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_bloom;
 		delete g_materialTest;
 		delete g_constantBufferMaterials;
-		delete g_mainMenuState;
-		delete g_gameState;
-		delete g_scoreState;
+		//delete g_mainMenuState;
+		//delete g_gameState;
+		//delete g_scoreState;
 		delete g_menu;
 		delete g_shadowMapping;
 		//DX::getInstance()->reportLiveObjects();

@@ -55,6 +55,7 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);

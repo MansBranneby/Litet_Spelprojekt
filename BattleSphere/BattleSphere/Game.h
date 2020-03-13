@@ -19,6 +19,8 @@
 using namespace DirectX;
 
 class State;
+class GameState;
+class MainMenuState;
 class Game
 {
 	

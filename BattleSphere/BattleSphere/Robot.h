@@ -93,5 +93,6 @@ public:
 	void setVel(DirectX::XMVECTOR vel);
 	DirectX::XMVECTOR getVel() const;
 
+	void reset();
 	void release();
 };
