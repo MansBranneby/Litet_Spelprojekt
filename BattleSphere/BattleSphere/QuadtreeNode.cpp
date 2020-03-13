@@ -327,8 +327,8 @@ float QuadtreeNode::testCollisionT(XMFLOAT2 start, XMFLOAT2 end)
 				triangles[1] = XMLoadFloat3(&m_cMeshes[ind1]);
 				triangles[2] = XMLoadFloat3(&m_cMeshes[ind2]);
 
-				XMVECTOR startReal = { start.x, 0.5f, start.y };
-				XMVECTOR endReal = { end.x, 0.5f, end.y };
+				XMVECTOR startReal = { start.x, 1.5f, start.y };
+				XMVECTOR endReal = { end.x, 1.5f, end.y };
 
 				float currT = testLineTriangleT(startReal, endReal, triangles);
 				if (currT != -1.0f)
