@@ -72,7 +72,7 @@ MainMenuState::MainMenuState()
 	m_resolutions.push_back({ 3840.0f, 2160.0f });
 	m_resolutions.push_back({ 7680.0f, 4320.0f });
 
-	m_originalFullscreenSetting = m_fullscreen = false;
+	m_originalFullscreenSetting = m_fullscreen = true;
 	m_musicOn = true;
 	m_selectedResIndex = 2;
 	m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
@@ -81,6 +81,15 @@ MainMenuState::MainMenuState()
 		m_resolutionElements[i]->setDrawn(true);
 		m_resolutionElements[i]->fadeOut(0.1f, 0.0f);
 	}
+
+	DX::getInstance()->setScreen
+	(
+		m_fullscreen,
+		m_resolutions[m_selectedResIndex].x,
+		m_resolutions[m_selectedResIndex].y
+	);
+
+	adjustElementsForScreen();
 }
 
 MainMenuState::~MainMenuState()
@@ -131,9 +140,9 @@ bool MainMenuState::hi_mainMenu(Game* game)
 			m_optionElements[0]->fadeIn(0.5f, 0.5f);
 			m_optionElements[1]->setDrawn(true);
 			m_optionElements[2]->setDrawn(true);
-			m_optionElements[2]->fadeIn(0.5f, 0.5f);
+			m_optionElements[2]->fadeOut(0.0f, 0.0f);
 			m_optionElements[3]->setDrawn(true);
-			m_optionElements[3]->fadeOut(0.0f, 0.0f);
+			m_optionElements[3]->fadeIn(0.5f, 0.5f);
 			m_optionElements[4]->setDrawn(true);
 			m_optionElements[4]->fadeIn(0.5f, 0.5f);
 			m_optionElements[5]->setDrawn(true);
