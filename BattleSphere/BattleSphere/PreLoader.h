@@ -35,7 +35,7 @@ public:
 	BillboardData getSubModelBillboardData(objectType type, int variant, int modelNr, int subModelNr);
 	int getNrOfVariants(objectType type) const;
 	int getNrOfModels(objectType type, int variant) const;
-	int getNrOfSubModels(objectType type, int modelNr, int variant) const;
+	int getNrOfSubModels(objectType type, int variant, int modelNr) const;
 
 	void setStaticData(objectType type, objectData data, int variant = 0); // Set position for static objects
 

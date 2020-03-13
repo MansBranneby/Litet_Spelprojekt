@@ -2,8 +2,8 @@
 
 Gamepad::Gamepad()
 {
-	m_deadZoneX = 0.1f;
-	m_deadZoneY = 0.1f;
+	m_deadZoneX = 0.2f;
+	m_deadZoneY = 0.2f;
 	m_state.Gamepad.wButtons = 0;
 	m_vibration.wLeftMotorSpeed = 0;
 	m_vibration.wRightMotorSpeed = 0;

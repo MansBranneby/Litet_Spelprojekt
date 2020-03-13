@@ -47,6 +47,8 @@ private:
 	bool m_originalFullscreenSetting;
 	XMFLOAT2 m_originalResolutionSetting;
 
+	UI_Element* m_botElements[4];
+	UI_Element* m_startElement;
 	MenuState m_menuState;
 	ActiveMainMenu m_activeMenu;
 	ActiveOptionsMenu m_optionsMenu;
@@ -60,6 +62,7 @@ private:
 	void changeColour(Game* game, int i, bool dir);
 	void adjustElementsForScreen();
 
+	void leaveColour(int robotNr);
 public:
 	MainMenuState();
 	virtual ~MainMenuState();
@@ -74,6 +77,7 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);

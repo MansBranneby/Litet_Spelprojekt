@@ -31,7 +31,10 @@ ConstantBuffer::ConstantBuffer(const void* data, UINT dataSize)
 ConstantBuffer::~ConstantBuffer()
 {
 	if (m_constantBuffer)
+	{
 		m_constantBuffer->Release();
+		m_constantBuffer = nullptr;
+	}
 }
 
 void ConstantBuffer::updateBuffer(const void* data, UINT dataSize)

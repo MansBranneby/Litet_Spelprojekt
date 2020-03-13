@@ -23,19 +23,22 @@ private:
 	float m_countDownTimer;
 	bool m_quitGame;
 
+	bool m_drawPlayer[4];
 	void setElementPos();
 
 public:
 	UserInterface(int nrOfPlayers);
 	~UserInterface();
-
+	void addPlayer(int playerIndex);
 	void setPlayerColours(int playerIndex, XMVECTOR colour);
 	void setSlotID(int playerIndex, int abilityType);
 	void setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext);
 
 	void update();
 	bool updateCountDown(float dt);
-	void updateQuitGame(int dir);
+	void updateQuitGame(float dt);
+	void setQuitGame(bool quitGame);
+	void quitGameHI(int dir);
 	void draw();
 	void drawAbility(int playerIndex, int abilityType, float cd);
 	void drawQuitGame();

@@ -1,11 +1,11 @@
 #pragma once
 #include "GameObject.h"
 
-#define OFFER_TIME 24.5f // Default 3.0f - Time to offer color transaction
-#define BLINKING_TIME 5.5f // Default 3.0f - Time to blink before changing type
+#define OFFER_TIME 15.0f // Default 3.0f - Time to offer color transaction
+#define BLINKING_TIME 3.5f // Default 3.0f - Time to blink before changing type
 #define BLINKING_FREQUENCY 1.0f // Blinks per second
-#define DOWN_TIME 2.0f // Time to offer no color
-#define TRANSITION_TIME 2.5f // Default 3.0f - Time to transition to new type
+#define DOWN_TIME 1.0f // Time to offer no color
+#define TRANSITION_TIME 1.5f // Default 3.0f - Time to transition to new type
 
 class Node : public GameObject
 {
@@ -27,6 +27,6 @@ public:
 	~Node();
 
 	bool isType(int type);
-	void updateTime(float dT);
+	bool updateTime(float dT);
 };
 

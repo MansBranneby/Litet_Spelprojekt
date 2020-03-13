@@ -124,6 +124,7 @@ PreLoader::PreLoader()
 	//loadFromFile(objectType::e_node, "OnMap\\NodeGoldenDuck(Node)", "NodeGoldenDuck(Node)Coll");
 	loadFromFile(objectType::e_projectile, "projectile", "1mesh1mat");
 	loadFromFile(objectType::e_projectile, "untitled", "1mesh1mat");
+	loadFromFile(objectType::e_projectile, "ball", "1mesh1mat");
 
 
 	// On map (with collision)
@@ -136,6 +137,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "OnMap\\Scenery", "SceneryColl");
 	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
 	loadFromFile(objectType::e_static, "OnMap\\ChinaTown", "ChinaTownColl");
+	loadFromFile(objectType::e_static, "OnMap\\Apartment", "ApartmentsColl");
 		// Nodes
 	loadFromFile(objectType::e_static, "OnMap\\NodeHotel", "NodeHotelColl");
 	loadFromFile(objectType::e_static, "OnMap\\NodeGoldenDuck", "NodeGoldenDuckColl");
@@ -146,12 +148,17 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static, "Background\\SS4", "SS4Coll");*/
 
-	// Billboards
-	loadFromFile(objectType::e_billboard, "TestTower");
-	//loadFromFile(objectType::e_billboard, "OnMap\\ChinaTown"); // Later to static
+	// Collidable billboards
+	//loadFromFile(objectType::e_static_billboard, "TestTower", "BSTowerColl");
+
+	// ScoreRoom billboards
+	loadFromFile(objectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomPlatforms", "ScoreRoomPlatformsColl");
+	loadFromFile(objectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
+	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
+	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
+	//ObjectType::e_static_billboard_score
 
 	// Background
-	loadFromFile(objectType::e_scene, "OnMap\\Apartment");
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
 	loadFromFile(objectType::e_ground, "Background\\Ground");
@@ -212,7 +219,7 @@ std::vector<XMFLOAT3> PreLoader::getCollisionMesh(objectType type, objectData da
 BillboardData PreLoader::getSubModelBillboardData(objectType type, int variant, int modelNr, int subModelNr)
 {
 	
-	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);;
+	return m_objects[(int)type][variant][modelNr].getSubModelBillboardData(subModelNr);
 }
 
 int PreLoader::getNrOfVariants(objectType type) const
@@ -225,7 +232,7 @@ int PreLoader::getNrOfModels(objectType type, int variant) const
 	return m_nrOfmodels[(int)type][variant];
 }
 
-int PreLoader::getNrOfSubModels(objectType type, int modelNr, int variant) const
+int PreLoader::getNrOfSubModels(objectType type, int variant, int modelNr) const
 {
 	return m_objects[(int)type][variant][modelNr].getNrOfSubModels();
 }

@@ -92,7 +92,7 @@ bool Node::isType(int type)
 	return false;
 }
 
-void Node::updateTime(float dT)
+bool Node::updateTime(float dT)
 {
 	// Update loop time
 	m_loopTime += dT;
@@ -113,6 +113,7 @@ void Node::updateTime(float dT)
 	{
 		pickNewColor();
 		m_newColorPicked = true;
+		return true;
 	}
 	else if (m_loopTime < OFFER_TIME + BLINKING_TIME + DOWN_TIME + TRANSITION_TIME) // Transition to new color
 	{
@@ -123,4 +124,5 @@ void Node::updateTime(float dT)
 		m_loopTime = 0.0f;
 		m_newColorPicked = false;
 	}
+	return false;
 }

@@ -30,6 +30,7 @@ Sound::Sound()
 	m_effect[(int)soundEffect::e_sniper] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_energy] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/energygun2.wav");
 	m_effect[(int)soundEffect::e_explosion] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/explosion.wav");
+	m_effect[(int)soundEffect::e_death] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/death.wav");
 
 	m_ambient[(int)soundAmbient::e_background] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/City_Amb_01.wav");
 	m_ambient[(int)soundAmbient::e_drone] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/helicopter-hovering-01.wav");
@@ -131,10 +132,7 @@ void Sound::stop(soundAmbient sound)
 
 void Sound::stop(soundMusic sound)
 {
-	if (!m_musicOn)
-	{
 		m_musicInstances[(int)sound]->Stop(true);
-	}
 }
 
 void Sound::toggleMusic()

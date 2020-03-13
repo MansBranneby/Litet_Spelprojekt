@@ -217,15 +217,15 @@ void Particles::addEngineFlame(XMVECTOR pos, XMVECTOR dir, XMVECTOR col, float r
 	XMVECTOR newDir = XMVector3Normalize(dir);
 	XMVECTOR size = { 0.6f, 0.9f, 0.0f, 0.0f };
 	float speed = (robVel > 8.0f) ? robVel : 8.0f;
-	float lifeSpan = 0.08f;
+	float lifeSpan = 0.04f;
 	float spread = 0.85f;
-	if (robVel > 80.0) // Dash
+	if (robVel > 160.0) // Dash
 	{ 
 		size = XMVectorSet(2.0f, 2.0f, 0.0f, 0.0f);
 		lifeSpan *= 4.0f;
 		spread = 0.3f;
 	}
-	else if (robVel > 25.0f) // Movement boost
+	else if (robVel > 50.0f) // Movement boost
 	{
 		lifeSpan *= 3.0f;
 		spread = 1.5f;

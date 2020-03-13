@@ -27,8 +27,8 @@ using namespace DirectX;
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
 #define ROTATION_SPEED 60.0f
-#define FAST_TRAVEL_SPEED 35.0f
-#define SLOW_TRAVEL_SPEED 14.0f
+#define FAST_TRAVEL_SPEED 55.0f
+#define SLOW_TRAVEL_SPEED 20.0f
 #define DRONE_START XMVectorSet(-88.0f, 13.0f, 145.0f, -1)
 #define DRONE_RISE_START XMVectorSet(-75.0f, 13.0f, 120.0f, -1)
 #define DRONE_MIDPOINT XMVectorSet(-15.0f, 13.0f, 50.0f, -1)
@@ -42,17 +42,17 @@ using namespace DirectX;
 #define TRAVEL_HEIGHT 50.0f
 
 // Spawning
-#define START_SPAWNED_RESOURCES 30
-#define MAX_RESOURCES_OUT_PER_PLAYER 2 // Default 2
-#define SPAWN_INTERVAL 30.0f
+#define START_SPAWNED_RESOURCES 4
+#define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
+#define SPAWN_INTERVAL 10.0f
 #define SPECIAL_RESOURCE_CHANCE 25 // % chance
 
 // Resource
-#define FLOAT_INTENSITY 6.0f // Default 6
+#define FLOAT_INTENSITY 10.0f // Default 6
 #define FLOAT_HEIGHT 3.0f // Default 3
-#define SPIN_INTENSITY 20.0f // Default 20
+#define SPIN_INTENSITY 35.0f // Default 20
 #define SMALL_SCALE 0.7f // Default 0.9
-#define SPAWN_ANIMATION_TIME 3.5f
+#define SPAWN_ANIMATION_TIME 6.5f
 #define SPAWN_HEIGHT 170.0f
 #define FINAL_HEIGHT 0.6f
 #define SPOTLIGHT_Y_OFFSET 30.0f
@@ -60,15 +60,15 @@ using namespace DirectX;
 
 
 // Normal resources
-#define PISTOL 0
-#define RIFLE 1
-#define MOVEMENT 2
-#define SHIELD 3
-#define DASH 4
-#define REFLECT 5
-#define SNIPER 6
-#define BEYBLADE 7
-#define ENERGY 8
+#define PISTOL 0 // 2
+#define RIFLE 1 // 7
+#define MOVEMENT 2 // 3
+#define SHIELD 3 // 1
+#define DASH 4 // 4
+#define REFLECT 5 // 0
+#define SNIPER 6 // 6
+#define BEYBLADE 7 // 5
+#define ENERGY 8 // 8
 
 // UI
 #define NR_OF_ICON_SLOTS 16
@@ -81,6 +81,11 @@ using namespace DirectX;
 #define OBJECT_TYPES 9 // Nr of object types
 enum class objectType
 {
+	e_static_billboard_score_platform,
+	e_score_scene,
+	e_number_billboard,
+	e_static_billboard_score,
+	e_static_billboard,
 	e_extra,
 	e_drone,
 	e_weapon,
@@ -117,6 +122,7 @@ enum class stateType
 {
 	e_gameState,
 	e_mainMenu,
+	e_scoreState,
 	e_default
 };
 

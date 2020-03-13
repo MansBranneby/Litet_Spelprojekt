@@ -4,23 +4,43 @@ BillboardHandler::BillboardHandler()
 {
 }
 
-BillboardHandler::BillboardHandler(PreLoader* preLoader)
+BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<objectType> objectTypes)
 {
-	// Create as many billboards as submodels
-	for (int i = 0; i < preLoader->getNrOfVariants(objectType::e_billboard); ++i)
+	for(int i = 0; i < objectTypes.size(); ++i)
 	{
-		for (int j = 0; j < preLoader->getNrOfModels(objectType::e_billboard, i); ++j)
+		// Create as many billboards as submodels for all the types in inside "createTheseBillboards"
+		for (int j = 0; j < preLoader->getNrOfVariants(objectTypes[i]); ++j)
 		{
-			if (j == 1)
-				float b = 10.0f;
-
-			for (int k = 0; k < preLoader->getNrOfSubModels(objectType::e_billboard, j, i); ++k)
+			for (int k = 0; k < preLoader->getNrOfModels(objectTypes[i], j); ++k)
 			{
-				BillboardData tempBillboardData = preLoader->getSubModelBillboardData(objectType::e_billboard, i, j, k);
-				m_billboards.push_back(Billboard(i, j, k, tempBillboardData)); // Each billboard knows its variantNr, modelNr and submodelNr
+				for (int l = 0; l < preLoader->getNrOfSubModels(objectTypes[i], j, k); ++l)
+				{
+					BillboardData tempBillboardData = preLoader->getSubModelBillboardData(objectTypes[i], j, k, l);
+					m_billboards.push_back(Billboard(objectTypes[i], j, k, l, tempBillboardData)); // Each billboard knows its variantNr, modelNr and submodelNr
+				}
 			}
 		}
 	}
+
+	for (int i = 0; i < m_billboards.size(); ++i)
+	{
+		switch (m_billboards[i].getObjectType())
+		{
+			case objectType::e_number_billboard:
+				m_numberBillboards.push_back(m_billboards[i]);
+				std::rotate(m_numberBillboards.rbegin(), m_numberBillboards.rbegin() + 1, m_numberBillboards.rend());
+				break;
+			case objectType::e_static_billboard:
+				m_staticBillboards.push_back(m_billboards[i]);
+				break;
+			case objectType::e_static_billboard_score_platform:
+				m_staticBillboardPlatform.push_back(m_billboards[i]);
+				break;
+
+		}
+	}
+	
+	//}
 	//// predefined colours
 	//DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
 	//DirectX::XMVECTOR lightblue = {0.0f, 0.3f, 0.4f, 1.0f };
@@ -28,10 +48,6 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader)
 	//DirectX::XMVECTOR lightPink = { 0.6f, 0.2f, 0.5f , 1.0f };
 	//DirectX::XMVECTOR purple = { 0.6f, 0.0f, 0.8f , 1.0f };
 	//DirectX::XMVECTOR darkPurple = { 0.4f, 0.0f, 0.4f , 1.0f };
-
-	//m_billboards[3].setAllStates(0.1f, 0.02f, lightPink, cyan, { -0.03f });
-	//m_billboards[2].setAllStates(0.01f, 0.02f, darkPurple, cyan, {-0.03f});
-	//m_billboards[5].setFlashState(0.05f);
 }
 
 BillboardHandler::~BillboardHandler()
@@ -40,6 +56,24 @@ BillboardHandler::~BillboardHandler()
 
 std::vector<Billboard> BillboardHandler::getBillboards() const
 {
+	return m_billboards;
+}
+
+std::vector<Billboard> BillboardHandler::getBillboardsOfType(objectType objectType) const
+{
+	switch (objectType)
+	{
+	case objectType::e_number_billboard:
+		return m_numberBillboards;
+		break;
+	case objectType::e_static_billboard:
+		return m_staticBillboards;
+		break;
+	case objectType::e_static_billboard_score_platform:
+		return m_staticBillboardPlatform;
+		break;
+	}
+
 	return m_billboards;
 }
 
@@ -59,4 +93,14 @@ void BillboardHandler::updateBillboards(float dt)
 	// Update billboards
 	for (int i = 0; i < m_billboards.size(); ++i)
 		m_billboards[i].update(dt);
+}
+
+void BillboardHandler::setAllStates(int i,float flashSpeed, float colourChangeSpeed, DirectX::XMVECTOR colourA, DirectX::XMVECTOR colourB, DirectX::XMVECTOR velocityUV)
+{
+	m_billboards[i].setAllStates(flashSpeed, colourChangeSpeed, colourA, colourB, velocityUV);	
+}
+
+void BillboardHandler::setNoneState(int i)
+{
+	m_billboards[i].setState(BillboardState::e_none);
 }

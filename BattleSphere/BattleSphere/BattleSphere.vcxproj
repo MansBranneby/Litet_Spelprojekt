@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AI.cpp" />
     <ClCompile Include="BackfaceCuller.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="BillboardHandler.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="QuadtreeNode.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ScoreState.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpawnDrone.cpp" />
@@ -199,6 +201,7 @@
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AI.h" />
     <ClInclude Include="BackfaceCuller.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardHandler.h" />
@@ -242,6 +245,7 @@
     <ClInclude Include="ProjectileBank.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="ScoreState.h" />
     <ClInclude Include="ShadowMapping.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpawnDrone.h" />
@@ -404,6 +408,14 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_main</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="PixelShaderLoadingScreen.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_main</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="PixelShaderMenu.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS_main</EntryPointName>

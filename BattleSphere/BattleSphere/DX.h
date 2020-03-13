@@ -28,6 +28,10 @@ private:
 	float m_width = 1920.0f;
 	float m_height = 1080.0f;
 
+	// Delta time
+	float m_dt = 1.0f;
+	float m_timer;
+
 	// Camera
 	Camera* m_camera;
 
@@ -53,6 +57,9 @@ public:
 	float getHeight();
 	bool fullScreenIsSet();
 
+	void setDeltaTime(float dt, float time = -1.0f);
+	float getDeltaTime();
+
 	void setWidthAndHeight(float width, float height);
 	HRESULT createDirect3DContext(HWND wndHandle);
 	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
@@ -60,6 +67,8 @@ public:
 	void reportLiveObjects();
 	bool screenChanged();
 	void setScreen(bool fullscreen, float width, float height);
+
+	void update(float dt);
 
 	void release();
 };

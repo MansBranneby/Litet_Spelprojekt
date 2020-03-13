@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "WICTextureLoader.h"
+#include <string>
+#include <wchar.h>
 
 class Menu
 {
@@ -15,6 +18,9 @@ private:
 	PixelShader* m_pixelShader;
 	PixelShader* m_pixelShaderAni;
 	PixelShader* m_pixelShaderUI;
+	PixelShader* m_pixelShaderLoadingScreen;
+
+	ID3D11ShaderResourceView* m_loadingScreenSRV;
 
 	void initializeResources();
 
@@ -26,5 +32,7 @@ public:
 	Camera* getCamera(bool perspective);
 	VertexShader* getVertexShader();
 	PixelShader* getPixelShader(int index);
+
+	void setLoadingScreenSRV();
 };
 
