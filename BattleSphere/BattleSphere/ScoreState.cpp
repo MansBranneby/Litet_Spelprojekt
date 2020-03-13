@@ -102,11 +102,11 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 						hasCollided = true;
 						if (m_input->isPressed(i, XINPUT_GAMEPAD_A)) // press A to get ready
 							m_readyPlayers[i] = j; // This player is ready
-
+					
 						break; // Collision found so we jump out
 					}
 				}
-				// Change
+			
 				// If one or more collisions have been detected with platform it will be lit up
 				int nrOfReadyPlayers = 0;
 				if (hasCollided)
@@ -114,15 +114,22 @@ bool ScoreState::updateScoreScorePlatforms(Game* game)
 					// Check amount of ready players
 					if (m_readyPlayers.size() == 1)
 					{
-						for(int k = 0; k < m_readyPlayers.size(); ++k)
+						for (int k = 0; k < m_readyPlayers.size(); ++k)
+						{
 							if(m_readyPlayers[k] != -1) nrOfReadyPlayers++;
+						}
 					}
 					else
 					{
 						for (int k = 1; k < m_readyPlayers.size(); ++k)
 						{
 							if (m_readyPlayers[0] == m_readyPlayers[k] && m_readyPlayers[0] != -1)
+							{
+								objectData data;
+								data.material.emission = cyan * intensity * k;
+								game->getPreLoader()->setSubModelData(BB[j].getObjectType(), data, BB[j].getModelNr(), BB[j].getSubModelNumber(), BB[j].getVariant());
 								nrOfReadyPlayers++;
+							}
 						}
 						nrOfReadyPlayers++;
 					}
