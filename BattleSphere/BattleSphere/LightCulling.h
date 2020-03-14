@@ -7,8 +7,6 @@
 #include <time.h>
 #include "Lights.h"
 
-#define FRUSTUM_COUNT 14000
-#define INDEX_COUNT FRUSTUM_COUNT * LIGHT_COUNT
 class LightCulling
 {
 private:
