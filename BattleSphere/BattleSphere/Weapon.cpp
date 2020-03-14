@@ -96,14 +96,7 @@ Weapon::Weapon(int type)
 
 		setScale(1.0f, 1.0f, 1.0f);
 	}
-	else
-	{
-		m_damage = 5;
-		m_recoil = 0.1f;
-		m_cooldown = 0.5f;
 
-		setScale(0.35f, 0.35f, 0.55f);
-	}
 
 	m_currentRecoil = m_recoil / 2.0f;
 }
@@ -273,16 +266,7 @@ void Weapon::upgrade()
 			m_damage += 10;
 		
 	}
-	else
-	{
-		m_damage += 2;
-		m_recoil -= 0.1f;
-		m_cooldown -= 0.05f;
-		if (m_damage > 15)
-			m_damage = 15;
-		if (m_cooldown < 0.1f)
-			m_cooldown = 0.1f;
-	}
+
 
 	/*
 	if (m_damage > 25.0f) m_damage = 25.0f;
@@ -294,7 +278,7 @@ void Weapon::upgrade()
 
 bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt)
 {
-	if ((m_type == PISTOL || m_type == RIFLE || m_type == ENERGY) && m_ready)
+	if ((m_type == RIFLE || m_type == ENERGY) && m_ready)
 	{
 		m_ready = false;
 
@@ -336,8 +320,6 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 			ProjectileBank::getInstance()->addProjectile(projPos, robotColour, projRot, projDir, m_type, (float)m_damage, m_blastRange, robotId);
 		else
 			ProjectileBank::getInstance()->addProjectile(projPos, robotColour, projRot, projDir, m_type, (float)m_damage, m_blastRange, robotId);
-		if (m_type == PISTOL)
-			Sound::getInstance()->play(soundEffect::e_pistol, projPos, 0.3f, 0.0f, 0.0f);
 		if (m_type == RIFLE)
 			Sound::getInstance()->play(soundEffect::e_rifle, projPos, 0.3f, -0.5f, 0.0f);
 		if (m_type == ENERGY)

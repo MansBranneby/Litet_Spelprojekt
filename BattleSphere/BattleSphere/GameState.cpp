@@ -940,7 +940,7 @@ bool GameState::update(Game* game, float dt)
 				}
 				else
 				{
-					int tierList[9] = { 2, 7, 4, 1, 5, 0, 6, 3, 8 };
+					int tierList[8] = { 6, 3, 1, 4, 0, 5, 2, 7};
 					float highestResource = -10000;
 					int highestIndex = -1;
 					for (int i = 0; i < m_resources.size(); i++)
@@ -1431,6 +1431,8 @@ void GameState::draw(Game* game, renderPass pass)
 					{
 						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE) // TODO: fix this bugg
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+						else
+							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), 0);
 						m_userInterface->drawHealthbar(m_robots[i]->getRobotID(), m_robots[i]->getHealth() / 100.0f);
 					}
 				}

@@ -73,7 +73,7 @@ Node::~Node()
 
 bool Node::isType(int type)
 {
-	if (type == PISTOL || type == RIFLE || type == SNIPER || type == BEYBLADE || type == ENERGY)
+	if (type == RIFLE || type == SNIPER || type == BEYBLADE || type == ENERGY)
 	{
 		if (m_colorType == RED)
 			return true;

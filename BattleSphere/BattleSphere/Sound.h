@@ -13,7 +13,7 @@ using namespace DirectX;
 
 enum class soundEffect
 {
-	e_pistol = 0,
+	
 	e_rifle = 1,
 	e_movement = 2,
 	e_dash = 3,
