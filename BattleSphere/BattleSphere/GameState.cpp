@@ -1411,7 +1411,7 @@ void GameState::draw(Game* game, renderPass pass)
 		m_spawnDrone->setConstantBuffer(false);
 
 		for (int i = 0; i < m_billboardHandler.getNrOfBillboards(); ++i)
-			game->getPreLoader()->draw(objectType::e_billboard, BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
+			game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 	}
 
 	// User interface

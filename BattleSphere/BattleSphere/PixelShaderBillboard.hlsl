@@ -166,9 +166,9 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 fragmentCol;
 
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
-	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
-	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
+	float3 Kd;
+	float3 Ke;
 
 	// ICON WARNING
 	if (iconWarning.x != -1.0f)
@@ -176,6 +176,16 @@ float4 PS_main(PS_IN input) : SV_Target
 		float2 uv = float2(input.tex.x + 0.1111f * iconWarning.x, input.tex.y);
 		Kd = txModel.Sample(sampAni, uv).xyz;
 		Ke = Kd;
+	}
+	else if (txModel.Sample(sampAni, input.tex + velocityUV.xy).w != 0.0f)
+	{
+		Kd = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+		Ke = Kd;
+	}
+	else
+	{
+		Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+		Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	}
 
 	float Ns = KsIn.w; // Specular shininess

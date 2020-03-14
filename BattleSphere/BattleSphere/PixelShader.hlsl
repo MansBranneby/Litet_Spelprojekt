@@ -101,6 +101,7 @@ Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
+Texture2D txModel : register(t4); // Model texture
 
 float4 PS_main(PS_IN input) : SV_Target
 {
@@ -130,14 +131,18 @@ float4 PS_main(PS_IN input) : SV_Target
 	float shadowCoeff = sum / 25.0;
 	
 	
-	
 	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
-	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+	float3 Kd = txModel.Sample(sampAni, input.tex).xyz;
+	float3 Ke = Kd * 0.6f;
+	if (txModel.Sample(sampAni, input.tex).w == 0.0f)
+	{
+		Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+		Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
+	}
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
-	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal

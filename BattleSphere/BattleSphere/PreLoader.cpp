@@ -132,7 +132,6 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static, "Background\\BSPD", "BSPDColl");
 	loadFromFile(objectType::e_static, "OnMap\\Bar", "BarColl");
 	loadFromFile(objectType::e_static, "OnMap\\Wall", "WallColl");
-	loadFromFile(objectType::e_static, "OnMap\\GasStation", "GasStationColl");
 	//loadFromFile(objectType::e_static, "OnMap\\HeadLights", "HeadLightsColl");
 	loadFromFile(objectType::e_static, "OnMap\\Scenery", "SceneryColl");
 	loadFromFile(objectType::e_static, "Background\\Edge", "EdgeColl");
@@ -158,6 +157,11 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
 	//ObjectType::e_static_billboard_score
 
+	// Static billboards
+	loadFromFile(objectType::e_static_billboard, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(objectType::e_static_billboard, "Background\\SS1", "SS1Coll");
+	loadFromFile(objectType::e_static_billboard, "Background\\SS3", "SS3Coll");
+	loadFromFile(objectType::e_static_billboard, "Background\\SS4", "SS4Coll");
 	// Background
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");
