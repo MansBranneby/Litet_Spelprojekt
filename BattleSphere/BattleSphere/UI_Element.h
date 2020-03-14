@@ -32,15 +32,17 @@ private:
 	//uiType m_type;
 	UI_Animation* m_animation;
 
-	float m_posX, m_posY;
+	float m_posX, m_posY, m_truePosX, m_truePosY;
 	float m_destinationX, m_destinationY;
-	float m_sizeX, m_sizeY;
+	float m_sizeX, m_sizeY, m_trueSizeX, m_trueSizeY;
 	float m_spriteSizeX, m_spriteSizeY;
 
 	float m_alpha;
 	bool m_isDrawn;
 	bool m_isReady;
 	float m_selectionTimer;
+
+	bool m_visible;
 
 	ID3D11ShaderResourceView* m_elementSRV;
 	//ID3D11Texture2D* m_texture;
@@ -53,6 +55,8 @@ public:
 	UI_Element(std::wstring fileName, bool isDrawn, float posX = 0.0f, float posY = 0.0f, float sizeX = 0.0f, float sizeY = 0.0f, float spriteSizeX = 0.0f, float spriteSizeY = 0.0f, u_int nrOfFrames = 0);
 	~UI_Element();
 
+	void adjustForScreen();
+	void updateVertexList();
 	void updateElement(float dt);
 	void updateVertexBuffer();
 	void draw();

@@ -38,6 +38,10 @@ private:
 	// Particles
 	Particles* m_particles;
 
+	// Resolution and full screen bool
+	bool m_screenChange;
+	bool m_fullscreen;
+
 public:
 	static DX* getInstance();
 
@@ -47,19 +51,22 @@ public:
 	ID3D11DeviceContext* getDeviceContext();
 	IDXGISwapChain* getSwapChain();
 
-	
-
 	ID3D11DepthStencilState* getDSSEnabled();
 	ID3D11DepthStencilState* getDSSDisabled();
 	float getWidth();
 	float getHeight();
+	bool fullScreenIsSet();
 
 	void setDeltaTime(float dt, float time = -1.0f);
 	float getDeltaTime();
 
+	void setWidthAndHeight(float width, float height);
 	HRESULT createDirect3DContext(HWND wndHandle);
 	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
+	void reInitializeCam(float width, float height, float nearPlane, float farPlane);
 	void reportLiveObjects();
+	bool screenChanged();
+	void setScreen(bool fullscreen, float width, float height);
 
 	void update(float dt);
 

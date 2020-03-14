@@ -33,7 +33,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
-	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -250.0f, -100.0f, 124.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -249.0f, -100.0f, 124.0f, 66.0f));
 
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		m_quitGameElements[i]->setDrawn(false);

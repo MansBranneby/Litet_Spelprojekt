@@ -326,7 +326,7 @@ LightCulling::~LightCulling()
 	}
 	if (m_lights)
 	{
-		delete m_lights;
+		m_lights = nullptr;
 	}
 }
 
@@ -338,8 +338,6 @@ void LightCulling::initialize()
 	createConstantBuffers();
 	createFrustumData();
 	createLightData();
-	
-
 }
 
 void LightCulling::computeFrustum()
@@ -350,9 +348,6 @@ void LightCulling::computeFrustum()
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_computeShaderFrustum->getComputeShader(), NULL, 0);
 	DX::getInstance()->getDeviceContext()->Dispatch(m_dispatchData->threadGroupsX, m_dispatchData->threadGroupsY, m_dispatchData->threadGroupsZ);
 	DX::getInstance()->getDeviceContext()->CopyResource(m_structuredResultBuffer, m_structuredBufferOut);
-
-
-	
 }
 
 void LightCulling::cullLights()
