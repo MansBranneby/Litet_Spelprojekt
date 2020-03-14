@@ -336,6 +336,7 @@ SpawnDrone::SpawnDrone(std::vector<Resource*>* m_resourcesPtr)
 
 SpawnDrone::~SpawnDrone()
 {
+	Lights::getInstance()->disable(m_droneLightIndex);
 	delete m_constantBufferIcons;
 }
 

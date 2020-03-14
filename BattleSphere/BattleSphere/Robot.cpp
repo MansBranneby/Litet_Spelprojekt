@@ -616,6 +616,9 @@ void Robot::reset()
 
 	// Particles
 	m_timeSinceParticles = 0.0f;
+	m_currentMission.index = 0;
+
+	setPosition(-100, 0, 0);
 }
 
 void Robot::release()

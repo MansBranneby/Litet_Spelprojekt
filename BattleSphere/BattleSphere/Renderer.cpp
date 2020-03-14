@@ -591,7 +591,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						if (Graph::getInstance()->getActive(i))
 						{
 							DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
-							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
 					}
@@ -653,9 +652,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
+					rotation = 0;
 					sunPos = sunStartPos;
 					moonPos = XMVector3Rotate(sunPos, XMVectorSet((float)sin(XM_PI / 2) * 0.5f, 0, (float)sin(XM_PI / 2), (float)cos(XM_PI / 2)));
 					XMVECTOR sunDir = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - sunPos);
+					Lights::getInstance()->setColor(g_sunMoonIndex, (float)238 / 255, (float)247 / 255, (float)222 / 255);
 					Lights::getInstance()->setDirection(g_sunMoonIndex, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
 					g_shadowMapping->getCamera()->setPosition(sunStartPos);
 					g_shadowMapping->getCamera()->updateBuffers();
@@ -688,7 +689,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
 					g_Game->draw(renderPass::e_menuScene);
-					DX::getInstance()->getParticles()->draw();
 					//finalRender();
 
 					ID3D11ShaderResourceView* nullSRV = { NULL };
