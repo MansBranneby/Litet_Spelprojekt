@@ -354,7 +354,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 					robNrPlus13 = robotNr + 14;
 					if (game->getRobots()[k] == nullptr)
 					{
-						game->getRobots()[k] = new Robot(robotNr);
+						game->getRobots()[k] = new Robot(k);
 					}
 					game->getRobots()[k]->setDrawn(true);
 					game->getRobots()[k]->setAi(true);
