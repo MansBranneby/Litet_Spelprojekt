@@ -52,6 +52,12 @@ bool Graph::getActive(int index)
 	return m_active[index];
 }
 
+void Graph::reset(int index)
+{
+	m_active[index];
+	m_path[index].clear();
+}
+
 void Graph::setQuadtree(QuadtreeNode* qtn)
 {
 	m_quadtree = qtn;

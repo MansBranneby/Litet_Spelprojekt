@@ -840,8 +840,13 @@ bool GameState::update(Game* game, float dt)
 
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
+
 	for (int j = 0; j < 4; j++)
 	{
+		// Update pathfinding
+		if (Graph::getInstance()->getActive(j))
+			Graph::getInstance()->updatePulse(j, dt);
+
 		if (m_robots[j] != nullptr && m_robots[j]->isDrawn() && m_robots[j]->isAi())
 		{
 			XMVECTOR closestDelta = m_robots[j]->getAIRotation();

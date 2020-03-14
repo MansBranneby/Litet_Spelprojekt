@@ -548,7 +548,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		m_botElements[i]->updateElement(dt);
 	}
 	m_startElement->updateElement(dt);
-	//DX::getInstance()->getParticles()->update(dt);
+	DX::getInstance()->getParticles()->update(dt);
 }
 
 void MainMenuState::u_options(Game* game, float dt)

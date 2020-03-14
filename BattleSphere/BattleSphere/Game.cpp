@@ -181,6 +181,7 @@ void Game::changeState(stateType state)
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
 					{
+						Graph::getInstance()->reset(j);
 						if (m_robots[j] != nullptr)
 						{
 							m_robots[j]->release();

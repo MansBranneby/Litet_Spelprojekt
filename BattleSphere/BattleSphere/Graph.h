@@ -56,6 +56,7 @@ public:
 	void draw(int index);
 	XMVECTOR getNodePos(int index);
 
+	void reset(int index);
 	void release();
 };
 
