@@ -354,7 +354,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 					robNrPlus13 = robotNr + 14;
 					if (game->getRobots()[k] == nullptr)
 					{
-						game->getRobots()[k] = new Robot(robotNr);
+						game->getRobots()[k] = new Robot(k);
 					}
 					game->getRobots()[k]->setDrawn(true);
 					game->getRobots()[k]->setAi(true);
@@ -548,7 +548,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		m_botElements[i]->updateElement(dt);
 	}
 	m_startElement->updateElement(dt);
-	DX::getInstance()->getParticles()->update(dt);
+	//DX::getInstance()->getParticles()->update(dt);
 }
 
 void MainMenuState::u_options(Game* game, float dt)

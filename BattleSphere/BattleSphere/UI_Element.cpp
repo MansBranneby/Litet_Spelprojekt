@@ -6,7 +6,14 @@ void UI_Element::initializeResources(std::wstring fileName)
 	float left, right, top, bottom, texU, texV, alpha;
 
 	(m_isDrawn ? alpha = 1.0f : alpha = 0.0f);
-	
+
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+	m_posX = m_truePosX * width;
+	m_posY = m_truePosY * height;
+	m_sizeX = m_trueSizeX * width;
+	m_sizeY = m_trueSizeY * height;
+
 	if (m_spriteSizeX != 0.0f || m_spriteSizeY != 0.0f)
 	{
 		left = m_posX - m_spriteSizeX / 2.0f;
@@ -28,42 +35,42 @@ void UI_Element::initializeResources(std::wstring fileName)
 		texV = 1.0f;
 	}
 
-		m_vertexList[0] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v0 pos	L T
-			0.0f, 0.0f,			//v0 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[1] =
-		{
-			1.0f, -1.0f, 0.0f,	//v1 pos	R B
-			texU, texV,			//v1 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[2] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v2 pos	L B
-			0.0f, texV,			//v2 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[3] =
-		{
-			-1.0f, 1.0f, 0.0f,	//v3 pos	L T
-			0.0f, 0.0f,			//v3 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[4] =
-		{
-			1.0f, 1.0f, 0.0f,	//v4 pos	R T
-			texU, 0.0f,			//v4 tex
-			alpha, 0.0f, 0.0f,
-		};
-		m_vertexList[5] =
-		{
-			1.0f, -1.0f, 0.0f,	//v5 pos	R B
-			texU, texV,			//v5 tex
-			alpha, 0.0f, 0.0f
-		};	
+	m_vertexList[0] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
+		0.0f, 0.0f,			//v0 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[1] =
+	{
+		1.0f, -1.0f, 0.0f,	//v1 pos	R B
+		texU, texV,			//v1 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[2] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v2 pos	L B
+		0.0f, texV,			//v2 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[3] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
+		0.0f, 0.0f,			//v3 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[4] =
+	{
+		1.0f, 1.0f, 0.0f,	//v4 pos	R T
+		texU, 0.0f,			//v4 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[5] =
+	{
+		1.0f, -1.0f, 0.0f,	//v5 pos	R B
+		texU, texV,			//v5 tex
+		alpha, 0.0f, 0.0f
+	};
 
 	m_vertexList[0].posX = left;
 	m_vertexList[0].posY = top;
@@ -82,7 +89,6 @@ void UI_Element::initializeResources(std::wstring fileName)
 
 	m_vertexList[5].posX = right;
 	m_vertexList[5].posY = bottom;
-
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
@@ -108,9 +114,15 @@ UI_Element::UI_Element(std::wstring fileName, bool isDrawn, float posX, float po
 	//m_type = type;
 
 	m_posX = posX;
+	m_truePosX = posX / 1920.0f;
 	m_posY = posY;
+	m_truePosY = posY / 1080.0f;
 	m_sizeX = sizeX;
+	m_trueSizeX = sizeX / 1920.0f;
 	m_sizeY = sizeY;
+	m_trueSizeY = sizeY / 1080.0f;
+
+	m_visible = isDrawn;
 
 	m_destinationX = m_posX;
 	m_destinationY = m_posY;
@@ -150,14 +162,97 @@ UI_Element::~UI_Element()
 	delete m_animation;
 }
 
+void UI_Element::adjustForScreen()
+{
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+	m_posX = m_truePosX * width;
+	m_posY = m_truePosY * height;
+	m_sizeX = m_trueSizeX * width;
+	m_sizeY = m_trueSizeY * height;
+
+	m_destinationX = m_posX;
+	m_destinationY = m_posY;
+
+	updateVertexList();
+	updateVertexBuffer();
+}
+
+void UI_Element::updateVertexList()
+{
+	float left = m_posX - m_sizeX / 2.0f;
+	float right = left + m_sizeX;
+	float top = m_posY + m_sizeY / 2.0f;
+	float bottom = top - m_sizeY;
+	float alpha, texU, texV;
+	texU = 1.0f;
+	texV = 1.0f;
+	alpha = m_vertexList[0].normX;
+
+	m_vertexList[0] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v0 pos	L T
+		0.0f, 0.0f,			//v0 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[1] =
+	{
+		1.0f, -1.0f, 0.0f,	//v1 pos	R B
+		texU, texV,			//v1 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[2] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v2 pos	L B
+		0.0f, texV,			//v2 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[3] =
+	{
+		-1.0f, 1.0f, 0.0f,	//v3 pos	L T
+		0.0f, 0.0f,			//v3 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[4] =
+	{
+		1.0f, 1.0f, 0.0f,	//v4 pos	R T
+		texU, 0.0f,			//v4 tex
+		alpha, 0.0f, 0.0f,
+	};
+	m_vertexList[5] =
+	{
+		1.0f, -1.0f, 0.0f,	//v5 pos	R B
+		texU, texV,			//v5 tex
+		alpha, 0.0f, 0.0f
+	};
+
+	m_vertexList[0].posX = left;
+	m_vertexList[0].posY = top;
+
+	m_vertexList[1].posX = right;
+	m_vertexList[1].posY = bottom;
+
+	m_vertexList[2].posX = left;
+	m_vertexList[2].posY = bottom;
+
+	m_vertexList[3].posX = left;
+	m_vertexList[3].posY = top;
+
+	m_vertexList[4].posX = right;
+	m_vertexList[4].posY = top;
+
+	m_vertexList[5].posX = right;
+	m_vertexList[5].posY = bottom;
+}
+
 void UI_Element::updateElement(float dt)
 {
-
 	if (m_destinationX != m_posX || m_destinationY != m_posY || !m_isReady) // Translation
 	{
 
 		m_isReady = m_animation->translateElement(m_vertexList, &m_posX, &m_posY, m_sizeX, m_sizeY, m_destinationX, m_destinationY, dt) && !m_animation->isResting();
-
+		m_truePosX = m_posX / DX::getInstance()->getWidth();
+		m_truePosY = m_posY / DX::getInstance()->getHeight();
 		updateVertexBuffer();
 	}
 	if (m_animation->isAnimated()) // Spritesheet or fading
@@ -205,8 +300,14 @@ void UI_Element::setPos(float posX, float posY, float scale)
 {
 	if (m_posX != posX || m_posY != posY || scale != 1.0f) // Only update if a change is made
 	{
-		m_posX = posX;
-		m_posY = posY;
+		float width = DX::getInstance()->getWidth();
+		float height = DX::getInstance()->getHeight();
+		m_truePosX = posX / 1920.0f;
+		m_truePosY = posY / 1080.0f;
+		m_posX = m_truePosX * width;
+		m_posY = m_truePosY * height;
+		m_sizeX = m_trueSizeX * width;
+		m_sizeY = m_trueSizeY * height;
 
 		float left, right, top, bottom;
 		left = m_posX - m_sizeX * scale / 2.0f;
@@ -242,8 +343,13 @@ void UI_Element::setPos(float posX, float posY, float scale)
 void UI_Element::setScale(float scale)
 {
 	//XMMATRIX scaleM = XMMatrixScaling(scale, scale, scale);
+	float width = DX::getInstance()->getWidth();
+	float height = DX::getInstance()->getHeight();
+
 	float posX = m_posX;
 	float posY = m_posY;
+	m_sizeX = m_trueSizeX * scale * width;
+	m_sizeY = m_trueSizeY * scale * height;
 
 	setPos(0.0f, 0.0f);
 
@@ -257,48 +363,57 @@ void UI_Element::setScale(float scale)
 		m_vertexList[i].posY = temp.m128_f32[1];
 		m_vertexList[i].posZ = temp.m128_f32[2];
 	}
-	
+
 	setPos(posX, posY, scale);
 }
 
 void UI_Element::setDestinationX(float deltaX, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationX += deltaX;
+	m_destinationX += deltaX *DX::getInstance()->getWidth() / 1920.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
 void UI_Element::setAbsDestinationX(float posX, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationX = posX;
+	m_destinationX = posX * DX::getInstance()->getWidth() / 1920.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
 void UI_Element::setDestinationY(float deltaY, float speed, float acceleration, float delay, float rest)
 {
-	m_destinationY += deltaY;
+	m_destinationY += deltaY *DX::getInstance()->getHeight() / 1080.0f;
 	m_animation->setAnimationData(speed, acceleration, delay, rest);
 }
 
 void UI_Element::fadeOut(float fadeTime, float delay)
 {
-	if (fadeTime != 0.0f || delay != 0.0f)
-		m_animation->setFadeOut(fadeTime, delay);
-	else
+	if (m_visible)
 	{
-		for (int i = 0; i < 6; i++)
-		{
-			m_vertexList[i].normX = 0.0f;
-			m_alpha = 0.0f;
-			m_animation->setFadeIn(fadeTime, delay);
+		if (fadeTime != 0.0f || delay != 0.0f)
 			m_animation->setFadeOut(fadeTime, delay);
+		else
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				m_vertexList[i].normX = 0.0f;
+				m_alpha = 0.0f;
+				m_animation->setFadeIn(fadeTime, delay);
+				m_animation->setFadeOut(fadeTime, delay);
 
+			}
 		}
+		m_visible = false;
 	}
+
 }
 
 void UI_Element::fadeIn(float fadeTime, float delay)
 {
-	m_animation->setFadeIn(fadeTime, delay);
+	if (!m_visible)
+	{
+		m_animation->setFadeIn(fadeTime, delay);
+		m_visible = true;
+	}
 }
 
 void UI_Element::setAnimated(bool isAnimated)

@@ -11,7 +11,7 @@ void UserInterface::setElementPos()
 			{
 				if (m_slotID[i * 4 + j] != -1)
 				{
-					m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -508.0f);
+					m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -500.0f);
 					m_elements[i * 9 + m_slotID[i * 4 + j]]->setDrawn(true);
 				}
 			}
@@ -33,7 +33,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
-	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -250.0f, -100.0f, 124.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -249.0f, -100.0f, 124.0f, 66.0f));
 
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		m_quitGameElements[i]->setDrawn(false);
@@ -92,6 +92,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	{
 	case 1:
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG.png", true, 0.0f, -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f, -(540.0f - PLAYER_BG_H) -13.0f, 167.0f, 26.0f));
 
 		m_slotID[1] = 0;
 		m_slotPos[0] = -120.0f;
@@ -105,6 +106,8 @@ UserInterface::UserInterface(int nrOfPlayers)
 	case 2:
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG.png", true, -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 1.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG1.png", true, -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 2.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 1.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 2.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
 
 		m_slotID[1] = 0;
 		m_slotPos[0] = -120.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD / 2.0f;
@@ -127,7 +130,10 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG.png", true, -PLAYER_BG_W - PLAYER_BG_PAD, -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG1.png", true, 0.0f, -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG2.png", true, PLAYER_BG_W + PLAYER_BG_PAD, -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
-
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f - PLAYER_BG_W - PLAYER_BG_PAD, -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f, -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f + PLAYER_BG_W + PLAYER_BG_PAD, -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		
 		m_slotID[1] = 0;
 		m_slotPos[0] = -120.0f - PLAYER_BG_W - PLAYER_BG_PAD;
 		//m_elements[0]->setPos(m_slotPos[0], -508.0f);
@@ -158,7 +164,10 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG1.png", true, -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 1.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG2.png", true, -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 2.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\PlayerBG3.png", true, -(960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 3.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H / 2.0f), PLAYER_BG_W, PLAYER_BG_H));
-
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f - (960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 0.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f - (960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 1.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f - (960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 2.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
+		m_healthBarElements.push_back(new UI_Element(L"Textures\\UserInterface\\healthbar.png", true, 88.0f - (960.0f - PLAYER_BG_W / 2.0f - PLAYER_BG_PAD) + 3.0f * (PLAYER_BG_PAD + PLAYER_BG_W), -(540.0f - PLAYER_BG_H) - 13.0f, 167.0f, 26.0f));
 		m_slotID[1] = 0;
 		m_slotPos[0] = -120.0f -  PLAYER_BG_W / 2.0f - PLAYER_BG_PAD / 2.0f - PLAYER_BG_W - PLAYER_BG_PAD;
 		//m_elements[0]->setPos(m_slotPos[0], -508.0f);
@@ -216,6 +225,8 @@ UserInterface::~UserInterface()
 		delete m_countDownElements[i];
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		delete m_quitGameElements[i];
+	for (int i = 0; i < m_healthBarElements.size(); i++)
+		delete m_healthBarElements[i];
 	delete m_constantBufferColours;
 }
 
@@ -476,6 +487,24 @@ void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
 
 	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
 	m_elements[elementIndex]->draw();
+}
+
+void UserInterface::drawHealthbar(int playerIndex, float hp)
+{
+	int reduction = 0;
+	for (int i = 0; i < playerIndex; i++)
+	{
+		if (!m_drawPlayer[i]) reduction++;
+	}
+	playerIndex -= reduction;
+	D3D11_MAPPED_SUBRESOURCE mappedMemory;
+
+	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
+	memcpy(mappedMemory.pData, &XMVectorSet(m_playerColours[playerIndex].m128_f32[0], m_playerColours[playerIndex].m128_f32[1], m_playerColours[playerIndex].m128_f32[2], hp), sizeof(XMVECTOR));
+	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
+
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(0, 1, m_constantBufferColours->getConstantBuffer());
+	m_healthBarElements[playerIndex]->draw();
 }
 
 void UserInterface::drawQuitGame()

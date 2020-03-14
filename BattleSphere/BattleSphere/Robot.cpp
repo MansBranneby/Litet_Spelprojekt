@@ -20,8 +20,8 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(PISTOL);
-	m_weapons.push_back(pistol);
+	Weapon* wep = new Weapon(RIFLE);
+	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
@@ -523,6 +523,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
 		XMVECTOR robPos = getPosition() - lookAt*1.0f;
 		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		velocity *= 45.0f / m_velocity;
 		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
 	}
 	
