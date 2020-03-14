@@ -30,6 +30,10 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<objectType>
 				m_numberBillboards.push_back(m_billboards[i]);
 				std::rotate(m_numberBillboards.rbegin(), m_numberBillboards.rbegin() + 1, m_numberBillboards.rend());
 				break;
+			case objectType::e_ranking_billboard:
+				m_rankingBillboards.push_back(m_billboards[i]);
+				std::rotate(m_rankingBillboards.rbegin(), m_rankingBillboards.rbegin() + 1, m_rankingBillboards.rend());
+				break;
 			case objectType::e_static_billboard:
 				m_staticBillboards.push_back(m_billboards[i]);
 				break;

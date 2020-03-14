@@ -111,7 +111,7 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 				int nrOfReadyPlayers = 0;
 				if (hasCollided)
 				{
-					objectData data;
+					/*objectData data;
 					m_rotation += dt;
 					data.pos = { 30.0f, 100, -280 };
 					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
@@ -123,7 +123,7 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 
 					data.pos = { 60.0f, 100, -280 };
 					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
-					game->getPreLoader()->drawOneModel(BB[6].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
+					game->getPreLoader()->drawOneModel(BB[6].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());*/
 
 
 					if (j == 1 || j == 3 || j == 5)
@@ -298,7 +298,7 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
+	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_ranking_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard
@@ -498,10 +498,11 @@ void ScoreState::draw(Game* game, renderPass pass)
 	{
 		std::vector<Billboard> BB = m_billboardHandler.getBillboards();
 		std::vector<Billboard> BBNumbers = m_billboardHandler.getBillboardsOfType(objectType::e_number_billboard);
+		std::vector<Billboard> BBRanking = m_billboardHandler.getBillboardsOfType(objectType::e_ranking_billboard);
 
 		for (int i = 0; i < BB.size(); ++i)
 		{
-			if (BB[i].getObjectType() != objectType::e_number_billboard)
+			if (BB[i].getObjectType() != objectType::e_number_billboard && BB[i].getObjectType() != objectType::e_ranking_billboard)
 				game->getPreLoader()->draw(BB[i].getObjectType(), BB[i].getBillboardData(), BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());
 		}
 
@@ -509,12 +510,21 @@ void ScoreState::draw(Game* game, renderPass pass)
 		float distX = 2.0f, distY = 4.0f;
 
 		std::vector<int> digits;
-		objectData data;
+		objectData data, dataRanking;
+		dataRanking.pos.m128_f32[0] = -10.0f;
+		dataRanking.pos.m128_f32[1] = (float)m_ranking.size();
 		data.pos.m128_f32[1] = (float)m_ranking.size();
 		for (int i = 0; i < m_playerIDs.size(); ++i)
 		{
 			int playerID = m_playerIDs[i];
 			score = m_robots[playerID]->getScore();
+
+			// Draw ranking
+			dataRanking.material.emission = m_robots[playerID]->getData().material.emission * 0.5f;
+			game->getPreLoader()->setSubModelData(objectType::e_ranking_billboard, dataRanking, BBRanking[i].getModelNr(), BBRanking[i].getSubModelNumber());
+			game->getPreLoader()->draw(BBRanking[i].getObjectType(), BBRanking[i].getBillboardData(), BBRanking[i].getModelNr(), BBRanking[i].getSubModelNumber(), BBRanking[i].getVariant());
+			dataRanking.pos.m128_f32[1] -= distY;
+
 			do
 			{
 				if (score == 10)
@@ -523,19 +533,19 @@ void ScoreState::draw(Game* game, renderPass pass)
 				score /= 10;
 			} while (score > 0);
 
-			data.pos.m128_f32[0] = -(float)digits.size() * 0.5f * 2.0f;
-			data.material.emission = m_robots[playerID]->getData().material.emission * 0.8f;
+			data.pos.m128_f32[0] = -(float)digits.size();
+			data.material.emission = m_robots[playerID]->getData().material.emission * 0.5f;
 			for (int j = int(digits.size()) - 1; j >= 0; --j)
 			{
 				digit = digits[j];
 
 				game->getPreLoader()->setSubModelData(objectType::e_number_billboard, data, BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber());
 				game->getPreLoader()->draw(BBNumbers[digit].getObjectType(), BBNumbers[digit].getBillboardData(), BBNumbers[digit].getModelNr(), BBNumbers[digit].getSubModelNumber(), BBNumbers[digit].getVariant());
-
+				
 				data.pos.m128_f32[0] += 2.0f;
 			}
+			data.pos.m128_f32[1] -= distY;
 
-			data.pos.m128_f32[1] -= 4.0f;
 			digits.clear();
 		}
 	}
