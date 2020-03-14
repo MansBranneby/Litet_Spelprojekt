@@ -5,7 +5,6 @@ MainMenuState::MainMenuState()
 	m_type = stateType::e_mainMenu;
 	m_menuState = MenuState::e_mainMenu;
 	m_activeMenu = ActiveMainMenu::e_startGame;
-	m_optionsMenu = ActiveOptionsMenu::e_resolution;
 
 	m_availableColours[0] = 1;
 	m_availableColours[1] = 1;
@@ -53,57 +52,13 @@ MainMenuState::MainMenuState()
 	m_startElement = new UI_Element(L"Textures\\MainMenu\\selection_pressStart.png", false, 0, 100, 688.0f, 66.0f);
 	m_startElement->fadeIn(0.1f, 0.0f);
 	//Lights::getInstance()->addPointLight(0, 0, -10, 50, 1, 1, 1, 10);
-
-	// Options
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_background.png", false, 0.0f, 0.0f, 1920.0f, 1080.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_selection.png", false, 300.0f, 0.0f, 390.0f, 34.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_off.png", false, 300.0f, -144.0f, 117.0f, 42.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -144.0f, 79.0f, 42.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_apply.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_applyG.png", false, 0.0f, -375.0f, 250.0f, 50.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_off.png", false, 300.0f, -288.0f, 117.0f, 42.0f));
-	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -288.0f, 79.0f, 42.0f));
-
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_800x600.png", false, 300.0f, 0.0f, 244.0f, 42.0f));
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1366x768.png", false, 300.0f, 0.0f, 260.0f, 42.0f));
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1920x1080.png", false, 300.0f, 0.0f, 275.0f, 42.0f));
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_2560x1440.png", false, 300.0f, 0.0f, 309.0f, 42.0f));
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_3840x2160.png", false, 300.0f, 0.0f, 301.0f, 42.0f));
-	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_7680x4320.png", false, 300.0f, 0.0f, 323.0f, 42.0f));
-
-	m_resolutions.push_back({ 800.0f, 600.0f });
-	m_resolutions.push_back({ 1366.0f, 768.0f });
-	m_resolutions.push_back({ 1920.0f, 1080.0f });
-	m_resolutions.push_back({ 2560.0f, 1440.0f });
-	m_resolutions.push_back({ 3840.0f, 2160.0f });
-	m_resolutions.push_back({ 7680.0f, 4320.0f });
-
-	m_originalFullscreenSetting = m_fullscreen = true;
-	m_musicOn = true;
-	m_selectedResIndex = 2;
-	m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
-	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-	{
-		m_resolutionElements[i]->setDrawn(true);
-		m_resolutionElements[i]->fadeOut(0.1f, 0.0f);
-	}
-
-	adjustElementsForScreen();
 }
 
 MainMenuState::~MainMenuState()
 {
-	for (int i = 0; i < (int)m_uiElements.size(); i++)
+	for (int i = 0; i < m_uiElements.size(); i++)
 	{
 		delete m_uiElements[i];
-	}
-	for (int i = 0; i < (int)m_optionElements.size(); i++)
-	{
-		delete m_optionElements[i];
-	}
-	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-	{
-		delete m_resolutionElements[i];
 	}
 	for (int i = 0; i < 4; i++)
 	{
@@ -121,50 +76,9 @@ bool MainMenuState::hi_mainMenu(Game* game)
 
 		if (game->getInput()->getThumbLY(j) > -0.2f && game->getInput()->getThumbLY(j) < 0.2f && !game->getInput()->isPressed(j, XINPUT_GAMEPAD_A)) // Set input to ready if no input is detected
 		{
+			//m_uiElements[1]->setSelectionTimer(0.0f);
+
 			game->getInput()->setBlocked(j, false);
-		}
-
-		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && m_activeMenu == ActiveMainMenu::e_options)
-		{
-			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
-			game->getInput()->setBlocked(j, true);
-			m_menuState = MenuState::e_optionsMenu;
-
-
-			for (int i = 1; i < 8; i++) // Hide main menu
-			{
-				m_uiElements[i]->fadeOut(0.5f, 0.0f);
-			}
-
-			game->getInput()->setBlocked(j, true);
-
-			m_optionElements[0]->setDrawn(true);
-			m_optionElements[0]->fadeIn(0.5f, 0.5f);
-			m_optionElements[1]->setDrawn(true);
-			m_optionElements[2]->setDrawn(true);
-			m_optionElements[2]->fadeOut(0.0f, 0.0f);
-			m_optionElements[3]->setDrawn(true);
-			m_optionElements[3]->fadeIn(0.5f, 0.5f);
-			m_optionElements[4]->setDrawn(true);
-			m_optionElements[4]->fadeIn(0.5f, 0.5f);
-			m_optionElements[5]->setDrawn(true);
-			m_optionElements[6]->setDrawn(true);
-			m_optionElements[6]->fadeOut(0.0f, 0.0f);
-			m_optionElements[7]->setDrawn(true);
-			m_optionElements[7]->fadeIn(0.5f, 0.5f);
-
-			m_resolutionElements[m_selectedResIndex]->fadeIn(0.5f, 0.5f);
-
-			if (m_optionsMenu == ActiveOptionsMenu::e_apply)
-			{
-				m_optionElements[1]->fadeOut(0.0f, 0.0f);
-				m_optionElements[5]->fadeIn(0.5f, 0.5f);
-			}
-			else
-			{
-				m_optionElements[1]->fadeIn(0.5f, 0.5f);
-				m_optionElements[5]->fadeOut(0.0f, 0.0f);
-			}
 		}
 
 		if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(j) && m_activeMenu == ActiveMainMenu::e_startGame)
@@ -352,7 +266,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 					}
 				}
 			}
-			float modifier = (DX::getInstance()->getWidth() / DX::getInstance()->getHeight()) / (1920.0f / 1080.0f);
 			switch (m_readyState[robotNr])
 			{
 			case 0:
@@ -361,7 +274,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_uiElements[robNrPlus9]->setDrawn(false);
 				m_uiElements[robNrPlus13]->setDrawn(true); // Press A -> Ready A
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
-				game->getRobots()[i]->setPosition(modifier * ((float)robotNr * 6.9f - 10.5f), -2.0f, 0.0f);
+				game->getRobots()[i]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
 				changeColour(game, i, true);
 				m_readyState[robotNr]++;
 				break;
@@ -451,8 +364,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 					m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
 					m_botElements[robotNr]->setDrawn(true);
 					m_botElements[robotNr]->fadeIn(0.1f, 0.0f);
-					float modifier = (DX::getInstance()->getWidth() / DX::getInstance()->getHeight()) / (1920.0f/1080.0f);
-					game->getRobots()[k]->setPosition(modifier * ((float)robotNr * 6.9f - 10.5f), -2.0f, 0.0f);
+					game->getRobots()[k]->setPosition((float)robotNr * 6.9f - 10.5f, -2.0f, 0.0f);
 					changeColour(game, k, true);
 					m_readyState[robotNr] = 2;
 				}
@@ -538,180 +450,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 
 void MainMenuState::hi_options(Game* game)
 {
-	for (int j = 0; j < XUSER_MAX_COUNT; j++)
-	{
-		if (!game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isPressed(j, XINPUT_GAMEPAD_A))
-		{
-			game->getInput()->setBlocked(j, false);
-		}
-
-		if (m_optionElements[1]->isReady() && m_resolutionElements[m_selectedResIndex]->isReady() && game->getInput()->getThumbLX(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_resolution)
-		{
-			if (m_selectedResIndex != (int)m_resolutionElements.size() - 1)
-			{
-				Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-				m_resolutionElements[m_selectedResIndex]->fadeOut(0.15f, 0.0f);
-				m_selectedResIndex += 1;
-				m_resolutionElements[m_selectedResIndex]->fadeIn(0.15f, 0.15f);
-			}
-		}
-
-		else if (m_optionElements[1]->isReady() && m_resolutionElements[m_selectedResIndex]->isReady() && game->getInput()->getThumbLX(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_resolution)
-		{
-			if (m_selectedResIndex != 0)
-			{
-				Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-				m_resolutionElements[m_selectedResIndex]->fadeOut(0.15f, 0.0f);
-				m_selectedResIndex -= 1;
-				m_resolutionElements[m_selectedResIndex]->fadeIn(0.15f, 0.15f);
-			}
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_resolution)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->setDestinationY(-144.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-			m_optionsMenu = ActiveOptionsMenu::e_fullscreen;
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_fullscreen)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->setDestinationY(144.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-			m_optionsMenu = ActiveOptionsMenu::e_resolution;
-		}
-
-		else if (m_optionElements[1]->isReady() && m_optionElements[2]->isReady() && m_optionElements[3]->isReady() && abs(game->getInput()->getThumbLX(j)) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_fullscreen)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_fullscreen = !m_fullscreen;
-			if (m_fullscreen)
-			{
-				m_optionElements[2]->fadeOut(0.15f, 0.0f);
-				m_optionElements[3]->fadeIn(0.15f, 0.15f);
-			}
-			else
-			{
-				m_optionElements[3]->fadeOut(0.15f, 0.0f);
-				m_optionElements[2]->fadeIn(0.15f, 0.15f);
-			}
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_fullscreen)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->setDestinationY(-144.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-			m_optionsMenu = ActiveOptionsMenu::e_music;
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionsMenu == ActiveOptionsMenu::e_music)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->setDestinationY(144.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.2f);
-			m_optionsMenu = ActiveOptionsMenu::e_fullscreen;
-		}
-
-		else if (
-			m_optionElements[1]->isReady() &&
-			m_optionElements[6]->isReady() &&
-			m_optionElements[7]->isReady() &&
-			!game->getInput()->isBlocked(j) &&
-			abs(game->getInput()->getThumbLX(j)) > 0.4f &&
-			m_optionsMenu == ActiveOptionsMenu::e_music
-			)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_musicOn = !m_musicOn;
-			if (m_musicOn)
-			{
-				m_optionElements[6]->fadeOut(0.15f, 0.0f);
-				m_optionElements[7]->fadeIn(0.15f, 0.15f);
-			}
-			else
-			{
-				m_optionElements[7]->fadeOut(0.15f, 0.0f);
-				m_optionElements[6]->fadeIn(0.15f, 0.15f);
-			}
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) < -0.4f && m_optionsMenu == ActiveOptionsMenu::e_music)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->fadeOut(0.1f, 0.0f);
-			m_optionElements[1]->setDestinationY(0.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.4f);
-			m_optionElements[5]->fadeIn(0.3f, 0.0f);
-			m_optionElements[4]->fadeOut(0.3f, 0.3f);
-			m_optionsMenu = ActiveOptionsMenu::e_apply;
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->getThumbLY(j) > 0.4f && m_optionElements[5]->isReady() && m_optionsMenu == ActiveOptionsMenu::e_apply)
-		{
-			Sound::getInstance()->play(soundUI::e_traverse, 0.4f);
-			m_optionElements[1]->fadeIn(0.1f, 0.0f);
-			m_optionElements[1]->setDestinationY(0.0f, SELECTIONSPEED, 1.0f, 0.0f, 0.4f);
-			m_optionElements[4]->fadeIn(0.3f, 0.0f);
-			m_optionElements[5]->fadeOut(0.3f, 0.3f);
-			m_optionsMenu = ActiveOptionsMenu::e_music;
-		}
-
-		else if (m_optionElements[1]->isReady() && game->getInput()->isPressed(j, XINPUT_GAMEPAD_A) && !game->getInput()->isBlocked(j) && m_optionsMenu == ActiveOptionsMenu::e_apply)
-		{
-			game->getInput()->setBlocked(j, true);
-			bool musicChanged = false;
-			bool resolutionChanged = false;
-
-			if (m_musicOn != Sound::getInstance()->musicIsOn())
-			{
-				if (m_musicOn)
-				{
-					Sound::getInstance()->toggleMusic();
-					Sound::getInstance()->play(soundMusic::e_game, 0.01f);
-				}
-				else
-				{
-					Sound::getInstance()->toggleMusic();
-					Sound::getInstance()->stop(soundMusic::e_game);
-					Sound::getInstance()->stop(soundMusic::e_menu);
-				}
-				musicChanged = true;
-			}
-
-			if (
-				m_fullscreen != m_originalFullscreenSetting ||
-				m_originalResolutionSetting.x != m_resolutions[m_selectedResIndex].x ||
-				m_originalResolutionSetting.y != m_resolutions[m_selectedResIndex].y
-				)
-			{
-				DX::getInstance()->setScreen
-				(
-					m_fullscreen,
-					m_resolutions[m_selectedResIndex].x,
-					m_resolutions[m_selectedResIndex].y
-				);
-
-				adjustElementsForScreen();
-				resolutionChanged = true;
-				m_originalFullscreenSetting = m_fullscreen;
-				m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
-			}
-
-			if (musicChanged || resolutionChanged)
-				Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
-		}
-
-		else if (game->getInput()->isPressed(j, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(j))
-		{
-			Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
-			m_menuState = MenuState::e_mainMenu;
-			m_activeMenu = ActiveMainMenu::e_options;
-
-			for (int i = 0; i < m_optionElements.size(); i++)
-				m_optionElements[i]->fadeOut(0.25f, 0.0f);
-			for (int i = 1; i < 8; i++)
-				m_uiElements[i]->fadeIn(0.25f, 0.25f);
-			m_resolutionElements[m_selectedResIndex]->fadeOut(0.25f, 0.25f);
-		}
-	}
 }
 
 void MainMenuState::u_mainMenu(Game* game, float dt)
@@ -723,11 +461,6 @@ void MainMenuState::u_mainMenu(Game* game, float dt)
 	m_uiElements[5]->updateElement(dt);
 	m_uiElements[6]->updateElement(dt);
 	m_uiElements[7]->updateElement(dt);
-
-	for (int i = 0; i < m_optionElements.size(); i++)
-		m_optionElements[i]->updateElement(dt);
-	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-		m_resolutionElements[i]->updateElement(dt);
 }
 
 void MainMenuState::u_robotSelection(Game* game, float dt)
@@ -781,7 +514,7 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		{
 			if (game->getRobots()[i] != nullptr)
 			{
-				game->getRobots()[i]->setPosition((ROBOT_START_POS[game->getRobots()[i]->getRobotID()]));
+				game->getRobots()[i]->setPosition(ROBOT_START_POS[game->getRobots()[i]->getRobotID()]);
 				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[game->getRobots()[i]->getRobotID()]);
 			}
 		}
@@ -815,19 +548,11 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 		m_botElements[i]->updateElement(dt);
 	}
 	m_startElement->updateElement(dt);
+	//DX::getInstance()->getParticles()->update(dt);
 }
 
 void MainMenuState::u_options(Game* game, float dt)
 {
-	for (int i = 0; i < (int)m_uiElements.size(); i++)
-		m_uiElements[i]->updateElement(dt);
-	for (int i = 0; i < (int)m_optionElements.size(); i++)
-		m_optionElements[i]->updateElement(dt);
-	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-		m_resolutionElements[i]->updateElement(dt);
-	for (int i = 0; i < 4; i++)
-		m_botElements[i]->updateElement(dt);
-	m_startElement->updateElement(dt);
 }
 
 void MainMenuState::pause()
@@ -874,7 +599,6 @@ bool MainMenuState::handleInputs(Game* game, float dt)
 		hi_robotSelection(game);
 		break;
 	case MenuState::e_optionsMenu:
-		hi_options(game);
 		break;
 	default:
 		break;
@@ -976,19 +700,6 @@ void MainMenuState::changeColour(Game* game, int robotNr, bool dir)
 	Graph::getInstance()->setColour(robotNr, game->getRobots()[robotNr]->getData().material.emission);
 }
 
-void MainMenuState::adjustElementsForScreen()
-{
-	for (int i = 0; i < (int)m_uiElements.size(); i++)
-		m_uiElements[i]->adjustForScreen();
-	for (int i = 0; i < (int)m_optionElements.size(); i++)
-		m_optionElements[i]->adjustForScreen();
-	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-		m_resolutionElements[i]->adjustForScreen();
-	for (int i = 0; i < 4; i++)
-		m_botElements[i]->adjustForScreen();
-	m_startElement->adjustForScreen();
-}
-
 void MainMenuState::firstTimeSetUp(Game* game)
 {
 	// Start at main menu
@@ -1005,7 +716,6 @@ void MainMenuState::firstTimeSetUp(Game* game)
 	}
 	for (int i = 3; i < 5; i++)
 		m_uiElements[i]->setAnimated(false);
-	m_uiElements[2]->setAnimated(true);
 	for (int i = 8; i < 17; i++) // Robot selection
 	{
 		m_uiElements[i]->setDrawn(false);
@@ -1028,13 +738,14 @@ void MainMenuState::firstTimeSetUp(Game* game)
 		game->leavePlayerIdIndex(i);
 	}
 }
-
 void MainMenuState::leaveColour(int robotNr)
 {
 	m_availableColours[m_robotColour[robotNr]] = 1;
 	m_robotColour[robotNr] = -1;
 
 }
+
+
 
 void MainMenuState::handleInput(Game* game)
 {
@@ -1058,20 +769,14 @@ bool MainMenuState::update(Game* game, float dt)
 	case MenuState::e_mainMenu:
 		u_mainMenu(game, dt);
 		break;
-
 	case MenuState::e_robotSelection:
 		u_robotSelection(game, dt);
 		break;
-
 	case MenuState::e_optionsMenu:
-		u_options(game, dt);
 		break;
-
 	default:
 		break;
 	}
-
-	DX::getInstance()->getParticles()->update(dt);
 	return 0;
 }
 
@@ -1085,16 +790,6 @@ void MainMenuState::draw(Game* game, renderPass pass)
 			if (m_uiElements[i]->isDrawn() && i != 2 && i != 3 && i != 4)
 				m_uiElements[i]->draw();
 		}
-		for (int i = 0; i < (int)m_optionElements.size(); i++)
-		{
-			if (m_optionElements[i]->isDrawn())
-				m_optionElements[i]->draw();
-		}
-		for (int i = 0; i < (int)m_resolutionElements.size(); i++)
-		{
-			if (m_resolutionElements[i]->isDrawn())
-				m_resolutionElements[i]->draw();
-		}
 		for (int i = 0; i < ARRAYSIZE(m_botElements); i++)
 		{
 			if (m_botElements[i]->isDrawn())
@@ -1102,6 +797,7 @@ void MainMenuState::draw(Game* game, renderPass pass)
 		}
 		if (m_startElement->isDrawn())
 			m_startElement->draw();
+
 	}
 
 	else if (pass == renderPass::e_menuAni)

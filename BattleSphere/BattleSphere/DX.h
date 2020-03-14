@@ -62,7 +62,8 @@ public:
 
 	void setWidthAndHeight(float width, float height);
 	HRESULT createDirect3DContext(HWND wndHandle);
-	void initializeCamAndParticles(float width, float height, float nearPlane, float farPlane);
+	void initializeCam(float width, float height, float nearPlane, float farPlane);
+	void initializeParticles();
 	void reInitializeCam(float width, float height, float nearPlane, float farPlane);
 	void reportLiveObjects();
 	bool screenChanged();

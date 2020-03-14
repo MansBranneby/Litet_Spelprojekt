@@ -168,6 +168,12 @@ void Game::changeState(stateType state)
 					Sound::getInstance()->stop(soundMusic::e_game);
 					Sound::getInstance()->stop(soundAmbient::e_background);
 
+					if (DX::getInstance()->getParticles())
+					{
+						delete DX::getInstance()->getParticles();
+						DX::getInstance()->initializeParticles();
+					}
+
 					GameState* s = dynamic_cast<GameState*>(m_states[i]);
 					if (s != nullptr) 
 						s->reset();
@@ -179,9 +185,6 @@ void Game::changeState(stateType state)
 						{
 							m_robots[j]->release();
 							m_robots[j]->reset();
-
-							//m_playerId[j] = -1;
-							//m_robots[j] = nullptr;
 						}
 					}
 					break;

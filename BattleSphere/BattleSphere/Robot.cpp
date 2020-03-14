@@ -20,8 +20,8 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(PISTOL);
-	m_weapons.push_back(pistol);
+	Weapon* wep = new Weapon(RIFLE);
+	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
