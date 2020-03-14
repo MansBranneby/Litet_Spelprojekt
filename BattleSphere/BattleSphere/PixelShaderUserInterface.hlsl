@@ -27,7 +27,16 @@ float4 PS_main(VS_OUT input) : SV_Target
 			elementColour.w = 0.0f;
 	}
 	else if (colour.x != 0.0f || colour.y != 0.0f || colour.z != 0.0f)
+	{
 		elementColour.xyz = colour.xyz;
+		if (colour.w != -1.0f && elementColour.w == 0.0f)
+		{
+			if (input.tex.x < colour.w)
+				elementColour.w = 0.75f;
+			else
+				elementColour.w = 0.0f;
+		}
+	}
 	else
 	{
 		if (colour.w != 0.0f &&  colour.w != -1.0f)

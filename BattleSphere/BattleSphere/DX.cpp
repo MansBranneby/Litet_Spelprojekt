@@ -14,6 +14,7 @@ DX::DX()
 	m_pDSStateDisabled = nullptr;
 	m_camera = nullptr;
 	m_particles = nullptr;
+	m_fullscreen = true;
 }
 
 void DX::createStencilStates()
@@ -23,7 +24,7 @@ void DX::createStencilStates()
 	// Depth test parameters
 	dsDesc.DepthEnable = true;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	
+
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
 	// Create depth stencil state
@@ -87,12 +88,12 @@ ID3D11Device* DX::getDevice()
 	return m_device;
 }
 
-ID3D11DeviceContext* DX::getDeviceContext() 
+ID3D11DeviceContext* DX::getDeviceContext()
 {
 	return m_deviceContext;
 }
 
-IDXGISwapChain* DX::getSwapChain() 
+IDXGISwapChain* DX::getSwapChain()
 {
 	return m_swapChain;
 }
@@ -128,6 +129,17 @@ float DX::getDeltaTime()
 	return m_dt;
 }
 
+bool DX::fullScreenIsSet()
+{
+	return m_fullscreen;
+}
+
+void DX::setWidthAndHeight(float width, float height)
+{
+	m_width = width;
+	m_height = height;
+}
+
 HRESULT DX::createDirect3DContext(HWND wndHandle)
 {
 	// create a struct to hold information about the swap chain
@@ -138,14 +150,15 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 
 	// fill the swap chain description struct
 	scd.BufferCount = 1;                                    // one back buffer
-	
+
 	scd.BufferDesc.Height = (UINT)m_height;
 	scd.BufferDesc.Width = (UINT)m_width;
 	scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
 	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
 	scd.OutputWindow = wndHandle;                           // the window to be used
 	scd.SampleDesc.Count = 1;                               // how many multisamples
-	scd.Windowed = false;                                    // windowed/full-screen mode
+	scd.Windowed = true;                                    // windowed/full-screen mode
+	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Enable alt enter switching
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 
@@ -181,6 +194,11 @@ void DX::initializeCamAndParticles(float width, float height, float nearPlane, f
 	m_particles = new Particles;
 }
 
+void DX::reInitializeCam(float width, float height, float nearPlane, float farPlane)
+{
+	m_camera->initialize(width, height, nearPlane, farPlane);
+}
+
 
 void DX::reportLiveObjects()
 {
@@ -211,7 +229,26 @@ void DX::update(float dt)
 		m_timer = -1.0f;
 	}
 }
+bool DX::screenChanged()
+{
+	bool tempScreenChange = false;
+	if (m_screenChange)
+	{
+		m_screenChange = false;
+		tempScreenChange = true;
+	}
+	return tempScreenChange;
+}
 
+void DX::setScreen(bool fullscreen, float width, float height)
+{
+	m_screenChange = true;
+	m_fullscreen = fullscreen;
+	if (width >= 10)
+		m_width = width;
+	if (height >= 10)
+		m_height = height;
+}
 
 void DX::release()
 {
@@ -222,6 +259,6 @@ void DX::release()
 	getSwapChain()->Release();
 	m_pDSStateDisabled->Release();
 	m_pDSStateEnabled->Release();
-	if(m_debug)	m_debug->Release();
+	if (m_debug)	m_debug->Release();
 	getDevice()->Release();
 }

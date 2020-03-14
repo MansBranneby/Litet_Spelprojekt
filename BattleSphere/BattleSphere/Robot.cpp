@@ -523,6 +523,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
 		XMVECTOR robPos = getPosition() - lookAt*1.0f;
 		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		velocity *= 45.0f / m_velocity;
 		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
 	}
 	
