@@ -2,7 +2,7 @@
 
 void Resource::setMaterial()
 {
-	if (m_type == PISTOL || m_type == RIFLE || m_type == SNIPER || m_type == BEYBLADE ||m_type == ENERGY)
+	if (m_type == RIFLE || m_type == SNIPER || m_type == BEYBLADE ||m_type == ENERGY)
 		m_material.emission = RED_EMISSION;
 	else if (m_type == MOVEMENT || m_type == DASH)
 		m_material.emission = GREEN_EMISSION;

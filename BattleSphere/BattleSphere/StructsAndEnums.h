@@ -60,21 +60,21 @@ using namespace DirectX;
 
 
 // Normal resources
-#define PISTOL 0 // 2
-#define RIFLE 1 // 7
-#define MOVEMENT 2 // 3
-#define SHIELD 3 // 1
-#define DASH 4 // 4
-#define REFLECT 5 // 0
-#define SNIPER 6 // 6
-#define BEYBLADE 7 // 5
-#define ENERGY 8 // 8
+
+#define RIFLE 0 // 7
+#define MOVEMENT 1 // 3
+#define SHIELD 2 // 1
+#define DASH 3 // 4
+#define REFLECT 4 // 0
+#define SNIPER 5 // 6
+#define BEYBLADE 6 // 5
+#define ENERGY 7 // 8
 
 // UI
 #define NR_OF_ICON_SLOTS 16
-#define NR_OF_ICON_ELEMENTS 36
+#define NR_OF_ICON_ELEMENTS 32
 
-#define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
+#define BIGGEST_NORMAL_INDEX 7 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 

@@ -17,7 +17,6 @@ Sound::Sound()
 	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/accept.wav");
 	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
 
-	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
 	m_effect[(int)soundEffect::e_movement] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/movement.wav");
 	m_effect[(int)soundEffect::e_dash] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/woosh.wav");

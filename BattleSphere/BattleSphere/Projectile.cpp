@@ -16,13 +16,7 @@ Projectile::Projectile(XMVECTOR pos, XMVECTOR colour, XMVECTOR rot, XMVECTOR dir
 	m_material.emission.m128_f32[3] = 1;
 	m_blastRange = blastRange;
 
-	if (type == PISTOL)
-	{
-		m_velocity = 75.0f;
-		setScale(0.35f, 0.35f, 0.35f);
-	}
-
-	else if (type == RIFLE)
+	if (type == RIFLE)
 	{
 		m_velocity = 150.0f;
 		setScale(0.35f, 0.35f, 0.35f);

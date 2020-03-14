@@ -940,7 +940,7 @@ bool GameState::update(Game* game, float dt)
 				}
 				else
 				{
-					int tierList[9] = { 2, 7, 4, 1, 5, 0, 6, 3, 8 };
+					int tierList[8] = { 6, 3, 1, 4, 0, 5, 2, 7};
 					float highestResource = -10000;
 					int highestIndex = -1;
 					for (int i = 0; i < m_resources.size(); i++)
@@ -1064,8 +1064,7 @@ bool GameState::update(Game* game, float dt)
 	}
 	m_updateMission = false;
 
-	// Projectile movement
-	ProjectileBank::getInstance()->moveProjectiles(dt);
+
 
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -1206,7 +1205,7 @@ bool GameState::update(Game* game, float dt)
 
 		// Test collision
 		CollisionInfo collisionInfo;
-		XMVECTOR nextPos = projectile->getPosition() + (projectile->getDirection() * projectile->getVelocity() * dt * 2.0f);
+		XMVECTOR nextPos = projectile->getPosition() + (projectile->getDirection() * (projectile->getVelocity() * dt * 2));
 		//CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
 		XMFLOAT2 start, end;
 		start.x = XMVectorGetX(projectile->getPosition());
@@ -1214,6 +1213,7 @@ bool GameState::update(Game* game, float dt)
 		end.x = XMVectorGetX(nextPos);
 		end.y = XMVectorGetZ(nextPos);
 		float t = game->getQuadtree()->testCollisionT(start, end);
+		float dist = XMVectorGetX(XMVector2Length(XMLoadFloat2(&start) - XMLoadFloat2(&end)));
 		// Remove based on conditions
 		if (t != -1.0f) // collisionInfo.m_colliding && 
 		{
@@ -1344,7 +1344,8 @@ bool GameState::update(Game* game, float dt)
 			}
 		}
 	}
-
+	// Projectile movement
+	ProjectileBank::getInstance()->moveProjectiles(dt);
 	for (int i = 0; i < m_resources.size(); i++)
 	{
 		m_resources[i]->updateTime(dt);
@@ -1430,6 +1431,8 @@ void GameState::draw(Game* game, renderPass pass)
 					{
 						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE) // TODO: fix this bugg
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+						else
+							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), 0);
 						m_userInterface->drawHealthbar(m_robots[i]->getRobotID(), m_robots[i]->getHealth() / 100.0f);
 					}
 				}
