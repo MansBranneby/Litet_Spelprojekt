@@ -14,10 +14,10 @@ using namespace DirectX;
 #define BLUE 2
 #define RED_DIFFUSE XMVectorSet(1.0f, 0, 0, -1)
 #define GREEN_DIFFUSE XMVectorSet(0, 1.0f, 0, -1)
-#define BLUE_DIFFUSE XMVectorSet(0, 0, 1.0f, -1)
+#define BLUE_DIFFUSE XMVectorSet(0.1f, 0.2f, 1.0f, -1)
 #define RED_EMISSION XMVectorSet(0.35f, 0, 0, -1)
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
-#define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
+#define BLUE_EMISSION XMVectorSet(0.05f, 0.1f, 0.5f, -1)
 
 // Dynamic camera
 #define MINIMUM_CAM_DISTANCE 25.0f
@@ -45,7 +45,7 @@ using namespace DirectX;
 #define START_SPAWNED_RESOURCES 4
 #define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
 #define SPAWN_INTERVAL 10.0f
-#define SPECIAL_RESOURCE_CHANCE 25 // % chance
+#define SPECIAL_RESOURCE_CHANCE 0 // % chance
 
 // Resource
 #define FLOAT_INTENSITY 10.0f // Default 6

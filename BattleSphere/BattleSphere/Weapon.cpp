@@ -311,19 +311,6 @@ bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float r
 
 		XMVECTOR projRot = XMVectorSet(0.0, 1.0, 0.0f, rot);
 
-		/*
-		m_currentRecoil += 0.02f;
-		if (m_currentRecoil >= m_recoil)
-			m_currentRecoil = 0.0f;
-
-		// TODO add recoil here
-		if (m_recoil / 2 <= m_currentRecoil)
-			rotate(XMVectorSet(0.0, 1.0, 0.0f, rot));
-		else
-		{
-		}
-		*/
-
 		XMVECTOR projDir;
 		if (side)
 			projDir = XMVector3Cross((projPos - robotPos), XMVectorSet(0, 1, 0, 0));

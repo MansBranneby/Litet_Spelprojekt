@@ -83,39 +83,41 @@ Resource::Resource(bool blocked, int spawnIndex, int type, float scale)
 	m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
 	if (type == RIFLE) // TODO: Remove
 	{
-		m_originalScale = XMVectorSet(0.8f * scale, 0.8f * scale, 0.8f * scale, 1.0f);
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 1.0f;
 		setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
 	}
 	else if (type == MOVEMENT)
 	{
-		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.0f;
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.4f;
 		setRotation(XMVectorSet(0.0, 0.0, 1.0, 40));
+		
 	}
 	else if (type == SHIELD)
 	{
-		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
-		//setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 1.45f;
+		setRotation(XMVectorSet(1.0, 0.0, 0.0, -35));
 	}
 	else if (type == DASH)
 	{
-		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.0f;
-		//setRotation(XMVectorSet(0.0, 0.0, 1.0, 90));
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 2.6f;
+		setRotation(XMVectorSet(1.0, 0.0, 0.0, 30));
 	}
 	else if (type == REFLECT)
 	{
-		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f);
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 1.45f;
 		setRotation(XMVectorSet(0.0, 0.0, 1.0, 30));
 	}
 	else if (type == BEYBLADE)
 	{
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 0.8f;
 	}
 	else if (type == SNIPER)
 	{
-		m_originalScale = XMVectorSet(1.8f * scale, 1.8f * scale, 1.8f * scale, 1.0f);
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 1.7f;
 	}
 	else if (type == ENERGY)
 	{
-		m_originalScale = XMVectorSet(3.8f * scale, 3.8f * scale, 1.8f * scale, 1.0f);
+		m_originalScale = XMVectorSet(scale, scale, scale, 1.0f) * 1.5f;
 	}
 	else
 	{
@@ -174,6 +176,7 @@ void Resource::updateTime(float dt)
 			m_floatRadian = 0;
 
 			setMaterial();
+			setPosition(XMVectorSetY(getPosition(), FINAL_HEIGHT));
 		}
 	}
 

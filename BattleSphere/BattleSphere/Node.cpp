@@ -5,24 +5,20 @@ void Node::setMaterial(float colorIntensity)
 	if (m_colorType == RED)
 	{
 		m_material.diffuse = RED_DIFFUSE;
-		m_material.diffuse.m128_f32[0] *= colorIntensity;
 		m_material.emission = RED_EMISSION;
-		m_material.emission.m128_f32[0] *= colorIntensity;
 	}
 	else if (m_colorType == GREEN)
 	{
 		m_material.diffuse = GREEN_DIFFUSE;
-		m_material.diffuse.m128_f32[1] *= colorIntensity;
 		m_material.emission = GREEN_EMISSION;
-		m_material.emission.m128_f32[1] *= colorIntensity;
 	}
 	else
 	{
 		m_material.diffuse = BLUE_DIFFUSE;
-		m_material.diffuse.m128_f32[2] *= colorIntensity;
 		m_material.emission = BLUE_EMISSION;
-		m_material.emission.m128_f32[2] *= colorIntensity;
 	}
+	m_material.diffuse *= colorIntensity;
+	m_material.emission *= colorIntensity;
 }
 
 void Node::leaveColor()

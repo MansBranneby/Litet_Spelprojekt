@@ -54,7 +54,7 @@ void SpawnDrone::startSpawn()
 	{
 		int spawnIndex = getSpawnIndex(); // TODO:: Change spawn types
 		//Resource* resource = new Resource(false, spawnIndex, i % BIGGEST_NORMAL_INDEX, 0.8f);
-		Resource* resource = new Resource(false, spawnIndex, rand() % BIGGEST_NORMAL_INDEX, 0.8f);
+		Resource* resource = new Resource(false, spawnIndex, rand() % BIGGEST_NORMAL_INDEX + 1, 0.8f);
 		XMFLOAT2 pos = m_spawns[spawnIndex];
 		resource->setPosition(XMVectorSet((float)(pos.x), 0.6f, (float)(pos.y), 0.0f));
 		m_resources->push_back(resource);
@@ -213,6 +213,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 
 		// Randomize whether it is a normal or special resource
 		bool isSpecial = false;
+		/*
 		if (rand() % 100 < SPECIAL_RESOURCE_CHANCE)
 		{
 			// Only make resource special if there are available spots
@@ -222,7 +223,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 					isSpecial = true;
 			}
 		}
-
+		*/
 
 		Resource* resource;
 		int spawnIndex;
