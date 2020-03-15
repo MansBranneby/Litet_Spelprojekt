@@ -11,8 +11,8 @@ void UserInterface::setElementPos()
 			{
 				if (m_slotID[i * 4 + j] != -1)
 				{
-					m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -500.0f);
-					m_elements[i * 9 + m_slotID[i * 4 + j]]->setDrawn(true);
+					m_elements[i * 8 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -500.0f);
+					m_elements[i * 8 + m_slotID[i * 4 + j]]->setDrawn(true);
 				}
 			}
 		
@@ -33,7 +33,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame.png", true, 0.0f, 100.0f, 599.0f, 66.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_selection.png", true, 0.0f, -100.0f, 420.0f, 69.0f));
 	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_yes.png", true, 0.0f, -100.0f, 172.0f, 66.0f));
-	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -250.0f, -100.0f, 124.0f, 66.0f));
+	m_quitGameElements.push_back(new UI_Element(L"Textures\\GameState\\quitGame_no.png", true, -249.0f, -100.0f, 124.0f, 66.0f));
 
 	for (int i = 0; i < m_quitGameElements.size(); i++)
 		m_quitGameElements[i]->setDrawn(false);
@@ -46,7 +46,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 	}
 	// PLAYER 1
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -55,7 +54,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 2																		 
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -66,7 +64,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 3																		  
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -75,7 +72,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	// PLAYER 4																
-	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 	m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -479,7 +475,7 @@ void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
 	}
 	playerIndex -= reduction;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	int elementIndex = playerIndex * 9 + abilityType;
+	int elementIndex = playerIndex * 8 + abilityType;
 
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, cd), sizeof(XMVECTOR));

@@ -25,6 +25,7 @@ private:
 	void setLightData();
 public:
 	static Lights* getInstance();
+	static void releaseInstance();
 	LightData* getLights();
 	int addPointLight(float x, float y, float z, float radius, float r, float g, float b, float intensity);
 	int addDirectionalLight(float dx, float dy, float dz, float r, float g, float b, float intensity);

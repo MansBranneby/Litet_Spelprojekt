@@ -2892,7 +2892,7 @@
 1 1 1
 0.8 0.8 0.8
 0.5 0.5 0.5
-0 0 0
+1 1 1
 225
 Textures\\GameState\\Buildings\\gas.png
 1.45
@@ -2902,11 +2902,11 @@ Textures\\GameState\\Buildings\\gas.png
 1690 1691 1692 
 1690 1693 1691 
 1 1 1
-0.8 0.0 0.0
+0.8 0.8 0.8
 0.5 0.5 0.5
-0 0 0
+1 1 1
 225
-Textures\\GameState\\Buildings\\toyoyo.png {T (0.05, 0.0, 0.0)}
+Textures\\GameState\\Buildings\\toyoyo.png {T (0.05 0.0)}
 1.45
 1
 2
@@ -2916,9 +2916,9 @@ Textures\\GameState\\Buildings\\toyoyo.png {T (0.05, 0.0, 0.0)}
 1 1 1
 0.8 0.8 0.8
 0.5 0.5 0.5
-0 0 0
+1 1 1
 225
-Textures\\GameState\\Buildings\\fuel.png {T (0.05, 0.0, 0.0)}
+Textures\\GameState\\Buildings\\fuel.png {T (0.05 0.0)}
 1.45
 1
 2

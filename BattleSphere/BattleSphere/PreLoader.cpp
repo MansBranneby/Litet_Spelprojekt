@@ -159,6 +159,7 @@ PreLoader::PreLoader()
 
 	// Static billboards
 	loadFromFile(objectType::e_static_billboard, "OnMap\\GasStation", "GasStationColl");
+	loadFromFile(objectType::e_static_billboard, "Background\\SS0", "SS0Coll");
 	loadFromFile(objectType::e_static_billboard, "Background\\SS1", "SS1Coll");
 	loadFromFile(objectType::e_static_billboard, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static_billboard, "Background\\SS4", "SS4Coll");

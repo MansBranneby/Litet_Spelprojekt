@@ -6,9 +6,9 @@ Sound::Sound()
 {
 	// TODO: ADD SUSPEND AND RESUME
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
-	#endif
+#endif
 	m_audEngine = std::make_unique<AudioEngine>(eflags);
 
 	m_listener.SetPosition(XMVectorSet(0, 0, 0, 0));
@@ -17,7 +17,6 @@ Sound::Sound()
 	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/accept.wav");
 	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
 
-	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
 	m_effect[(int)soundEffect::e_movement] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/movement.wav");
 	m_effect[(int)soundEffect::e_dash] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/woosh.wav");
@@ -46,6 +45,7 @@ Sound::Sound()
 
 
 	m_index = 0;
+	m_musicOn = true;
 }
 
 Sound* Sound::getInstance()
@@ -65,11 +65,14 @@ void Sound::play(soundUI sound, float volume, float pitch, float pan)
 
 void Sound::play(soundMusic sound, float volume, float pitch, float pan)
 {
-	m_musicInstances[(int)sound]->SetVolume(volume);
-	m_musicInstances[(int)sound]->SetPitch(pitch);
-	m_musicInstances[(int)sound]->SetPan(pan);
+	if (m_musicOn)
+	{
+		m_musicInstances[(int)sound]->SetVolume(volume);
+		m_musicInstances[(int)sound]->SetPitch(pitch);
+		m_musicInstances[(int)sound]->SetPan(pan);
 
-	m_musicInstances[(int)sound]->Play(true);
+		m_musicInstances[(int)sound]->Play(true);
+	}
 }
 
 void Sound::play(soundAmbient sound, float volume, float pitch, float pan)
@@ -90,7 +93,7 @@ void Sound::play(soundAmbient sound, XMVECTOR pos, float volume, float falloff, 
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, falloff));
-		//emitter.SetPosition(pos);
+	//emitter.SetPosition(pos);
 
 	m_ambientInstances[(int)sound]->SetVolume(volume);
 	m_ambientInstances[(int)sound]->SetPitch(pitch);
@@ -109,7 +112,7 @@ void Sound::play(soundEffect sound, XMVECTOR pos, float volume, float pitch, flo
 		m_emitter.SetPosition(m_listenerPos);
 	else
 		m_emitter.SetPosition(m_listenerPos + XMVector3Normalize(dir) * powf(length, 0.4f));
-		//m_emitter.SetPosition(pos);
+	//m_emitter.SetPosition(pos);
 
 	m_effectInstances[m_index]->SetVolume(volume);
 	m_effectInstances[m_index]->SetPitch(pitch);
@@ -128,7 +131,17 @@ void Sound::stop(soundAmbient sound)
 
 void Sound::stop(soundMusic sound)
 {
-	m_musicInstances[(int)sound]->Stop(true);
+		m_musicInstances[(int)sound]->Stop(true);
+}
+
+void Sound::toggleMusic()
+{
+	m_musicOn = !m_musicOn;
+}
+
+bool Sound::musicIsOn()
+{
+	return m_musicOn;
 }
 
 void Sound::update(float dt)

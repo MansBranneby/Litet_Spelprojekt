@@ -29,6 +29,8 @@ private:
 	void setRasterizerState();
 	void setSamplerState();
 	void createBlendState();
+	void resizeBuffers();
+
 public:
 
 	// Member functions
@@ -36,10 +38,12 @@ public:
 	~GraphicResources();
 	void bindDepthStencilState();
 	HWND initializeResources(HINSTANCE hInstance);
+	void updateRenderTarget();
 	ID3D11RasterizerState* getRasterizerState() const;
 	ID3D11DepthStencilView* getDepthStencilView() const;
 	ID3D11RenderTargetView** getBackBuffer();
 	ID3D11SamplerState** getSamplerState();
 	ID3D11BlendState* getBlendState() const;
 	void setViewPortDim(UINT width, UINT height);
+	void releaseDepthStencilViews();
 };

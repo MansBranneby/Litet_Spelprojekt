@@ -13,7 +13,7 @@ using namespace DirectX;
 
 enum class soundEffect
 {
-	e_pistol = 0,
+	
 	e_rifle = 1,
 	e_movement = 2,
 	e_dash = 3,
@@ -64,6 +64,8 @@ private:
 	Sound();
 	static Sound* m_instance;
 
+	bool m_musicOn;
+
 	std::unique_ptr<AudioEngine> m_audEngine;
 
 	XMVECTOR m_listenerPos;
@@ -91,6 +93,9 @@ public:
 
 	void stop(soundAmbient sound);
 	void stop(soundMusic sound);
+
+	void toggleMusic();
+	bool musicIsOn();
 
 	void update(float dt);
 

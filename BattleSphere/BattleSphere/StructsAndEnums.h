@@ -14,10 +14,10 @@ using namespace DirectX;
 #define BLUE 2
 #define RED_DIFFUSE XMVectorSet(1.0f, 0, 0, -1)
 #define GREEN_DIFFUSE XMVectorSet(0, 1.0f, 0, -1)
-#define BLUE_DIFFUSE XMVectorSet(0, 0, 1.0f, -1)
+#define BLUE_DIFFUSE XMVectorSet(0.1f, 0.2f, 1.0f, -1)
 #define RED_EMISSION XMVectorSet(0.35f, 0, 0, -1)
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
-#define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
+#define BLUE_EMISSION XMVectorSet(0.05f, 0.1f, 0.5f, -1)
 
 // Dynamic camera
 #define MINIMUM_CAM_DISTANCE 25.0f
@@ -45,7 +45,7 @@ using namespace DirectX;
 #define START_SPAWNED_RESOURCES 4
 #define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
 #define SPAWN_INTERVAL 10.0f
-#define SPECIAL_RESOURCE_CHANCE 25 // % chance
+#define SPECIAL_RESOURCE_CHANCE 0 // % chance
 
 // Resource
 #define FLOAT_INTENSITY 10.0f // Default 6
@@ -60,21 +60,21 @@ using namespace DirectX;
 
 
 // Normal resources
-#define PISTOL 0 // 2
-#define RIFLE 1 // 7
-#define MOVEMENT 2 // 3
-#define SHIELD 3 // 1
-#define DASH 4 // 4
-#define REFLECT 5 // 0
-#define SNIPER 6 // 6
-#define BEYBLADE 7 // 5
-#define ENERGY 8 // 8
+
+#define RIFLE 0 // 7
+#define MOVEMENT 1 // 3
+#define SHIELD 2 // 1
+#define DASH 3 // 4
+#define REFLECT 4 // 0
+#define SNIPER 5 // 6
+#define BEYBLADE 6 // 5
+#define ENERGY 7 // 8
 
 // UI
 #define NR_OF_ICON_SLOTS 16
-#define NR_OF_ICON_ELEMENTS 36
+#define NR_OF_ICON_ELEMENTS 32
 
-#define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
+#define BIGGEST_NORMAL_INDEX 7 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 

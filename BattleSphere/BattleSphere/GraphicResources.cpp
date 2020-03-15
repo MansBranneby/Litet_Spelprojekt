@@ -8,7 +8,8 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	float height = DX::getInstance()->getHeight();
 	float nearPlane = 0.1f;
 	float farPlane = 500.0f;
-	DX::getInstance()->initializeCamAndParticles(width, height, nearPlane, farPlane);
+	DX::getInstance()->initializeCam(width, height, nearPlane, farPlane);
+	DX::getInstance()->initializeParticles();
 
 	createDepthStencil();
 	createBackBuffer();
@@ -17,7 +18,41 @@ HWND GraphicResources::initializeResources(HINSTANCE hInstance)
 	setSamplerState();
 	setViewPort();
 
+	IDXGIDevice* pDXGIDevice;
+	DX::getInstance()->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice);
+	IDXGIAdapter* pDXGIAdapter;
+	pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&pDXGIAdapter);
+	IDXGIFactory* pIDXGIFactory;
+	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pIDXGIFactory);
+	pIDXGIFactory->MakeWindowAssociation(wndHandle, DXGI_MWA_NO_ALT_ENTER);
+	pDXGIDevice->Release();
+	pDXGIAdapter->Release();
+	pIDXGIFactory->Release();
+
 	return wndHandle;
+}
+
+void GraphicResources::updateRenderTarget()
+{
+	createBackBuffer();
+	setViewPort();
+	createDepthStencil();
+}
+
+void GraphicResources::resizeBuffers()
+{
+	DX::getInstance()->getDeviceContext()->ClearState();
+	DX::getInstance()->getDeviceContext()->Flush();
+
+	ID3D11RenderTargetView* nullViews = nullptr;
+	DX::getInstance()->getDeviceContext()->OMSetRenderTargets(1, &nullViews, nullptr);
+	if (m_backbufferRTV)
+		m_backbufferRTV->Release();
+	releaseDepthStencilViews();
+
+	DX::getInstance()->getSwapChain()->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+	updateRenderTarget();
 }
 
 HWND GraphicResources::initWindow(HINSTANCE hInstance)
@@ -62,7 +97,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	//// check if IMGUI can handle the message (when we click INSIDE ImGui
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
 		return true;
-
 	switch (message)
 	{
 	case WM_DESTROY:
@@ -78,6 +112,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void GraphicResources::createDepthStencil()
 {
+
 	ID3D11Texture2D* pDepthStencil = NULL;
 	D3D11_TEXTURE2D_DESC descDepth;
 	ZeroMemory(&descDepth, sizeof(descDepth));
@@ -106,19 +141,19 @@ void GraphicResources::createDepthStencil()
 	descDSV.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view
-	if(pDepthStencil != nullptr)
+	if (pDepthStencil != nullptr)
 		hr = DX::getInstance()->getDevice()->CreateDepthStencilView(pDepthStencil, &descDSV, &m_depthDSV);
 	if (FAILED(hr))
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	
+
 	srvDesc.Format = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-	
+
 	// Create the depth stencil view
 	if (pDepthStencil != nullptr)
 		hr = DX::getInstance()->getDevice()->CreateShaderResourceView(pDepthStencil, &srvDesc, &m_depthSRV);
@@ -126,7 +161,7 @@ void GraphicResources::createDepthStencil()
 		MessageBox(NULL, L"_depthStencilView", L"Error", MB_OK | MB_ICONERROR);
 
 
-	
+
 	pDepthStencil->Release();
 
 }
@@ -138,13 +173,15 @@ void GraphicResources::createBackBuffer()
 	DX::getInstance()->getSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
 	// use the back buffer address to create the render target
-	if(pBackBuffer != nullptr)
+	if (pBackBuffer != nullptr)
 		DX::getInstance()->getDevice()->CreateRenderTargetView(pBackBuffer, NULL, &m_backbufferRTV);
 	pBackBuffer->Release();
 }
 
 void GraphicResources::setViewPort()
 {
+	m_viewPort.Width = DX::getInstance()->getWidth();
+	m_viewPort.Height = DX::getInstance()->getHeight();
 	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
 }
 
@@ -231,7 +268,6 @@ GraphicResources::~GraphicResources()
 		m_samplerState->Release();
 	if (m_depthSRV)
 		m_depthSRV->Release();
-	
 }
 
 void GraphicResources::bindDepthStencilState()
@@ -270,4 +306,13 @@ void GraphicResources::setViewPortDim(UINT width, UINT height)
 	m_viewPort.Height = (float)height;
 	DX::getInstance()->getDeviceContext()->RSSetViewports(1, &m_viewPort);
 
+}
+
+void GraphicResources::releaseDepthStencilViews()
+{
+	// Release previous depth stencil DSV and SRV
+	if (m_depthDSV)
+		m_depthDSV->Release();
+	if (m_depthSRV)
+		m_depthSRV->Release();
 }

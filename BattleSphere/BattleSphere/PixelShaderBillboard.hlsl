@@ -180,7 +180,7 @@ float4 PS_main(PS_IN input) : SV_Target
 	else if (txModel.Sample(sampAni, input.tex + velocityUV.xy).w != 0.0f)
 	{
 		Kd = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-		Ke = Kd;
+		Ke = Kd * 0.6f;
 	}
 	else
 	{
@@ -294,8 +294,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		case 2: // Translate
 			{
-				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-				fragmentCol += (modelTexture * 0.5f);
+				/*float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+				fragmentCol += (modelTexture * 0.5f);*/
 			}
 			break;
 		case 3: // Flash and interpolate

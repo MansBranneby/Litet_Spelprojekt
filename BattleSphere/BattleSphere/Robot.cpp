@@ -20,8 +20,8 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(PISTOL);
-	m_weapons.push_back(pistol);
+	Weapon* wep = new Weapon(RIFLE);
+	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
@@ -56,33 +56,32 @@ bool Robot::isAi()
 void Robot::updateAIWeapon(bool seePlayer)
 {
 	///int* tierListR;
-	int tierList[9];
+	int tierList[8];
 
 	if (seePlayer)
 	{
-		tierList[0] = 2;
-		tierList[1] = 7;
-		tierList[2] = 3;
-		tierList[3] = 1;
-		tierList[4] = 4;
-		tierList[5] = 0;
-		tierList[6] = 6;
-		tierList[7] = 5;
-		tierList[8] = 8;
+	
+		tierList[0] = 6;
+		tierList[1] = 2;
+		tierList[2] = 1;
+		tierList[3] = 3;
+		tierList[4] = 0;
+		tierList[5] = 5;
+		tierList[6] = 4;
+		tierList[7] = 7;
 
 		
 		
 	}
 	else {
-		tierList[0] = 2;
-		tierList[1] = 5;
-		tierList[2] = 8;
-		tierList[3] = 1;
-		tierList[4] = 7;
-		tierList[5] = 0;
-		tierList[6] = 4;
-		tierList[7] = 3;
-		tierList[8] = 6;
+		tierList[0] = 4;
+		tierList[1] = 7;
+		tierList[2] = 1;
+		tierList[3] = 6;
+		tierList[4] = 0;
+		tierList[5] = 3;
+		tierList[6] = 2;
+		tierList[7] = 5;
 
 		
 
@@ -523,6 +522,7 @@ void Robot::update(float dt, QuadtreeNode* qtn, XMVECTOR& start, XMVECTOR& end)
 		XMVECTOR lookAt = { XMScalarCos(rotRadian), 0.0f, XMScalarSin(rotRadian), 0.0f };
 		XMVECTOR robPos = getPosition() - lookAt*1.0f;
 		float velocity = XMVector3Length(m_vel).m128_f32[0]/dt;
+		velocity *= 45.0f / m_velocity;
 		DX::getInstance()->getParticles()->addEngineFlame(robPos, -lookAt, m_colour, velocity);
 	}
 	
@@ -597,8 +597,8 @@ void Robot::reset()
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* pistol = new Weapon(PISTOL);
-	m_weapons.push_back(pistol);
+	Weapon* rifle = new Weapon(RIFLE);
+	m_weapons.push_back(rifle);
 	m_ready = true;
 	m_time = 0;
 	m_material.ambient = XMVectorSet(0.5, 0.5, 0.5, -1);
@@ -616,6 +616,9 @@ void Robot::reset()
 
 	// Particles
 	m_timeSinceParticles = 0.0f;
+	m_currentMission.index = 0;
+
+	setPosition(-100, 0, 0);
 }
 
 void Robot::release()
