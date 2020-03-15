@@ -40,6 +40,9 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<objectType>
 			case objectType::e_static_billboard_score_platform:
 				m_staticBillboardPlatform.push_back(m_billboards[i]);
 				break;
+			case objectType::e_platformbar_billboard:
+				m_platformBarsBillboards.push_back(m_billboards[i]);
+				break;
 
 		}
 	}
@@ -75,6 +78,9 @@ std::vector<Billboard> BillboardHandler::getBillboardsOfType(objectType objectTy
 		break;
 	case objectType::e_static_billboard_score_platform:
 		return m_staticBillboardPlatform;
+		break;
+	case objectType::e_platformbar_billboard:
+		return m_platformBarsBillboards;
 		break;
 	}
 

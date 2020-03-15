@@ -35,49 +35,72 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 		DirectX::XMVECTOR black = { 0.0f, 0.0f, 0.0f, 0.0f };
 		float intensity = 1.0f / float(game->getNrOfPlayers());
 		std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score_platform);
+		std::vector<Billboard> BBBars = m_billboardHandler.getBillboardsOfType(objectType::e_platformbar_billboard);
 		// Test each player against collision mesh
 		bool hasCollided = false;
 
-		//for (int i = 0; i < BB.size(); ++i)
-		//{
-		//	hasCollided = false;
-		//	// Get collision mesh
-		//	std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
-		//	for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
-		//	{
-		//		for (int k = 0; k < colMesh.size(); k += 3)
-		//		{
-		//			// Get indices
-		//			unsigned int ind1 = k + 1;
-		//			unsigned int ind2 = k + 2;
+		objectData data;
+		for (int j = 0; j < BBBars.size(); ++j)
+		{
+			int index = j;
+			data.material.emission = cyan * 0.25f;
+			game->getPreLoader()->setSubModelData(BBBars[index].getObjectType(), data, BBBars[index].getModelNr(), BBBars[index].getSubModelNumber(), BBBars[index].getVariant());
+		}
 
-		//			// Get vertices
-		//			DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
-		//			DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
-		//			DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+		for (int i = 0; i < BB.size(); ++i)
+		{
+			hasCollided = false;
+			int nrOfCollisions = 0;
+			// Get collision mesh
+			std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[i].getObjectType(), BB[i].getModelNr(), BB[i].getVariant());
+			std::vector<int> playerCol;
+			for (int j = 0; j < XUSER_MAX_COUNT && m_robots[j] != nullptr; ++j)
+			{
+				for (int k = 0; k < colMesh.size(); k += 3)
+				{
+					// Get indices
+					unsigned int ind1 = k + 1;
+					unsigned int ind2 = k + 2;
 
-		//			// Test collision between player and collision mesh
-		//			if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
-		//			{
-		//				hasCollided = true;
-		//				break; // Collision found so we jump out
-		//			}
-		//		}
-		//	}
-		//	if (hasCollided)
-		//	{
-		//		/*objectData data;
-		//		data.material.emission = cyan * 0.25f;
-		//		game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-		//	}
-		//	else
-		//	{
-		//		/*objectData data;
-		//		data.material.emission = black;
-		//		game->getPreLoader()->setSubModelData(BB[i].getObjectType(), data, BB[i].getModelNr(), BB[i].getSubModelNumber(), BB[i].getVariant());*/
-		//	}
-		//}
-		
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					if (testSphereTriangle(m_robots[j]->getPosition(), game->getPreLoader()->getBoundingData(objectType::e_robot, 0, 0).halfWD.x, v0, v1, v2).m_colliding)
+					{
+						hasCollided = true;
+						playerCol.push_back(j);
+						break; // Collision found so we jump out
+					}
+				}
+			}
+
+			if (hasCollided)
+			{
+				int index = 0;
+				if (i == 0 || i == 1)
+					index = 0;
+				else if (i == 2 || i == 3)
+					index = 8;
+				else
+					index = 4;
+				
+				for (int j = 0; j < playerCol.size(); ++j)
+				{
+					if (playerCol[j] != -1 && m_readyPlayers[playerCol[j]] != -1)
+						data.material.emission = m_robots[playerCol[j]]->getColour();
+					else
+						data.material.emission = cyan;
+					game->getPreLoader()->setSubModelData(BBBars[index + j].getObjectType(), data, BBBars[index + j].getModelNr(), BBBars[index + j].getSubModelNumber(), BBBars[index + j].getVariant());
+				}
+			}
+		}
+
+
+	
+
 		for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
 		{
 			for (int j = 0; j < BB.size(); ++j)
@@ -111,28 +134,6 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 				int nrOfReadyPlayers = 0;
 				if (hasCollided)
 				{
-					/*objectData data;
-					m_rotation += dt;
-					data.pos = { 30.0f, 100, -280 };
-					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
-					game->getPreLoader()->drawOneModel(BB[7].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
-
-					data.pos = { 45.0f, 100, -280 };
-					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
-					game->getPreLoader()->drawOneModel(BB[7].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());
-
-					data.pos = { 60.0f, 100, -280 };
-					BB[7].rotate({ 0.0f, 1.0f, 0.0f, m_rotation });
-					game->getPreLoader()->drawOneModel(BB[6].getObjectType(), BB[7].getData(), data, BB[7].getModelNr(), BB[7].getVariant());*/
-
-
-					if (j == 1 || j == 3 || j == 5)
-					{
-						objectData data;
-						data.material.emission = cyan * intensity;
-						game->getPreLoader()->setSubModelData(BB[j].getObjectType(), data, BB[j].getModelNr(), BB[j].getSubModelNumber(), BB[j].getVariant());
-					}
-
 					// Check amount of ready players
 					if (m_readyPlayers.size() == 1)
 					{
@@ -188,6 +189,7 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 			hasCollided = false; // Reset bool for the next player
 		}
 	}
+
 	return exitGame;
 }
 
@@ -298,7 +300,7 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_ranking_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
+	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_ranking_billboard, objectType::e_platformbar_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard

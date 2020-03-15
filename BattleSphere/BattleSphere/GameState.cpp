@@ -750,6 +750,10 @@ void GameState::reset()
 
 void GameState::firstTimeSetUp(Game* game)
 {
+	// Set camera position and look at
+	DX::getInstance()->getCam()->setPosition({0.0f, 120.0f, -110.0f});
+	DX::getInstance()->getCam()->setLookAt({0.0f, 0.0f, 0.0f});
+
 	m_robots = game->getRobots();
 	m_quitGame = false;
 
@@ -784,24 +788,13 @@ void GameState::firstTimeSetUp(Game* game)
 		XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
 		XMVectorSet(120.0f, 2.0f, 50.0f, 0)
 	};
-	/*for (int i = 1; i < 4; i++)
-	{
-		m_robots[i] = new Robot(i);
-		m_robots[i]->setColour(1, 0, 0);
-		m_robots[i]->setDrawn(true);
 
-		m_robots[i]->setAi(true);
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		m_robots[i]->setDrawn(true);
 		m_robots[i]->setPosition(ROBOT_START_POS[i]);
 		m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
-	}*/
-
-	//m_robots[0]->setPosition(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
-
-
-
-
-
-
+	}
 }
 
 

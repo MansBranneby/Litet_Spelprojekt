@@ -77,10 +77,10 @@ using namespace DirectX;
 #define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
 // Special - bigger than normal number - resources
 
-
-#define OBJECT_TYPES 9 // Nr of object types
+// e_nrOfEnums should be at the bottom as it indicates how many objectTypes there are
 enum class objectType
 {
+	e_platformbar_billboard,
 	e_static_billboard_score_platform,
 	e_score_scene,
 	e_number_billboard,
