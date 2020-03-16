@@ -20,7 +20,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* wep = new Weapon(RIFLE);
+	Weapon* wep = new Weapon(ENERGY);
 	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;
@@ -181,15 +181,27 @@ int Robot::getPlayerId()
 
 bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool deleteProjectile, bool playSound)
 {
+	bool explode = true;
 	if (m_currentWeapon[RIGHT] != -1)
+	{
 		damage *= m_weapons[m_currentWeapon[RIGHT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		if (m_weapons[m_currentWeapon[RIGHT]]->getType() == REFLECT && m_weapons[m_currentWeapon[RIGHT]]->getActive())
+			explode = false;
+	}
 	if (m_currentWeapon[LEFT] != -1)
+	{
 		damage *= m_weapons[m_currentWeapon[LEFT]]->getDefense(m_playerId, projDir, getPosition(), m_colour, m_currentRotation, projIndex);
+		if (m_weapons[m_currentWeapon[LEFT]]->getType() == REFLECT && m_weapons[m_currentWeapon[LEFT]]->getActive())
+			explode = false;
+	}
 
 	if (projIndex != -1 && deleteProjectile)
 	{
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 	}
+
+	if (projIndex != -1 && ProjectileBank::getInstance()->getList()[projIndex]->getType() == ENERGY && explode)
+		ProjectileBank::getInstance()->getList()[projIndex]->explode();
 
 	if (damage != 0.0f)
 	{

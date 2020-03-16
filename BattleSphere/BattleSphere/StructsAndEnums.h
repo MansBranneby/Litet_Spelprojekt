@@ -27,8 +27,8 @@ using namespace DirectX;
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
 #define ROTATION_SPEED 60.0f
-#define FAST_TRAVEL_SPEED 55.0f
-#define SLOW_TRAVEL_SPEED 20.0f
+#define FAST_TRAVEL_SPEED 55.0f * 2.f
+#define SLOW_TRAVEL_SPEED 20.0f * 2.f
 #define DRONE_START XMVectorSet(-88.0f, 13.0f, 145.0f, -1)
 #define DRONE_RISE_START XMVectorSet(-75.0f, 13.0f, 120.0f, -1)
 #define DRONE_MIDPOINT XMVectorSet(-15.0f, 13.0f, 50.0f, -1)
@@ -42,7 +42,7 @@ using namespace DirectX;
 #define TRAVEL_HEIGHT 50.0f
 
 // Spawning
-#define START_SPAWNED_RESOURCES 4
+#define START_SPAWNED_RESOURCES 6
 #define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
 #define SPAWN_INTERVAL 10.0f
 #define SPECIAL_RESOURCE_CHANCE 0 // % chance

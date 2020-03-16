@@ -1321,8 +1321,6 @@ bool GameState::update(Game* game, float dt)
 								}
 
 								m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false);
-								
-								ProjectileBank::getInstance()->getList()[i]->explode();
 							}
 
 						}

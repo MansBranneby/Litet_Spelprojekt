@@ -69,7 +69,7 @@ Weapon::Weapon(int type)
 	{
 		//m_damage = 30;
 		//m_cooldown = 1.8f;
-		m_damage = 44;
+		m_damage = 30;
 		m_cooldown = 1.8f;
 
 		setScale(1.5f, 1.5f, 1.5f);
