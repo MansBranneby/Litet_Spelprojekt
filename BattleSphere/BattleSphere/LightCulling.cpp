@@ -14,8 +14,8 @@ void LightCulling::createConstantBuffers()
 	m_dispatchData->threadsX =(UINT)ceilf(DX::getInstance()->getWidth() / 16);
 	m_dispatchData->threadsY =(UINT)ceilf(DX::getInstance()->getHeight() / 16);
 	m_dispatchData->threadsZ = 1;
-	m_dispatchData->threadGroupsX = (UINT)ceilf(m_dispatchData->threadsX / 16);
-	m_dispatchData->threadGroupsY = (UINT)ceilf(m_dispatchData->threadsY / 16);
+	m_dispatchData->threadGroupsX = (UINT)ceilf((float)m_dispatchData->threadsX / 16);
+	m_dispatchData->threadGroupsY = (UINT)ceilf((float)m_dispatchData->threadsY / 16);
 	m_dispatchData->threadGroupsZ = 1;
 	m_dispatchCBuffer = new ConstantBuffer(m_dispatchData, sizeof(dispatchInfo));
 

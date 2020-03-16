@@ -319,6 +319,18 @@ void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int ne
 	}
 }
 
+void UserInterface::adjustForScreen()
+{
+	for (int i = 0; i < (int)m_elements.size(); i++)
+		m_elements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_countDownElements.size(); i++)
+		m_countDownElements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_quitGameElements.size(); i++)
+		m_quitGameElements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_healthBarElements.size(); i++)
+		m_healthBarElements[i]->adjustForScreen();
+}
+
 void UserInterface::update()
 {
 	setElementPos();

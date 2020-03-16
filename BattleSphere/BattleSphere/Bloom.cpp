@@ -225,7 +225,7 @@ void Bloom::run()
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_horizontalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_bloomSRV[1]);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_gaussUAV, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch(ceilf((UINT)(DX::getInstance()->getWidth() * 0.25f / 30)), (UINT)(DX::getInstance()->getHeight() * 0.25f), 1);
+	DX::getInstance()->getDeviceContext()->Dispatch((UINT)ceilf((DX::getInstance()->getWidth() * 0.25f / 30)), (UINT)(DX::getInstance()->getHeight() * 0.25f), 1);
 
 	ID3D11ShaderResourceView* nullSRV = { NULL };
 	ID3D11UnorderedAccessView* nullUAV = { NULL };
@@ -236,7 +236,7 @@ void Bloom::run()
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_verticalCS.getComputeShader(), nullptr, 0);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_gaussSRV);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &m_bloomUAV, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch((UINT)(DX::getInstance()->getWidth() * 0.25f), ceilf((UINT)(DX::getInstance()->getHeight() * 0.25f / 30)), 1);
+	DX::getInstance()->getDeviceContext()->Dispatch((UINT)(DX::getInstance()->getWidth() * 0.25f), (UINT)ceilf((DX::getInstance()->getHeight() * 0.25f / 30)), 1);
 
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &nullSRV);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);

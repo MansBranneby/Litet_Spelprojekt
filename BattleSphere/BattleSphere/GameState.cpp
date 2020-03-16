@@ -797,16 +797,8 @@ void GameState::firstTimeSetUp(Game* game)
 	}*/
 
 	//m_robots[0]->setPosition(XMVectorSet(-180.0f, 2.0f, 50.0f, 0));
-
-
-
-
-
-
+	m_userInterface->adjustForScreen();
 }
-
-
-
 
 void GameState::handleInput(Game* game)
 {
