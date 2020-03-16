@@ -275,7 +275,6 @@ void MainMenuState::hi_robotSelection(Game* game)
 		{
 
 			game->getInput()->setBlocked(i, true);
-			Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 			int robIdx = i;
 			if (robotNr == -1 || game->getRobots()[i]->isAi())
 			{
@@ -368,10 +367,12 @@ void MainMenuState::hi_robotSelection(Game* game)
 				game->getRobots()[i]->setPosition(modifier * ((float)robotNr * 6.9f - 10.5f), -2.0f, 0.0f);
 				changeColour(game, i, true);
 				m_readyState[robotNr]++;
+				Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 				break;
 			case 1:
 				m_uiElements[robNrPlus13]->setDrawn(false);
 				m_readyState[robotNr]++;
+				Sound::getInstance()->play(soundUI::e_front, 0.05f, -1.0f);
 				break;
 			default:
 				break;
@@ -380,9 +381,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		//PRESS B//
 		if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) != -1 && !game->getRobots()[i]->isAi())
 		{
-			Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 			game->getInput()->setBlocked(i, true);
-
 			switch (m_readyState[robotNr])
 			{
 			case 1:
@@ -393,11 +392,13 @@ void MainMenuState::hi_robotSelection(Game* game)
 				m_readyState[robotNr]--;
 				leaveColour(i);
 				game->leavePlayerIdIndex(i);
+				Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 				break;
 			case 2:
 				m_uiElements[robNrPlus13]->setDrawn(true);
 				m_uiElements[robNrPlus13]->fadeIn(0.1f, 0.0f);
 				m_readyState[robotNr]--;
+				Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 				break;
 			default:
 				break;
@@ -512,7 +513,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 		{
 			if (game->getInput()->isPressed(i, XINPUT_GAMEPAD_B) && !game->getInput()->isBlocked(i) && game->getPlayerIdIndex(i) == -1) // To main menu
 			{
-				Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
+				
 				game->getInput()->setBlocked(i, true);
 				int nrOfPlayers = 0;
 				for (int j = 0; j < XUSER_MAX_COUNT; j++)
@@ -523,7 +524,7 @@ void MainMenuState::hi_robotSelection(Game* game)
 				if (!nrOfPlayers)
 				{
 					m_menuState = MenuState::e_mainMenu;
-
+					Sound::getInstance()->play(soundUI::e_back, 0.05f, -1.0f);
 					for (int i = 1; i < 8; i++) // Hide main menu
 					{
 						//m_uiElements[i]->setDrawn(false);

@@ -262,11 +262,11 @@ void Weapon::upgrade()
 		m_cooldown -= 0.2f;
 		m_blastRange += 10;
 		m_damage = 10;
-		if(m_cooldown > 1.0f)
+		if (m_cooldown > 1.0f)
 			m_cooldown = 1.0f;
-		if(m_blastRange < 60)
+		if (m_blastRange < 60)
 			m_blastRange = 60;
-		if(m_damage < 60)
+		if (m_damage < 60)
 			m_damage = 60;
 	}
 }

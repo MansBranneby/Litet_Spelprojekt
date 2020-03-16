@@ -20,7 +20,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* wep = new Weapon(SNIPER);
+	Weapon* wep = new Weapon(RIFLE);
 	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;

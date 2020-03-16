@@ -3,20 +3,20 @@
 void SpawnDrone::loadLists()
 {
 	// Normal spawns
+	m_spawns.push_back({ -15, 29 });
+	m_spawns.push_back({ 15, 29 });
+	m_spawns.push_back({ -15, -34 });
+	m_spawns.push_back({ 15, -34 });
+	m_spawns.push_back({ -15, -3 });
+	m_spawns.push_back({ 15, -3 });
+	m_spawns.push_back({ -15, -63 });
+	m_spawns.push_back({ 15, -63 });
 	m_spawns.push_back({ -62, 120 });
 	m_spawns.push_back({ -120, 100 });
 	m_spawns.push_back({ -74, 85 });
 	m_spawns.push_back({ -46, 85 });
 	m_spawns.push_back({ -15, 85 }); 
 	m_spawns.push_back({ 120, 39 });
-	m_spawns.push_back({ -15, 29 });
-	m_spawns.push_back({ 15, 29 });
-	m_spawns.push_back({ -15, -3 });
-	m_spawns.push_back({ 15, -3 });
-	m_spawns.push_back({ -15, -34 });
-	m_spawns.push_back({ 15, -34 });
-	m_spawns.push_back({ -15, -63 });
-	m_spawns.push_back({ 15, -63 });
 	m_spawns.push_back({ -67, 0 });
 	m_spawns.push_back({ -80, 0 });
 	m_spawns.push_back({ -54, 0 });
