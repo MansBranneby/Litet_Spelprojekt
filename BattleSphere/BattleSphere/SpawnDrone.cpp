@@ -242,7 +242,7 @@ bool SpawnDrone::assignMission(Robot** robots)
 		}
 
 		// Set vector for icon warning
-		m_nextSpawnWarning = XMVectorSet((float)resource->getType(), 0.0f, 0.0f, 0.0f);
+		m_nextSpawnWarning = XMVectorSet((float)resource->getType() + 1.0f, 0.0f, 0.0f, 0.0f);
 
 		// Set resource under drone
 		XMVECTOR pos = m_spawnDroneBody.getPosition();
@@ -627,7 +627,7 @@ void SpawnDrone::setConstantBuffer(bool on)
 	if (on)
 	{
 		DX::getInstance()->getDeviceContext()->Map(*m_constantBufferIcons->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-		memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), sizeof(XMVECTOR));
+		memcpy(mappedMemory.pData, &m_nextSpawnWarning, sizeof(XMVECTOR));
 		DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferIcons->getConstantBuffer(), 0);
 
 		DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(6, 1, m_constantBufferIcons->getConstantBuffer());
