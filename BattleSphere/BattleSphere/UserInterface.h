@@ -15,6 +15,7 @@ private:
 	std::vector<UI_Element*> m_countDownElements;
 	std::vector<UI_Element*> m_quitGameElements;
 	std::vector<UI_Element*> m_healthBarElements;
+	std::vector<UI_Element*> m_winnerElements;
 	int m_nrOfPlayers;
 
 	ConstantBuffer* m_constantBufferColours;

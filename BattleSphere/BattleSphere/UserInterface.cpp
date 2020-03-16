@@ -40,6 +40,8 @@ UserInterface::UserInterface(int nrOfPlayers)
 
 	m_quitGame = true;
 
+	// Winner has been chosen (transition from gamestate to scorestate)
+
 	for (int i = 0; i < 4; i++)
 	{
 		m_drawPlayer[i] = false;
