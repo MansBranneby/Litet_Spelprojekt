@@ -638,7 +638,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_userInterface);
 
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime();
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime() * 4.0f;
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);

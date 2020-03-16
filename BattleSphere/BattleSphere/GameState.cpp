@@ -392,6 +392,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					}
 
 					// Camera dev zoom
+					/*
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && !m_devZoomOut)
 					{
 						m_devZoomOut = true;
@@ -400,6 +401,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					{
 						m_devZoomOut = false;
 					}
+					*/
 
 					// Change weapons
 					if (m_robots[i]->isReady(dt))
@@ -819,8 +821,6 @@ bool GameState::update(Game* game, float dt)
 		return 0;
 	game->updatePlayerStatus();
 	m_robots[3];
-	// Update sounds
-	Sound::getInstance()->update(dt);
 
 	// Update dynamic camera
 	updateDynamicCamera(dt);
@@ -891,7 +891,7 @@ bool GameState::update(Game* game, float dt)
 			}
 
 			// Interpolate it.
-			float value = (degree + ((newDegree - degree) * 0.3f));
+			float value = (degree + ((newDegree - degree) * 0.1f));
 
 			// Wrap it..
 			float rangeZero = 360;
@@ -1042,7 +1042,7 @@ bool GameState::update(Game* game, float dt)
 									int resourceIndex = m_robots[i]->getResourceIndex();
 									if (m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1))
 									{
-										if (m_robots[i]->isAi())
+										if (!m_robots[i]->isAi())
 											m_input->setVibration(i, 0.5f);
 
 										if (resourceIndex != -1)
@@ -1313,8 +1313,6 @@ bool GameState::update(Game* game, float dt)
 								}
 
 								m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false);
-								
-								ProjectileBank::getInstance()->getList()[i]->explode();
 							}
 
 						}
@@ -1427,7 +1425,7 @@ void GameState::draw(Game* game, renderPass pass)
 					int size = (int)m_robots[i]->getWeapons().size();
 					for (int j = 0; j < size; j++)
 					{
-						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE) // TODO: fix this bugg
+						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE)
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
 						else
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), 0);
