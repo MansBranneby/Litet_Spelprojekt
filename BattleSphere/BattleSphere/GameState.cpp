@@ -891,7 +891,7 @@ bool GameState::update(Game* game, float dt)
 			}
 
 			// Interpolate it.
-			float value = (degree + ((newDegree - degree) * 0.3f));
+			float value = (degree + ((newDegree - degree) * 0.1f));
 
 			// Wrap it..
 			float rangeZero = 360;
@@ -1042,7 +1042,7 @@ bool GameState::update(Game* game, float dt)
 									int resourceIndex = m_robots[i]->getResourceIndex();
 									if (m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1))
 									{
-										if (m_robots[i]->isAi())
+										if (!m_robots[i]->isAi())
 											m_input->setVibration(i, 0.5f);
 
 										if (resourceIndex != -1)

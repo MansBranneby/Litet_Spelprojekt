@@ -26,9 +26,9 @@ Weapon::Weapon(int type)
 
 	if (type == RIFLE)
 	{
-		m_damage = 6;
+		m_damage = 8;
 		m_recoil = 0.4f;
-		m_cooldown = 0.3f;
+		m_cooldown = 0.2f;
 
 		setScale(0.5f, 0.5f, 0.5f);
 		m_relativePos = XMVectorSet(1.6f, 1.2f, 0.0f, 0.0f);
@@ -196,13 +196,13 @@ void Weapon::upgrade()
 {
 	if (m_type == RIFLE)
 	{
-			m_recoil -= 0.1f;
-			m_damage += 4;
-			m_cooldown -= 0.1f;
-			if (m_recoil < 0.1f)
-				m_recoil = 0.1f;
-			if (m_cooldown < 0.1f)
-				m_cooldown = 0.1f;
+		m_recoil -= 0.1f;
+		m_damage += 6;
+		m_cooldown -= 0.05f;
+		if (m_recoil < 0.1f)
+			m_recoil = 0.1f;
+		if (m_cooldown < 0.1f)
+			m_cooldown = 0.1f;
 	}
 	else if (m_type == MOVEMENT)
 	{
@@ -245,7 +245,7 @@ void Weapon::upgrade()
 		if (m_cooldown < 1.0f)
 			m_cooldown = 1.0f;
 		if (m_damage > 50)
-			m_duration = 50;
+			m_damage = 50;
 	}
 	else if (m_type == BEYBLADE)
 	{
