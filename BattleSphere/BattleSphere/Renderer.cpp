@@ -455,7 +455,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 
 		setupTestTriangle();
-		DX::getInstance()->setScreen(true, 1920.0f, 1080.0f);
+		DX::getInstance()->setScreen(true, 1280.0f, 720.0f);
 		if (DX::getInstance()->screenChanged())
 			setScreen();
 		loadingScreen();
