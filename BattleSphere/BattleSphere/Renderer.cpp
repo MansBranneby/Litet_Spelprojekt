@@ -497,6 +497,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		Graph::getInstance()->createVertexBuffer();
 
+		ShowCursor(FALSE);
+
 		while (WM_QUIT != msg.message)
 		{
 			if (DX::getInstance()->screenChanged())
