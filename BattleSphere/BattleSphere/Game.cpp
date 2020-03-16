@@ -50,6 +50,7 @@ void Game::updatePlayerStatus()
 			Robot* robot = new Robot(i);
 			robot->setPosition(XMVectorSet(-1000, 0, 0, 1));
 			m_robots[i] = robot;
+			m_robots[i]->setDrawn(false);
 			m_nrOfPlayers++;
 		}
 	}
@@ -100,6 +101,9 @@ Game::Game()
 
 bool Game::update(float dt)
 {
+	// Update sounds
+	Sound::getInstance()->update(dt);
+
 	bool returnValue = true;
 	for (int i = 0; i < m_states.size(); i++)
 	{
@@ -132,8 +136,8 @@ void Game::changeState(stateType state)
 	if (state == stateType::e_gameState)
 	{
 		Sound::getInstance()->stop(soundMusic::e_menu);
-		Sound::getInstance()->play(soundMusic::e_game, 0.30f);
-		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+		//Sound::getInstance()->play(soundMusic::e_game, 0.25f);
+		//Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
 	}
 	
 	if (isActive(stateType::e_mainMenu))

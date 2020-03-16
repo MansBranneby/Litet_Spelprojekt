@@ -20,7 +20,7 @@ Robot::Robot(int playerId)
 	m_resource = -1;
 	m_currentWeapon[LEFT] = -1;
 	m_currentWeapon[RIGHT] = 0;
-	Weapon* wep = new Weapon(ENERGY);
+	Weapon* wep = new Weapon(RIFLE);
 	m_weapons.push_back(wep);
 	m_ready = true;
 	m_time = 0;
@@ -43,9 +43,6 @@ Robot::Robot(int playerId)
 
 	// Particles
 	m_timeSinceParticles = 0.0f;
-
-	
-	
 }
 
 bool Robot::isAi()
@@ -199,9 +196,9 @@ bool Robot::damagePlayer(float damage, XMVECTOR projDir, int projIndex, bool del
 	{
 		ProjectileBank::getInstance()->removeProjectile(projIndex);
 	}
-
-	if (projIndex != -1 && ProjectileBank::getInstance()->getList()[projIndex]->getType() == ENERGY && explode)
+	else if (projIndex != -1 && ProjectileBank::getInstance()->getList()[projIndex]->getType() == ENERGY && explode)
 		ProjectileBank::getInstance()->getList()[projIndex]->explode();
+
 
 	if (damage != 0.0f)
 	{

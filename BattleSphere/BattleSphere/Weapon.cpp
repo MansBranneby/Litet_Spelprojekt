@@ -196,51 +196,52 @@ void Weapon::upgrade()
 {
 	if (m_type == RIFLE)
 	{
-		if (m_recoil > 0.2f)
 			m_recoil -= 0.1f;
-		if (m_damage < 20)
-			m_damage += 2;
-		if (m_cooldown > 0.05f)
-			m_cooldown -= 0.05f;
+			m_damage += 4;
+			m_cooldown -= 0.1f;
+			if (m_recoil < 0.1f)
+				m_recoil = 0.1f;
+			if (m_cooldown < 0.1f)
+				m_cooldown = 0.1f;
 	}
 	else if (m_type == MOVEMENT)
 	{
-		m_cooldown -= 0.5f;
+		m_cooldown -= 2.0f;
 		m_duration += 1.0f;
 		m_speed += 0.2f;
-		if (m_cooldown < 6.0f)
-			m_cooldown = 6.0f;
+		if (m_cooldown < 3.0f)
+			m_cooldown = 3.0f;
 		if (m_duration > 8.0)
 			m_duration = 8.0f;
 	}
 	else if (m_type == SHIELD)
 	{
 		m_cooldown -= 0.5f;
-		m_duration += 0.5f;
-		if (m_cooldown < 6.0f)
-			m_cooldown = 6.0f;
+		m_duration += 1.0f;
+		if (m_cooldown < 5.0f)
+			m_cooldown = 5.0f;
 		if (m_duration > 8.0)
 			m_duration = 8.0f;
 	}
 	else if (m_type == DASH)
 	{
-		m_cooldown -= 0.1f;
-		if (m_cooldown < 1.0f)
-			m_cooldown = 1.0f;
+		m_cooldown -= 0.2f;
+		if (m_cooldown < 0.8f)
+			m_cooldown = 0.8f;
 	}
 	else if (m_type == REFLECT)
 	{
-		m_cooldown -= 1.0f;
-		m_duration += 0.5f;
-		if (m_cooldown < 8.0f)
-			m_cooldown = 8.0f;
-		if (m_duration > 7.0)
-			m_duration = 7.0f;
+		m_cooldown -= 0.5f;
+		m_duration += 1.0f;
+		if (m_cooldown < 5.0f)
+			m_cooldown = 5.0f;
+		if (m_duration > 5.0)
+			m_duration = 5.0f;
 	}
 	else if (m_type == SNIPER)
 	{
 		m_cooldown -= 0.2f;
-		m_damage += 5;
+		m_damage += 12;
 		if (m_cooldown < 1.0f)
 			m_cooldown = 1.0f;
 		if (m_damage > 50)
@@ -258,22 +259,16 @@ void Weapon::upgrade()
 	}
 	else if (m_type == ENERGY)
 	{
+		m_cooldown -= 0.2f;
+		m_blastRange += 10;
+		m_damage = 10;
 		if(m_cooldown > 1.0f)
-			m_cooldown -= 0.2f;
+			m_cooldown = 1.0f;
 		if(m_blastRange < 60)
-			m_blastRange += 5;
+			m_blastRange = 60;
 		if(m_damage < 60)
-			m_damage += 10;
-		
+			m_damage = 60;
 	}
-
-
-	/*
-	if (m_damage > 25.0f) m_damage = 25.0f;
-	if (m_recoil < 0.0f) m_recoil = 0.0f;
-	if (m_cooldown < 2.0f) m_cooldown = 2.0f;
-	if (m_duration > 8.0) m_duration = 8.0f;
-	*/
 }
 
 bool Weapon::shoot(int robotId, XMVECTOR robotPos, XMVECTOR robotColour, float rot, int side, float dt)

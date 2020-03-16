@@ -50,12 +50,13 @@ enum class soundUI
 	e_traverse = 0,
 	e_front = 1,
 	e_back = 2,
+	e_countdown = 3
 };
 
 #define NR_EFFECT_SOUNDS 14
 #define NR_AMBIENT_SOUNDS 3
 #define NR_MUSIC_SOUNDS 2
-#define NR_UI_SOUNDS 3
+#define NR_UI_SOUNDS 4
 #define NR_EFFECT_INSTANCES 50
 
 class Sound

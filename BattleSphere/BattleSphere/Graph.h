@@ -7,7 +7,7 @@
 #include "QuadtreeNode.h"
 
 #define POINT_DISTANCE 1
-#define PULSE_SPEED 90
+#define PULSE_SPEED 120
 #define MAX_USER 4
 
 struct graphNode

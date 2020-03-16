@@ -34,13 +34,13 @@ void SpawnDrone::loadLists()
 	m_spawns.push_back({ -39, -70 });
 	m_spawns.push_back({ -50, -81 });
 	m_spawns.push_back({ -50, -59 });
-	m_normalSpawnAmount = (int)(m_spawns.size());
 
 	// Special spawns
 	m_spawns.push_back({ -163, 120 });
 	m_spawns.push_back({ -60, 85 });
 	m_spawns.push_back({ 56, 50 });
 	m_spawns.push_back({ 155, 28 });
+	m_normalSpawnAmount = (int)(m_spawns.size());
 	m_specialSpawnAmount = (int)(m_spawns.size() - m_normalSpawnAmount);
 
 	// Free spawn bool list
@@ -270,7 +270,7 @@ bool SpawnDrone::translateDoor(float dt, bool open)
 {
 	if (open)
 	{
-		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] - dt * 2.0f, 0.0f);
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] - dt * 15.0f, 0.0f);
 		if (m_BSPDdoor.getPosition().m128_f32[1] <= BSPD_DOOR_OPEN)
 		{
 			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_OPEN, 0.0f);
@@ -279,7 +279,7 @@ bool SpawnDrone::translateDoor(float dt, bool open)
 	}
 	else
 	{
-		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] + dt * 2.0f, 0.0f);
+		m_BSPDdoor.setPosition(0.0f, m_BSPDdoor.getPosition().m128_f32[1] + dt * 15.0f, 0.0f);
 		if (m_BSPDdoor.getPosition().m128_f32[1] >= BSPD_DOOR_CLOSED)
 		{
 			m_BSPDdoor.setPosition(0.0f, BSPD_DOOR_CLOSED, 0.0f);

@@ -327,21 +327,33 @@ void UserInterface::update()
 bool UserInterface::updateCountDown(float dt)
 {
 	m_countDownTimer += dt;
-
-	if (m_countDownTimer >= 4.0f)
+	if (m_countDownTimer >= 4.3f)
 	{
-		m_countDownElements[3]->setDrawn(false);
+		Sound::getInstance()->play(soundMusic::e_game, 0.15f);
+		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+		m_countDownTimer = 4.3f;
+		return false;
+	}
+	else if (m_countDownTimer >= 4.0f)
+	{
+		if (m_countDownElements[3]->isDrawn())
+		{
+			Sound::getInstance()->play(soundUI::e_countdown, 1.0f);
+			m_countDownElements[3]->setDrawn(false);
+		}
 		return false;
 	}
 	else
 	{
 		if (m_countDownTimer < 1.0f)
 		{
+			
 			if (!m_countDownElements[2]->isDrawn())
 			{
 				m_countDownElements[2]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[2]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[2]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 0.0f);
 			}
 			m_countDownElements[2]->setPos(0.0f, 0.0f, m_countDownTimer);
 			m_countDownElements[2]->updateElement(dt);
@@ -353,6 +365,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[1]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[1]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[1]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[1]->setPos(0.0f, 0.0f, m_countDownTimer - 1.0f);
 			m_countDownElements[1]->updateElement(dt);
@@ -365,6 +378,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[0]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[0]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[0]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[0]->setPos(0.0f, 0.0f, m_countDownTimer - 2.0f);
 			m_countDownElements[0]->updateElement(dt);
@@ -377,6 +391,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[3]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[3]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[3]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[3]->setPos(0.0f, 0.0f, (m_countDownTimer - 3.0f));
 			m_countDownElements[3]->updateElement(dt);
