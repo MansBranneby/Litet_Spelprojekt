@@ -177,8 +177,9 @@ void GameState::handleMovement(Game* game, float dt, int id)
 	// Save velocity for collision
 	if (!m_robots[id]->isAi())
 	{
-		m_robots[id]->setVel(robLookAt *
-			m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
+		/*m_robots[id]->setVel(robLookAt *
+			m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger*/ //CHEAT: speed
+		m_robots[id]->setVel(robLookAt * m_robots[id]->getVelocity() * dt);
 
 	// Robot and weapon movement
 		m_robots[id]->move(m_robots[id]->getVel());
@@ -425,7 +426,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					}
 
 					// TODO: add collision and remove projectile
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN))
+					/*if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN)) //CHEAT?: take damage
 					{
 						int resourceIndex = m_robots[i]->getResourceIndex();
 						if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), -1))
@@ -437,11 +438,11 @@ bool GameState::handleInputs(Game* game, float dt)
 								m_resources[resourceIndex]->setBlocked(false);
 							}
 						}
-					}
+					}*/
 
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_X))
 					{
-						m_robots[i]->upgradeWeapon(RIFLE);
+						//m_robots[i]->upgradeWeapon(RIFLE); //CHEAT: rifle
 					}
 				}
 
@@ -453,11 +454,11 @@ bool GameState::handleInputs(Game* game, float dt)
 				}
 
 				// TODO: remove cheats yooo
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
+				/*if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP)) CHEAT: revive
 				{
 					m_robots[i]->setHealth(100);
 					m_input->setVibration(i, 0.0f);
-				}
+				}*/
 
 				if (m_robots[i]->getResourceIndex() != -1)
 				{
