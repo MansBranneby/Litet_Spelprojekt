@@ -311,6 +311,8 @@ ScoreState::ScoreState(Game* game)
 	m_transparency.initialize();
 	m_transparency.bindConstantBuffer();
 
+	// User interface
+	m_userInterface = nullptr;
 
 	//// Initialize dynamic camera
 	//m_zoomingOutToStart = false;
@@ -348,6 +350,9 @@ ScoreState::~ScoreState()
 		delete m_dboHandler;
 	if (m_spawnDrone)
 		delete m_spawnDrone;
+
+	if (m_userInterface)
+		delete m_userInterface;
 }
 
 void ScoreState::pause()
@@ -361,7 +366,7 @@ void ScoreState::resume()
 void ScoreState::firstTimeSetUp(Game* game)
 {
 	m_hasChosen = false;
-
+	m_userInterface = new UserInterface(-1);
 	// Set camera position and lookAt
 	DirectX::XMVECTOR lookAt{ 35.0f, 40.0f, -60.0f };
 	lookAt = { 45.0f, 120.0f, -260.0f };
@@ -430,6 +435,8 @@ bool ScoreState::update(Game* game, float dt)
 {
 	bool exitGame = false;
 
+	m_userInterface->updateScoreWinning(dt);
+
 	handleInputs(game, dt);
 	game->updatePlayerStatus();
 
@@ -458,6 +465,12 @@ bool ScoreState::update(Game* game, float dt)
 
 void ScoreState::draw(Game* game, renderPass pass)
 {
+	// User interface
+	if (pass == renderPass::e_userInterface)
+	{
+		m_userInterface->drawBlackScreen();
+	}
+
 	if (pass == renderPass::e_opaque)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)

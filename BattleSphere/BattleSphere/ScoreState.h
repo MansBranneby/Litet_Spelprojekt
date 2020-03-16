@@ -11,6 +11,7 @@
 #include "Sound.h"
 #include "BillboardHandler.h"
 #include "Node.h"
+#include "UserInterface.h"
 
 class ScoreState : public State
 {
@@ -22,6 +23,7 @@ private:
 	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
 	Transparency m_transparency;
+	UserInterface* m_userInterface;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;

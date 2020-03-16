@@ -16,6 +16,7 @@ private:
 	std::vector<UI_Element*> m_quitGameElements;
 	std::vector<UI_Element*> m_healthBarElements;
 	std::vector<UI_Element*> m_winnerElements;
+	UI_Element* m_BlackScreenElement;
 	int m_nrOfPlayers;
 
 	ConstantBuffer* m_constantBufferColours;
@@ -24,7 +25,8 @@ private:
 	float m_slotPos[16]; // array for icon positions
 	float m_countDownTimer;
 	bool m_quitGame;
-
+	float m_winningTimer;
+	float m_blackScreenFadeTimer;
 	bool m_drawPlayer[4];
 	void setElementPos();
 
@@ -38,6 +40,8 @@ public:
 
 	void update();
 	bool updateCountDown(float dt);
+	bool updateWinning(float dt, int playerIndex);
+	bool updateScoreWinning(float dt);
 	void updateQuitGame(float dt);
 	void setQuitGame(bool quitGame);
 	void quitGameHI(int dir);
@@ -45,6 +49,8 @@ public:
 	void drawAbility(int playerIndex, int abilityType, float cd);
 	void drawHealthbar(int playerIndex, float hp);
 	void drawQuitGame();
+	void drawWinning(int playerIndex);
+	void drawBlackScreen();
 
 	bool getQuitGame();
 };

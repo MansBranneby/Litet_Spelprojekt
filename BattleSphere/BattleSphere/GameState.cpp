@@ -639,6 +639,9 @@ GameState::GameState(Game* game)
 	index = m_lights->addSpotLight(47.5f, 14.7f, -0.34f, 20.0f, -0.0f, -0.9f, -0.3f, 0.8f, 0.8f, 0.8f, 30.0f, 5.0f); // Gas station spotlight
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 
+	// ScoreScreen
+	m_lights->addPointLight(45.0f, 130.0f, -330.0f, 100.0f, 0, 0.46f, 0.6f, 15);
+
 	// Initialize dynamic camera
 	m_zoomingOutToStart = false;
 	m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
@@ -674,6 +677,10 @@ GameState::GameState(Game* game)
 
 	// Quit Game
 	m_quitGame = false;
+
+	// Win game
+	m_winGame = false;
+	m_winnerIndex = -1;
 }
 
 GameState::~GameState()
@@ -756,6 +763,7 @@ void GameState::firstTimeSetUp(Game* game)
 
 	m_robots = game->getRobots();
 	m_quitGame = false;
+	m_winGame = false;
 
 	//// Create user interface (based on number of players) ////
 	int nrOfPlayers = 0;
@@ -791,9 +799,12 @@ void GameState::firstTimeSetUp(Game* game)
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		m_robots[i]->setDrawn(true);
-		m_robots[i]->setPosition(ROBOT_START_POS[i]);
-		m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
+		if (m_robots[i] != nullptr)
+		{
+			m_robots[i]->setDrawn(true);
+			m_robots[i]->setPosition(ROBOT_START_POS[i]);
+			m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
+		}
 	}
 }
 
@@ -811,7 +822,15 @@ bool GameState::update(Game* game, float dt)
 	// Countdown
 	if (m_userInterface->updateCountDown(dt) || m_quitGame)
 		dt = 0.0f;
-
+	// Winning
+	if (m_winGame)
+	{
+		if (m_userInterface->updateWinning(dt, m_winnerIndex))
+		{
+			setPaused(true); // Pause this state
+			game->changeState(stateType::e_scoreState); // Change state to ScoreState
+		}
+	}
 
 	m_input = game->getInput();
 	m_robots = game->getRobots();
@@ -1373,13 +1392,14 @@ bool GameState::update(Game* game, float dt)
 			}
 		}
 	}
-	if (nrOfPlayersAlive <= 1) // If zero or one person is alive then change to scorestate 
+	if (nrOfPlayersAlive <= 1 && !m_winGame) // If zero or one person is alive then change to scorestate 
 	{
 		if (winner != -1)
+		{
+			m_winGame = true;
 			m_robots[winner]->addScore(1); // Award one point to the winning player 
-		// If no one is left alive it's a tie and no points are awarded 
-		setPaused(true); // Pause this state
-		game->changeState(stateType::e_scoreState); // Change state to ScoreState
+			m_winnerIndex = m_robots[winner]->getPlayerId();
+		}
 	}
 
 	return 0;
@@ -1432,6 +1452,9 @@ void GameState::draw(Game* game, renderPass pass)
 		{
 			m_userInterface->drawQuitGame();
 		}
+
+		if (m_winGame)
+			m_userInterface->drawWinning(m_winnerIndex);
 	}
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
