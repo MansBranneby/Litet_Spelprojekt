@@ -127,12 +127,12 @@ void Game::changeState(stateType state)
 {
 	if (state == stateType::e_mainMenu)
 	{
-		Sound::getInstance()->play(soundMusic::e_menu, 0.01f);
+		Sound::getInstance()->play(soundMusic::e_menu, 0.15f);
 	}
 	if (state == stateType::e_gameState)
 	{
 		Sound::getInstance()->stop(soundMusic::e_menu);
-		Sound::getInstance()->play(soundMusic::e_game, 0.01f);
+		Sound::getInstance()->play(soundMusic::e_game, 0.30f);
 		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
 	}
 	

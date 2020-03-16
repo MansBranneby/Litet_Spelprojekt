@@ -38,8 +38,8 @@ Sound::Sound()
 	m_ambientInstances[(int)soundAmbient::e_drone] = m_ambient[(int)soundAmbient::e_drone]->CreateInstance(SoundEffectInstance_Use3D);
 	m_ambientInstances[(int)soundAmbient::e_shield] = m_ambient[(int)soundAmbient::e_shield]->CreateInstance(SoundEffectInstance_Use3D);
 
-	m_music[(int)soundMusic::e_menu] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/menuSong.wav");
-	m_music[(int)soundMusic::e_game] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/gameSong.wav");
+	m_music[(int)soundMusic::e_menu] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/BS_menu.wav");
+	m_music[(int)soundMusic::e_game] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/BS_game.wav");
 	m_musicInstances[(int)soundMusic::e_menu] = m_music[(int)soundMusic::e_menu]->CreateInstance();
 	m_musicInstances[(int)soundMusic::e_game] = m_music[(int)soundMusic::e_game]->CreateInstance();
 
