@@ -18,8 +18,6 @@ Robot::Robot(int playerId)
 	m_nextnextW = -1;
 	m_score = 0;
 	m_resource = -1;
-	m_currentWeapon[LEFT] = -1;
-	m_currentWeapon[RIGHT] = 0;
 	Weapon* wep = new Weapon(RIFLE);
 	m_weapons.push_back(wep);
 	m_ready = true;
@@ -599,8 +597,6 @@ void Robot::reset()
 	m_health = 100;
 	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
-	m_currentWeapon[LEFT] = -1;
-	m_currentWeapon[RIGHT] = 0;
 	m_nextW = -1;
 	m_nextnextW = -1;
 	m_resource = -1;

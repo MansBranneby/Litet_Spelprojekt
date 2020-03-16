@@ -42,7 +42,7 @@ void GameState::updateDynamicCamera(float dT)
 		float maxX = -2000;
 		float minZ = 2000;
 		float maxZ = -2000;
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		for (int i = 0; i < 1; i++)
 		{
 			if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 			{
@@ -65,7 +65,7 @@ void GameState::updateDynamicCamera(float dT)
 		}
 
 		// Set look at between players and move it upp the z-axis slightly
-		newLookAt /= (float)nrOfPlayers;
+		newLookAt /= 1;//(float)nrOfPlayers;
 		newLookAt.m128_f32[3] -= 100.0f;
 
 		// Calculate biggest distance
@@ -392,7 +392,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					}
 
 					// Camera dev zoom
-					/*
+					
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && !m_devZoomOut)
 					{
 						m_devZoomOut = true;
@@ -401,7 +401,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					{
 						m_devZoomOut = false;
 					}
-					*/
+					
 
 					// Change weapons
 					if (m_robots[i]->isReady(dt))
@@ -456,11 +456,23 @@ bool GameState::handleInputs(Game* game, float dt)
 				}
 
 				// TODO: remove cheats yooo
-				/*if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP)) CHEAT: revive
+				
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP)) //CHEAT: revive
 				{
 					m_robots[i]->setHealth(100);
 					m_input->setVibration(i, 0.0f);
-				}*/
+				}
+
+				if (m_input->isPressed(i, XINPUT_GAMEPAD_X)) //CHEAT: revive
+				{
+					//m_robots[i]->upgradeWeapon(MOVEMENT);
+					//m_robots[i]->upgradeWeapon(SHIELD);
+					//m_robots[i]->upgradeWeapon(DASH);
+					//m_robots[i]->upgradeWeapon(REFLECT);
+					//m_robots[i]->upgradeWeapon(SNIPER);
+					//m_robots[i]->upgradeWeapon(BEYBLADE);
+					//m_robots[i]->upgradeWeapon(ENERGY);
+				}
 
 				if (m_robots[i]->getResourceIndex() != -1)
 				{
@@ -777,6 +789,14 @@ void GameState::firstTimeSetUp(Game* game)
 		{
 			m_userInterface->setPlayerColours(m_robots[i]->getRobotID(), m_robots[i]->getColour());
 			m_lineShots.setColour(i, m_robots[i]->getColour());
+
+			//m_robots[i]->upgradeWeapon(MOVEMENT);
+			//m_robots[i]->upgradeWeapon(SHIELD);
+			//m_robots[i]->upgradeWeapon(DASH);
+			//m_robots[i]->upgradeWeapon(REFLECT);
+			//m_robots[i]->upgradeWeapon(SNIPER);
+			//m_robots[i]->upgradeWeapon(BEYBLADE);
+			//m_robots[i]->upgradeWeapon(ENERGY);
 		}
 	}
 	//Spawn AI:s
@@ -823,7 +843,11 @@ bool GameState::update(Game* game, float dt)
 	m_robots[3];
 
 	// Update dynamic camera
-	updateDynamicCamera(dt);
+	bool no = false;
+	if (m_input->isPressed(0, XINPUT_GAMEPAD_Y))
+		no = true;
+	if (no)
+		updateDynamicCamera(dt);
 
 	// Update spawning drone
 	m_spawnDrone->update(m_robots, dt);
@@ -1412,6 +1436,7 @@ void GameState::draw(Game* game, renderPass pass)
 	}
 
 	// User interface
+	/*
 	if (pass == renderPass::e_userInterface)
 	{
 		if (m_quitGame == -1)
@@ -1439,7 +1464,7 @@ void GameState::draw(Game* game, renderPass pass)
 			m_userInterface->drawQuitGame();
 		}
 	}
-
+	*/
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)
 	{
 		for (int i = 0; i < m_nodes.size(); i++)

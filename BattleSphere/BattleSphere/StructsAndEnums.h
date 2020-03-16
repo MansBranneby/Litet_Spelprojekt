@@ -43,7 +43,7 @@ using namespace DirectX;
 
 // Spawning
 #define START_SPAWNED_RESOURCES 6
-#define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
+#define MAX_RESOURCES_OUT_PER_PLAYER 25 // Default 2
 #define SPAWN_INTERVAL 10.0f
 #define SPECIAL_RESOURCE_CHANCE 0 // % chance
 

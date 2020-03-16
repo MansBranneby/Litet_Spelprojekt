@@ -641,7 +641,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_userInterface);
 
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime() * 4.0f;
+					//rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime() * 50.0f;
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
@@ -729,7 +729,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					ID3D11ShaderResourceView* nullSRV = { NULL };
 					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullSRV);
 				}
-
+				/*
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
 				ImGui::NewFrame();
@@ -742,10 +742,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				/*ImGui::SliderFloat("Pos X: ", &positions[0], -200, 200);
 				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
 				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/
-
+				/*
 				ImGui::End();
 				ImGui::Render();
 				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+				*/
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
 				counterFrames++;
