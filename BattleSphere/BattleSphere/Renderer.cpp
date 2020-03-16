@@ -458,6 +458,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		DX::getInstance()->setScreen(true, 1280.0f, 720.0f);
 		if (DX::getInstance()->screenChanged())
 			setScreen();
+		Sound::getInstance()->play(soundMusic::e_menu, 0.15f);
 		loadingScreen();
 
 		resBuffer resBuff =
