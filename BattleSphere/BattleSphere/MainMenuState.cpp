@@ -65,22 +65,26 @@ MainMenuState::MainMenuState()
 	m_optionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_on.png", false, 300.0f, -288.0f, 79.0f, 42.0f));
 
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_800x600.png", false, 300.0f, 0.0f, 244.0f, 42.0f));
+	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1280x720.png", false, 300.0f, 0.0f, 260.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1366x768.png", false, 300.0f, 0.0f, 260.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_1920x1080.png", false, 300.0f, 0.0f, 275.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_2560x1440.png", false, 300.0f, 0.0f, 309.0f, 42.0f));
+	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_2736x1824.png", false, 300.0f, 0.0f, 301.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_3840x2160.png", false, 300.0f, 0.0f, 301.0f, 42.0f));
 	m_resolutionElements.push_back(new UI_Element(L"Textures\\MainMenu\\Options\\options_7680x4320.png", false, 300.0f, 0.0f, 323.0f, 42.0f));
 
 	m_resolutions.push_back({ 800.0f, 600.0f });
+	m_resolutions.push_back({ 1280.0f, 720.0f });
 	m_resolutions.push_back({ 1366.0f, 768.0f });
 	m_resolutions.push_back({ 1920.0f, 1080.0f });
 	m_resolutions.push_back({ 2560.0f, 1440.0f });
+	m_resolutions.push_back({ 2736.0f, 1824.0f });
 	m_resolutions.push_back({ 3840.0f, 2160.0f });
 	m_resolutions.push_back({ 7680.0f, 4320.0f });
 
 	m_originalFullscreenSetting = m_fullscreen = true;
 	m_musicOn = true;
-	m_selectedResIndex = 2;
+	m_selectedResIndex = 1;
 	m_originalResolutionSetting = m_resolutions[m_selectedResIndex];
 	for (int i = 0; i < (int)m_resolutionElements.size(); i++)
 	{
