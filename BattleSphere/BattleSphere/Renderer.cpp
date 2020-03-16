@@ -73,8 +73,19 @@ GraphicResources g_graphicResources;
 Bloom* g_bloom = nullptr;
 Menu* g_menu = nullptr;
 
+struct resBuffer
+{
+	float width;
+	float height;
+	float aspectRatio;
+	float padding;
+};
+
+ConstantBuffer* g_resolutionBuffer = nullptr;
+
 //TODO Remove
 ConstantBuffer* g_constantBufferMaterials = nullptr;
+
 
 ID3D11Buffer* g_vertexBufferFSQuad = nullptr;
 ID3D11Buffer* _vertexBuffer = nullptr;
@@ -323,6 +334,7 @@ void billboardRender()
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderBillboard.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(7, 1, g_resolutionBuffer->getConstantBuffer());
 }
 
 void transparencyRender()
@@ -332,6 +344,7 @@ void transparencyRender()
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(7, 1, g_resolutionBuffer->getConstantBuffer());
 	DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 }
 
@@ -447,6 +460,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 			setScreen();
 		loadingScreen();
 
+		resBuffer resBuff =
+		{
+			DX::getInstance()->getWidth(),
+			DX::getInstance()->getHeight(),
+			DX::getInstance()->getWidth() / DX::getInstance()->getHeight(),
+			0.0f
+		};
+		g_resolutionBuffer = new ConstantBuffer(&resBuff, sizeof(resBuffer));
+
 		g_Clock = new Clock();
 
 		g_gameState = new GameState(g_Game);
@@ -478,7 +500,17 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		while (WM_QUIT != msg.message)
 		{
 			if (DX::getInstance()->screenChanged())
+			{
+				resBuff =
+				{
+					DX::getInstance()->getWidth(),
+					DX::getInstance()->getHeight(),
+					DX::getInstance()->getWidth() / DX::getInstance()->getHeight(),
+					0.0f
+				};
+				g_resolutionBuffer->updateBuffer(&resBuff, sizeof(resBuffer));
 				setScreen();
+			}
 
 			g_Clock->calcDeltaTime();
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
@@ -744,6 +776,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_Clock;
 		g_Game->release();
 		delete g_Game;
+		delete g_resolutionBuffer;
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
 		g_pixelShaderDownsample.release();

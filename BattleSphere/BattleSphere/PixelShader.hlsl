@@ -38,6 +38,14 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 	matrix lightVP;
 };
 
+cbuffer PS_CONSTANT_BUFFER : register(b7)
+{
+	float resWidth;
+	float resHeight;
+	float resAspectRatio;
+	float resPadding;
+};
+
 cbuffer PS_ROBOT_DATA : register (b4) 
 {
 	float4 playerPosition[4];
@@ -120,8 +128,8 @@ float4 PS_main(PS_IN input) : SV_Target
 	float depth = PosRelLight.z / PosRelLight.w;
 
 	float ep = 0.0005f;	
-	float dx = 1.0f / 1920;
-	float dy = 1.0f / 1080;
+	float dx = 1.0f / resWidth;
+	float dy = 1.0f / resHeight;
 
 	float sum = 0;
 	float x, y;
@@ -296,13 +304,13 @@ float4 PS_main(PS_IN input) : SV_Target
 	{
 
 		float3 ndcSpace = float3(0,0,0);
-		ndcSpace.x = input.pos.x / 1920; // 0 - 1
+		ndcSpace.x = input.pos.x / resWidth; // 0 - 1
 		ndcSpace.x = ndcSpace.x * 2 - 1;
-		ndcSpace.y = -input.pos.y / 1080; // 0 - 1
+		ndcSpace.y = -input.pos.y / resHeight; // 0 - 1
 
 		ndcSpace.y = (ndcSpace.y * 2 + 1);
 		ndcSpace.z = input.pos.z;
-		float aspectRatio = 9.0f / 16.0f;
+		float aspectRatio = 1.0f/resAspectRatio;
 		for (int j = 0; j < 4; j++)
 		{
 			float2 dist = playerPosition[j].xy - ndcSpace.xy;
