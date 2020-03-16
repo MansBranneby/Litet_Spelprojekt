@@ -36,6 +36,7 @@ public:
 	void setSlotID(int playerIndex, int abilityType);
 	void setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext);
 
+	void adjustForScreen();
 	void update();
 	bool updateCountDown(float dt);
 	void updateQuitGame(float dt);
