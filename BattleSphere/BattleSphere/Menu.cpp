@@ -3,7 +3,7 @@
 void Menu::initializeResources()
 {
 	HRESULT hr = CoInitialize(NULL);
-	hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), L"Textures\\loadingScreen.png", NULL, &m_loadingScreenSRV);
+	hr = CreateWICTextureFromFile(DX::getInstance()->getDevice(), L"Textures\\loadingScreen2.png", NULL, &m_loadingScreenSRV);
 	if (FAILED(hr))
 		MessageBox(NULL, L"Error in m_loadingScreenSRV", L"Error", MB_OK | MB_ICONERROR);
 }

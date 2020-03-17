@@ -11,8 +11,8 @@ void UserInterface::setElementPos()
 			{
 				if (m_slotID[i * 4 + j] != -1)
 				{
-					m_elements[i * 9 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -500.0f);
-					m_elements[i * 9 + m_slotID[i * 4 + j]]->setDrawn(true);
+					m_elements[i * 8 + m_slotID[i * 4 + j]]->setPos(m_slotPos[i * 4 + j], -500.0f);
+					m_elements[i * 8 + m_slotID[i * 4 + j]]->setDrawn(true);
 				}
 			}
 		
@@ -350,6 +350,18 @@ void UserInterface::setSlotID(int playerIndex, int abilityType, int side, int ne
 	}
 }
 
+void UserInterface::adjustForScreen()
+{
+	for (int i = 0; i < (int)m_elements.size(); i++)
+		m_elements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_countDownElements.size(); i++)
+		m_countDownElements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_quitGameElements.size(); i++)
+		m_quitGameElements[i]->adjustForScreen();
+	for (int i = 0; i < (int)m_healthBarElements.size(); i++)
+		m_healthBarElements[i]->adjustForScreen();
+}
+
 void UserInterface::update()
 {
 	setElementPos();
@@ -358,21 +370,33 @@ void UserInterface::update()
 bool UserInterface::updateCountDown(float dt)
 {
 	m_countDownTimer += dt;
-
-	if (m_countDownTimer >= 4.0f)
+	if (m_countDownTimer >= 4.3f)
 	{
-		m_countDownElements[3]->setDrawn(false);
+		Sound::getInstance()->play(soundMusic::e_game, 0.15f);
+		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+		m_countDownTimer = 4.3f;
+		return false;
+	}
+	else if (m_countDownTimer >= 4.0f)
+	{
+		if (m_countDownElements[3]->isDrawn())
+		{
+			Sound::getInstance()->play(soundUI::e_countdown, 1.0f);
+			m_countDownElements[3]->setDrawn(false);
+		}
 		return false;
 	}
 	else
 	{
 		if (m_countDownTimer < 1.0f)
 		{
+			
 			if (!m_countDownElements[2]->isDrawn())
 			{
 				m_countDownElements[2]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[2]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[2]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 0.0f);
 			}
 			m_countDownElements[2]->setPos(0.0f, 0.0f, m_countDownTimer);
 			m_countDownElements[2]->updateElement(dt);
@@ -384,6 +408,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[1]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[1]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[1]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[1]->setPos(0.0f, 0.0f, m_countDownTimer - 1.0f);
 			m_countDownElements[1]->updateElement(dt);
@@ -396,6 +421,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[0]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[0]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[0]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[0]->setPos(0.0f, 0.0f, m_countDownTimer - 2.0f);
 			m_countDownElements[0]->updateElement(dt);
@@ -408,6 +434,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[3]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[3]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[3]->setDrawn(true);
+				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
 			}
 			m_countDownElements[3]->setPos(0.0f, 0.0f, (m_countDownTimer - 3.0f));
 			m_countDownElements[3]->updateElement(dt);
@@ -557,7 +584,7 @@ void UserInterface::drawAbility(int playerIndex, int abilityType, float cd)
 	}
 	playerIndex -= reduction;
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
-	int elementIndex = playerIndex * 9 + abilityType;
+	int elementIndex = playerIndex * 8 + abilityType;
 
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
 	memcpy(mappedMemory.pData, &XMVectorSet(0.0f, 0.0f, 0.0f, cd), sizeof(XMVECTOR));

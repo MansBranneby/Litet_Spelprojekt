@@ -14,10 +14,10 @@ using namespace DirectX;
 #define BLUE 2
 #define RED_DIFFUSE XMVectorSet(1.0f, 0, 0, -1)
 #define GREEN_DIFFUSE XMVectorSet(0, 1.0f, 0, -1)
-#define BLUE_DIFFUSE XMVectorSet(0, 0, 1.0f, -1)
+#define BLUE_DIFFUSE XMVectorSet(0.1f, 0.2f, 1.0f, -1)
 #define RED_EMISSION XMVectorSet(0.35f, 0, 0, -1)
 #define GREEN_EMISSION XMVectorSet(0, 0.35f, 0, -1)
-#define BLUE_EMISSION XMVectorSet(0, 0, 0.35f, -1)
+#define BLUE_EMISSION XMVectorSet(0.05f, 0.1f, 0.5f, -1)
 
 // Dynamic camera
 #define MINIMUM_CAM_DISTANCE 25.0f
@@ -26,9 +26,9 @@ using namespace DirectX;
 
 // Spawning drone
 #define PROPELLER_SPEED 1700.0f
-#define ROTATION_SPEED 60.0f
-#define FAST_TRAVEL_SPEED 55.0f
-#define SLOW_TRAVEL_SPEED 20.0f
+#define ROTATION_SPEED 60.0f * 4.f
+#define FAST_TRAVEL_SPEED 55.0f * 2.f
+#define SLOW_TRAVEL_SPEED 20.0f * 2.f
 #define DRONE_START XMVectorSet(-88.0f, 13.0f, 145.0f, -1)
 #define DRONE_RISE_START XMVectorSet(-75.0f, 13.0f, 120.0f, -1)
 #define DRONE_MIDPOINT XMVectorSet(-15.0f, 13.0f, 50.0f, -1)
@@ -37,15 +37,15 @@ using namespace DirectX;
 //#define DRONE_START XMVectorSet(66.0f, 5.0f, 46.5f, -1)
 #define RESOURCE_OFFSET -8.0f
 #define LIGHT_OFFSET 0.0f
-#define ROTATION_THRESHOLD 0.06f // Radian difference bias
+#define ROTATION_THRESHOLD 0.06f * 4.f // Radian difference bias
 #define TRAVEL_THRESHOLD 0.3f
 #define TRAVEL_HEIGHT 50.0f
 
 // Spawning
-#define START_SPAWNED_RESOURCES 4
+#define START_SPAWNED_RESOURCES 6
 #define MAX_RESOURCES_OUT_PER_PLAYER 4 // Default 2
 #define SPAWN_INTERVAL 10.0f
-#define SPECIAL_RESOURCE_CHANCE 25 // % chance
+#define SPECIAL_RESOURCE_CHANCE 0 // % chance
 
 // Resource
 #define FLOAT_INTENSITY 10.0f // Default 6
@@ -60,21 +60,21 @@ using namespace DirectX;
 
 
 // Normal resources
-#define PISTOL 0 // 2
-#define RIFLE 1 // 7
-#define MOVEMENT 2 // 3
-#define SHIELD 3 // 1
-#define DASH 4 // 4
-#define REFLECT 5 // 0
-#define SNIPER 6 // 6
-#define BEYBLADE 7 // 5
-#define ENERGY 8 // 8
+
+#define RIFLE 0 // 7
+#define MOVEMENT 1 // 3
+#define SHIELD 2 // 1
+#define DASH 3 // 4
+#define REFLECT 4 // 0
+#define SNIPER 5 // 6
+#define BEYBLADE 6 // 5
+#define ENERGY 7 // 8
 
 // UI
 #define NR_OF_ICON_SLOTS 16
-#define NR_OF_ICON_ELEMENTS 36
+#define NR_OF_ICON_ELEMENTS 32
 
-#define BIGGEST_NORMAL_INDEX 8 // Update if adding resources!
+#define BIGGEST_NORMAL_INDEX 7 // Update if adding resources!
 // Special - bigger than normal number - resources
 
 // e_nrOfEnums should be at the bottom as it indicates how many objectTypes there are

@@ -16,8 +16,8 @@ Sound::Sound()
 	m_ui[(int)soundUI::e_traverse] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/traverse.wav");
 	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/accept.wav");
 	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
+	m_ui[(int)soundUI::e_countdown] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/countdown.wav");
 
-	m_effect[(int)soundEffect::e_pistol] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/weakshot.wav");
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
 	m_effect[(int)soundEffect::e_movement] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/movement.wav");
 	m_effect[(int)soundEffect::e_dash] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/woosh.wav");
@@ -39,8 +39,8 @@ Sound::Sound()
 	m_ambientInstances[(int)soundAmbient::e_drone] = m_ambient[(int)soundAmbient::e_drone]->CreateInstance(SoundEffectInstance_Use3D);
 	m_ambientInstances[(int)soundAmbient::e_shield] = m_ambient[(int)soundAmbient::e_shield]->CreateInstance(SoundEffectInstance_Use3D);
 
-	m_music[(int)soundMusic::e_menu] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/menuSong.wav");
-	m_music[(int)soundMusic::e_game] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/gameSong.wav");
+	m_music[(int)soundMusic::e_menu] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/BS_menu.wav");
+	m_music[(int)soundMusic::e_game] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/BS_game.wav");
 	m_musicInstances[(int)soundMusic::e_menu] = m_music[(int)soundMusic::e_menu]->CreateInstance();
 	m_musicInstances[(int)soundMusic::e_game] = m_music[(int)soundMusic::e_game]->CreateInstance();
 
