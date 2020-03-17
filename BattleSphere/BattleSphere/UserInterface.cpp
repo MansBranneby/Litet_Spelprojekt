@@ -24,6 +24,8 @@ UserInterface::UserInterface(int nrOfPlayers)
 {
 	if (nrOfPlayers == -1)
 	{
+		m_quitGame = true;
+
 		// Winner has been chosen (transition from gamestate to scorestate)
 		m_winningTimer = 0.0f;
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.0f));
@@ -40,6 +42,14 @@ UserInterface::UserInterface(int nrOfPlayers)
 	}
 	else
 	{
+		// Winner has been chosen (transition from gamestate to scorestate)
+		m_winningTimer = 0.0f;
+		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.0f));
+		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_1.png", false, -12.0f, -13.0f, 610.0f, 166.0f));
+		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_2.png", false, -12.0f, 69.0f, 629.0f, 581.0f));
+		m_blackScreenFadeTimer = 0.0f;
+		m_BlackScreenElement = new UI_Element(L"Textures\\GameState\\BlackScreen.png", false, 0.0f, 0.0f, 1920.0f, 1080.0f);
+
 		// Countdown
 		m_countDownTimer = 0.0f;
 		m_countDownElements.push_back(new UI_Element(L"Textures\\GameState\\countdown_1.png", false, 0.0f, 0.0f, 400.0f, 400.0f));
@@ -58,20 +68,11 @@ UserInterface::UserInterface(int nrOfPlayers)
 
 		m_quitGame = true;
 
-		// Winner has been chosen (transition from gamestate to scorestate)
-		m_winningTimer = 0.0f;
-		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.0f));
-		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_1.png", false, -12.0f, -13.0f, 610.0f, 166.0f));
-		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_2.png", false, -12.0f, 69.0f, 629.0f, 581.0f));
-		m_blackScreenFadeTimer = 0.0f;
-		m_BlackScreenElement = new UI_Element(L"Textures\\GameState\\BlackScreen.png", false, 0.0f, 0.0f, 1920.0f, 1080.0f);
-
 		for (int i = 0; i < 4; i++)
 		{
 			m_drawPlayer[i] = false;
 		}
 		// PLAYER 1
-		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -82,7 +83,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		// PLAYER 2																		 
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -92,7 +92,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		// PLAYER 3																		  
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
-		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Dash.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
@@ -101,7 +100,6 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Beyblade.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Energy.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		// PLAYER 4																
-		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Rifle.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Movement.png", true, -960.0f, -508.0f, 60.0f, 60.0f));
 		m_elements.push_back(new UI_Element(L"Textures\\UserInterface\\Shield.png", true, -960.0f, -508.0f, 60.0f, 60.0f));

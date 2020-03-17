@@ -207,6 +207,10 @@ void Game::changeState(stateType state)
 					if (s != nullptr)
 						s->reset();
 					ProjectileBank::getInstance()->release();
+
+					for (int j = 0; j < XUSER_MAX_COUNT; j++)
+						if (m_robots[j] != nullptr) m_robots[i]->releaseScoreState();
+
 					break;
 				}
 			}
@@ -250,6 +254,10 @@ void Game::changeState(stateType state)
 					ScoreState* s = dynamic_cast<ScoreState*>(m_states[i]);
 					if (s != nullptr)
 						s->reset();
+
+					for (int j = 0; j < XUSER_MAX_COUNT; j++)
+						if (m_robots[j] != nullptr) m_robots[i]->releaseScoreState();
+
 					ProjectileBank::getInstance()->release();
 					break;
 				}

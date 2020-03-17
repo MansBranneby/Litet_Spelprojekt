@@ -642,3 +642,26 @@ void Robot::release()
 
 	delete[] m_positionHistory;
 }
+
+void Robot::releaseScoreState()
+{
+	// TODO realease resource?
+	for (int i = 0; i < m_weapons.size(); i++)
+	{
+		if (m_weapons[i])
+			delete m_weapons[i];
+	}
+	m_weapons.clear();
+	m_health = 100;
+	m_vel = XMVectorSet(0, 0, 0, 0);
+	m_currentRotation = 0.0;
+	m_nextW = -1;
+	m_nextnextW = -1;
+	m_resource = -1;
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	Weapon* rifle = new Weapon(RIFLE);
+	m_weapons.push_back(rifle);
+	m_ready = true;
+	m_time = 0;
+}

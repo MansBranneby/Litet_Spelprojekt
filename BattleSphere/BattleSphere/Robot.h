@@ -108,4 +108,5 @@ public:
 
 	void reset();
 	void release();
+	void releaseScoreState();
 };
