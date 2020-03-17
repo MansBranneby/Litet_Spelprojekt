@@ -31,7 +31,12 @@ UserInterface::UserInterface(int nrOfPlayers)
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_2.png", false, -12.0f, 69.0f, 629.0f, 581.0f));
 		m_blackScreenFadeTimer = 0.0f;
 		m_BlackScreenElement = new UI_Element(L"Textures\\GameState\\BlackScreen.png", true, 0.0f, 0.0f, 1920.0f, 1080.0f);
+
+		for (int i = 0; i < nrOfPlayers; i++)
+			m_playerColours[i] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 		m_constantBufferColours = new ConstantBuffer(&m_playerColours[0], sizeof(XMVECTOR));
+
+		m_nrOfPlayers = nrOfPlayers;
 	}
 	else
 	{
