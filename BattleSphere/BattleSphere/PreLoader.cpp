@@ -158,8 +158,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
-	//loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomWalls");
-	//loadFromFile(objectType::e_static_billboard_score_platform, "ScoreRoom\\ScoreRoomTestPlatform", "ScoreRoomPlatformsColl");
+	loadFromFile(objectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomShelves", "ScoreRoomShelvesColl");
 	// Background
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");

@@ -482,7 +482,7 @@ bool GameState::handleInputs(Game* game, float dt)
 				XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
 				XMVECTOR newPos = m_robots[i]->getPosition();
 				float l = XMVectorGetX(XMVector3Length(v));
-				float d = robotBD.halfWD.x * 0.5f;
+				float d = robotBD.halfWD.x;
 
 				// if robot moved further than its diameter
 				if (d < l)
@@ -827,8 +827,8 @@ bool GameState::update(Game* game, float dt)
 	{
 		if (m_userInterface->updateWinning(dt, m_winnerIndex))
 		{
-			setPaused(true); // Pause this state
 			game->changeState(stateType::e_scoreState); // Change state to ScoreState
+			return true;
 		}
 	}
 
@@ -1274,7 +1274,7 @@ bool GameState::update(Game* game, float dt)
 				ProjectileBank::getInstance()->removeProjectile(i);
 			}
 		}
-		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 200.0f)
+		else if (XMVectorGetX(XMVector3Length(projectile->getPosition())) > 300.0f)
 		{
 			// Remove after a certain distance from origin
 			ProjectileBank::getInstance()->removeProjectile(i);

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "GameState.h"
 #include "MainMenuState.h"
+#include "ScoreState.h"
 
 int Game::setPlayerIdIndex(int id)
 {
@@ -152,8 +153,7 @@ void Game::changeState(stateType state)
 			}
 		}
 	}
-
-	if (isActive(stateType::e_gameState))
+	else if (isActive(stateType::e_gameState))
 	{
 		if (state == stateType::e_mainMenu)
 		{
@@ -187,6 +187,66 @@ void Game::changeState(stateType state)
 					break;
 				}
 			}
+		}
+		else if (state == stateType::e_scoreState)
+		{
+			for (int i = 0; i < m_states.size(); i++)
+			{
+				if (m_states[i]->getType() == stateType::e_gameState)
+				{
+					m_states[i]->setPaused(true);
+					GameState* s = dynamic_cast<GameState*>(m_states[i]);
+					if (s != nullptr)
+						s->reset();
+					ProjectileBank::getInstance()->release();
+					break;
+				}
+			}
+			
+		}
+	}
+	else if (isActive(stateType::e_scoreState))
+	{
+		if (state == stateType::e_mainMenu)
+		{
+			for (int i = 0; i < m_states.size(); i++)
+			{
+				if (m_states[i]->getType() == stateType::e_scoreState)
+				{
+					m_states[i]->setPaused(true);
+
+					ScoreState* s = dynamic_cast<ScoreState*>(m_states[i]);
+					if (s != nullptr)
+						s->reset();
+					ProjectileBank::getInstance()->release();
+
+					for (int j = 0; j < XUSER_MAX_COUNT; j++)
+					{
+						if (m_robots[j] != nullptr)
+						{
+							m_robots[j]->release();
+							m_robots[j]->reset();
+						}
+					}
+					break;
+				}
+			}
+		}
+		else if (state == stateType::e_gameState)
+		{
+			for (int i = 0; i < m_states.size(); i++)
+			{
+				if (m_states[i]->getType() == stateType::e_scoreState)
+				{
+					m_states[i]->setPaused(true);
+					ScoreState* s = dynamic_cast<ScoreState*>(m_states[i]);
+					if (s != nullptr)
+						s->reset();
+					ProjectileBank::getInstance()->release();
+					break;
+				}
+			}
+
 		}
 	}
 	

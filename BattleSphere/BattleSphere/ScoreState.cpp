@@ -162,7 +162,7 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 							m_ranking.clear();
 							m_playerIDs.clear();
 							m_hasChosen = true;
-							setPaused(true); // Pause this state
+							//setPaused(true); // Pause this state
 							game->changeState(stateType::e_mainMenu); // Change state to mainMenu
 							return false;
 							break;
@@ -175,7 +175,7 @@ bool ScoreState::updatePlatforms(Game* game, float dt)
 							m_hasChosen = true;
 							m_ranking.clear();
 							m_playerIDs.clear();
-							setPaused(true); // Pause this state
+							//setPaused(true); // Pause this state
 							game->changeState(stateType::e_gameState); // Change state to gameState
 							return false;
 							break;
@@ -244,44 +244,6 @@ void ScoreState::handleInputs(Game* game, float dt)
 				m_robots[i]->setHealth(100);
 				m_input->setVibration(i, 0.0f);
 			}
-
-			// COLLISION PLAYER VS STATIC OBJECTS
-			CollisionInfo collisionInfo;
-			boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
-			robotBD.pos = m_robots[i]->getPosition();
-			XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
-			XMVECTOR newPos = m_robots[i]->getPosition();
-			float l = XMVectorGetX(XMVector3Length(v));
-			float d = robotBD.halfWD.x;
-
-			// if robot moved further than its diameter
-			if (d < l)
-			{
-				float tIncrement = 1.0f - l / (l + d);
-				for (float t = tIncrement; t < 1.0f; t += tIncrement)
-				{
-					robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
-					collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
-
-					if (collisionInfo.m_colliding)
-					{
-						// Collision found, stop tests
-						newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
-						break;
-					}
-				}
-			}
-			for (int j = 0; j < 10; ++j)
-			{
-				// Normal collision
-				robotBD.pos = newPos;
-				collisionInfo = game->getQuadtree()->testCollision(robotBD, m_robots[i]->getPreviousPosition());
-				if (collisionInfo.m_colliding)
-					newPos += collisionInfo.m_normal;
-				else break;
-			}
-			m_robots[i]->setPosition(newPos);
-			m_robots[i]->storePositionInHistory(newPos);
 		}
 	}
 }
@@ -300,7 +262,7 @@ ScoreState::ScoreState(Game* game)
 	spawnNodes();
 
 	// Create billboards
-	std::vector<objectType> billboardObjectTypes = { objectType::e_billboard, objectType::e_ranking_billboard, objectType::e_platformbar_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform };
+	std::vector<objectType> billboardObjectTypes = {objectType::e_billboard, objectType::e_ranking_billboard, objectType::e_platformbar_billboard, objectType::e_number_billboard, objectType::e_static_billboard_score_platform, objectType::e_static_billboard_score };
 	m_billboardHandler = BillboardHandler(game->getPreLoader(), billboardObjectTypes);
 
 	// Scoreboard
@@ -313,28 +275,6 @@ ScoreState::ScoreState(Game* game)
 
 	// User interface
 	m_userInterface = nullptr;
-
-	//// Initialize dynamic camera
-	//m_zoomingOutToStart = false;
-	//m_vecToCam = XMVector3Normalize(DX::getInstance()->getCam()->getPosition() - DX::getInstance()->getCam()->getLookAt());
-	//m_camStartPos = DX::getInstance()->getCam()->getPosition();
-	//m_camStartLookAt = DX::getInstance()->getCam()->getLookAt();
-	//float xFovHalf = DX::getInstance()->getCam()->getXFOV() / 2.0f;
-	//float yFovHalf = DX::getInstance()->getCam()->getYFOV() / 2.0f;
-	//m_fOVPlanes[0] = XMVector3Rotate(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -yFovHalf)); // Bottom
-	//m_fOVPlanes[1] = XMVector3Rotate(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), xFovHalf)); // Left
-	//m_fOVPlanes[2] = XMVector3Rotate(XMVectorSet(0.0f, -1.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), yFovHalf)); // Top
-	//m_fOVPlanes[3] = XMVector3Rotate(XMVectorSet(-1.0f, 0.0f, 0.0, 0.0f), XMQuaternionRotationNormal(XMVectorSet(0.0f, 1.0f, 0.0, 0.0f), -xFovHalf)); // Right
-
-	//// Rotate plane according to look at
-	//float camAngle = XMScalarACos(XMVector3Dot(XMVectorSet(0.0, 0.0, 1.0f, 0.0f), -m_vecToCam).m128_f32[0]);
-	//for (int i = 0; i < 4; i++)
-	//	m_fOVPlanes[i] = XMVector3Rotate(m_fOVPlanes[i], XMQuaternionRotationNormal(XMVectorSet(1.0f, 0.0f, 0.0, 0.0f), -camAngle)); // Bottom
-
-	//m_fOVPlanes[0].m128_f32[2] *= -1;
-	//m_fOVPlanes[1].m128_f32[2] *= -1;
-	//m_fOVPlanes[2].m128_f32[2] *= -1;
-	//m_fOVPlanes[3].m128_f32[2] *= -1;
 
 	// Dynamic background object
 	m_dboHandler = new DBOHandler();
@@ -361,6 +301,26 @@ void ScoreState::pause()
 
 void ScoreState::resume()
 {
+}
+
+void ScoreState::reset()
+{
+	// Delete first
+	for (int i = 0; i < m_resources.size(); i++)
+		delete m_resources[i];
+	m_resources.clear();
+	for (int i = 0; i < m_nodes.size(); i++)
+		delete m_nodes[i];
+	m_nodes.clear();
+	if (m_spawnDrone)
+		delete m_spawnDrone;
+
+	delete m_userInterface;
+	m_userInterface = nullptr;
+
+	// Spawn preset nodes and initialize spawning drone
+	m_spawnDrone = new SpawnDrone(&m_resources);
+	spawnNodes();
 }
 
 void ScoreState::firstTimeSetUp(Game* game)
@@ -431,6 +391,144 @@ void ScoreState::handleInput(Game* game)
 {
 }
 
+void ScoreState::handleCollision(Game* game)
+{
+	// COLLISION PLAYER VS STATIC OBJECTS
+	CollisionInfo collisionInfo;
+	boundingData robotBD = game->getPreLoader()->getBoundingData(objectType::e_robot, 1, 0);
+	std::vector<Billboard> BB = m_billboardHandler.getBillboardsOfType(objectType::e_static_billboard_score);
+	for (int i = 0; i < XUSER_MAX_COUNT && m_robots[i] != nullptr; ++i)
+	{
+		robotBD.pos = m_robots[i]->getPosition();
+		XMVECTOR v = m_robots[i]->getPosition() - m_robots[i]->getPreviousPosition();
+		XMVECTOR newPos = m_robots[i]->getPosition();
+		float l = XMVectorGetX(XMVector3Length(v));
+		float d = robotBD.halfWD.x;
+
+		// if robot moved further than its diameter
+		if (d < l)
+		{
+			float shortest = INFINITY;
+			float length = 0.0f;
+			std::vector<DirectX::XMVECTOR> normals;
+			std::vector<DirectX::XMVECTOR> contactPoints;
+			float tIncrement = 1.0f - l / (l + d);
+			for (float t = tIncrement; t < 1.0f; t += tIncrement)
+			{
+				robotBD.pos = m_robots[i]->getPreviousPosition() + (v * t);
+
+				for (int j = 0; j < (int)BB.size(); ++j)
+				{
+					std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[j].getObjectType(), BB[j].getModelNr(), BB[j].getVariant());
+					for (int k = 0; k < (int)colMesh.size(); k += 3)
+					{
+						// Get indices
+						unsigned int ind1 = k + 1;
+						unsigned int ind2 = k + 2;
+
+						// Get vertices
+						DirectX::XMVECTOR v0 = { colMesh[k].x, colMesh[k].y, colMesh[k].z };
+						DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+						DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+						// Test collision between player and collision mesh
+						collisionInfo = testSphereTriangle(robotBD.pos, robotBD.halfWD.x, v0, v1, v2);
+
+						// Collision detected!
+						if (collisionInfo.m_colliding)
+						{
+							// Average normals in case bounding volume intersects with corner					
+							normals.push_back(collisionInfo.m_normal);
+							contactPoints.push_back(collisionInfo.m_contactPoint);
+						}
+					}
+				}
+				// Find normal closest to current position
+				for (int j = 0; j < normals.size(); ++j)
+				{
+					length = DirectX::XMVectorGetX(DirectX::XMVector3Length(contactPoints[j] - robotBD.pos));
+
+					if (length < shortest)
+					{
+						shortest = length;
+						collisionInfo.m_normal = normals[j];
+						collisionInfo.m_colliding = true;
+						collisionInfo.m_contactPoint = contactPoints[j];
+					}
+				}
+
+				if (collisionInfo.m_colliding)
+				{
+					// Collision found, stop tests
+					collisionInfo.m_normal.m128_f32[1] = 0;
+					newPos = m_robots[i]->getPreviousPosition() + (v * t) + collisionInfo.m_normal;
+					break;
+				}
+			}
+		}
+
+		for (int j = 0; j < 10; ++j)
+		{
+			// Normal collision
+			robotBD.pos = newPos;
+			float shortest = INFINITY;
+			float length = 0.0f;
+			std::vector<DirectX::XMVECTOR> normals;
+			std::vector<DirectX::XMVECTOR> contactPoints;
+			bool collision = false;
+			for (int k = 0; k < (int)BB.size(); ++k)
+			{
+				std::vector<DirectX::XMFLOAT3> colMesh = game->getPreLoader()->getCollisionMesh(BB[k].getObjectType(), BB[k].getModelNr(), BB[k].getVariant());
+				for (int l = 0; l < (int)colMesh.size(); l += 3)
+				{
+					// Get indices
+					unsigned int ind1 = l + 1;
+					unsigned int ind2 = l + 2;
+
+					// Get vertices
+					DirectX::XMVECTOR v0 = { colMesh[l].x, colMesh[l].y, colMesh[l].z };
+					DirectX::XMVECTOR v1 = { colMesh[ind1].x, colMesh[ind1].y, colMesh[ind1].z };
+					DirectX::XMVECTOR v2 = { colMesh[ind2].x, colMesh[ind2].y, colMesh[ind2].z };
+
+					// Test collision between player and collision mesh
+					collisionInfo = testSphereTriangle(robotBD.pos, robotBD.halfWD.x, v0, v1, v2);
+					// Collision detected!
+					if (collisionInfo.m_colliding)
+					{
+						// Average normals in case bounding volume intersects with corner					
+						normals.push_back(collisionInfo.m_normal);
+						contactPoints.push_back(collisionInfo.m_contactPoint);
+					}
+				}
+
+			}
+			// Find normal closest to current position
+			for (int k = 0; k < normals.size(); ++k)
+			{
+				length = DirectX::XMVectorGetX(DirectX::XMVector3Length(contactPoints[k] - robotBD.pos));
+
+				if (length < shortest)
+				{
+					shortest = length;
+					collisionInfo.m_normal = normals[k];
+					collisionInfo.m_colliding = true;
+					collisionInfo.m_contactPoint = contactPoints[k];
+				}
+			}
+
+			if (collisionInfo.m_colliding)
+			{
+				// Collision found
+				collisionInfo.m_normal.m128_f32[1] = 0;
+				newPos += collisionInfo.m_normal;
+			}
+		}
+
+		m_robots[i]->setPosition(newPos);
+		m_robots[i]->storePositionInHistory(newPos);
+	}
+}
+
 bool ScoreState::update(Game* game, float dt)
 {
 	bool exitGame = false;
@@ -457,6 +555,9 @@ bool ScoreState::update(Game* game, float dt)
 
 	// Update platforms
 	exitGame = updatePlatforms(game, dt);
+
+	// Handle collision
+	handleCollision(game);
 
 	m_scoreTimer += dt;
 

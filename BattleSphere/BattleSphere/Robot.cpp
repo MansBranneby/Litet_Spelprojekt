@@ -607,6 +607,7 @@ void Robot::reset()
 	m_material.emission = XMVectorSet(0.0, 0.0, 0.0, -1);
 	m_colour = XMVectorSet(1.0, 1.0, 1.0, -1);
 	m_vel = XMVectorSet(0, 0, 0, 0);
+	m_score = 0;
 
 	// Position history
 	m_positionHistorySize = 0;

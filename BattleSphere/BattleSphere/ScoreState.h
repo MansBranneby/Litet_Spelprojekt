@@ -61,9 +61,11 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
+	void handleCollision(Game* game);
 	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };
