@@ -52,6 +52,12 @@ bool Graph::getActive(int index)
 	return m_active[index];
 }
 
+void Graph::reset(int index)
+{
+	m_active[index];
+	m_path[index].clear();
+}
+
 void Graph::setQuadtree(QuadtreeNode* qtn)
 {
 	m_quadtree = qtn;
@@ -212,7 +218,7 @@ Graph::Graph()
 	m_nodes[5].pos = XMVectorSet(156.0f, 0.0f, 50.0f, 0.0f);
 	m_nodes[6].pos = XMVectorSet(106.0f, 0.0f, -58.0f, 0.0f);
 	m_nodes[7].pos = XMVectorSet(122.0f, 0.0f, -78.0f, 0.0f);
-	m_nodes[8].pos = XMVectorSet(102.0f, 0.0f, -110.0f, 0.0f);
+	m_nodes[8].pos = XMVectorSet(102.0f, 0.0f, -85.0f, 0.0f);
 	m_nodes[9].pos = XMVectorSet(80.0f, 0.0f, -60.0f, 0.0f);
 	m_nodes[10].pos = XMVectorSet(66.0f, 0.0f, -66.0f, 0.0f);
 	m_nodes[11].pos = XMVectorSet(66.0f, 0.0f, -38.0f, 0.0f);
@@ -221,9 +227,9 @@ Graph::Graph()
 	m_nodes[14].pos = XMVectorSet(27.0f, 0.0f, -66.0f, 0.0f);
 	m_nodes[15].pos = XMVectorSet(44.0f, 0.0f, -70.0f, 0.0f);
 	m_nodes[16].pos = XMVectorSet(14.0f, 0.0f, -75.0f, 0.0f);
-	m_nodes[17].pos = XMVectorSet(0.0f, 0.0f, -110.0f, 0.0f);
+	m_nodes[17].pos = XMVectorSet(0.0f, 0.0f, -85.0f, 0.0f);
 	m_nodes[18].pos = XMVectorSet(-14.0f, 0.0f, -75.0f, 0.0f);
-	m_nodes[19].pos = XMVectorSet(-65.0f, 0.0f, -92.0f, 0.0f);
+	m_nodes[19].pos = XMVectorSet(-65.0f, 0.0f, -90.0f, 0.0f);
 	m_nodes[20].pos = XMVectorSet(120.0f, 0.0f, 120.0f, 0.0f);
 	m_nodes[21].pos = XMVectorSet(-65.0f, 0.0f, -45.0f, 0.0f);
 	m_nodes[22].pos = XMVectorSet(-14.0f, 0.0f, -45.0f, 0.0f);

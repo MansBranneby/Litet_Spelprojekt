@@ -63,7 +63,7 @@ private:
 	bool handleInputs(Game* game, float dt);
 
 	// Quit Game
-	bool m_quitGame;
+	int m_quitGame;
 
 	// Win game
 	bool m_winGame;

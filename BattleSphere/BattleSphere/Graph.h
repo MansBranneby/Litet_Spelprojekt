@@ -7,7 +7,7 @@
 #include "QuadtreeNode.h"
 
 #define POINT_DISTANCE 1
-#define PULSE_SPEED 90
+#define PULSE_SPEED 120
 #define MAX_USER 4
 
 struct graphNode
@@ -56,6 +56,7 @@ public:
 	void draw(int index);
 	XMVECTOR getNodePos(int index);
 
+	void reset(int index);
 	void release();
 };
 

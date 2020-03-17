@@ -73,8 +73,19 @@ GraphicResources g_graphicResources;
 Bloom* g_bloom = nullptr;
 Menu* g_menu = nullptr;
 
+struct resBuffer
+{
+	float width;
+	float height;
+	float aspectRatio;
+	float padding;
+};
+
+ConstantBuffer* g_resolutionBuffer = nullptr;
+
 //TODO Remove
 ConstantBuffer* g_constantBufferMaterials = nullptr;
+
 
 ID3D11Buffer* g_vertexBufferFSQuad = nullptr;
 ID3D11Buffer* _vertexBuffer = nullptr;
@@ -323,6 +334,7 @@ void billboardRender()
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(&g_pixelShaderBillboard.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(7, 1, g_resolutionBuffer->getConstantBuffer());
 }
 
 void transparencyRender()
@@ -332,6 +344,7 @@ void transparencyRender()
 	DX::getInstance()->getDeviceContext()->DSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->GSSetShader(nullptr, nullptr, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShader(&gPS.getPixelShader(), nullptr, 0);
+	DX::getInstance()->getDeviceContext()->PSSetConstantBuffers(7, 1, g_resolutionBuffer->getConstantBuffer());
 	DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
 }
 
@@ -442,10 +455,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 
 		setupTestTriangle();
-		DX::getInstance()->setScreen(true, 1920.0f, 1080.0f);
+		DX::getInstance()->setScreen(true, 1280.0f, 720.0f);
 		if (DX::getInstance()->screenChanged())
 			setScreen();
+		Sound::getInstance()->play(soundMusic::e_menu, 0.15f);
 		loadingScreen();
+
+		resBuffer resBuff =
+		{
+			DX::getInstance()->getWidth(),
+			DX::getInstance()->getHeight(),
+			DX::getInstance()->getWidth() / DX::getInstance()->getHeight(),
+			0.0f
+		};
+		g_resolutionBuffer = new ConstantBuffer(&resBuff, sizeof(resBuffer));
 
 		g_Clock = new Clock();
 
@@ -475,10 +498,22 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 		Graph::getInstance()->createVertexBuffer();
 
+		ShowCursor(FALSE);
+
 		while (WM_QUIT != msg.message)
 		{
 			if (DX::getInstance()->screenChanged())
+			{
+				resBuff =
+				{
+					DX::getInstance()->getWidth(),
+					DX::getInstance()->getHeight(),
+					DX::getInstance()->getWidth() / DX::getInstance()->getHeight(),
+					0.0f
+				};
+				g_resolutionBuffer->updateBuffer(&resBuff, sizeof(resBuffer));
 				setScreen();
+			}
 
 			g_Clock->calcDeltaTime();
 			if (PeekMessage(&msg, wndHandle, 0, 0, PM_REMOVE))
@@ -591,7 +626,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 						if (Graph::getInstance()->getActive(i))
 						{
 							DX::getInstance()->getDeviceContext()->OMSetBlendState(g_graphicResources.getBlendState(), NULL, 0xFFFFFFFF);
-							Graph::getInstance()->updatePulse(i, g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime());
 							Graph::getInstance()->draw(i);
 						}
 					}
@@ -607,7 +641,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					g_Game->draw(renderPass::e_userInterface);
 
 
-					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime();
+					rotation += rotCoeff * speed * g_Clock->getDeltaTime() * DX::getInstance()->getDeltaTime() * 4.0f;
 					if (rotation >= 360)
 						rotation -= 360;
 					float rotInRad = XMConvertToRadians(rotation);
@@ -653,9 +687,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				}
 				else if (g_Game->isActive(stateType::e_mainMenu))
 				{
+					rotation = 0;
 					sunPos = sunStartPos;
 					moonPos = XMVector3Rotate(sunPos, XMVectorSet((float)sin(XM_PI / 2) * 0.5f, 0, (float)sin(XM_PI / 2), (float)cos(XM_PI / 2)));
 					XMVECTOR sunDir = XMVector3Normalize(XMVectorSet(0, 0, 0, 0) - sunPos);
+					Lights::getInstance()->setColor(g_sunMoonIndex, (float)238 / 255, (float)247 / 255, (float)222 / 255);
 					Lights::getInstance()->setDirection(g_sunMoonIndex, XMVectorGetX(sunDir), XMVectorGetY(sunDir), XMVectorGetZ(sunDir));
 					g_shadowMapping->getCamera()->setPosition(sunStartPos);
 					g_shadowMapping->getCamera()->updateBuffers();
@@ -688,7 +724,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->IASetInputLayout(&gVS.getvertexLayout());
 
 					g_Game->draw(renderPass::e_menuScene);
-					DX::getInstance()->getParticles()->draw();
 					//finalRender();
 
 					ID3D11ShaderResourceView* nullSRV = { NULL };
@@ -744,6 +779,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		delete g_Clock;
 		g_Game->release();
 		delete g_Game;
+		delete g_resolutionBuffer;
 		g_vertexShaderFinalRender.release();
 		g_pixelShaderFinalRender.release();
 		g_pixelShaderDownsample.release();

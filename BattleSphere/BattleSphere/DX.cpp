@@ -185,12 +185,14 @@ HRESULT DX::createDirect3DContext(HWND wndHandle)
 	return hr;
 }
 
-void DX::initializeCamAndParticles(float width, float height, float nearPlane, float farPlane)
+void DX::initializeCam(float width, float height, float nearPlane, float farPlane)
 {
 	m_camera = new Camera();
 	m_camera->initialize(width, height, nearPlane, farPlane);
+}
 
-	// Initialize particles
+void DX::initializeParticles()
+{
 	m_particles = new Particles;
 }
 

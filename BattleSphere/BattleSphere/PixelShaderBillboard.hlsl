@@ -66,6 +66,14 @@ cbuffer PS_CONSTANT_BUFFER : register (b6)
 	float4 iconWarning;
 }
 
+cbuffer PS_CONSTANT_BUFFER : register(b7)
+{
+	float resWidth;
+	float resHeight;
+	float resAspectRatio;
+	float resPadding;
+};
+
 float DoAttenuation(Light light, float d)
 {
 	return 1.0f - smoothstep(light.Range * 0.2f, light.Range, d);
@@ -152,8 +160,8 @@ float4 PS_main(PS_IN input) : SV_Target
 	float depth = PosRelLight.z / PosRelLight.w;
 
 	float ep = 0.0005f;
-	float dx = 1.0f / 1920;
-	float dy = 1.0f / 1080;
+	float dx = 1.0f / resWidth;
+	float dy = 1.0f / resHeight;
 
 	float sum = 0;
 	float x, y;
@@ -166,9 +174,9 @@ float4 PS_main(PS_IN input) : SV_Target
 	float3 fragmentCol;
 
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
-	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
-	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
+	float3 Kd;
+	float3 Ke;
 
 	// ICON WARNING
 	if (iconWarning.x != -1.0f)
@@ -176,6 +184,16 @@ float4 PS_main(PS_IN input) : SV_Target
 		float2 uv = float2(input.tex.x + 0.1111f * iconWarning.x, input.tex.y);
 		Kd = txModel.Sample(sampAni, uv).xyz;
 		Ke = Kd;
+	}
+	else if (txModel.Sample(sampAni, input.tex + velocityUV.xy).w != 0.0f)
+	{
+		Kd = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+		Ke = Kd * 0.6f;
+	}
+	else
+	{
+		Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+		Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	}
 
 	float Ns = KsIn.w; // Specular shininess
@@ -254,13 +272,13 @@ float4 PS_main(PS_IN input) : SV_Target
 	if (Ke.x > 0 || Ke.y > 0 || Ke.z > 0)
 		fragmentCol = Ke;
 	float3 ndcSpace = float3(0,0,0);
-	ndcSpace.x = input.pos.x / 1920; // 0 - 1
+	ndcSpace.x = input.pos.x / resWidth; // 0 - 1
 	ndcSpace.x = ndcSpace.x * 2 - 1;
-	ndcSpace.y = -input.pos.y / 1080; // 0 - 1
+	ndcSpace.y = -input.pos.y / resHeight; // 0 - 1
 
 	ndcSpace.y = (ndcSpace.y * 2 + 1);
 	ndcSpace.z = input.pos.z;
-	float aspectRatio = 9.0f / 16.0f;
+	float aspectRatio = resAspectRatio;
 	for (int j = 0; j < 4; j++)
 	{
 		float2 dist = playerPosition[j].xy - ndcSpace.xy;
@@ -284,8 +302,8 @@ float4 PS_main(PS_IN input) : SV_Target
 			break;
 		case 2: // Translate
 			{
-				float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
-				fragmentCol += (modelTexture * 0.5f);
+				/*float3 modelTexture = txModel.Sample(sampAni, input.tex + velocityUV.xy).xyz;
+				fragmentCol += (modelTexture * 0.5f);*/
 			}
 			break;
 		case 3: // Flash and interpolate

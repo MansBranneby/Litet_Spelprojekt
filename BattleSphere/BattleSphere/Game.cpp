@@ -51,6 +51,7 @@ void Game::updatePlayerStatus()
 			Robot* robot = new Robot(i);
 			robot->setPosition(XMVectorSet(-1000, 0, 0, 1));
 			m_robots[i] = robot;
+			m_robots[i]->setDrawn(false);
 			m_nrOfPlayers++;
 		}
 	}
@@ -101,6 +102,9 @@ Game::Game()
 
 bool Game::update(float dt)
 {
+	// Update sounds
+	Sound::getInstance()->update(dt);
+
 	bool returnValue = true;
 	for (int i = 0; i < m_states.size(); i++)
 	{
@@ -128,13 +132,13 @@ void Game::changeState(stateType state)
 {
 	if (state == stateType::e_mainMenu)
 	{
-		Sound::getInstance()->play(soundMusic::e_menu, 0.01f);
+		Sound::getInstance()->play(soundMusic::e_menu, 0.15f);
 	}
 	if (state == stateType::e_gameState)
 	{
 		Sound::getInstance()->stop(soundMusic::e_menu);
-		Sound::getInstance()->play(soundMusic::e_game, 0.01f);
-		Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
+		//Sound::getInstance()->play(soundMusic::e_game, 0.25f);
+		//Sound::getInstance()->play(soundAmbient::e_background, 0.05f);
 	}
 	
 	if (isActive(stateType::e_mainMenu))
@@ -168,6 +172,12 @@ void Game::changeState(stateType state)
 					Sound::getInstance()->stop(soundMusic::e_game);
 					Sound::getInstance()->stop(soundAmbient::e_background);
 
+					if (DX::getInstance()->getParticles())
+					{
+						delete DX::getInstance()->getParticles();
+						DX::getInstance()->initializeParticles();
+					}
+
 					GameState* s = dynamic_cast<GameState*>(m_states[i]);
 					if (s != nullptr) 
 						s->reset();
@@ -175,13 +185,11 @@ void Game::changeState(stateType state)
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
 					{
+						Graph::getInstance()->reset(j);
 						if (m_robots[j] != nullptr)
 						{
 							m_robots[j]->release();
 							m_robots[j]->reset();
-
-							//m_playerId[j] = -1;
-							//m_robots[j] = nullptr;
 						}
 					}
 					break;

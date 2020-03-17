@@ -38,6 +38,14 @@ cbuffer PS_CONSTANT_BUFFER : register(b3)
 	matrix lightVP;
 };
 
+cbuffer PS_CONSTANT_BUFFER : register(b7)
+{
+	float resWidth;
+	float resHeight;
+	float resAspectRatio;
+	float resPadding;
+};
+
 cbuffer PS_ROBOT_DATA : register (b4) 
 {
 	float4 playerPosition[4];
@@ -101,6 +109,7 @@ Texture2D<uint2> LightGrid : register(t0);
 StructuredBuffer<uint> LightIndex : register(t1);
 StructuredBuffer<Light> Lights : register(t2);
 Texture2D txShadowMap : register(t3);
+Texture2D txModel : register(t4); // Model texture
 
 float4 PS_main(PS_IN input) : SV_Target
 {
@@ -119,8 +128,8 @@ float4 PS_main(PS_IN input) : SV_Target
 	float depth = PosRelLight.z / PosRelLight.w;
 
 	float ep = 0.0005f;	
-	float dx = 1.0f / 1920;
-	float dy = 1.0f / 1080;
+	float dx = 1.0f / resWidth;
+	float dy = 1.0f / resHeight;
 
 	float sum = 0;
 	float x, y;
@@ -130,14 +139,18 @@ float4 PS_main(PS_IN input) : SV_Target
 	float shadowCoeff = sum / 25.0;
 	
 	
-	
 	float3 Ia = { 0.5, 0.5, 0.5 }; // Ambient light
 	float3 fragmentCol;
 	
 	float3 Ka = float3(KaIn.x, KaIn.y, KaIn.z); // Ambient surface colour
-	float3 Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+	float3 Kd = txModel.Sample(sampAni, input.tex).xyz;
+	float3 Ke = Kd * 0.6f;
+	if (txModel.Sample(sampAni, input.tex).w == 0.0f)
+	{
+		Kd = float3(KdIn.x, KdIn.y, KdIn.z); // Diffuse surface colour
+		Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
+	}
 	float3 Ks = float3(KsIn.x, KsIn.y, KsIn.z); // Specular surface colour
-	float3 Ke = float3(KeIn.x, KeIn.y, KeIn.z); // Emissive surface colour
 	
 	float Ns = KsIn.w; // Specular shininess
 	float3 normal = normalize(input.nor); // Surface normal
@@ -291,13 +304,13 @@ float4 PS_main(PS_IN input) : SV_Target
 	{
 
 		float3 ndcSpace = float3(0,0,0);
-		ndcSpace.x = input.pos.x / 1920; // 0 - 1
+		ndcSpace.x = input.pos.x / resWidth; // 0 - 1
 		ndcSpace.x = ndcSpace.x * 2 - 1;
-		ndcSpace.y = -input.pos.y / 1080; // 0 - 1
+		ndcSpace.y = -input.pos.y / resHeight; // 0 - 1
 
 		ndcSpace.y = (ndcSpace.y * 2 + 1);
 		ndcSpace.z = input.pos.z;
-		float aspectRatio = 9.0f / 16.0f;
+		float aspectRatio = 1.0f/resAspectRatio;
 		for (int j = 0; j < 4; j++)
 		{
 			float2 dist = playerPosition[j].xy - ndcSpace.xy;
