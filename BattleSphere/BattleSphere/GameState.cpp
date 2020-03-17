@@ -804,16 +804,13 @@ void GameState::firstTimeSetUp(Game* game)
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
 	{
-		if (m_robots[i] != nullptr)
+		if (m_robots[i] != nullptr && m_robots[i]->isDrawn())
 		{
-			m_robots[i]->setDrawn(true);
 			m_robots[i]->setPosition(ROBOT_START_POS[i]);
 			m_robots[i]->storePositionInHistory(ROBOT_START_POS[i]);
 		}
 	}
 
-
-	
 	m_userInterface->adjustForScreen();
 }
 
