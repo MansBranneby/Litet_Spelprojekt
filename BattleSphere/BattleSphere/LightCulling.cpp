@@ -11,11 +11,11 @@ void LightCulling::createConstantBuffers()
 
 	/*Data for compute shader, gives increased thread information*/
 	m_dispatchData = new dispatchInfo();
-	m_dispatchData->threadsX = 16 * 4;
-	m_dispatchData->threadsY = 16 * 3;
+	m_dispatchData->threadsX =(UINT)ceilf(DX::getInstance()->getWidth() / 16);
+	m_dispatchData->threadsY =(UINT)ceilf(DX::getInstance()->getHeight() / 16);
 	m_dispatchData->threadsZ = 1;
-	m_dispatchData->threadGroupsX = 4;
-	m_dispatchData->threadGroupsY = 3;
+	m_dispatchData->threadGroupsX = (UINT)ceilf((float)m_dispatchData->threadsX / 16);
+	m_dispatchData->threadGroupsY = (UINT)ceilf((float)m_dispatchData->threadsY / 16);
 	m_dispatchData->threadGroupsZ = 1;
 	m_dispatchCBuffer = new ConstantBuffer(m_dispatchData, sizeof(dispatchInfo));
 
@@ -43,14 +43,15 @@ void LightCulling::createLightData()
 	DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, 0, &m_lightIndexCountBuffer);
 
 	bufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
-	bufferDesc.ByteWidth = sizeof(UINT) * INDEX_COUNT;
+	UINT indexCount = 16 * 16 * m_dispatchData->threadGroupsX * m_dispatchData->threadGroupsY * LIGHT_COUNT;
+	bufferDesc.ByteWidth = sizeof(UINT) * indexCount;
 	DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, 0, &m_lightIndexListBuffer);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Buffer.ElementOffset = 0;
 	srvDesc.Buffer.ElementWidth = sizeof(UINT);
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = INDEX_COUNT;
+	srvDesc.Buffer.NumElements = indexCount;
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	if (m_lightIndexListBuffer != nullptr)
@@ -64,7 +65,7 @@ void LightCulling::createLightData()
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 	if(m_lightIndexCountBuffer != nullptr)
 		DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_lightIndexCountBuffer, &uavDesc, &m_lightIndexCountUAV);
-	uavDesc.Buffer.NumElements = INDEX_COUNT;
+	uavDesc.Buffer.NumElements = indexCount;
 	if (m_lightIndexListBuffer != nullptr)
 		DX::getInstance()->getDevice()->CreateUnorderedAccessView(m_lightIndexListBuffer, &uavDesc, &m_lightIndexListUAV);
 
@@ -122,7 +123,8 @@ void LightCulling::createLightData()
 		DX::getInstance()->getDevice()->CreateShaderResourceView(m_lightBuffer, &srvDesc, &m_lightSRV);
 
 	srvDesc.Buffer.ElementWidth = sizeof(frustum);
-	srvDesc.Buffer.NumElements = FRUSTUM_COUNT;
+	UINT frustumCount = 16 * 16 * m_dispatchData->threadGroupsX * m_dispatchData->threadGroupsY;
+	srvDesc.Buffer.NumElements = frustumCount;
 	if (m_structuredResultBuffer != nullptr)
 		DX::getInstance()->getDevice()->CreateShaderResourceView(m_structuredResultBuffer, &srvDesc, &m_frustumSRV);
 	
@@ -136,14 +138,15 @@ void LightCulling::createFrustumData()
 	bufferDesc.CPUAccessFlags = 0;
 	bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	bufferDesc.StructureByteStride = sizeof(frustum);
-	bufferDesc.ByteWidth = sizeof(frustum) * FRUSTUM_COUNT;
+	UINT frustumCount = 16 * 16 * m_dispatchData->threadGroupsX * m_dispatchData->threadGroupsY;
+	bufferDesc.ByteWidth = sizeof(frustum) * frustumCount;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	DX::getInstance()->getDevice()->CreateBuffer(&bufferDesc, 0, &m_structuredBufferOut);
 
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 	uavDesc.Buffer.FirstElement = 0;
-	uavDesc.Buffer.NumElements = FRUSTUM_COUNT;
+	uavDesc.Buffer.NumElements = frustumCount;
 	uavDesc.Buffer.Flags = 0;
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
@@ -364,7 +367,10 @@ void LightCulling::cullLights()
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(0, 1, &m_frustumSRV);
 	DX::getInstance()->getDeviceContext()->CSSetShaderResources(1, 1, &m_lightSRV);
 	DX::getInstance()->getDeviceContext()->CSSetShader(&m_computeShaderLightCulling->getComputeShader(), NULL, 0);
-	DX::getInstance()->getDeviceContext()->Dispatch(64, 48, 1);
+	UINT dispatchX, dispatchY;
+	dispatchX = (UINT)ceilf(DX::getInstance()->getWidth() / 32);
+	dispatchY = (UINT)ceilf(DX::getInstance()->getHeight() / 32);
+	DX::getInstance()->getDeviceContext()->Dispatch(dispatchX, dispatchY, 1);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(1, 1, &nullUAV, 0);
 	DX::getInstance()->getDeviceContext()->CSSetUnorderedAccessViews(2, 1, &nullUAV, 0);
 	DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &m_lightGridSRV);

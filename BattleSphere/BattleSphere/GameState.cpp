@@ -177,8 +177,9 @@ void GameState::handleMovement(Game* game, float dt, int id)
 	// Save velocity for collision
 	if (!m_robots[id]->isAi())
 	{
-		m_robots[id]->setVel(robLookAt *
-			m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger
+		/*m_robots[id]->setVel(robLookAt *
+			m_robots[id]->getVelocity() * dt * ((m_input->isPressed(id, XINPUT_GAMEPAD_Y)) ? 2.0f : 1.0f)); // TODO remove trigger*/ //CHEAT: speed
+		m_robots[id]->setVel(robLookAt * m_robots[id]->getVelocity() * dt);
 
 	// Robot and weapon movement
 		m_robots[id]->move(m_robots[id]->getVel());
@@ -207,7 +208,7 @@ bool GameState::handleInputs(Game* game, float dt)
 			game->getInput()->setBlocked(i, false);
 	}
 
-	if (!m_quitGame)
+	if (m_quitGame == -1)
 	{
 		for (int i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -320,7 +321,7 @@ bool GameState::handleInputs(Game* game, float dt)
 						rob.m128_f32[1] = 0.0f; // Set Y to 0;
 						XMVECTOR resource = m_resources[j]->getPosition();
 						resource.m128_f32[1] = 0.0f; // Set Y to 0; 
-						if (XMVectorGetX(XMVector3Length(rob - resource)) < 2.0f &&
+						if (XMVectorGetX(XMVector3Length(rob - resource)) < 3.5f &&
 							!m_resources[j]->isBlocked())
 						{
 							Sound::getInstance()->play(soundEffect::e_pickup, rob, 0.4f);
@@ -391,6 +392,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					}
 
 					// Camera dev zoom
+					/*
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_BACK) && !m_devZoomOut)
 					{
 						m_devZoomOut = true;
@@ -399,6 +401,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					{
 						m_devZoomOut = false;
 					}
+					*/
 
 					// Change weapons
 					if (m_robots[i]->isReady(dt))
@@ -425,7 +428,7 @@ bool GameState::handleInputs(Game* game, float dt)
 					}
 
 					// TODO: add collision and remove projectile
-					if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN))
+					/*if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_DOWN)) //CHEAT?: take damage
 					{
 						int resourceIndex = m_robots[i]->getResourceIndex();
 						if (m_robots[i]->damagePlayer(1, XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), -1))
@@ -437,27 +440,27 @@ bool GameState::handleInputs(Game* game, float dt)
 								m_resources[resourceIndex]->setBlocked(false);
 							}
 						}
-					}
+					}*/
 
 					if (m_input->isPressed(i, XINPUT_GAMEPAD_X))
 					{
-						m_robots[i]->upgradeWeapon(RIFLE);
+						//m_robots[i]->upgradeWeapon(RIFLE); //CHEAT: rifle
 					}
 				}
 
 				// Quit Game
 				if (m_input->isPressed(i, XINPUT_GAMEPAD_START) && !m_input->isBlocked(i))
 				{
-					m_quitGame = true;
+					m_quitGame = i;
 					break;
 				}
 
 				// TODO: remove cheats yooo
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP))
+				/*if (m_input->isPressed(i, XINPUT_GAMEPAD_DPAD_UP)) CHEAT: revive
 				{
 					m_robots[i]->setHealth(100);
 					m_input->setVibration(i, 0.0f);
-				}
+				}*/
 
 				if (m_robots[i]->getResourceIndex() != -1)
 				{
@@ -517,39 +520,39 @@ bool GameState::handleInputs(Game* game, float dt)
 	}
 	else
 	{
-		for (int i = 0; i < XUSER_MAX_COUNT; i++)
+		if (!m_input->refresh(m_quitGame, dt))
 		{
-			if (!m_input->refresh(i, dt))
-			{
-				m_input->reconnectController(i);
-			}
-			else
-			{
-				m_input->setVibration(i, 0.0f);
+			m_input->reconnectController(m_quitGame);
+		}
+		else
+		{
+			m_input->setVibration(m_quitGame, 0.0f);
 
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && m_userInterface->getQuitGame())
-				{
-					//setPaused(true);
-					game->changeState(stateType::e_mainMenu);
-					return true;
-				}
-				if (m_input->isPressed(i, XINPUT_GAMEPAD_A) && !m_userInterface->getQuitGame())
-				{
-					m_quitGame = false;
-					m_userInterface->setQuitGame(true);
-				}
-				if (game->getInput()->getThumbLX(i) > 0.2f && !game->getInput()->isBlocked(i))
-				{
-					m_userInterface->quitGameHI(RIGHT);
-					game->getInput()->setBlocked(i, true);
-				}
-				if (game->getInput()->getThumbLX(i) < -0.2f && !game->getInput()->isBlocked(i))
-				{
-					m_userInterface->quitGameHI(LEFT);
-					game->getInput()->setBlocked(i, true);
-				}
+			if (m_input->isPressed(m_quitGame, XINPUT_GAMEPAD_A) && m_userInterface->getQuitGame())
+			{
+				game->changeState(stateType::e_mainMenu);
+				return true;
 			}
-
+			if (m_input->isPressed(m_quitGame, XINPUT_GAMEPAD_A) && !m_userInterface->getQuitGame())
+			{
+				m_quitGame = -1;
+				m_userInterface->setQuitGame(true);
+			}
+			if (m_input->isPressed(m_quitGame, XINPUT_GAMEPAD_B))
+			{
+				m_quitGame = -1;
+				m_userInterface->setQuitGame(true);
+			}
+			if (game->getInput()->getThumbLX(m_quitGame) > 0.2f && !game->getInput()->isBlocked(m_quitGame))
+			{
+				m_userInterface->quitGameHI(LEFT);
+				game->getInput()->setBlocked(m_quitGame, true);
+			}
+			if (game->getInput()->getThumbLX(m_quitGame) < -0.2f && !game->getInput()->isBlocked(m_quitGame))
+			{
+				m_userInterface->quitGameHI(RIGHT);
+				game->getInput()->setBlocked(m_quitGame, true);
+			}
 		}
 	}
 	return false;
@@ -676,7 +679,7 @@ GameState::GameState(Game* game)
 	m_sawInterval = 0.0f;
 
 	// Quit Game
-	m_quitGame = false;
+	m_quitGame = -1;
 
 	// Win game
 	m_winGame = false;
@@ -762,8 +765,8 @@ void GameState::firstTimeSetUp(Game* game)
 	DX::getInstance()->getCam()->setLookAt({0.0f, 0.0f, 0.0f});
 
 	m_robots = game->getRobots();
-	m_quitGame = false;
 	m_winGame = false;
+	m_quitGame = -1;
 
 	//// Create user interface (based on number of players) ////
 	int nrOfPlayers = 0;
@@ -796,9 +799,11 @@ void GameState::firstTimeSetUp(Game* game)
 		XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
 		XMVectorSet(120.0f, 2.0f, 50.0f, 0)
 	};
+	
 
-	for (int i = 0; i < XUSER_MAX_COUNT; i++)
-	{
+
+	m_userInterface->adjustForScreen();
+}
 		if (m_robots[i] != nullptr)
 		{
 			m_robots[i]->setDrawn(true);
@@ -808,19 +813,16 @@ void GameState::firstTimeSetUp(Game* game)
 	}
 }
 
-
-
-
 void GameState::handleInput(Game* game)
 {
 }
 
 bool GameState::update(Game* game, float dt)
 {
-	if (m_quitGame)
+	if (m_quitGame != -1)
 		m_userInterface->updateQuitGame(dt);
 	// Countdown
-	if (m_userInterface->updateCountDown(dt) || m_quitGame)
+	if (m_userInterface->updateCountDown(dt) || m_quitGame != -1)
 		dt = 0.0f;
 	// Winning
 	if (m_winGame)
@@ -838,8 +840,6 @@ bool GameState::update(Game* game, float dt)
 		return 0;
 	game->updatePlayerStatus();
 	m_robots[3];
-	// Update sounds
-	Sound::getInstance()->update(dt);
 
 	// Update dynamic camera
 	updateDynamicCamera(dt);
@@ -852,8 +852,13 @@ bool GameState::update(Game* game, float dt)
 
 	// Update billboards
 	m_billboardHandler.updateBillboards(dt);
+
 	for (int j = 0; j < 4; j++)
 	{
+		// Update pathfinding
+		if (Graph::getInstance()->getActive(j))
+			Graph::getInstance()->updatePulse(j, dt);
+
 		if (m_robots[j] != nullptr && m_robots[j]->isDrawn() && m_robots[j]->isAi())
 		{
 			XMVECTOR closestDelta = m_robots[j]->getAIRotation();
@@ -905,7 +910,7 @@ bool GameState::update(Game* game, float dt)
 			}
 
 			// Interpolate it.
-			float value = (degree + ((newDegree - degree) * 0.3f));
+			float value = (degree + ((newDegree - degree) * 0.1f));
 
 			// Wrap it..
 			float rangeZero = 360;
@@ -952,7 +957,7 @@ bool GameState::update(Game* game, float dt)
 				}
 				else
 				{
-					int tierList[9] = { 2, 7, 4, 1, 5, 0, 6, 3, 8 };
+					int tierList[8] = { 6, 3, 1, 4, 0, 5, 2, 7};
 					float highestResource = -10000;
 					int highestIndex = -1;
 					for (int i = 0; i < m_resources.size(); i++)
@@ -1056,7 +1061,7 @@ bool GameState::update(Game* game, float dt)
 									int resourceIndex = m_robots[i]->getResourceIndex();
 									if (m_robots[i]->damagePlayer(m_robots[j]->getWeapons()[m_robots[j]->getCurrentWeapon(RIGHT)]->getDamage(), end - start, -1))
 									{
-										if (m_robots[i]->isAi())
+										if (!m_robots[i]->isAi())
 											m_input->setVibration(i, 0.5f);
 
 										if (resourceIndex != -1)
@@ -1076,8 +1081,7 @@ bool GameState::update(Game* game, float dt)
 	}
 	m_updateMission = false;
 
-	// Projectile movement
-	ProjectileBank::getInstance()->moveProjectiles(dt);
+
 
 	Robot** robots = game->getRobots();
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
@@ -1218,7 +1222,7 @@ bool GameState::update(Game* game, float dt)
 
 		// Test collision
 		CollisionInfo collisionInfo;
-		XMVECTOR nextPos = projectile->getPosition() + (projectile->getDirection() * projectile->getVelocity() * dt * 2.0f);
+		XMVECTOR nextPos = projectile->getPosition() + (projectile->getDirection() * (projectile->getVelocity() * dt * 2));
 		//CollisionInfo collisionInfo = game->getQuadtree()->testCollision(projectileBD);
 		XMFLOAT2 start, end;
 		start.x = XMVectorGetX(projectile->getPosition());
@@ -1226,6 +1230,7 @@ bool GameState::update(Game* game, float dt)
 		end.x = XMVectorGetX(nextPos);
 		end.y = XMVectorGetZ(nextPos);
 		float t = game->getQuadtree()->testCollisionT(start, end);
+		float dist = XMVectorGetX(XMVector2Length(XMLoadFloat2(&start) - XMLoadFloat2(&end)));
 		// Remove based on conditions
 		if (t != -1.0f) // collisionInfo.m_colliding && 
 		{
@@ -1327,8 +1332,6 @@ bool GameState::update(Game* game, float dt)
 								}
 
 								m_robots[j]->damagePlayer(ProjectileBank::getInstance()->getList()[i]->getDamage(), ProjectileBank::getInstance()->getList()[i]->getDirection(), i, false);
-								
-								ProjectileBank::getInstance()->getList()[i]->explode();
 							}
 
 						}
@@ -1356,7 +1359,8 @@ bool GameState::update(Game* game, float dt)
 			}
 		}
 	}
-
+	// Projectile movement
+	ProjectileBank::getInstance()->moveProjectiles(dt);
 	for (int i = 0; i < m_resources.size(); i++)
 	{
 		m_resources[i]->updateTime(dt);
@@ -1430,7 +1434,7 @@ void GameState::draw(Game* game, renderPass pass)
 	// User interface
 	if (pass == renderPass::e_userInterface)
 	{
-		if (!m_quitGame)
+		if (m_quitGame == -1)
 		{
 			m_userInterface->draw(); // Draw player box
 
@@ -1441,8 +1445,10 @@ void GameState::draw(Game* game, renderPass pass)
 					int size = (int)m_robots[i]->getWeapons().size();
 					for (int j = 0; j < size; j++)
 					{
-						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE) // TODO: fix this bugg
+						if (m_robots[i]->getWeapons()[j]->getType() != RIFLE)
 							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), m_robots[i]->getWeapons()[j]->getCD());
+						else
+							m_userInterface->drawAbility(m_robots[i]->getRobotID(), m_robots[i]->getWeapons()[j]->getType(), 0);
 						m_userInterface->drawHealthbar(m_robots[i]->getRobotID(), m_robots[i]->getHealth() / 100.0f);
 					}
 				}
@@ -1579,6 +1585,8 @@ void GameState::draw(Game* game, renderPass pass)
 			0.0f, 0.0f, 0.0f, 0.0f,
 		};
 
+		objectData relPosData;
+		
 		for (int i = 0; i < m_resources.size(); i++)
 		{
 			int resType = m_resources[i]->getType();
@@ -1612,13 +1620,15 @@ void GameState::draw(Game* game, renderPass pass)
 				break;
 
 			case MOVEMENT:
+				relPosData.pos = XMVectorSet(0, 0.3f, 1.5f, 0);
 				game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 0, 1, 6);
-				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 6);
+				game->getPreLoader()->draw(objectType::e_resource, relPosData, m_resources[i]->getData(), 0, 0, 6, false);
 				break;
 
 			case DASH:
+				relPosData.pos = XMVectorSet(0, -1.0f, 0.8f, 0);
 				game->getPreLoader()->setSubModelData(objectType::e_resource, tempData, 0, 1, 7);
-				game->getPreLoader()->draw(objectType::e_resource, m_resources[i]->getData(), 0, 0, 7);
+				game->getPreLoader()->draw(objectType::e_resource, relPosData, m_resources[i]->getData(), 0, 0, 7, false);
 				break;
 
 			default:

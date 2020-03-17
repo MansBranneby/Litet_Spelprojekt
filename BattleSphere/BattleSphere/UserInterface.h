@@ -2,6 +2,7 @@
 
 #include "UI_Element.h"
 #include "ConstantBuffer.h"
+#include "Sound.h"
 
 #define PLAYER_BG_PAD 110.4f
 #define PLAYER_BG_H 115.0f
@@ -38,6 +39,7 @@ public:
 	void setSlotID(int playerIndex, int abilityType);
 	void setSlotID(int playerIndex, int abilityType, int side, int next, int nextNext);
 
+	void adjustForScreen();
 	void update();
 	bool updateCountDown(float dt);
 	bool updateWinning(float dt, int playerIndex);

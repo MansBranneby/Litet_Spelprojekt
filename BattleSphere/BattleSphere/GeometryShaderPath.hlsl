@@ -16,7 +16,7 @@ void GS_main(
 )
 {
 	float3 direction = normalize(input[1].xyz - input[0].xyz);
-	float4 right = float4(cross(direction, float3(0, 1, 0)), 0.0f) * 0.4f;//or left idk lol left handed system :) :gun:
+	float4 right = float4(cross(direction, float3(0, 1, 0)), 0.0f) * 0.6f;//or left idk lol left handed system :) :gun:
 
 	GSOutput element[4];
 	element[0].posWC = input[1] - right;//+ float4(-1, 0, 1, 0);//-right;

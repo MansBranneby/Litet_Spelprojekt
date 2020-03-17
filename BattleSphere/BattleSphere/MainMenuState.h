@@ -7,17 +7,18 @@
 
 const XMVECTOR ROBOT_START_POS[4]
 {
-	XMVectorSet(-85.0f, 2.0f, 50.0f, 0),
+	XMVectorSet(-75.0f, 2.0f, -15.0f, 0),
 	XMVectorSet(100.0f, 2.0f, -50.0f, 0),
-	XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
-	XMVectorSet(120.0f, 2.0f, 50.0f, 0)
+	XMVectorSet(-10.0f, 2.0f, -70.0f, 0),
+	XMVectorSet(30.0f, 2.0f, 50.0f, 0)
 };
 
 enum class MenuState
 {
 	e_mainMenu,
 	e_robotSelection,
-	e_optionsMenu
+	e_optionsMenu,
+	e_howToPlay
 };
 enum class ActiveMainMenu
 {
@@ -39,6 +40,7 @@ class MainMenuState : public State
 private:
 	std::vector<UI_Element*> m_uiElements;
 	std::vector<UI_Element*> m_optionElements;
+	std::vector<UI_Element*> m_howToPlayElements;
 	std::vector<UI_Element*> m_resolutionElements;
 	std::vector<XMFLOAT2> m_resolutions;
 	bool m_fullscreen;
@@ -70,10 +72,12 @@ public:
 	bool hi_mainMenu(Game* game);
 	void hi_robotSelection(Game* game);
 	void hi_options(Game* game);
+	void hi_howToPlay(Game* game);
 
 	void u_mainMenu(Game* game, float dt);
 	void u_robotSelection(Game* game, float dt);
 	void u_options(Game* game, float dt);
+	void u_howToPlay(Game* game, float dt);
 
 	void pause();
 	void resume();
