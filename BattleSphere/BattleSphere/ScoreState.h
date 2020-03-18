@@ -11,6 +11,7 @@
 #include "Sound.h"
 #include "BillboardHandler.h"
 #include "Node.h"
+#include "UserInterface.h"
 
 class ScoreState : public State
 {
@@ -22,6 +23,7 @@ private:
 	BillboardHandler m_billboardHandler;
 	Lights* m_lights;
 	Transparency m_transparency;
+	UserInterface* m_userInterface;
 
 	// Spawning
 	SpawnDrone* m_spawnDrone;
@@ -47,8 +49,8 @@ private:
 	std::vector<int> m_collidedPlatforms;
 	float m_scoreTimer;
 	float m_scoreTimerAcceleration;
-	bool updateScoreScorePlatforms(Game* game);
-
+	bool updatePlatforms(Game* game, float dt);
+	float m_rotation;
 
 	void handleMovement(Game* game, float dt, int id);
 	void handleInputs(Game* game, float dt);
@@ -59,9 +61,11 @@ public:
 
 	void pause();
 	void resume();
+	void reset();
 
 	void firstTimeSetUp(Game* game);
 	void handleInput(Game* game);
+	void handleCollision(Game* game);
 	bool update(Game* game, float dt);
 	void draw(Game* game, renderPass pass = renderPass::e_scene);
 };

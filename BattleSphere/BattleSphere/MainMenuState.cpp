@@ -834,7 +834,6 @@ void MainMenuState::u_robotSelection(Game* game, float dt)
 				game->getRobots()[i]->storePositionInHistory(ROBOT_START_POS[game->getRobots()[i]->getRobotID()]);
 			}
 		}
-		//setPaused(true);
 		game->changeState(stateType::e_gameState);
 	}
 

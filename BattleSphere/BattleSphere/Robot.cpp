@@ -45,6 +45,15 @@ Robot::Robot(int playerId)
 	m_timeSinceParticles = 0.0f;
 }
 
+Robot::~Robot()
+{
+	for (int i = 0; i < m_weapons.size(); ++i)
+		delete m_weapons[i];
+	m_weapons.clear();
+
+	if (m_positionHistory) delete[] m_positionHistory;
+}
+
 bool Robot::isAi()
 {
 	return m_isAi;
@@ -599,8 +608,6 @@ void Robot::reset()
 	m_health = 100;
 	m_vel = XMVectorSet(0, 0, 0, 0);
 	m_currentRotation = 0.0;
-	m_currentWeapon[LEFT] = -1;
-	m_currentWeapon[RIGHT] = 0;
 	m_nextW = -1;
 	m_nextnextW = -1;
 	m_resource = -1;
@@ -615,13 +622,7 @@ void Robot::reset()
 	m_material.emission = XMVectorSet(0.0, 0.0, 0.0, -1);
 	m_colour = XMVectorSet(1.0, 1.0, 1.0, -1);
 	m_vel = XMVectorSet(0, 0, 0, 0);
-
-	// Position history
-	m_positionHistorySize = 0;
-	m_positionHistoryCap = 100;
-	m_positionHistoryPtr = 0;
-	m_positionHistory = new DirectX::XMVECTOR[m_positionHistoryCap];
-	m_positionHistory[m_positionHistoryCap - 1] = getPosition();
+	m_score = 0;
 
 	// Particles
 	m_timeSinceParticles = 0.0f;
@@ -632,12 +633,26 @@ void Robot::reset()
 
 void Robot::release()
 {
-	// TODO realease resource?
+	 //TODO realease resource?
 	for (int i = 0; i < m_weapons.size(); i++)
 	{
-		delete m_weapons[i];
+		if(m_weapons[i]) delete m_weapons[i];
 	}
 	m_weapons.clear();
+}
 
-	delete[] m_positionHistory;
+void Robot::releaseScoreState()
+{
+	m_health = 100;
+	m_vel = XMVectorSet(0, 0, 0, 0);
+	m_currentRotation = 0.0;
+	m_nextW = -1;
+	m_nextnextW = -1;
+	m_resource = -1;
+	m_currentWeapon[LEFT] = -1;
+	m_currentWeapon[RIGHT] = 0;
+	Weapon* rifle = new Weapon(RIFLE);
+	m_weapons.push_back(rifle);
+	m_ready = true;
+	m_time = 0;
 }

@@ -30,24 +30,24 @@ BillboardHandler::BillboardHandler(PreLoader* preLoader, std::vector<objectType>
 				m_numberBillboards.push_back(m_billboards[i]);
 				std::rotate(m_numberBillboards.rbegin(), m_numberBillboards.rbegin() + 1, m_numberBillboards.rend());
 				break;
+			case objectType::e_ranking_billboard:
+				m_rankingBillboards.push_back(m_billboards[i]);
+				std::rotate(m_rankingBillboards.rbegin(), m_rankingBillboards.rbegin() + 1, m_rankingBillboards.rend());
+				break;
 			case objectType::e_static_billboard:
 				m_staticBillboards.push_back(m_billboards[i]);
 				break;
 			case objectType::e_static_billboard_score_platform:
 				m_staticBillboardPlatform.push_back(m_billboards[i]);
 				break;
-
+			case objectType::e_platformbar_billboard:
+				m_platformBarsBillboards.push_back(m_billboards[i]);
+				break;
+			case objectType::e_static_billboard_score:
+				m_staticBillboardScoreRoom.push_back(m_billboards[i]);
+				break;
 		}
 	}
-	
-	//}
-	//// predefined colours
-	//DirectX::XMVECTOR cyan = { 0.0f, 0.4f, 0.3f, 1.0f };
-	//DirectX::XMVECTOR lightblue = {0.0f, 0.3f, 0.4f, 1.0f };
-	//DirectX::XMVECTOR pink = { 1.0f, 0.01f, 0.6f , 1.0f};
-	//DirectX::XMVECTOR lightPink = { 0.6f, 0.2f, 0.5f , 1.0f };
-	//DirectX::XMVECTOR purple = { 0.6f, 0.0f, 0.8f , 1.0f };
-	//DirectX::XMVECTOR darkPurple = { 0.4f, 0.0f, 0.4f , 1.0f };
 }
 
 BillboardHandler::~BillboardHandler()
@@ -71,6 +71,12 @@ std::vector<Billboard> BillboardHandler::getBillboardsOfType(objectType objectTy
 		break;
 	case objectType::e_static_billboard_score_platform:
 		return m_staticBillboardPlatform;
+		break;
+	case objectType::e_platformbar_billboard:
+		return m_platformBarsBillboards;
+		break;
+	case objectType::e_static_billboard_score:
+		return m_staticBillboardScoreRoom;
 		break;
 	}
 
