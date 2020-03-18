@@ -157,6 +157,7 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_number_billboard, "ScoreRoom\\ScoreRoomNumbers");
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoomTVs");
 	loadFromFile(objectType::e_score_scene, "ScoreRoom\\ScoreRoom");
+	loadFromFile(objectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomWalls", "ScoreRoomWallsColl");
 	//ObjectType::e_static_billboard_score
 
 	// Static billboards
@@ -165,7 +166,6 @@ PreLoader::PreLoader()
 	loadFromFile(objectType::e_static_billboard, "Background\\SS1", "SS1Coll");
 	loadFromFile(objectType::e_static_billboard, "Background\\SS3", "SS3Coll");
 	loadFromFile(objectType::e_static_billboard, "Background\\SS4", "SS4Coll");
-	loadFromFile(objectType::e_static_billboard_score, "ScoreRoom\\ScoreRoomWalls", "ScoreRoomWallsColl");
 	// Background
 
 	loadFromFile(objectType::e_scene, "OnMap\\ChinaTownInt");

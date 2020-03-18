@@ -643,7 +643,9 @@ GameState::GameState(Game* game)
 	m_lights->addPointLight(-67, 12, -1.6f, 50, 1, 1, 0.6f, 15);
 
 	// ScoreScreen
-	m_lights->addPointLight(45.0f, 130.0f, -330.0f, 100.0f, 0, 0.46f, 0.6f, 15);
+	m_lights->addPointLight(80.0f, 105.0f, -305.0f, 50.0f, 0, 0.46f, 0.6f, 10.0f);
+	m_lights->addPointLight(15.0f, 105.0f, -305.0f, 30.0f, 0, 0.46f, 0.6f, 10.0f);
+	m_lights->addPointLight(45.0f, 130.0f, -260.0f, 30.0f, 0, 0.46f, 0.6f, 10.0f);
 
 	// Initialize dynamic camera
 	m_zoomingOutToStart = false;

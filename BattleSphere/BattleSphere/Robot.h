@@ -54,6 +54,7 @@ private:
 	void deathAnimation();
 public:
 	Robot(int playerId);
+	~Robot();
 	//Robot(QuadtreeNode* qtn); Add
 	bool isAi();
 	void updateAIWeapon(bool seePlayer);

@@ -28,14 +28,12 @@ UserInterface::UserInterface(int nrOfPlayers)
 
 		// Winner has been chosen (transition from gamestate to scorestate)
 		m_winningTimer = 0.0f;
-		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.0f));
+		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.1f));
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_1.png", false, -12.0f, -13.0f, 610.0f, 166.0f));
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_2.png", false, -12.0f, 69.0f, 629.0f, 581.0f));
 		m_blackScreenFadeTimer = 0.0f;
 		m_BlackScreenElement = new UI_Element(L"Textures\\GameState\\BlackScreen.png", true, 0.0f, 0.0f, 1920.0f, 1080.0f);
 
-		for (int i = 0; i < nrOfPlayers; i++)
-			m_playerColours[i] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 		m_constantBufferColours = new ConstantBuffer(&m_playerColours[0], sizeof(XMVECTOR));
 
 		m_nrOfPlayers = nrOfPlayers;
@@ -44,7 +42,7 @@ UserInterface::UserInterface(int nrOfPlayers)
 	{
 		// Winner has been chosen (transition from gamestate to scorestate)
 		m_winningTimer = 0.0f;
-		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 98.0f));
+		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_0.png", false, 0.0f, 0.0f, 562.0f, 97.0f));
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_1.png", false, -12.0f, -13.0f, 610.0f, 166.0f));
 		m_winnerElements.push_back(new UI_Element(L"Textures\\GameState\\Winner_2.png", false, -12.0f, 69.0f, 629.0f, 581.0f));
 		m_blackScreenFadeTimer = 0.0f;
@@ -451,7 +449,7 @@ bool UserInterface::updateWinning(float dt, int playerIndex)
 {
 	m_winningTimer += dt;
 
-	if (m_winningTimer < 8.0f)
+	if (m_winningTimer < 6.0f)
 	{
 		if (!m_winnerElements[0]->isDrawn())
 		{
@@ -467,7 +465,7 @@ bool UserInterface::updateWinning(float dt, int playerIndex)
 		m_winnerElements[1]->updateElement(dt);
 		m_winnerElements[2]->updateElement(dt);
 
-		if (m_winningTimer > 6.0f)
+		if (m_winningTimer > 4.0f)
 		{
 			m_BlackScreenElement->setDrawn(true);
 			m_BlackScreenElement->fadeIn(2.0f, 0.0f);
@@ -510,6 +508,7 @@ void UserInterface::setQuitGame(bool quitGame)
 	m_quitGameElements[2]->setPos(0.0f, -100.0f);
 	m_quitGameElements[3]->setPos(-250.0f, -100.0f);
 	m_quitGameElements[2]->setAbsDestinationX(0.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
+	m_quitGameElements[3]->setAbsDestinationX(-250.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
 	m_quitGameElements[3]->setAbsDestinationX(-250.0f, 10000.0f, 2.0f, 0.0f, 0.0f);
 }
 

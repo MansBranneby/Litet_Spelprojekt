@@ -209,7 +209,14 @@ void Game::changeState(stateType state)
 					ProjectileBank::getInstance()->release();
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
-						if (m_robots[j] != nullptr) m_robots[i]->releaseScoreState();
+					{
+						if (m_robots[j] != nullptr)
+						{
+							m_robots[i]->release();
+							m_robots[i]->releaseScoreState();
+						}
+
+					}
 
 					break;
 				}
@@ -227,6 +234,12 @@ void Game::changeState(stateType state)
 				{
 					m_states[i]->setPaused(true);
 
+					if (DX::getInstance()->getParticles())
+					{
+						delete DX::getInstance()->getParticles();
+						DX::getInstance()->initializeParticles();
+					}
+			
 					ScoreState* s = dynamic_cast<ScoreState*>(m_states[i]);
 					if (s != nullptr)
 						s->reset();
@@ -234,10 +247,11 @@ void Game::changeState(stateType state)
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
 					{
+						Graph::getInstance()->reset(j);
 						if (m_robots[j] != nullptr)
 						{
-							m_robots[j]->release();
 							m_robots[j]->reset();
+							m_robots[j]->release();
 						}
 					}
 					break;
@@ -256,7 +270,14 @@ void Game::changeState(stateType state)
 						s->reset();
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
-						if (m_robots[j] != nullptr) m_robots[i]->releaseScoreState();
+					{
+						if (m_robots[j] != nullptr)
+						{
+							m_robots[j]->release();
+							m_robots[j]->releaseScoreState();
+						}
+
+					}
 
 					ProjectileBank::getInstance()->release();
 					break;
