@@ -65,6 +65,10 @@ private:
 	// Quit Game
 	int m_quitGame;
 
+	// Win game
+	bool m_winGame;
+	int m_winnerIndex;
+
 public:
 	GameState(Game* game);
 	~GameState();

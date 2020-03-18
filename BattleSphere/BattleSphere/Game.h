@@ -38,7 +38,6 @@ private:
 public:
 	
 	Game();
-
 	bool update(float dt);
 	//void updateSec();
 	void draw(renderPass pass = renderPass::e_scene);
