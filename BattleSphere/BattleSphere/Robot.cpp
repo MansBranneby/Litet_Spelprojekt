@@ -654,6 +654,7 @@ void Robot::releaseScoreState()
 	m_currentWeapon[RIGHT] = 0;
 	Weapon* rifle = new Weapon(RIFLE);
 	m_weapons.push_back(rifle);
+	m_currentMission.index = 0;
 	m_ready = true;
 	m_time = 0;
 }
