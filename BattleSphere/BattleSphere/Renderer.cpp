@@ -730,12 +730,12 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 					DX::getInstance()->getDeviceContext()->PSSetShaderResources(0, 1, &nullSRV);
 				}
 
-				ImGui_ImplDX11_NewFrame();
-				ImGui_ImplWin32_NewFrame();
-				ImGui::NewFrame();
-				ImGui::Begin("Settings");
+				//ImGui_ImplDX11_NewFrame();
+				//ImGui_ImplWin32_NewFrame();
+				//ImGui::NewFrame();
+				//ImGui::Begin("Settings");
 
-				ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
+				//ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
 				//ImGui::ColorPicker4("Pick a color", moonColor);
 				//ImGui::SliderFloat("Rotation: ", &speed, 0, 10);
 				//ImGui::SliderFloat("Intensity: ", &intensity, 0, 100);
@@ -743,9 +743,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 				ImGui::SliderFloat("Pos Z: ", &positions[1], -200, 200);
 				Lights::getInstance()->setPosition(tempIndex, positions[0], 5, positions[1]);*/
 
-				ImGui::End();
-				ImGui::Render();
-				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+				//ImGui::End();
+				//ImGui::Render();
+				//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 				DX::getInstance()->getSwapChain()->Present(0, 0);
 
 				counterFrames++;

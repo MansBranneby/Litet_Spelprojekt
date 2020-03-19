@@ -133,6 +133,8 @@ void Game::changeState(stateType state)
 	if (state == stateType::e_mainMenu)
 	{
 		Sound::getInstance()->play(soundMusic::e_menu, 0.15f);
+		//Sound::getInstance()->stop(soundMusic::e_game);
+		//Sound::getInstance()->stop(soundAmbient::e_background);
 	}
 	if (state == stateType::e_gameState)
 	{
@@ -234,6 +236,9 @@ void Game::changeState(stateType state)
 				{
 					m_states[i]->setPaused(true);
 
+					Sound::getInstance()->stop(soundMusic::e_game);
+					Sound::getInstance()->stop(soundAmbient::e_background);
+
 					if (DX::getInstance()->getParticles())
 					{
 						delete DX::getInstance()->getParticles();
@@ -250,8 +255,8 @@ void Game::changeState(stateType state)
 						Graph::getInstance()->reset(j);
 						if (m_robots[j] != nullptr)
 						{
-							m_robots[j]->reset();
 							m_robots[j]->release();
+							m_robots[j]->reset();
 						}
 					}
 					break;

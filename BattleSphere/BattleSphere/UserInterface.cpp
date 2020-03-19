@@ -382,7 +382,7 @@ bool UserInterface::updateCountDown(float dt)
 	{
 		if (m_countDownElements[3]->isDrawn())
 		{
-			Sound::getInstance()->play(soundUI::e_countdown, 1.0f);
+			Sound::getInstance()->play(soundUI::e_countdown, 0.4f);
 			m_countDownElements[3]->setDrawn(false);
 		}
 		return false;
@@ -409,7 +409,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[1]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[1]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[1]->setDrawn(true);
-				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
+				Sound::getInstance()->play(soundUI::e_countdown, 0.4f, -0.5f);
 			}
 			m_countDownElements[1]->setPos(0.0f, 0.0f, m_countDownTimer - 1.0f);
 			m_countDownElements[1]->updateElement(dt);
@@ -422,7 +422,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[0]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[0]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[0]->setDrawn(true);
-				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
+				Sound::getInstance()->play(soundUI::e_countdown, 0.4f, -0.5f);
 			}
 			m_countDownElements[0]->setPos(0.0f, 0.0f, m_countDownTimer - 2.0f);
 			m_countDownElements[0]->updateElement(dt);
@@ -435,7 +435,7 @@ bool UserInterface::updateCountDown(float dt)
 				m_countDownElements[3]->fadeIn(0.8f, 0.0f);
 				m_countDownElements[3]->fadeOut(0.1f, 0.9f);
 				m_countDownElements[3]->setDrawn(true);
-				Sound::getInstance()->play(soundUI::e_countdown, 1.0f, -0.5f);
+				Sound::getInstance()->play(soundUI::e_countdown, 0.4f, -0.5f);
 			}
 			m_countDownElements[3]->setPos(0.0f, 0.0f, (m_countDownTimer - 3.0f));
 			m_countDownElements[3]->updateElement(dt);
