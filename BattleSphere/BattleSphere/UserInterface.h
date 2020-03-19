@@ -42,7 +42,7 @@ public:
 	void adjustForScreen();
 	void update();
 	bool updateCountDown(float dt);
-	bool updateWinning(float dt, int playerIndex);
+	bool updateWinning(float dt);
 	bool updateScoreWinning(float dt);
 	void updateQuitGame(float dt);
 	void setQuitGame(bool quitGame);
@@ -51,7 +51,7 @@ public:
 	void drawAbility(int playerIndex, int abilityType, float cd);
 	void drawHealthbar(int playerIndex, float hp);
 	void drawQuitGame();
-	void drawWinning(int playerIndex);
+	void drawWinning(XMVECTOR winnerColour);
 	void drawBlackScreen();
 
 	bool getQuitGame();

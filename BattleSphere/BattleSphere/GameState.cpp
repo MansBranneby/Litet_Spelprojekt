@@ -830,7 +830,7 @@ bool GameState::update(Game* game, float dt)
 	// Winning
 	if (m_winGame)
 	{
-		if (m_userInterface->updateWinning(dt, m_winnerIndex))
+		if (m_userInterface->updateWinning(dt))
 		{
 			game->changeState(stateType::e_scoreState); // Change state to ScoreState
 			return true;
@@ -1463,7 +1463,7 @@ void GameState::draw(Game* game, renderPass pass)
 		}
 
 		if (m_winGame)
-			m_userInterface->drawWinning(m_winnerIndex);
+			m_userInterface->drawWinning(m_robots[m_winnerIndex]->getColour());
 	}
 
 	if (pass == renderPass::e_opaque || pass == renderPass::e_shadow)

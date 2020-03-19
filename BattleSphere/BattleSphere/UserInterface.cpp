@@ -447,7 +447,7 @@ bool UserInterface::updateCountDown(float dt)
 	}
 }
 
-bool UserInterface::updateWinning(float dt, int playerIndex)
+bool UserInterface::updateWinning(float dt)
 {
 	m_winningTimer += dt;
 
@@ -643,7 +643,7 @@ void UserInterface::drawQuitGame()
 	m_quitGameElements[3]->draw();
 }
 
-void UserInterface::drawWinning(int playerIndex)
+void UserInterface::drawWinning(XMVECTOR winnerColour)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedMemory;
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
@@ -653,7 +653,7 @@ void UserInterface::drawWinning(int playerIndex)
 	m_winnerElements[2]->draw();
 
 	DX::getInstance()->getDeviceContext()->Map(*m_constantBufferColours->getConstantBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMemory);
-	memcpy(mappedMemory.pData, &m_playerColours[playerIndex], sizeof(XMVECTOR));
+	memcpy(mappedMemory.pData, &winnerColour, sizeof(XMVECTOR));
 	DX::getInstance()->getDeviceContext()->Unmap(*m_constantBufferColours->getConstantBuffer(), 0);
 
 	m_winnerElements[1]->draw();
