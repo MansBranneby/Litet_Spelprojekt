@@ -16,7 +16,7 @@ Sound::Sound()
 	m_ui[(int)soundUI::e_traverse] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/traverse.wav");
 	m_ui[(int)soundUI::e_front] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/accept.wav");
 	m_ui[(int)soundUI::e_back] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/back.wav");
-	m_ui[(int)soundUI::e_countdown] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/countdown.wav");
+	m_ui[(int)soundUI::e_countdown] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/countdown5.wav");
 
 	m_effect[(int)soundEffect::e_rifle] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/quickshot.wav");
 	m_effect[(int)soundEffect::e_movement] = std::make_unique<SoundEffect>(m_audEngine.get(), L"Sounds/movement.wav");
