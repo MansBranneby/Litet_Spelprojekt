@@ -201,6 +201,11 @@ void Game::changeState(stateType state)
 						{
 							m_robots[j]->release();
 							m_robots[j]->reset();
+							if (m_robots[j]->isAi())
+							{
+								delete m_robots[j];
+								m_robots[j] = nullptr;
+							}
 						}
 					}
 					break;
@@ -266,6 +271,11 @@ void Game::changeState(stateType state)
 						{
 							m_robots[j]->release();
 							m_robots[j]->reset();
+							if (m_robots[j]->isAi())
+							{
+								delete m_robots[j];
+								m_robots[j] = nullptr;
+							}
 						}
 					}
 					break;
