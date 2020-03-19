@@ -511,6 +511,8 @@ void MainMenuState::hi_robotSelection(Game* game)
 					leaveColour(k);
 					game->getRobots()[k]->setAi(false);
 					game->getRobots()[k]->setRobotID(-1);
+					delete game->getRobots()[k];
+					game->getRobots()[k] = nullptr;
 					m_uiElements[robNrPlus9]->setDrawn(true);
 					m_uiElements[robNrPlus13]->setDrawn(false); // Press A -> Ready A
 					m_readyState[robotNr] = 0;

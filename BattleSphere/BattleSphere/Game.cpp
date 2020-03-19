@@ -52,9 +52,18 @@ void Game::updatePlayerStatus()
 			robot->setPosition(XMVectorSet(-1000, 0, 0, 1));
 			m_robots[i] = robot;
 			m_robots[i]->setDrawn(false);
-			m_nrOfPlayers++;
+			//m_nrOfPlayers++;
 		}
 	}
+	int counter = 0;
+	for (int i = 0; i < XUSER_MAX_COUNT; i++)
+	{
+		if (m_robots[i] != nullptr && !m_robots[i]->isAi())
+		{
+			counter++;
+		}
+	}
+	m_nrOfPlayers = counter;
 }
 
 Robot** Game::getRobots()
@@ -273,6 +282,12 @@ void Game::changeState(stateType state)
 					ScoreState* s = dynamic_cast<ScoreState*>(m_states[i]);
 					if (s != nullptr)
 						s->reset();
+
+					if (DX::getInstance()->getParticles())
+					{
+						delete DX::getInstance()->getParticles();
+						DX::getInstance()->initializeParticles();
+					}
 
 					for (int j = 0; j < XUSER_MAX_COUNT; j++)
 					{

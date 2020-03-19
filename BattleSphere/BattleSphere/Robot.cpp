@@ -629,6 +629,7 @@ void Robot::reset()
 	m_currentMission.index = 0;
 
 	setPosition(-100, 0, 0);
+	setDrawn(false);
 }
 
 void Robot::release()
