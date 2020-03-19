@@ -798,10 +798,10 @@ void GameState::firstTimeSetUp(Game* game)
 	//Spawn AI:s
 	const XMVECTOR ROBOT_START_POS[4]
 	{
-		XMVectorSet(-85.0f, 2.0f, 50.0f, 0),
+		XMVectorSet(-75.0f, 2.0f, -15.0f, 0),
 		XMVectorSet(100.0f, 2.0f, -50.0f, 0),
-		XMVectorSet(-85.0f, 2.0f, -50.0f, 0),
-		XMVectorSet(120.0f, 2.0f, 50.0f, 0)
+		XMVectorSet(-10.0f, 2.0f, -70.0f, 0),
+		XMVectorSet(30.0f, 2.0f, 50.0f, 0)
 	};
 
 	for (int i = 0; i < XUSER_MAX_COUNT; i++)
