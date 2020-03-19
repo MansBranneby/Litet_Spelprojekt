@@ -67,7 +67,7 @@ HWND GraphicResources::initWindow(HINSTANCE hInstance)
 	wcex.hInstance = hInstance;
 	wcex.lpszClassName = L"BattleSphere";
 	if (!RegisterClassEx(&wcex))
-		return false;
+		return 0;
 
 	RECT rc = { 0, 0, (int)DX::getInstance()->getWidth() , (int)DX::getInstance()->getHeight() };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
